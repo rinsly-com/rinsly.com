@@ -37,7 +37,7 @@
     {
       "binding": "D1",
       "database_name": "rinsly",
-      "database_id": "TODO-run-wrangler-d1-create-rinsly",
+      "database_id": "bc3bc7c5-00ec-4071-bfc0-4e294720a431",
       "remote": true,
     },
   ],
