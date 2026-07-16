@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+/*
+ * Rinsly design system — ported from the proposal artifact (Voorstel — Hosting
+ * & Onderhoud). Palette tokens are defined as raw CSS variables on :root so they
+ * can shift with the colour scheme, and the Tailwind `@theme` maps colour
+ * utilities (bg-paper, text-accent, …) onto them. Light + dark are supported via
+ * prefers-color-scheme, with a data-theme override winning in either direction.
+ */
+@theme {
+  --color-paper: var(--paper);
+  --color-card: var(--card);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-hair: var(--hair);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-slate: var(--slate);
+  --color-slate-ink: var(--slate-ink);
+  --color-good: var(--good);
+
+  --radius-pill: 999px;
+
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+:root {
+  --paper: #f4f7f9;
+  --card: #ffffff;
+  --ink: #14212e;
+  --muted: #566573;
+  --hair: #dfe6eb;
+  --accent: #2c7ea8;
+  --accent-soft: #e7f1f7;
+  --slate: #152b3c;
+  --slate-ink: #eaf2f7;
+  --good: #2e7d57;
+  --shadow: 0 1px 2px rgba(21, 43, 60, 0.06), 0 12px 32px -18px rgba(21, 43, 60, 0.3);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #0e1922;
+    --card: #15232f;
+    --ink: #e8eff4;
+    --muted: #8fa1b0;
+    --hair: #24384a;
+    --accent: #4fa8d4;
+    --accent-soft: #12242f;
+    --slate: #1b2e3d;
+    --slate-ink: #eaf2f7;
+    --good: #56c08a;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 40px -20px rgba(0, 0, 0, 0.7);
+  }
+}
+
+:root[data-theme="light"] {
+  --paper: #f4f7f9;
+  --card: #ffffff;
+  --ink: #14212e;
+  --muted: #566573;
+  --hair: #dfe6eb;
+  --accent: #2c7ea8;
+  --accent-soft: #e7f1f7;
+  --slate: #152b3c;
+  --slate-ink: #eaf2f7;
+  --good: #2e7d57;
+  --shadow: 0 1px 2px rgba(21, 43, 60, 0.06), 0 12px 32px -18px rgba(21, 43, 60, 0.3);
+}
+
+:root[data-theme="dark"] {
+  --paper: #0e1922;
+  --card: #15232f;
+  --ink: #e8eff4;
+  --muted: #8fa1b0;
+  --hair: #24384a;
+  --accent: #4fa8d4;
+  --accent-soft: #12242f;
+  --slate: #1b2e3d;
+  --slate-ink: #eaf2f7;
+  --good: #56c08a;
+  --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 16px 40px -20px rgba(0, 0, 0, 0.7);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+/* The soft elevated-card shadow from the proposal, exposed as a utility. */
+.shadow-card {
+  box-shadow: var(--shadow);
+}
+
+/* Smooth in-page anchor scrolling (respecting reduced-motion). */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* Form-success check circle: the circle pops in, then the tick draws itself. */
+@keyframes rinsly-pop {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes rinsly-check-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.rinsly-check-circle {
+  animation: rinsly-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.rinsly-check-path {
+  stroke-dasharray: 26;
+  stroke-dashoffset: 26;
+  animation: rinsly-check-draw 0.4s 0.22s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rinsly-check-circle {
+    animation: none;
+  }
+  .rinsly-check-path {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}

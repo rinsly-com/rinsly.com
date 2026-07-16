@@ -1,0 +1,51 @@
+{
+  // ===========================================================================
+  // Rinsly — single Cloudflare Worker serving the Payload admin + API + the
+  // localized Next.js frontend (SSR), backed by D1 (database) and R2 (media).
+  //
+  // Local `pnpm dev` uses a local SQLite mock via wrangler's platform proxy;
+  // remote bindings are only enabled in production builds (see
+  // getCloudflareContextFromWrangler in payload.config.ts).
+  //
+  // TODO before first deploy (you provide these Cloudflare resources):
+  //   1. wrangler d1 create rinsly           → paste the id into database_id
+  //   2. wrangler r2 bucket create rinsly     (media originals)
+  //   3. Point the rinsly.com custom domain at this worker (routes below).
+  //   4. Edge redirects: rinsly.com/ → /en, rinsly.nl/* → /nl/* (Bulk Redirects
+  //      or a Redirect Rule — not managed here).
+  // ===========================================================================
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rinsly",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-08-15",
+  "compatibility_flags": [
+    // Enable Node.js APIs in the Worker runtime.
+    "nodejs_compat",
+    // Allow the app to fetch public URLs.
+    "global_fetch_strictly_public",
+  ],
+  // Custom domain(s) for the worker. Uncomment once the zone is on Cloudflare.
+  // "routes": [
+  //   { "pattern": "rinsly.com", "custom_domain": true },
+  //   { "pattern": "www.rinsly.com", "custom_domain": true },
+  // ],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS",
+  },
+  "d1_databases": [
+    {
+      "binding": "D1",
+      "database_name": "rinsly",
+      "database_id": "TODO-run-wrangler-d1-create-rinsly",
+      "remote": true,
+    },
+  ],
+  // Media originals stored in R2, served by this worker at /api/media/file/<f>.
+  // payload.config.ts activates the R2 storage adapter once this binding exists.
+  // Production rewrites these URLs through Cloudflare Image Transformations
+  // (/cdn-cgi/image) — enable it on the rinsly.com zone. See src/lib/image.ts.
+  "r2_buckets": [
+    { "binding": "R2", "bucket_name": "rinsly" },
+  ],
+}

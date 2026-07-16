@@ -1,0 +1,26 @@
+diff --git a/dist/postgres/requireDrizzleKit.js b/dist/postgres/requireDrizzleKit.js
+index d5bb5772d511e6ec13f3e903c7bbf4c83711a7a0..a1461399ad0e4055b51c7e553ae6b779e3832f0a 100644
+--- a/dist/postgres/requireDrizzleKit.js
++++ b/dist/postgres/requireDrizzleKit.js
+@@ -1,7 +1,7 @@
+ import { createRequire } from 'module';
+ const require = createRequire(import.meta.url);
+ export const requireDrizzleKit = ()=>{
+-    const { generateDrizzleJson, generateMigration, pushSchema, upPgSnapshot } = require('drizzle-kit/api');
++    const { generateDrizzleJson, generateMigration, pushSchema, upPgSnapshot } = require('drizzle-kit/_api'.replaceAll('_', ''));
+     return {
+         generateDrizzleJson,
+         generateMigration,
+diff --git a/dist/sqlite/requireDrizzleKit.js b/dist/sqlite/requireDrizzleKit.js
+index e2ede3c94a6138c8746f018af01c14cfefbbd920..54c82eebffb14e99a5f2c3045e88c571cd300d6d 100644
+--- a/dist/sqlite/requireDrizzleKit.js
++++ b/dist/sqlite/requireDrizzleKit.js
+@@ -1,7 +1,7 @@
+ import { createRequire } from 'module';
+ const require = createRequire(import.meta.url);
+ export const requireDrizzleKit = ()=>{
+-    const { generateSQLiteDrizzleJson, generateSQLiteMigration, pushSQLiteSchema } = require('drizzle-kit/api');
++    const { generateSQLiteDrizzleJson, generateSQLiteMigration, pushSQLiteSchema } = require('drizzle-kit/_api'.replaceAll('_', ''));
+     return {
+         generateDrizzleJson: generateSQLiteDrizzleJson,
+         generateMigration: generateSQLiteMigration,
