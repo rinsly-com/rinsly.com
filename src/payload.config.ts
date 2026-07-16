@@ -27,6 +27,12 @@ const realpath = (value: string) => (fs.existsSync(value) ? fs.realpathSync(valu
 // Workers runtime and bindings must come from wrangler's platform proxy instead.
 const isCLI = process.argv.some((value) => realpath(value)?.endsWith(path.join('payload', 'bin.js')))
 const isProduction = process.env.NODE_ENV === 'production'
+// True during `next build` (including the build run inside
+// `opennextjs-cloudflare build`). The build must NOT open the remote D1: Next
+// collects page data with several parallel workers, and each one opening the
+// single remote D1 preview session makes Cloudflare return SQLITE_BUSY
+// ("database is locked"). During the build we use a LOCAL binding mock instead.
+const isNextBuild = process.env.NEXT_PHASE === 'phase-production-build'
 
 // Payload's default logger uses pino-pretty, which relies on Node APIs not
 // available in the Workers runtime. In production route logs through console.*.
@@ -50,10 +56,12 @@ const cloudflareLogger = {
   silent: () => {},
 } as any // Use PayloadLogger type when it's exported
 
-// In the Worker we read bindings from the live Cloudflare context. Locally and
-// under the CLI we spin up wrangler's platform proxy so the same config works.
+// The deployed Worker reads live bindings via getCloudflareContext. Local dev,
+// the Payload CLI, and the Next build all use wrangler's platform proxy — but
+// only the CLI (e.g. `payload migrate`) talks to the REAL remote D1; the build
+// uses a local mock (see isNextBuild above).
 const cloudflare =
-  isCLI || !isProduction
+  isCLI || !isProduction || isNextBuild
     ? await getCloudflareContextFromWrangler()
     : await getCloudflareContext({ async: true })
 
@@ -169,7 +177,9 @@ function getCloudflareContextFromWrangler(): Promise<CloudflareContext> {
     ({ getPlatformProxy }) =>
       getPlatformProxy({
         environment: process.env.CLOUDFLARE_ENV,
-        remoteBindings: isProduction,
+        // Remote bindings only for the production Payload CLI (migrations).
+        // Never during the Next build (would lock D1) or local dev.
+        remoteBindings: isProduction && isCLI && !isNextBuild,
       } satisfies GetPlatformProxyOptions),
   )
 }
