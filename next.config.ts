@@ -12,6 +12,12 @@ const nextConfig: NextConfig = {
   // Packages with Cloudflare Workers (workerd) specific code.
   // https://opennext.js.org/cloudflare/howtos/workerd
   serverExternalPackages: ['jose', 'pg-cloudflare'],
+  experimental: {
+    // Page-data collection / prerender workers each open wrangler's local D1
+    // mock; parallel workerd instances race on WAL recovery of the same SQLite
+    // file (SQLITE_BUSY_RECOVERY) and abort the build. Collect serially.
+    cpus: 1,
+  },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
