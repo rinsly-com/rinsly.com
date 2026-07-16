@@ -1,7 +1,7 @@
 import type { Footer, Page } from '@/payload-types'
 import { absoluteUrl, SITE_NAME, SITE_URL } from './siteUrl'
 
-const DEFAULT_DESCRIPTION = 'Rinsly — webontwikkeling & hosting.'
+const DEFAULT_DESCRIPTION = 'Rinsly — webontwikkeling & beheer.'
 
 /** Resolve a populated Media relation to an absolute, crawler-reachable URL. */
 function absoluteMediaUrl(media: unknown): string | undefined {

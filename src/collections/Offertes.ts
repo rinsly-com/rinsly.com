@@ -32,8 +32,9 @@ export const Offertes: CollectionConfig = {
       label: { en: 'Subscription', nl: 'Abonnement' },
       type: 'select',
       options: [
-        { label: { en: 'Basic', nl: 'Basis' }, value: 'basis' },
-        { label: { en: 'Hosting & Maintenance', nl: 'Hosting & Onderhoud' }, value: 'onderhoud' },
+        { label: { en: 'Care', nl: 'Care' }, value: 'care' },
+        { label: { en: 'Fully managed', nl: 'Volledig beheerd' }, value: 'beheerd' },
+        { label: { en: 'Partner', nl: 'Partner' }, value: 'partner' },
         { label: { en: 'Custom', nl: 'Op maat' }, value: 'opmaat' },
       ],
     },

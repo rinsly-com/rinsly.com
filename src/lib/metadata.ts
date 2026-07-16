@@ -5,8 +5,8 @@ import { absoluteUrl, SITE_NAME } from './siteUrl'
 import { localePath, LOCALE_OG, type Locale } from './locale'
 
 const DEFAULT_DESCRIPTION: Record<Locale, string> = {
-  nl: 'Rinsly — webontwikkeling & hosting. Onbezorgd online, up-to-date en veilig.',
-  en: 'Rinsly — web development & hosting. Online without worries, up to date and secure.',
+  nl: 'Rinsly — webontwikkeling & beheer. Onbezorgd online, up-to-date en veilig.',
+  en: 'Rinsly — web development & management. Online without worries, up to date and secure.',
 }
 
 // The SEO plugin's `meta` group. Typed loosely so this helper compiles before

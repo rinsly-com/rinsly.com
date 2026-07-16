@@ -7,8 +7,9 @@
  * Run with:  pnpm seed        (= payload run scripts/seed.ts)
  *
  * Idempotent: re-running rebuilds the home page + globals, deletes any stray
- * non-home pages, and re-publishes. On a fresh DB a dev admin is created:
- * dev@rinsly.local / rinsly-dev.
+ * non-home pages, and re-publishes. On a fresh DB an admin is created from
+ * SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD, falling back to the dev credentials
+ * dev@rinsly.local / rinsly-dev — set the env vars when seeding a remote DB.
  */
 import { getPayload } from 'payload'
 import { sql } from '@payloadcms/db-d1-sqlite'
@@ -58,8 +59,8 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
   const hero: Block = {
     blockType: 'hero',
     header: {
-      eyebrow: t(locale, 'Webontwikkeling & hosting', 'Web development & hosting'),
-      title: t(locale, 'Websites die werken. Zorgeloos gehost.', 'Websites that work. Hosted without worries.'),
+      eyebrow: t(locale, 'Webontwikkeling & beheer', 'Web development & management'),
+      title: t(locale, 'Websites die werken. Volledig beheerd.', 'Websites that work. Fully managed.'),
       intro: t(
         locale,
         'Rinsly bouwt en beheert snelle, veilige websites op het Cloudflare-platform. Onbezorgd online, up-to-date en veilig — zonder dat u er omkijken naar heeft.',
@@ -101,11 +102,11 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
       },
       {
         icon: 'IconServer',
-        title: t(locale, 'Hosting & onderhoud', 'Hosting & maintenance'),
+        title: t(locale, 'Volledig beheer', 'Full management'),
         description: t(
           locale,
-          'Snelle, veilige hosting met technisch onderhoud in één vast bedrag.',
-          'Fast, secure hosting with technical maintenance in one fixed fee.',
+          'Wij nemen het complete technische beheer uit handen — hosting inbegrepen, voor één vast bedrag.',
+          'We take the full technical management off your hands — hosting included, for one fixed fee.',
         ),
         features: [
           feature(t(locale, 'Cloudflare-platform', 'Cloudflare platform')),
@@ -135,54 +136,71 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
     anchor: 'prijzen',
     header: {
       eyebrow: t(locale, 'Prijzen', 'Pricing'),
-      title: t(locale, 'Kies wat bij u past', 'Pick what fits'),
-      intro: t(locale, 'Alle bedragen zijn exclusief 21% btw.', 'All prices exclude 21% VAT.'),
+      title: t(locale, 'Uw website, volledig beheerd', 'Your website, fully managed'),
+      intro: t(
+        locale,
+        'Hosting is bij elk pakket inbegrepen. Alle bedragen zijn exclusief 21% btw.',
+        'Hosting is included in every plan. All prices exclude 21% VAT.',
+      ),
     },
     tiers: [
       {
-        name: t(locale, 'Basis', 'Basic'),
-        for: t(locale, 'Kleine site, alleen hosting', 'Small site, hosting only'),
-        price: '€45',
+        name: 'Care',
+        for: t(locale, 'Voor sites die wij bouwden', 'For sites we built'),
+        price: '€49',
         per: t(locale, '/ mnd', '/ mo'),
-        priceNote: t(locale, 'of €495 per jaar', 'or €495 per year'),
+        priceNote: t(locale, 'of €539 per jaar (1 maand gratis)', 'or €539 per year (1 month free)'),
         recommended: false,
         features: [
           feature(t(locale, 'Hosting op Cloudflare', 'Hosting on Cloudflare')),
           feature(t(locale, 'SSL & uptime-monitoring', 'SSL & uptime monitoring')),
+          feature(t(locale, 'Beveiligings- & CMS-updates', 'Security & CMS updates')),
           feature(t(locale, 'Wekelijkse back-ups', 'Weekly backups')),
-          feature(t(locale, 'Contentwijzigingen', 'Content changes'), false),
+          feature(t(locale, 'Wijzigingen', 'Changes'), false),
           feature(t(locale, 'Doorontwikkeling', 'Continuous improvement'), false),
         ],
       },
       {
-        name: t(locale, 'Hosting & Onderhoud', 'Hosting & Maintenance'),
-        for: t(locale, 'Volledig ontzorgd', 'Fully managed'),
-        price: '€90',
+        name: t(locale, 'Volledig beheerd', 'Fully managed'),
+        for: t(locale, 'Volledig ontzorgd', 'Everything taken care of'),
+        price: '€99',
         per: t(locale, '/ mnd', '/ mo'),
-        priceNote: t(locale, 'of €990 per jaar (1 maand gratis)', 'or €990 per year (1 month free)'),
+        priceNote: t(locale, 'of €1.089 per jaar (1 maand gratis)', 'or €1,089 per year (1 month free)'),
         recommended: true,
         badge: t(locale, 'Aanbevolen', 'Recommended'),
         features: [
-          feature(t(locale, 'Hosting op Cloudflare', 'Hosting on Cloudflare')),
-          feature(t(locale, 'SSL & uptime-monitoring', 'SSL & uptime monitoring')),
-          feature(t(locale, 'Beveiligingsupdates & patches', 'Security updates & patches')),
-          feature(t(locale, 'Payload CMS-updates', 'Payload CMS updates')),
-          feature(t(locale, 'Wekelijkse back-ups', 'Weekly backups')),
+          feature(t(locale, 'Alles uit Care', 'Everything in Care')),
           feature(t(locale, 'Tot 1 uur/mnd wijzigingen', 'Up to 1 hr/mo changes')),
           feature(t(locale, 'Reactietijd binnen 2 werkdagen', 'Response within 2 business days')),
+          feature(t(locale, 'Eén vast aanspreekpunt', 'One dedicated point of contact')),
+        ],
+      },
+      {
+        name: 'Partner',
+        for: t(locale, 'Voor sites die moeten groeien', 'For sites that need to grow'),
+        price: '€199',
+        per: t(locale, '/ mnd', '/ mo'),
+        priceNote: t(locale, 'of €2.189 per jaar (1 maand gratis)', 'or €2,189 per year (1 month free)'),
+        recommended: false,
+        features: [
+          feature(t(locale, 'Alles uit Volledig beheerd', 'Everything in Fully managed')),
+          feature(t(locale, 'Tot 4 uur/mnd doorontwikkeling', 'Up to 4 hrs/mo development')),
+          feature(t(locale, 'Proactieve SEO & performance', 'Proactive SEO & performance')),
+          feature(t(locale, 'Kwartaaloverleg & roadmap', 'Quarterly review & roadmap')),
+          feature(t(locale, 'Reactietijd binnen 1 werkdag', 'Response within 1 business day')),
         ],
       },
       {
         name: t(locale, 'Op maat', 'Custom'),
-        for: t(locale, 'Grotere projecten', 'Larger projects'),
+        for: t(locale, 'Grotere organisaties', 'Larger organisations'),
         price: t(locale, 'Op aanvraag', 'On request'),
         per: '',
         recommended: false,
         features: [
-          feature(t(locale, 'Alles uit Onderhoud', 'Everything in Maintenance')),
-          feature(t(locale, 'Meer wijzigingsuren', 'More change hours')),
-          feature(t(locale, 'Doorontwikkeling', 'Continuous improvement')),
-          feature(t(locale, 'SLA op maat', 'Custom SLA')),
+          feature(t(locale, 'Alles uit Partner', 'Everything in Partner')),
+          feature(t(locale, 'SLA met gegarandeerde reactietijden', 'SLA with guaranteed response times')),
+          feature(t(locale, 'Meer ontwikkeluren', 'More development hours')),
+          feature(t(locale, 'Afspraken over security & compliance', 'Security & compliance agreements')),
         ],
       },
     ],
@@ -225,6 +243,11 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
             locale,
             'Dat hangt af van de omvang en complexiteit van de website. Op basis van uw wensen maken we vooraf een heldere offerte op maat — daarna weet u precies waar u aan toe bent.',
             'That depends on the size and complexity of the website. Based on your needs we prepare a clear, tailored quote up front — so you know exactly where you stand.',
+          ),
+          t(
+            locale,
+            'Net gestart? In overleg kunnen de bouwkosten over het eerste jaar worden gespreid.',
+            'Just starting out? By arrangement, the build cost can be spread over the first year.',
           ),
         ),
       },
@@ -307,8 +330,8 @@ const headerData = (locale: Locale, home: number) => ({
 const footerLocalized = (locale: Locale) => ({
   tagline: t(
     locale,
-    'Webontwikkeling & hosting uit Woerden. Onbezorgd online.',
-    'Web development & hosting from Woerden. Online without worries.',
+    'Webontwikkeling & beheer uit Woerden. Onbezorgd online.',
+    'Web development & management from Woerden. Online without worries.',
   ),
   menuItems: [
     { label: t(locale, 'Diensten', 'Services'), url: `/${locale}#diensten` },
@@ -356,11 +379,13 @@ async function run() {
   const users = await payload.find({ collection: 'users', limit: 1, sort: 'createdAt' })
   let user = users.docs[0] as User | undefined
   if (!user) {
+    const email = process.env.SEED_ADMIN_EMAIL || 'dev@rinsly.local'
+    const password = process.env.SEED_ADMIN_PASSWORD || 'rinsly-dev'
     user = (await payload.create({
       collection: 'users',
-      data: { email: 'dev@rinsly.local', password: 'rinsly-dev', roles: ['admin'] },
+      data: { email, password, roles: ['admin'] },
     })) as User
-    console.log('Created dev admin dev@rinsly.local / rinsly-dev')
+    console.log(`Created admin ${email}`)
   } else if (!user.roles?.includes('admin')) {
     user = (await payload.update({
       collection: 'users',

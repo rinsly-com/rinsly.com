@@ -20,12 +20,12 @@ import { buildSiteJsonLd } from '@/lib/structuredData'
 import '../globals.css'
 
 const DEFAULT_TITLE: Record<Locale, string> = {
-  nl: 'Rinsly — webontwikkeling & hosting',
-  en: 'Rinsly — web development & hosting',
+  nl: 'Rinsly — webontwikkeling & beheer',
+  en: 'Rinsly — web development & management',
 }
 const DEFAULT_DESCRIPTION: Record<Locale, string> = {
-  nl: 'Rinsly — webontwikkeling & hosting. Onbezorgd online, up-to-date en veilig.',
-  en: 'Rinsly — web development & hosting. Online without worries, up to date and secure.',
+  nl: 'Rinsly — webontwikkeling & beheer. Onbezorgd online, up-to-date en veilig.',
+  en: 'Rinsly — web development & management. Online without worries, up to date and secure.',
 }
 
 export const viewport: Viewport = {

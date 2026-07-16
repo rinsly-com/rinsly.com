@@ -1,7 +1,7 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const SUBSCRIPTIONS = ['basis', 'onderhoud', 'opmaat']
+const SUBSCRIPTIONS = ['care', 'beheerd', 'partner', 'opmaat']
 const ADDITIONS = ['localization', 'email', 'design', 'seo', 'content', 'other']
 
 function json(body: unknown, status = 200): Response {
@@ -49,7 +49,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
         bedrijf,
         naam,
         email,
-        subscription: subscription as 'basis' | 'onderhoud' | 'opmaat',
+        subscription: subscription as 'care' | 'beheerd' | 'partner' | 'opmaat',
         additions: additions as ('localization' | 'email' | 'design' | 'seo' | 'content' | 'other')[],
         additionsOther: additions.includes('other') ? additionsOther || undefined : undefined,
         bericht: bericht || undefined,

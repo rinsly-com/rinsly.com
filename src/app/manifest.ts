@@ -6,9 +6,9 @@ export const dynamic = 'force-static'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Rinsly — webontwikkeling & hosting',
+    name: 'Rinsly — webontwikkeling & beheer',
     short_name: SITE_NAME,
-    description: 'Rinsly — webontwikkeling & hosting.',
+    description: 'Rinsly — webontwikkeling & beheer.',
     lang: 'nl',
     start_url: '/nl',
     display: 'standalone',

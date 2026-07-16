@@ -616,7 +616,7 @@ export interface Offerte {
   bedrijf: string;
   naam: string;
   email: string;
-  subscription?: ('basis' | 'onderhoud' | 'opmaat') | null;
+  subscription?: ('care' | 'beheerd' | 'partner' | 'opmaat') | null;
   additions?: ('localization' | 'email' | 'design' | 'seo' | 'content' | 'other')[] | null;
   additionsOther?: string | null;
   bericht?: string | null;

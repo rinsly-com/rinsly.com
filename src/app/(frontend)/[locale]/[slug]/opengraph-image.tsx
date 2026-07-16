@@ -18,7 +18,7 @@ export default async function Image({
   const page = await getPageBySlug(slug, loc)
   return renderOgImage({
     title: page?.title || 'Rinsly',
-    eyebrow: loc === 'nl' ? 'Webontwikkeling & hosting' : 'Web development & hosting',
+    eyebrow: loc === 'nl' ? 'Webontwikkeling & beheer' : 'Web development & management',
     imageUrl: metaImageUrl(page),
   })
 }

@@ -89,8 +89,8 @@ plugins.push(
       doc?.title ? `${doc.title} — Rinsly` : 'Rinsly',
     generateDescription: ({ doc }: { doc?: { title?: string } }) =>
       doc?.title
-        ? `${doc.title} — webontwikkeling & hosting bij Rinsly.`
-        : 'Rinsly — webontwikkeling & hosting.',
+        ? `${doc.title} — webontwikkeling & beheer bij Rinsly.`
+        : 'Rinsly — webontwikkeling & beheer.',
     fields: ({ defaultFields }) => [
       ...defaultFields,
       {

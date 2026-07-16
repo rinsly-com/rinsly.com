@@ -27,7 +27,7 @@ export function metaImageUrl(page: Page | null | undefined): string | undefined 
 
 export function renderOgImage({
   title,
-  eyebrow = 'Webontwikkeling & hosting',
+  eyebrow = 'Webontwikkeling & beheer',
   imageUrl,
 }: {
   title: string

@@ -56,8 +56,9 @@ const COPY = {
 } as const
 
 const SUBSCRIPTIONS = [
-  { value: 'basis', nl: 'Basis', en: 'Basic', price: '€45 / mnd', priceEn: '€45 / mo', recommended: false },
-  { value: 'onderhoud', nl: 'Hosting & Onderhoud', en: 'Hosting & Maintenance', price: '€90 / mnd', priceEn: '€90 / mo', recommended: true },
+  { value: 'care', nl: 'Care', en: 'Care', price: '€49 / mnd', priceEn: '€49 / mo', recommended: false },
+  { value: 'beheerd', nl: 'Volledig beheerd', en: 'Fully managed', price: '€99 / mnd', priceEn: '€99 / mo', recommended: true },
+  { value: 'partner', nl: 'Partner', en: 'Partner', price: '€199 / mnd', priceEn: '€199 / mo', recommended: false },
   { value: 'opmaat', nl: 'Op maat', en: 'Custom', price: 'Op aanvraag', priceEn: 'On request', recommended: false },
 ] as const
 

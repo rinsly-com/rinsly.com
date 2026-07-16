@@ -13,7 +13,7 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
   const page = await getPageBySlug('home', loc)
   return renderOgImage({
     title: page?.title || 'Rinsly',
-    eyebrow: loc === 'nl' ? 'Webontwikkeling & hosting' : 'Web development & hosting',
+    eyebrow: loc === 'nl' ? 'Webontwikkeling & beheer' : 'Web development & management',
     imageUrl: metaImageUrl(page),
   })
 }
