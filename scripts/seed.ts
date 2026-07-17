@@ -139,8 +139,8 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
       title: t(locale, 'Uw website, volledig beheerd', 'Your website, fully managed'),
       intro: t(
         locale,
-        'Hosting is bij elk pakket inbegrepen. Alle bedragen zijn exclusief 21% btw.',
-        'Hosting is included in every plan. All prices exclude 21% VAT.',
+        'U bent altijd eigenaar van uw site en data, maandelijks opzegbaar, gebouwd als maatwerk op het Cloudflare-platform — geen WordPress-template. Hosting is bij elk pakket inbegrepen. Onze tarieven zijn zakelijk en exclusief 21% btw.',
+        'You always own your site and data, cancel monthly, custom-built on the Cloudflare platform — not a WordPress template. Hosting is included in every plan. Our rates are for business customers and exclude 21% VAT.',
       ),
     },
     tiers: [
@@ -178,9 +178,9 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
       {
         name: 'Partner',
         for: t(locale, 'Voor sites die moeten groeien', 'For sites that need to grow'),
-        price: '€199',
+        price: '€249',
         per: t(locale, '/ mnd', '/ mo'),
-        priceNote: t(locale, 'of €2.189 per jaar (1 maand gratis)', 'or €2,189 per year (1 month free)'),
+        priceNote: t(locale, 'of €2.490 per jaar (2 maanden gratis)', 'or €2,490 per year (2 months free)'),
         recommended: false,
         features: [
           feature(t(locale, 'Alles uit Volledig beheerd', 'Everything in Fully managed')),
@@ -193,14 +193,17 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
       {
         name: t(locale, 'Op maat', 'Custom'),
         for: t(locale, 'Grotere organisaties', 'Larger organisations'),
-        price: t(locale, 'Op aanvraag', 'On request'),
-        per: '',
+        price: t(locale, 'vanaf €499', 'from €499'),
+        per: t(locale, '/ mnd', '/ mo'),
+        priceNote: t(locale, 'op basis van uw wensen', 'tailored to your needs'),
         recommended: false,
         features: [
           feature(t(locale, 'Alles uit Partner', 'Everything in Partner')),
           feature(t(locale, 'SLA met gegarandeerde reactietijden', 'SLA with guaranteed response times')),
+          feature(t(locale, 'Streven naar 99,9% uptime', 'Targeting 99.9% uptime')),
+          feature(t(locale, 'Staging-omgeving', 'Staging environment')),
           feature(t(locale, 'Meer ontwikkeluren', 'More development hours')),
-          feature(t(locale, 'Afspraken over security & compliance', 'Security & compliance agreements')),
+          feature(t(locale, 'Verwerkersovereenkomst (AVG) & beveiligingsmaatregelen', 'Data-processing agreement (GDPR) & security measures')),
         ],
       },
     ],
@@ -241,8 +244,8 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
         body: richBody(
           t(
             locale,
-            'Dat hangt af van de omvang en complexiteit van de website. Op basis van uw wensen maken we vooraf een heldere offerte op maat — daarna weet u precies waar u aan toe bent.',
-            'That depends on the size and complexity of the website. Based on your needs we prepare a clear, tailored quote up front — so you know exactly where you stand.',
+            'Een maatwerksite start vanaf €2.500 (excl. btw); de exacte prijs hangt af van de omvang en complexiteit. Op basis van uw wensen maken we vooraf een heldere offerte op maat — daarna weet u precies waar u aan toe bent.',
+            'A custom site starts from €2,500 (excl. VAT); the exact price depends on the size and complexity. Based on your needs we prepare a clear, tailored quote up front — so you know exactly where you stand.',
           ),
           t(
             locale,
@@ -339,6 +342,10 @@ const footerLocalized = (locale: Locale) => ({
     { label: t(locale, 'Prijzen', 'Pricing'), url: `/${locale}#prijzen` },
     { label: 'Contact', url: `/${locale}#contact` },
   ],
+  infoLinks: [
+    { label: t(locale, 'Privacyverklaring', 'Privacy policy'), url: `/${locale}/privacy` },
+    { label: t(locale, 'Algemene voorwaarden', 'Terms & conditions'), url: `/${locale}/voorwaarden` },
+  ],
   copyright: t(
     locale,
     '© Rinsly 2026 — Alle rechten voorbehouden.',
@@ -351,6 +358,360 @@ const footerShared = {
   kvk: '85578835',
   btw: 'NL248209085B01',
 }
+
+/* -------------------------------------------------------------------------- */
+/* Legal pages (privacyverklaring + algemene voorwaarden)                     */
+/*                                                                            */
+/* Rendered as standalone rich-text pages at /[locale]/privacy and           */
+/* /[locale]/voorwaarden. Content is authored below as a compact node list    */
+/* (headings / paragraphs / lists, with **bold** inline) and compiled to      */
+/* Lexical. These are solid market-standard drafts and are kept consistent    */
+/* with the offerte contract + verwerkersovereenkomst — have a Dutch lawyer   */
+/* confirm the binding wording before relying on them.                        */
+/* -------------------------------------------------------------------------- */
+
+type LegalNode = { h: string } | { p: string } | { ul: string[] } | { ol: string[] }
+
+/** Split a string on `**bold**` markers into Lexical text nodes. */
+const inlineText = (s: string) =>
+  s
+    .split(/(\*\*[^*]+\*\*)/g)
+    .filter(Boolean)
+    .map((part) =>
+      part.startsWith('**') && part.endsWith('**')
+        ? { type: 'text', detail: 0, format: 1, mode: 'normal', style: '', text: part.slice(2, -2), version: 1 }
+        : { type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text: part, version: 1 },
+    )
+
+const legalRich = (nodes: LegalNode[]) => ({
+  root: {
+    type: 'root',
+    format: '' as const,
+    indent: 0,
+    version: 1,
+    direction: 'ltr' as const,
+    children: nodes.map((n) => {
+      if ('h' in n) {
+        return { type: 'heading', tag: 'h2', format: '', indent: 0, version: 1, direction: 'ltr', children: inlineText(n.h) }
+      }
+      if ('ul' in n || 'ol' in n) {
+        const items = 'ul' in n ? n.ul : n.ol
+        const ordered = 'ol' in n
+        return {
+          type: 'list',
+          listType: ordered ? 'number' : 'bullet',
+          tag: ordered ? 'ol' : 'ul',
+          start: 1,
+          format: '',
+          indent: 0,
+          version: 1,
+          direction: 'ltr',
+          children: items.map((text, i) => ({
+            type: 'listitem',
+            value: i + 1,
+            format: '',
+            indent: 0,
+            version: 1,
+            direction: 'ltr',
+            children: inlineText(text),
+          })),
+        }
+      }
+      return {
+        type: 'paragraph',
+        format: '',
+        indent: 0,
+        version: 1,
+        direction: 'ltr',
+        textFormat: 0,
+        textStyle: '',
+        children: inlineText(n.p),
+      }
+    }),
+  },
+})
+
+/** A one-block layout carrying a legal document as reading-width prose. */
+const legalLayout = (eyebrow: string, title: string, nodes: LegalNode[]): Block[] => [
+  { blockType: 'richText', width: 'narrow', header: { eyebrow, title }, content: legalRich(nodes) },
+]
+
+const privacyNodes: Record<Locale, LegalNode[]> = {
+  nl: [
+    { p: 'Laatst bijgewerkt: 17 juli 2026.' },
+    { p: 'Rinsly hecht veel waarde aan de bescherming van uw persoonsgegevens. In deze privacyverklaring leggen we uit welke gegevens we verwerken wanneer u onze website bezoekt of contact met ons opneemt, met welk doel en op welke grondslag, en welke rechten u heeft.' },
+    { h: '1. Verwerkingsverantwoordelijke' },
+    { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden. KvK 85578835. E-mail: contact@rinsly.com. Rinsly is de verwerkingsverantwoordelijke voor de verwerking van persoonsgegevens via deze website.' },
+    { h: '2. Welke gegevens we verwerken' },
+    { ul: [
+      '**Contactgegevens** die u zelf verstrekt via het contactformulier of per e-mail: uw naam, e-mailadres en de inhoud van uw bericht.',
+      '**Technische gegevens** die automatisch worden vastgelegd wanneer u de site bezoekt: uw IP-adres, browsertype en technische log- en gebruiksgegevens.',
+    ] },
+    { h: '3. Doeleinden en grondslagen' },
+    { p: 'We verwerken uw gegevens uitsluitend voor de volgende doeleinden:' },
+    { ul: [
+      'Het beantwoorden van uw vraag of het opstellen van een offerte. Grondslag: de uitvoering van of stappen voorafgaand aan een overeenkomst (art. 6 lid 1 sub b AVG).',
+      'Het beveiligen, onderhouden en verbeteren van de website. Grondslag: ons gerechtvaardigd belang bij een veilige en goed werkende website (art. 6 lid 1 sub f AVG).',
+      'Het voldoen aan wettelijke verplichtingen, zoals de fiscale bewaarplicht. Grondslag: een wettelijke plicht (art. 6 lid 1 sub c AVG).',
+    ] },
+    { h: '4. Cookies' },
+    { p: 'Deze website plaatst uitsluitend functionele en strikt noodzakelijke cookies die nodig zijn om de site goed te laten werken en te beveiligen. Hiervoor is geen toestemming vereist. Worden er in de toekomst analytische of tracking-cookies geplaatst, dan vragen we daarvoor vooraf uw toestemming.' },
+    { h: '5. Bewaartermijnen' },
+    { p: 'We bewaren uw gegevens niet langer dan nodig is voor de genoemde doeleinden. Contactgegevens bewaren we zolang dat nodig is om uw vraag af te handelen en gedurende een redelijke periode daarna; gegevens die onder een wettelijke bewaarplicht vallen, bewaren we gedurende de wettelijke termijn. Technische logbestanden bewaren we voor een beperkte periode.' },
+    { h: '6. Verwerkers en derden' },
+    { p: 'Voor de hosting en werking van de website maken we gebruik van Cloudflare, Inc., dat als verwerker in onze opdracht persoonsgegevens verwerkt. We verkopen uw gegevens niet en delen deze niet met derden, behalve wanneer dat noodzakelijk is voor de genoemde doeleinden of wanneer we daartoe wettelijk verplicht zijn.' },
+    { h: '7. Doorgifte buiten de EER' },
+    { p: "Cloudflare, Inc. is gevestigd in de Verenigde Staten. Voor zover daarbij persoonsgegevens buiten de Europese Economische Ruimte worden verwerkt, gebeurt dat onder passende waarborgen zoals het EU-US Data Privacy Framework of de modelcontractbepalingen (SCC's) van de Europese Commissie." },
+    { h: '8. Uw rechten' },
+    { p: 'U heeft het recht op inzage, rectificatie, verwijdering, beperking van de verwerking, bezwaar tegen de verwerking en gegevensoverdraagbaarheid. Stuur uw verzoek naar contact@rinsly.com; we reageren binnen de wettelijke termijn. Bent u het niet eens met hoe we met uw gegevens omgaan, dan kunt u een klacht indienen bij de Autoriteit Persoonsgegevens.' },
+    { h: '9. Beveiliging' },
+    { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer en regelmatige back-ups.' },
+    { h: '10. Wijzigingen' },
+    { p: 'We kunnen deze privacyverklaring van tijd tot tijd aanpassen. De actuele versie staat altijd op deze pagina, met de datum van de laatste wijziging bovenaan.' },
+  ],
+  en: [
+    { p: 'Last updated: 17 July 2026.' },
+    { p: 'Rinsly takes the protection of your personal data seriously. This privacy policy explains which data we process when you visit our website or contact us, for what purpose and on what legal basis, and what rights you have.' },
+    { h: '1. Controller' },
+    { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, the Netherlands. Chamber of Commerce (KvK) 85578835. Email: contact@rinsly.com. Rinsly is the controller for the processing of personal data through this website.' },
+    { h: '2. Data we process' },
+    { ul: [
+      '**Contact details** you provide yourself through the contact form or by email: your name, email address and the content of your message.',
+      '**Technical data** recorded automatically when you visit the site: your IP address, browser type and technical log and usage data.',
+    ] },
+    { h: '3. Purposes and legal bases' },
+    { p: 'We process your data only for the following purposes:' },
+    { ul: [
+      'Answering your question or preparing a quote. Basis: performance of, or steps prior to, a contract (art. 6(1)(b) GDPR).',
+      'Securing, maintaining and improving the website. Basis: our legitimate interest in a secure, well-functioning website (art. 6(1)(f) GDPR).',
+      'Complying with legal obligations, such as tax retention rules. Basis: a legal obligation (art. 6(1)(c) GDPR).',
+    ] },
+    { h: '4. Cookies' },
+    { p: 'This website places only functional and strictly necessary cookies required for the site to work and to be secure. No consent is required for these. Should analytics or tracking cookies be introduced in the future, we will ask for your consent first.' },
+    { h: '5. Retention' },
+    { p: 'We do not keep your data longer than necessary for the purposes above. We keep contact details for as long as needed to handle your enquiry and for a reasonable period afterwards; data subject to a legal retention obligation is kept for the statutory term. Technical logs are kept for a limited period.' },
+    { h: '6. Processors and third parties' },
+    { p: 'For hosting and running the website we use Cloudflare, Inc., which processes personal data as our processor on our instructions. We do not sell your data and do not share it with third parties except where necessary for the purposes above or where legally required.' },
+    { h: '7. Transfers outside the EEA' },
+    { p: "Cloudflare, Inc. is based in the United States. Where personal data is processed outside the European Economic Area, this takes place under appropriate safeguards such as the EU-US Data Privacy Framework or the European Commission's Standard Contractual Clauses (SCCs)." },
+    { h: '8. Your rights' },
+    { p: 'You have the right to access, rectification, erasure, restriction of processing, objection to processing and data portability. Send your request to contact@rinsly.com; we will respond within the statutory period. If you disagree with how we handle your data, you may lodge a complaint with the Dutch Data Protection Authority (Autoriteit Persoonsgegevens).' },
+    { h: '9. Security' },
+    { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control and regular backups.' },
+    { h: '10. Changes' },
+    { p: 'We may update this privacy policy from time to time. The current version is always available on this page, with the date of the last change shown at the top.' },
+  ],
+}
+
+const voorwaardenNodes: Record<Locale, LegalNode[]> = {
+  nl: [
+    { p: 'Laatst bijgewerkt: 17 juli 2026.' },
+    { h: 'Artikel 1 — Definities' },
+    { ul: [
+      '**Rinsly:** de eenmanszaak Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, KvK 85578835, gebruiker van deze algemene voorwaarden.',
+      '**Opdrachtgever:** de partij die met Rinsly een overeenkomst aangaat of daartoe een offerte ontvangt.',
+      '**Diensten:** het bouwen van websites en/of het verzorgen van hosting en technisch onderhoud, zoals nader omschreven in de offerte of overeenkomst.',
+      '**Meerwerk:** werkzaamheden die buiten de overeengekomen Diensten vallen.',
+    ] },
+    { h: 'Artikel 2 — Toepasselijkheid' },
+    { ol: [
+      'Deze algemene voorwaarden zijn van toepassing op alle offertes, aanbiedingen en overeenkomsten tussen Rinsly en opdrachtgever.',
+      'Afwijkingen gelden alleen als deze schriftelijk zijn overeengekomen.',
+      'De toepasselijkheid van inkoop- of andere voorwaarden van opdrachtgever wordt uitdrukkelijk van de hand gewezen.',
+      'Deze voorwaarden zijn gericht op zakelijke opdrachtgevers.',
+    ] },
+    { h: 'Artikel 3 — Offertes en totstandkoming' },
+    { ol: [
+      'Offertes en op de website genoemde vanaf-prijzen zijn vrijblijvend en indicatief, tenzij uitdrukkelijk anders vermeld.',
+      'Een overeenkomst komt tot stand na schriftelijke aanvaarding of ondertekening door beide partijen.',
+      'Kennelijke vergissingen of fouten in een offerte binden Rinsly niet.',
+    ] },
+    { h: 'Artikel 4 — Prijzen en betaling' },
+    { ol: [
+      'Alle prijzen zijn zakelijk en exclusief 21% btw.',
+      'Facturatie van hosting en onderhoud vindt vooraf plaats, per jaar of per kwartaal. Betaling geschiedt binnen 14 dagen na factuurdatum.',
+      'Bij niet-tijdige betaling is opdrachtgever van rechtswege in verzuim en is de wettelijke handelsrente en redelijke incassokosten verschuldigd.',
+      'Rinsly mag de vergoeding jaarlijks per 1 januari aanpassen aan de consumentenprijsindex (CBS). Verdergaande verhogingen worden ten minste één maand vooraf aangekondigd; is opdrachtgever het daarmee niet eens, dan kan zij de overeenkomst opzeggen tegen de ingangsdatum van de verhoging.',
+    ] },
+    { h: 'Artikel 5 — Uitvoering' },
+    { ol: [
+      'Rinsly voert de Diensten naar beste inzicht en vermogen uit; het betreft een inspanningsverplichting.',
+      'Opdrachtgever verstrekt tijdig de informatie, content en toegang die Rinsly redelijkerwijs nodig heeft, en staat in voor de rechtmatigheid van aangeleverde content.',
+      'Genoemde termijnen zijn indicatief en niet fataal, tenzij schriftelijk anders overeengekomen.',
+    ] },
+    { h: 'Artikel 6 — Hosting en diensten van derden' },
+    { ol: [
+      'De website wordt gehost op het Cloudflare-platform. Op de diensten van Cloudflare zijn diens eigen voorwaarden van toepassing.',
+      'Rinsly is niet aansprakelijk voor storingen, wijzigingen of uitval die aan Cloudflare of andere toeleveranciers zijn toe te rekenen.',
+    ] },
+    { h: 'Artikel 7 — Beschikbaarheid en onderhoud' },
+    { ol: [
+      'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Een specifieke of ononderbroken beschikbaarheid wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
+      'Rinsly maakt periodiek back-ups zodat herstel bij dataverlies redelijkerwijs mogelijk is.',
+      'Storingen kunnen per e-mail worden gemeld; Rinsly reageert binnen de in de overeenkomst of SLA genoemde termijn.',
+    ] },
+    { h: 'Artikel 8 — Meerwerk' },
+    { ol: [
+      'Werkzaamheden buiten de overeengekomen Diensten gelden als Meerwerk en worden vooraf afgesproken of op nacalculatie uitgevoerd tegen € 95 per uur (excl. btw).',
+    ] },
+    { h: 'Artikel 9 — Looptijd en opzegging' },
+    { ol: [
+      'Onderhouds- en hostingovereenkomsten worden aangegaan voor onbepaalde tijd en zijn maandelijks opzegbaar met een opzegtermijn van één maand.',
+      'Vooruitbetaalde vergoedingen over de periode na de opzegdatum worden naar rato terugbetaald.',
+      'Elke partij kan de overeenkomst met onmiddellijke ingang ontbinden bij een wezenlijke, niet-herstelde tekortkoming van de andere partij of bij diens faillissement of surseance van betaling.',
+    ] },
+    { h: 'Artikel 10 — Intellectueel eigendom en eigendom' },
+    { ol: [
+      'De website, de inhoud en de bijbehorende data blijven eigendom van opdrachtgever. Na volledige betaling verkrijgt opdrachtgever het recht op vrije overdracht van de website en de broncode.',
+      'Door Rinsly gebruikte generieke onderdelen, hulpmiddelen en kennis blijven aan Rinsly voorbehouden.',
+      'Bij beëindiging verleent Rinsly redelijke medewerking aan de overdracht van de website, data en het domein en houdt de omgeving hiervoor nog dertig dagen beschikbaar.',
+    ] },
+    { h: 'Artikel 11 — Verwerking van persoonsgegevens' },
+    { ol: [
+      'Voor zover Rinsly bij de Diensten persoonsgegevens verwerkt in opdracht van opdrachtgever, geldt de tussen partijen gesloten verwerkersovereenkomst, die onderdeel uitmaakt van de overeenkomst.',
+    ] },
+    { h: 'Artikel 12 — Aansprakelijkheid' },
+    { ol: [
+      'De aansprakelijkheid van Rinsly is beperkt tot directe schade en tot ten hoogste het bedrag dat opdrachtgever in de twaalf maanden voorafgaand aan de schadeveroorzakende gebeurtenis uit hoofde van de overeenkomst heeft betaald.',
+      'Rinsly is niet aansprakelijk voor indirecte schade, waaronder gevolgschade, gederfde omzet en dataverlies buiten de laatst beschikbare back-up.',
+      'Deze beperkingen gelden niet bij opzet of bewuste roekeloosheid van Rinsly.',
+    ] },
+    { h: 'Artikel 13 — Overmacht' },
+    { ol: [
+      'Bij overmacht worden de verplichtingen opgeschort. Onder overmacht valt mede het uitvallen van of storingen bij toeleveranciers zoals Cloudflare.',
+    ] },
+    { h: 'Artikel 14 — Geheimhouding' },
+    { ol: [
+      'Partijen houden vertrouwelijke informatie geheim en gebruiken deze uitsluitend voor de uitvoering van de overeenkomst.',
+    ] },
+    { h: 'Artikel 15 — Klachten' },
+    { ol: [
+      'Klachten over de Diensten worden binnen bekwame tijd na ontdekking schriftelijk aan Rinsly gemeld, zodat Rinsly gelegenheid heeft deze te verhelpen.',
+    ] },
+    { h: 'Artikel 16 — Wijziging van de voorwaarden' },
+    { ol: [
+      'Rinsly mag deze algemene voorwaarden wijzigen. Wijzigingen gelden voor lopende overeenkomsten na aankondiging, met inachtneming van een redelijke termijn.',
+    ] },
+    { h: 'Artikel 17 — Toepasselijk recht en geschillen' },
+    { ol: [
+      'Op alle overeenkomsten is Nederlands recht van toepassing.',
+      'Geschillen worden voorgelegd aan de bevoegde rechter in het arrondissement van de vestigingsplaats van Rinsly.',
+    ] },
+  ],
+  en: [
+    { p: 'Last updated: 17 July 2026.' },
+    { h: 'Article 1 — Definitions' },
+    { ul: [
+      '**Rinsly:** the sole proprietorship Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, the Netherlands, KvK 85578835, user of these terms.',
+      '**Client:** the party entering into an agreement with Rinsly or receiving a quote for that purpose.',
+      '**Services:** building websites and/or providing hosting and technical maintenance, as further described in the quote or agreement.',
+      '**Additional work:** work falling outside the agreed Services.',
+    ] },
+    { h: 'Article 2 — Applicability' },
+    { ol: [
+      'These terms apply to all quotes, offers and agreements between Rinsly and the client.',
+      'Deviations apply only where agreed in writing.',
+      "The applicability of the client's purchasing or other terms is expressly rejected.",
+      'These terms are intended for business clients.',
+    ] },
+    { h: 'Article 3 — Quotes and formation' },
+    { ol: [
+      'Quotes and any "from" prices stated on the website are without obligation and indicative, unless expressly stated otherwise.',
+      'An agreement is formed upon written acceptance or signature by both parties.',
+      'Obvious mistakes or errors in a quote do not bind Rinsly.',
+    ] },
+    { h: 'Article 4 — Prices and payment' },
+    { ol: [
+      'All prices are for business clients and exclude 21% VAT.',
+      'Hosting and maintenance are invoiced in advance, annually or quarterly. Payment is due within 14 days of the invoice date.',
+      'On late payment the client is in default by operation of law and owes the statutory commercial interest and reasonable collection costs.',
+      'Rinsly may adjust the fee annually on 1 January in line with the Dutch consumer price index (CBS). Increases beyond that are announced at least one month in advance; if the client does not agree, it may terminate the agreement as at the effective date of the increase.',
+    ] },
+    { h: 'Article 5 — Performance' },
+    { ol: [
+      'Rinsly performs the Services to the best of its insight and ability; this is a best-efforts obligation.',
+      'The client provides, in good time, the information, content and access Rinsly reasonably needs, and warrants the lawfulness of content it supplies.',
+      'Stated deadlines are indicative and not strict, unless agreed otherwise in writing.',
+    ] },
+    { h: 'Article 6 — Hosting and third-party services' },
+    { ol: [
+      "The website is hosted on the Cloudflare platform. Cloudflare's own terms apply to its services.",
+      'Rinsly is not liable for outages, changes or downtime attributable to Cloudflare or other suppliers.',
+    ] },
+    { h: 'Article 7 — Availability and maintenance' },
+    { ol: [
+      'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. No specific or uninterrupted availability is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
+      'Rinsly makes periodic backups so that recovery from data loss is reasonably possible.',
+      'Incidents may be reported by email; Rinsly responds within the period stated in the agreement or SLA.',
+    ] },
+    { h: 'Article 8 — Additional work' },
+    { ol: [
+      'Work outside the agreed Services counts as additional work and is agreed in advance or carried out on a time-and-materials basis at € 95 per hour (excl. VAT).',
+    ] },
+    { h: 'Article 9 — Term and termination' },
+    { ol: [
+      "Maintenance and hosting agreements are entered into for an indefinite term and are cancellable monthly with one month's notice.",
+      'Fees prepaid for the period after the termination date are refunded pro rata.',
+      'Either party may terminate the agreement with immediate effect in the event of a material, uncured breach by the other party or its bankruptcy or suspension of payment.',
+    ] },
+    { h: 'Article 10 — Intellectual property and ownership' },
+    { ol: [
+      "The website, its content and associated data remain the client's property. After full payment the client obtains the right to freely transfer the website and source code.",
+      'Generic components, tools and know-how used by Rinsly remain reserved to Rinsly.',
+      'On termination Rinsly gives reasonable assistance with the transfer of the website, data and domain and keeps the environment available for a further thirty days.',
+    ] },
+    { h: 'Article 11 — Processing of personal data' },
+    { ol: [
+      "Where Rinsly processes personal data on the client's instructions as part of the Services, the data-processing agreement concluded between the parties applies and forms part of the agreement.",
+    ] },
+    { h: 'Article 12 — Liability' },
+    { ol: [
+      "Rinsly's liability is limited to direct damage and to at most the amount the client paid under the agreement in the twelve months preceding the event causing the damage.",
+      'Rinsly is not liable for indirect damage, including consequential loss, lost revenue and data loss beyond the last available backup.',
+      "These limitations do not apply in the event of intent or deliberate recklessness on Rinsly's part.",
+    ] },
+    { h: 'Article 13 — Force majeure' },
+    { ol: [
+      'In the event of force majeure the obligations are suspended. Force majeure includes the failure of or disruptions at suppliers such as Cloudflare.',
+    ] },
+    { h: 'Article 14 — Confidentiality' },
+    { ol: [
+      'The parties keep confidential information secret and use it only to perform the agreement.',
+    ] },
+    { h: 'Article 15 — Complaints' },
+    { ol: [
+      'Complaints about the Services are reported to Rinsly in writing within a reasonable time of discovery, so that Rinsly has the opportunity to remedy them.',
+    ] },
+    { h: 'Article 16 — Changes to these terms' },
+    { ol: [
+      'Rinsly may amend these terms. Changes apply to ongoing agreements after announcement, observing a reasonable period.',
+    ] },
+    { h: 'Article 17 — Governing law and disputes' },
+    { ol: [
+      'All agreements are governed by Dutch law.',
+      'Disputes are submitted to the competent court in the district where Rinsly is established.',
+    ] },
+  ],
+}
+
+/** The two content pages seeded alongside the home one-pager. */
+const contentPages = [
+  {
+    slug: 'privacy',
+    title: (locale: Locale) => t(locale, 'Privacyverklaring', 'Privacy policy'),
+    layout: (locale: Locale) =>
+      legalLayout(t(locale, 'Juridisch', 'Legal'), t(locale, 'Privacyverklaring', 'Privacy policy'), privacyNodes[locale]),
+  },
+  {
+    slug: 'voorwaarden',
+    title: (locale: Locale) => t(locale, 'Algemene voorwaarden', 'Terms & conditions'),
+    layout: (locale: Locale) =>
+      legalLayout(t(locale, 'Juridisch', 'Legal'), t(locale, 'Algemene voorwaarden', 'Terms & conditions'), voorwaardenNodes[locale]),
+  },
+]
+
+/** The slugs the one-pager cleanup must preserve. */
+const keepSlugs = ['home', ...contentPages.map((p) => p.slug)]
 
 /** Drizzle-push orphan repair (dev only; a no-op on a migrated database). */
 async function repairOrphanedVersions(payload: PayloadInstance) {
@@ -435,11 +796,45 @@ async function run() {
   await payload.update({ collection: 'pages', id: homeId, data: { _status: 'published' } as never, user })
   console.log('Published home (one-pager)')
 
-  // One-pager: remove any stray non-home pages (the collection + route stay, so
-  // new pages can be added in the admin later).
+  // Standalone legal pages (privacyverklaring + algemene voorwaarden), linked
+  // from the footer. Upserted by slug and published in both locales.
+  for (const page of contentPages) {
+    const existing = await payload.find({
+      collection: 'pages',
+      where: { slug: { equals: page.slug } },
+      draft: true,
+      limit: 1,
+      depth: 0,
+    })
+    let doc = existing.docs.find((d) => d?.id != null) as { id: number } | undefined
+    if (!doc) {
+      doc = (await payload.create({
+        collection: 'pages',
+        draft: true,
+        locale: 'nl',
+        data: { slug: page.slug, title: page.title('nl') } as never,
+        user,
+      })) as { id: number }
+    }
+    for (const locale of ['nl', 'en'] as Locale[]) {
+      await payload.update({
+        collection: 'pages',
+        id: doc.id,
+        draft: true,
+        locale,
+        data: { title: page.title(locale), layout: page.layout(locale) } as never,
+        user,
+      })
+    }
+    await payload.update({ collection: 'pages', id: doc.id, data: { _status: 'published' } as never, user })
+    console.log(`Published /${page.slug}`)
+  }
+
+  // One-pager: remove any stray pages other than home + the legal pages (the
+  // collection + route stay, so new pages can be added in the admin later).
   const others = await payload.find({
     collection: 'pages',
-    where: { slug: { not_equals: 'home' } },
+    where: { slug: { not_in: keepSlugs } },
     draft: true,
     limit: 200,
     depth: 0,
