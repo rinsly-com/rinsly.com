@@ -33,7 +33,7 @@ export const Offertes: CollectionConfig = {
       type: 'select',
       options: [
         { label: { en: 'Care', nl: 'Care' }, value: 'care' },
-        { label: { en: 'Fully managed', nl: 'Volledig beheerd' }, value: 'beheerd' },
+        { label: { en: 'Managed', nl: 'Managed' }, value: 'beheerd' },
         { label: { en: 'Partner', nl: 'Partner' }, value: 'partner' },
         { label: { en: 'Custom', nl: 'Op maat' }, value: 'opmaat' },
       ],

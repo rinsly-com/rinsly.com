@@ -152,16 +152,19 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
         priceNote: t(locale, 'of €539 per jaar (1 maand gratis)', 'or €539 per year (1 month free)'),
         recommended: false,
         features: [
-          feature(t(locale, 'Hosting op Cloudflare', 'Hosting on Cloudflare')),
+          feature(t(locale, 'Hosting', 'Hosting')),
+          feature(t(locale, 'Snelle, performante website', 'Fast, high-performance website')),
+          feature(t(locale, 'Volwaardig CMS (geen WordPress)', 'A real CMS (not WordPress)')),
           feature(t(locale, 'SSL & uptime-monitoring', 'SSL & uptime monitoring')),
           feature(t(locale, 'Beveiligings- & CMS-updates', 'Security & CMS updates')),
           feature(t(locale, 'Wekelijkse back-ups', 'Weekly backups')),
+          feature(t(locale, 'Ticketsupport', 'Ticket support')),
           feature(t(locale, 'Wijzigingen', 'Changes'), false),
           feature(t(locale, 'Doorontwikkeling', 'Continuous improvement'), false),
         ],
       },
       {
-        name: t(locale, 'Volledig beheerd', 'Fully managed'),
+        name: 'Managed',
         for: t(locale, 'Volledig ontzorgd', 'Everything taken care of'),
         price: '€99',
         per: t(locale, '/ mnd', '/ mo'),
@@ -169,9 +172,8 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
         recommended: true,
         badge: t(locale, 'Aanbevolen', 'Recommended'),
         features: [
-          feature(t(locale, 'Alles uit Care', 'Everything in Care')),
-          feature(t(locale, 'Tot 1 uur/mnd wijzigingen', 'Up to 1 hr/mo changes')),
-          feature(t(locale, 'Reactietijd binnen 2 werkdagen', 'Response within 2 business days')),
+          feature(t(locale, 'Alles uit het Care-pakket', 'Everything in the Care package')),
+          feature(t(locale, 'Tot 1 uur/mnd wijzigingen/support inbegrepen', 'Up to 1 hr/mo changes/support included')),
           feature(t(locale, 'Eén vast aanspreekpunt', 'One dedicated point of contact')),
         ],
       },
@@ -183,11 +185,10 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
         priceNote: t(locale, 'of €2.490 per jaar (2 maanden gratis)', 'or €2,490 per year (2 months free)'),
         recommended: false,
         features: [
-          feature(t(locale, 'Alles uit Volledig beheerd', 'Everything in Fully managed')),
+          feature(t(locale, 'Alles uit het Managed-pakket', 'Everything in the Managed package')),
           feature(t(locale, 'Tot 4 uur/mnd doorontwikkeling', 'Up to 4 hrs/mo development')),
-          feature(t(locale, 'Proactieve SEO & performance', 'Proactive SEO & performance')),
+          feature(t(locale, 'SEO- & performance-optimalisatie', 'SEO & performance optimisation')),
           feature(t(locale, 'Kwartaaloverleg & roadmap', 'Quarterly review & roadmap')),
-          feature(t(locale, 'Reactietijd binnen 1 werkdag', 'Response within 1 business day')),
         ],
       },
       {
@@ -198,7 +199,7 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
         priceNote: t(locale, 'op basis van uw wensen', 'tailored to your needs'),
         recommended: false,
         features: [
-          feature(t(locale, 'Alles uit Partner', 'Everything in Partner')),
+          feature(t(locale, 'Alles uit het Partner-pakket', 'Everything in the Partner package')),
           feature(t(locale, 'SLA met gegarandeerde reactietijden', 'SLA with guaranteed response times')),
           feature(t(locale, 'Streven naar 99,9% uptime', 'Targeting 99.9% uptime')),
           feature(t(locale, 'Staging-omgeving', 'Staging environment')),
@@ -710,9 +711,6 @@ const contentPages = [
   },
 ]
 
-/** The slugs the one-pager cleanup must preserve. */
-const keepSlugs = ['home', ...contentPages.map((p) => p.slug)]
-
 /** Drizzle-push orphan repair (dev only; a no-op on a migrated database). */
 async function repairOrphanedVersions(payload: PayloadInstance) {
   const drizzle = (
@@ -828,21 +826,6 @@ async function run() {
     }
     await payload.update({ collection: 'pages', id: doc.id, data: { _status: 'published' } as never, user })
     console.log(`Published /${page.slug}`)
-  }
-
-  // One-pager: remove any stray pages other than home + the legal pages (the
-  // collection + route stay, so new pages can be added in the admin later).
-  const others = await payload.find({
-    collection: 'pages',
-    where: { slug: { not_in: keepSlugs } },
-    draft: true,
-    limit: 200,
-    depth: 0,
-  })
-  for (const doc of others.docs) {
-    if (doc?.id == null) continue
-    await payload.delete({ collection: 'pages', id: doc.id, user })
-    console.log(`Removed stray page /${(doc as { slug?: string }).slug}`)
   }
 
   // Globals
