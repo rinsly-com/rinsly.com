@@ -39,8 +39,8 @@ importers:
         specifier: 3.85.2
         version: 3.85.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.85.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
       '@rinsly-com/site-core':
-        specifier: ^0.2.1
-        version: 0.2.1(5a23d8da4716ce67ac153d7bd6a9b20c)
+        specifier: ^0.2.2
+        version: 0.2.2(5a23d8da4716ce67ac153d7bd6a9b20c)
       '@tabler/icons-react':
         specifier: ^3.44.0
         version: 3.44.0(react@19.2.6)
@@ -1981,8 +1981,8 @@ packages:
   '@preact/signals-core@1.14.4':
     resolution: {integrity: sha512-HNB6HYeYKhQbJ1aKl+YRjrS4+QWHLKX6qKoUsfS/m0vqzsVaEBiZiaKbG/e+NKk2ch5ALQr/ihWaMHxiCuuWHA==}
 
-  '@rinsly-com/site-core@0.2.1':
-    resolution: {integrity: sha512-L6Fia36S+y8NwD0cIfmltBjqO9ewTrHsnbVYJyRvtKYV/h2nq5hPWoQwFMZZ9JGkEMnQmSZL0fgMKPILdbTWRA==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.2.1/1a875ed04a9be62dbf3aea5ba88788156d5b5fd2}
+  '@rinsly-com/site-core@0.2.2':
+    resolution: {integrity: sha512-XoasSa/cdOKqeVyRd1nHEmyI3gW0guDswdBvN3GZAg4/KkCmG2aq7N9LRaA0Jev8Q5RlH5KhiHa2uWtRcD8RCA==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.2.2/e666a39d029cab9de6105e8d982e4e37e02a29d2}
     peerDependencies:
       '@opennextjs/cloudflare': ^1.20.1
       '@payloadcms/db-d1-sqlite': 3.85.2
@@ -7840,7 +7840,7 @@ snapshots:
 
   '@preact/signals-core@1.14.4': {}
 
-  '@rinsly-com/site-core@0.2.1(5a23d8da4716ce67ac153d7bd6a9b20c)':
+  '@rinsly-com/site-core@0.2.2(5a23d8da4716ce67ac153d7bd6a9b20c)':
     dependencies:
       '@gsap/react': 2.1.2(gsap@3.15.0)(react@19.2.6)
       '@opennextjs/cloudflare': 1.20.1(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(wrangler@4.111.0)

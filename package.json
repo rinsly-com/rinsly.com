@@ -26,7 +26,7 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
-    "@rinsly-com/site-core": "^0.2.1",
+    "@rinsly-com/site-core": "^0.2.2",
     "@gsap/react": "^2.1.2",
     "@opennextjs/cloudflare": "^1.20.1",
     "@payloadcms/db-d1-sqlite": "3.85.2",
