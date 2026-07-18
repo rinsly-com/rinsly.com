@@ -76,7 +76,7 @@ export default async function LocaleLayout({
   const siteJsonLd = buildSiteJsonLd(footer)
 
   return (
-    <html lang={LOCALE_HTML_LANG[locale]} suppressHydrationWarning>
+    <html lang={LOCALE_HTML_LANG[locale]} data-scroll-behavior="smooth" suppressHydrationWarning>
       <head>
         {/*
          * Enable the motion layer (SiteAnimator) synchronously, before first

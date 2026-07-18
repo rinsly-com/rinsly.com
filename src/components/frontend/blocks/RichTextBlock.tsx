@@ -18,10 +18,7 @@ export function RichTextBlock({ header, content, width }: Props) {
       <div className={narrow ? 'mx-auto max-w-3xl' : ''}>
         <SectionHeading header={header} className="mb-6" />
         {content && (
-          <div
-            data-reveal
-            className="prose-headings:font-bold prose-headings:text-ink prose-a:text-accent text-[15px] leading-relaxed text-ink/90"
-          >
+          <div data-reveal className="rich-text">
             <RichText data={content} />
           </div>
         )}
