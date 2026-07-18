@@ -422,7 +422,6 @@ export interface ContactBlock {
      */
     intro?: string | null;
   };
-  showForm?: boolean | null;
   items?:
     | {
         kind?: ('email' | 'phone' | 'address' | 'text') | null;
@@ -907,7 +906,6 @@ export interface ContactBlockSelect<T extends boolean = true> {
         title?: T;
         intro?: T;
       };
-  showForm?: T;
   items?:
     | T
     | {
@@ -1068,7 +1066,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface Header {
   id: number;
   /**
-   * Logo shown at the top-left of the header. Leave empty for the default Rinsly mark.
+   * Logo shown at the top-left of the header. Leave empty to use the default logo.
    */
   logo?: (number | null) | Media;
   /**
@@ -1130,7 +1128,7 @@ export interface Header {
 export interface Footer {
   id: number;
   /**
-   * Logo shown in the footer. Leave empty for the default Rinsly mark.
+   * Logo shown in the footer. Leave empty to use the default logo.
    */
   logo?: (number | null) | Media;
   tagline?: string | null;

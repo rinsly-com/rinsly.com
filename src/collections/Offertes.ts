@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { authenticated } from '../access/roles'
+import { authenticated } from '@rinsly-com/site-core/access'
 
 /**
  * Offertes — quote requests submitted through the multi-step contact wizard.

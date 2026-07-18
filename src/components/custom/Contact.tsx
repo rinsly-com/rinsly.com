@@ -1,14 +1,16 @@
 import type { Page } from '@/payload-types'
-import type { Locale } from '@/lib/locale'
-import { Buttons } from '@/components/frontend/ui/CMSLink'
-import { Icon } from '@/components/frontend/ui/Icon'
-import { OfferteForm } from '@/components/frontend/OfferteForm'
-import { Section } from '@/components/frontend/ui/Section'
-import { SectionHeading } from '@/components/frontend/ui/SectionHeading'
+import type { Locale } from '@rinsly-com/site-core'
+import { Section, SectionHeading, Buttons, Icon } from '@rinsly-com/site-core/ui'
 
-type Props = Extract<NonNullable<Page['layout']>[number], { blockType: 'contact' }> & {
-  locale: Locale
-}
+import { OfferteForm } from '@/components/OfferteForm'
+
+/**
+ * Rinsly's custom `contact` renderer — the engine's core contact block shows
+ * details only; here we override it (via `extraRenderers`) to add the quote-
+ * request wizard (OfferteForm) on the right, matching the original layout.
+ */
+type ContactBlock = Extract<NonNullable<Page['layout']>[number], { blockType: 'contact' }>
+type Props = ContactBlock & { locale: Locale }
 
 type Item = NonNullable<Props['items']>[number]
 
@@ -25,8 +27,7 @@ function hrefFor(item: Item): string | undefined {
   return undefined
 }
 
-/** Contact section: details (left) + an optional quote-request form (right). */
-export function Contact({ header, items, buttons, showForm, locale }: Props) {
+export function Contact({ header, items, buttons, locale }: Props) {
   return (
     <Section className="py-16 sm:py-20">
       <div className="grid gap-10 lg:grid-cols-2">
@@ -70,7 +71,7 @@ export function Contact({ header, items, buttons, showForm, locale }: Props) {
           ) : null}
         </div>
 
-        {showForm !== false && <OfferteForm locale={locale} />}
+        <OfferteForm locale={locale} />
       </div>
     </Section>
   )
