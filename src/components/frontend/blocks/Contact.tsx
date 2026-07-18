@@ -33,7 +33,7 @@ export function Contact({ header, items, buttons, showForm, locale }: Props) {
         <div className="flex flex-col gap-6">
           <SectionHeading header={header} />
           {items?.length ? (
-            <ul className="flex flex-col gap-4">
+            <ul data-reveal-group className="flex flex-col gap-4">
               {items.map((item, i) => {
                 const href = hrefFor(item)
                 const body = (

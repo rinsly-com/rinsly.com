@@ -29,12 +29,16 @@ function toNavItem(link: LinkFields, key: string, locale: Locale): NavItem | nul
 export function SiteHeader({ header, locale }: SiteHeaderProps) {
   const [open, setOpen] = useState(false)
   const barRef = useRef<HTMLDivElement>(null)
+  const menuRef = useRef<HTMLElement>(null)
   const pathname = usePathname()
 
   useEffect(() => {
     if (!open) return
     const onPointerDown = (e: PointerEvent) => {
-      if (barRef.current && !barRef.current.contains(e.target as Node)) setOpen(false)
+      const target = e.target as Node
+      const inBar = barRef.current?.contains(target)
+      const inMenu = menuRef.current?.contains(target)
+      if (!inBar && !inMenu) setOpen(false)
     }
     document.addEventListener('pointerdown', onPointerDown)
     return () => document.removeEventListener('pointerdown', onPointerDown)
@@ -74,6 +78,7 @@ export function SiteHeader({ header, locale }: SiteHeaderProps) {
   }
 
   return (
+    <>
     <header className="sticky top-0 z-40 border-b border-hair/70 bg-paper/85 backdrop-blur-md">
       <div ref={barRef} className="mx-auto w-full max-w-[1080px] px-5 sm:px-8">
         <div className="flex h-16 items-center justify-between gap-4">
@@ -135,41 +140,47 @@ export function SiteHeader({ header, locale }: SiteHeaderProps) {
             )}
           </button>
         </div>
-
-        {open && (
-          <nav id="mobile-menu" aria-label="Hoofdmenu mobiel" className="flex flex-col gap-1 pb-4 md:hidden">
-            {navItems.map((item) => (
-              <Link
-                key={item.key}
-                href={item.href}
-                {...linkTarget(item)}
-                onClick={(e) => {
-                  setOpen(false)
-                  handleNavClick(e, item.href)
-                }}
-                className="rounded-lg px-3 py-2.5 text-sm font-medium text-ink transition-colors hover:text-accent"
-              >
-                {item.label}
-              </Link>
-            ))}
-            {cta && (
-              <Link
-                href={cta.href}
-                {...linkTarget(cta)}
-                onClick={() => setOpen(false)}
-                className="mt-2 inline-flex items-center gap-2 self-start rounded-pill bg-accent px-5 py-2.5 text-sm font-semibold text-white"
-              >
-                {cta.label}
-                <ArrowIcon />
-              </Link>
-            )}
-            <div className="mt-3 border-t border-hair pt-3">
-              <LocaleSwitcher current={locale} hrefFor={switchLocaleHref} />
-            </div>
-          </nav>
-        )}
       </div>
     </header>
+
+    {open && (
+      <nav
+        ref={menuRef}
+        id="mobile-menu"
+        aria-label="Hoofdmenu mobiel"
+        className="fixed inset-x-0 top-16 z-30 flex flex-col gap-1 border-b border-hair/70 bg-paper/80 px-5 pb-4 pt-4 backdrop-blur-md sm:px-8 md:hidden"
+      >
+        {navItems.map((item) => (
+          <Link
+            key={item.key}
+            href={item.href}
+            {...linkTarget(item)}
+            onClick={(e) => {
+              setOpen(false)
+              handleNavClick(e, item.href)
+            }}
+            className="rounded-lg px-3 py-2.5 text-sm font-medium text-ink transition-colors hover:text-accent"
+          >
+            {item.label}
+          </Link>
+        ))}
+        {cta && (
+          <Link
+            href={cta.href}
+            {...linkTarget(cta)}
+            onClick={() => setOpen(false)}
+            className="mt-2 inline-flex items-center gap-2 self-start rounded-pill bg-accent px-5 py-2.5 text-sm font-semibold text-white"
+          >
+            {cta.label}
+            <ArrowIcon />
+          </Link>
+        )}
+        <div className="mt-3 border-t border-hair pt-3">
+          <LocaleSwitcher current={locale} hrefFor={switchLocaleHref} />
+        </div>
+      </nav>
+    )}
+    </>
   )
 }
 

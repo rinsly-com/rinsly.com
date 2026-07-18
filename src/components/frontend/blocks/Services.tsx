@@ -14,7 +14,7 @@ export function Services({ header, cards }: Props) {
     <Section className="py-16 sm:py-20">
       <SectionHeading header={header} />
       {cards?.length ? (
-        <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div data-reveal-group className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {cards.map((card, i) => (
             <article
               key={card.id ?? i}
