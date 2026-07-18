@@ -25,6 +25,7 @@ export function Button({ label, href, variant = 'primary', newTab, className }: 
     <Link
       href={href}
       className={className ? `${styles} ${className}` : styles}
+      {...(variant === 'primary' ? { 'data-magnetic': '' } : {})}
       {...(newTab ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
     >
       {label}

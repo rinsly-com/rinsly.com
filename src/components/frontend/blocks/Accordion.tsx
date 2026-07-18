@@ -23,7 +23,7 @@ export function Accordion({ header, items }: Props) {
   return (
     <Section className="py-16 sm:py-20">
       <SectionHeading header={header} align="center" className="mx-auto mb-10" />
-      <div className="mx-auto flex max-w-3xl flex-col gap-3">
+      <div data-reveal-group className="mx-auto flex max-w-3xl flex-col gap-3">
         {items.map((item, index) => {
           const isOpen = openIndex === index
           return (

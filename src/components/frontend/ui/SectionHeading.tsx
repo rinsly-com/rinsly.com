@@ -33,7 +33,7 @@ export function SectionHeading({
     .join(' ')
 
   return (
-    <div className={wrap}>
+    <div data-reveal className={wrap}>
       {eyebrow && <Eyebrow>{eyebrow}</Eyebrow>}
       {title && (
         <h2 className="text-2xl font-extrabold tracking-[-0.02em] text-ink sm:text-[32px] sm:leading-[1.1]">

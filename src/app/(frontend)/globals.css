@@ -100,6 +100,78 @@ h3 {
   box-shadow: var(--shadow);
 }
 
+/*
+ * Motion layer. The inline head script adds `.anim` to <html> only when JS is on
+ * AND motion is allowed, so these rules never apply for reduced-motion or no-JS
+ * users — content renders fully visible and static.
+ *
+ * Scroll-driven reveals (below) start hidden and are shown by GSAP once they
+ * enter the viewport (see SiteAnimator.tsx). The hero entrance, by contrast, is
+ * CSS-only and runs on load so the LCP heading never waits on the GSAP bundle.
+ */
+.anim [data-reveal],
+.anim [data-reveal-group] > * {
+  opacity: 0;
+}
+
+/* will-change only where motion is continuous (scrubbed parallax). Applying it
+ * to every reveal target would pin dozens of permanent GPU layers; GSAP already
+ * promotes transformed layers for the brief duration of a reveal instead. */
+[data-parallax] {
+  will-change: transform;
+}
+
+/* ── Hero entrance (CSS, runs at first paint — no JS dependency) ──────────── */
+
+/* The LCP heading animates transform ONLY (opacity stays 1) so it is painted
+ * immediately from the server HTML and counts toward LCP at first paint. */
+.anim [data-hero-title] {
+  animation: rinsly-hero-title 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+/* Supporting hero bits (eyebrow, lede, buttons) may fade — they are not LCP.
+ * Per-element animation-delay is set inline in Hero.tsx for the stagger. */
+.anim [data-hero-el] {
+  opacity: 0;
+  animation: rinsly-hero-rise 0.75s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+.anim [data-hero-glow] {
+  animation: rinsly-hero-bloom 1.6s ease-out both;
+}
+
+@keyframes rinsly-hero-title {
+  from {
+    transform: translateY(24px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+@keyframes rinsly-hero-rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes rinsly-hero-bloom {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
+  }
+}
+
+/* A magnetic button should glide, not fight GSAP's inline transforms. */
+[data-magnetic] {
+  transition: none;
+}
+
 /* Smooth in-page anchor scrolling (respecting reduced-motion). */
 html {
   scroll-behavior: smooth;

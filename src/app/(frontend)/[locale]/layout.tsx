@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import React from 'react'
 
 import { JsonLd } from '@/components/frontend/JsonLd'
+import { SiteAnimator } from '@/components/frontend/SiteAnimator'
 import { SiteFooter } from '@/components/frontend/SiteFooter'
 import { SiteHeader } from '@/components/frontend/SiteHeader'
 import { getFooter, getHeader } from '@/lib/globals'
@@ -75,9 +76,24 @@ export default async function LocaleLayout({
   const siteJsonLd = buildSiteJsonLd(footer)
 
   return (
-    <html lang={LOCALE_HTML_LANG[locale]}>
+    <html lang={LOCALE_HTML_LANG[locale]} suppressHydrationWarning>
+      <head>
+        {/*
+         * Enable the motion layer (SiteAnimator) synchronously, before first
+         * paint, but ONLY when JS is on and the user allows motion. The `.anim`
+         * class is what makes reveal targets start hidden, so no-JS and
+         * reduced-motion users always see fully-rendered content.
+         */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "try{if(!matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('anim')}catch(e){}",
+          }}
+        />
+      </head>
       <body className="font-sans">
         <JsonLd data={siteJsonLd} />
+        <SiteAnimator />
         <SiteHeader header={header} locale={locale} />
         <main>{children}</main>
         <SiteFooter footer={footer} locale={locale} />

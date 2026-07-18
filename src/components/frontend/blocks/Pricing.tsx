@@ -17,7 +17,7 @@ export function Pricing({ header, tiers }: Props) {
     <Section className="py-16 sm:py-20">
       <SectionHeading header={header} />
       {tiers?.length ? (
-        <div className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+        <div data-reveal-group className="mt-10 grid gap-4 md:grid-cols-2 lg:grid-cols-3">
           {tiers.map((tier, i) => {
             const highlight = Boolean(tier.recommended)
             const wide = tiers.length >= 4 && i === tiers.length - 1
@@ -45,7 +45,10 @@ export function Pricing({ header, tiers }: Props) {
                     )}
                     <div className="mt-4 flex items-baseline gap-1">
                       {tier.price && (
-                        <span className="text-[38px] font-extrabold tracking-[-0.03em] tabular-nums text-ink">
+                        <span
+                          data-count
+                          className="text-[38px] font-extrabold tracking-[-0.03em] tabular-nums text-ink"
+                        >
                           {tier.price}
                         </span>
                       )}

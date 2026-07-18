@@ -11,7 +11,10 @@ export function Note({ text }: Props) {
   if (!text) return null
   return (
     <Section className="pb-6 sm:pb-8">
-      <div className="mx-auto max-w-2xl rounded-xl border border-hair border-l-[3px] border-l-accent bg-accent-soft px-5 py-4 text-center text-sm text-ink">
+      <div
+        data-reveal
+        className="mx-auto max-w-2xl rounded-xl border border-hair border-l-[3px] border-l-accent bg-accent-soft px-5 py-4 text-center text-sm text-ink"
+      >
         {text}
       </div>
     </Section>
