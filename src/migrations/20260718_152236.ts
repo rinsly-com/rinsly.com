@@ -258,7 +258,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`header_eyebrow\` text,
   	\`header_title\` text,
   	\`header_intro\` text,
-  	\`show_form\` integer DEFAULT true,
   	\`anchor\` text,
   	\`block_name\` text,
   	FOREIGN KEY (\`_parent_id\`) REFERENCES \`pages\`(\`id\`) ON UPDATE no action ON DELETE cascade
@@ -612,7 +611,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	\`header_eyebrow\` text,
   	\`header_title\` text,
   	\`header_intro\` text,
-  	\`show_form\` integer DEFAULT true,
   	\`anchor\` text,
   	\`_uuid\` text,
   	\`block_name\` text,

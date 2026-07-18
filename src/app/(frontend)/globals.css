@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Scan the engine's block/UI components (node_modules) so Tailwind generates
+ * their utility classes. This project's own src/ is auto-scanned. */
+@source "../../../node_modules/@rinsly-com/site-core/src";
+
 /*
  * Rinsly design system — ported from the proposal artifact (Voorstel — Hosting
  * & Onderhoud). Palette tokens are defined as raw CSS variables on :root so they

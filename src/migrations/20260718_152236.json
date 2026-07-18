@@ -1773,14 +1773,6 @@
           "notNull": false,
           "autoincrement": false
         },
-        "show_form": {
-          "name": "show_form",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": true
-        },
         "anchor": {
           "name": "anchor",
           "type": "text",
@@ -4237,14 +4229,6 @@
           "primaryKey": false,
           "notNull": false,
           "autoincrement": false
-        },
-        "show_form": {
-          "name": "show_form",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": true
         },
         "anchor": {
           "name": "anchor",
@@ -6710,6 +6694,6 @@
   "internal": {
     "indexes": {}
   },
-  "id": "3479baf6-81b2-4b6d-a431-54ca89436dc4",
+  "id": "a20e45a1-e0bc-4400-b750-b2cc25286312",
   "prevId": "00000000-0000-0000-0000-000000000000"
 }

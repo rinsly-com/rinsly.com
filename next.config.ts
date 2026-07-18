@@ -6,6 +6,8 @@ import { fileURLToPath } from 'url'
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
 const nextConfig: NextConfig = {
+  // The engine ships as TypeScript/JSX source; Next must transpile it.
+  transpilePackages: ['@rinsly-com/site-core'],
   images: {
     localPatterns: [{ pathname: '/api/media/file/**' }],
   },

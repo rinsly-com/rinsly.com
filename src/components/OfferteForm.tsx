@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-import type { Locale } from '@/lib/locale'
+import type { Locale } from '@rinsly-com/site-core'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
