@@ -9,10 +9,11 @@
   // remote bindings are only enabled in production builds (see
   // getCloudflareContextFromWrangler in payload.config.ts).
   //
-  // TODO before first deploy (you provide these Cloudflare resources):
-  //   1. wrangler d1 create rinsly            → paste the id into database_id
-  //   2. wrangler r2 bucket create rinsly     (media originals)
-  //   3. Attach the accp.rinsly.com custom domain to this worker in the
+  // Cloudflare resources (created 2026-07-23):
+  //   D1 "rinsly-accp" (07896317-…) + R2 "rinsly-accp" — bound below.
+  // Remaining before the CMS is fully usable:
+  //   - Set the runtime PAYLOAD_SECRET (+ DEPLOY_DISPATCH_TOKEN) on this worker.
+  //   - Attach the accp.rinsly.com custom domain to this worker in the
   //      Cloudflare dashboard (Worker → Settings → Domains & Routes). NOT via
   //      wrangler routes: CI deploys with an account-scoped token that can't
   //      manage zone (Workers Routes) permissions.
@@ -37,8 +38,8 @@
   "d1_databases": [
     {
       "binding": "D1",
-      "database_name": "rinsly",
-      "database_id": "bc3bc7c5-00ec-4071-bfc0-4e294720a431",
+      "database_name": "rinsly-accp",
+      "database_id": "07896317-ed2b-41d6-8b72-8ddce580690a",
       "remote": true,
     },
   ],
@@ -47,7 +48,7 @@
   // Production rewrites these URLs through Cloudflare Image Transformations
   // (/cdn-cgi/image) — enable it on the rinsly.com zone. See src/lib/image.ts.
   "r2_buckets": [
-    { "binding": "R2", "bucket_name": "rinsly" },
+    { "binding": "R2", "bucket_name": "rinsly-accp" },
   ],
   "vars": {
     // GitHub repository_dispatch endpoint the CMS "Deploy" button POSTs to (see
