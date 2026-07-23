@@ -1,0 +1,35 @@
+name: Deploy production (static)
+
+# The public production site (rinsly worker) is a fully static export of the
+# published content, snapshotted from the live accp CMS API at build time.
+#
+# Triggered by:
+#   - repository_dispatch [deploy-static] — the CMS admin "Deploy" button + the
+#     on-publish hooks (src/hooks/triggerStaticDeploy.ts fires the dispatch)
+#   - push to main — code changes that also need the static site rebuilt
+#   - manual run
+#
+# "pnpm run deploy:static" snapshots PAYLOAD_API_URL, builds the static export,
+# then `wrangler deploy --config wrangler.static.jsonc`. It does NOT touch D1.
+
+on:
+  repository_dispatch:
+    types: [deploy-static]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-rinsly-prod
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    permissions:
+      contents: read
+      packages: read
+    uses: rinsly-com/rinsly-template/.github/workflows/site-deploy.yml@main
+    secrets: inherit
+    with:
+      deploy-command: 'pnpm run deploy:static'
+      payload-api-url: 'https://accp.rinsly.com'

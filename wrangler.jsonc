@@ -1,21 +1,21 @@
 {
   // ===========================================================================
-  // Rinsly — single Cloudflare Worker serving the Payload admin + API + the
-  // localized Next.js frontend (SSR), backed by D1 (database) and R2 (media).
+  // ACCP — the dynamic Cloudflare Worker serving the Payload admin + API + the
+  // localized Next.js frontend (SSR), backed by D1 (database) and R2 (media),
+  // at accp.rinsly.com. The PUBLIC site (rinsly.com) is a separate static export
+  // built from this worker's published content — see wrangler.static.jsonc.
   //
   // Local `pnpm dev` uses a local SQLite mock via wrangler's platform proxy;
   // remote bindings are only enabled in production builds (see
   // getCloudflareContextFromWrangler in payload.config.ts).
   //
   // TODO before first deploy (you provide these Cloudflare resources):
-  //   1. wrangler d1 create rinsly           → paste the id into database_id
+  //   1. wrangler d1 create rinsly            → paste the id into database_id
   //   2. wrangler r2 bucket create rinsly     (media originals)
-  //   3. Point the rinsly.com custom domain at this worker (routes below).
-  //   4. Edge redirects: rinsly.com/ → /en, rinsly.nl/* → /nl/* (Bulk Redirects
-  //      or a Redirect Rule — not managed here).
+  //   3. Point the accp.rinsly.com custom domain at this worker (routes below).
   // ===========================================================================
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "rinsly",
+  "name": "rinsly-accp",
   "main": ".open-next/worker.js",
   "compatibility_date": "2025-08-15",
   "compatibility_flags": [
@@ -24,10 +24,9 @@
     // Allow the app to fetch public URLs.
     "global_fetch_strictly_public",
   ],
-  // Custom domain(s) for the worker. Uncomment once the zone is on Cloudflare.
+  // Custom domain for the accp CMS. Uncomment once the zone is on Cloudflare.
   // "routes": [
-  //   { "pattern": "rinsly.com", "custom_domain": true },
-  //   { "pattern": "www.rinsly.com", "custom_domain": true },
+  //   { "pattern": "accp.rinsly.com", "custom_domain": true },
   // ],
   "assets": {
     "directory": ".open-next/assets",

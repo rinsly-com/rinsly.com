@@ -19,8 +19,10 @@ export const siteConfig = {
       en: 'Rinsly — web development & management. Online without worries, up to date and secure.',
     } as Localized,
   },
-  // rinsly.nl serves the Dutch site; allow it (and rinsly.com is `url`).
-  extraOrigins: ['https://rinsly.nl'] as string[],
+  // `url` (rinsly.com) is the public static site — allow it so the accp CMS
+  // accepts API calls from it (e.g. the offerte form). accp.rinsly.com is the
+  // CMS's own origin.
+  extraOrigins: ['https://accp.rinsly.com'] as string[],
 } as const
 
 export type SiteConfig = typeof siteConfig

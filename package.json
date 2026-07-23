@@ -6,8 +6,11 @@
   "type": "module",
   "scripts": {
     "build": "pnpm run generate:types:cloudflare && cross-env NODE_OPTIONS=\"--no-deprecation --max-old-space-size=8000\" next build",
+    "build:static": "pnpm run generate:types:cloudflare && node scripts/build-static.mjs",
     "deploy": "pnpm run deploy:database && pnpm run deploy:app",
     "deploy:app": "opennextjs-cloudflare build ${CLOUDFLARE_ENV:+--env=$CLOUDFLARE_ENV} && opennextjs-cloudflare deploy ${CLOUDFLARE_ENV:+--env=$CLOUDFLARE_ENV}",
+    "deploy:static": "pnpm run build:static && wrangler deploy --config wrangler.static.jsonc",
+    "preview:static": "pnpm run build:static && wrangler dev --config wrangler.static.jsonc",
     "deploy:database": "pnpm run lint:migrations && cross-env NODE_ENV=production PAYLOAD_SECRET=ignore payload migrate && wrangler d1 execute D1 --command 'PRAGMA optimize' ${CLOUDFLARE_ENV:+--env=$CLOUDFLARE_ENV} --remote",
     "dev": "cross-env NODE_OPTIONS=--no-deprecation next dev",
     "devsafe": "rm -rf .next && rm -rf .open-next && cross-env NODE_OPTIONS=--no-deprecation next dev",
@@ -26,7 +29,7 @@
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
   },
   "dependencies": {
-    "@rinsly-com/site-core": "^0.2.2",
+    "@rinsly-com/site-core": "^0.4.0",
     "@gsap/react": "^2.1.2",
     "@opennextjs/cloudflare": "^1.20.1",
     "@payloadcms/db-d1-sqlite": "3.85.2",

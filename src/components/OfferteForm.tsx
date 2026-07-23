@@ -18,6 +18,11 @@ type Data = {
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
+// On the dynamic accp site this is same-origin (empty base). On the static prod
+// site (rinsly.com) there is no API, so the build inlines the accp origin here
+// (NEXT_PUBLIC_API_URL) and the form posts cross-origin to accp (CORS-allowed).
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
+
 const COPY = {
   nl: {
     steps: ['Gegevens', 'Abonnement', 'Toevoegingen', 'Verzenden'],
@@ -121,7 +126,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
     if (status === 'submitting') return
     setStatus('submitting')
     try {
-      const res = await fetch('/api/offerte', {
+      const res = await fetch(`${API_BASE}/api/offerte`, {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(data),

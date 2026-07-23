@@ -1,0 +1,21 @@
+{
+  // ===========================================================================
+  // PRODUCTION — fully static site. No `main`, no D1, no runtime: just the
+  // static export in out/ served from Cloudflare's edge (Workers Static Assets).
+  // Built from published content on accp. Deploy: pnpm run deploy:static
+  // ===========================================================================
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "rinsly",
+  "compatibility_date": "2025-08-15",
+  // Custom domain for the public site. Uncomment once the zone is on Cloudflare.
+  // "routes": [
+  //   { "pattern": "rinsly.com", "custom_domain": true },
+  // ],
+  "assets": {
+    "directory": "out",
+    // Next's static export emits 404.html and trailing-slash directory pages;
+    // out/_redirects (written by build-static.mjs) sends `/` -> `/nl`.
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash",
+  },
+}
