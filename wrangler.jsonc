@@ -12,7 +12,10 @@
   // TODO before first deploy (you provide these Cloudflare resources):
   //   1. wrangler d1 create rinsly            → paste the id into database_id
   //   2. wrangler r2 bucket create rinsly     (media originals)
-  //   3. Point the accp.rinsly.com custom domain at this worker (routes below).
+  //   3. Attach the accp.rinsly.com custom domain to this worker in the
+  //      Cloudflare dashboard (Worker → Settings → Domains & Routes). NOT via
+  //      wrangler routes: CI deploys with an account-scoped token that can't
+  //      manage zone (Workers Routes) permissions.
   // ===========================================================================
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "rinsly-accp",
@@ -24,10 +27,9 @@
     // Allow the app to fetch public URLs.
     "global_fetch_strictly_public",
   ],
-  // Custom domain for the accp CMS. Uncomment once the zone is on Cloudflare.
-  // "routes": [
-  //   { "pattern": "accp.rinsly.com", "custom_domain": true },
-  // ],
+  // Custom domain (accp.rinsly.com) is attached in the Cloudflare dashboard, NOT
+  // here — so CI's account-scoped token doesn't need zone (Workers Routes) perms.
+  // wrangler deploy only updates the worker script; the domain binding persists.
   "assets": {
     "directory": ".open-next/assets",
     "binding": "ASSETS",
@@ -47,4 +49,10 @@
   "r2_buckets": [
     { "binding": "R2", "bucket_name": "rinsly" },
   ],
+  "vars": {
+    // GitHub repository_dispatch endpoint the CMS "Deploy" button POSTs to (see
+    // src/hooks/triggerStaticDeploy.ts). Non-secret. The paired
+    // DEPLOY_DISPATCH_TOKEN is a Worker SECRET (never stored here).
+    "DEPLOY_DISPATCH_URL": "https://api.github.com/repos/rinsly-com/rinsly.com/dispatches",
+  },
 }

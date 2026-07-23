@@ -1,9 +1,17 @@
 name: Deploy ACCP (CMS)
 
 # The accp worker (rinsly-accp) is the dynamic Payload CMS + live preview at
-# accp.rinsly.com. "pnpm run deploy" migrates the accp D1 (lint:migrations
-# first) then builds + deploys via opennextjs-cloudflare. Runs on code changes
-# to main; the static production site is deployed separately (deploy-prod.yml).
+# accp.rinsly.com. "pnpm run deploy" migrates the accp D1 then builds + deploys
+# via opennextjs-cloudflare.
+#
+# Self-contained (inlined) copy of the fleet pipeline. Canonical source:
+# rinsly-com/rinsly-template/.github/workflows/site-deploy.yml — kept in sync by
+# the fleet tooling. (Inlined rather than referenced because GitHub's private
+# cross-repo reusable-workflow access was unreliable for this org.)
+#
+# Custom domains are attached in the Cloudflare dashboard (not in wrangler.jsonc),
+# so the CLOUDFLARE_API_TOKEN only needs account-level perms (no zone/Workers
+# Routes).
 
 on:
   push:
@@ -14,11 +22,37 @@ concurrency:
   group: deploy-rinsly-accp
   cancel-in-progress: false
 
+permissions:
+  contents: read
+  packages: read
+
 jobs:
   deploy:
-    permissions:
-      contents: read
-      packages: read
-    uses: rinsly-com/rinsly-template/.github/workflows/site-deploy.yml@main
-    secrets: inherit
-    # deploy-command defaults to "pnpm run deploy".
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js + GitHub Packages auth
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@rinsly-com'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
+
+      - name: Build + deploy
+        run: pnpm run deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
