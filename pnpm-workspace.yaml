@@ -5,6 +5,6 @@ allowBuilds:
   unrs-resolver: true
   workerd: true
 minimumReleaseAgeExclude:
-  - '@rinsly-com/site-core@0.2.0 || 0.2.1 || 0.2.2 || 0.4.0'
+  - '@rinsly-com/site-core@0.2.0 || 0.2.1 || 0.2.2 || 0.4.0 || 0.5.0'
 patchedDependencies:
   '@payloadcms/drizzle@3.85.2': patches/@payloadcms__drizzle@3.85.2.patch

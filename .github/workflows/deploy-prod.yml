@@ -42,6 +42,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # Production is ALWAYS built from `main`, whatever dispatched the run.
+          #
+          # GitHub runs a repository_dispatch against the DEFAULT branch, which is
+          # `develop`. So without pinning this, the CMS "Deploy now" button would
+          # build the public site from staging code — silently, and only once
+          # develop had moved ahead of main. A push to main already checks out
+          # main, and a manual run keeps whichever ref was chosen.
+          ref: ${{ github.event_name == 'repository_dispatch' && 'main' || github.ref }}
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
