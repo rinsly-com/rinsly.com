@@ -3,18 +3,27 @@ name: Deploy production (static)
 # The public production site (rinsly worker) is a fully static export of the
 # published content, snapshotted from the live accp CMS API at build time.
 #
-# Prod is deployed DELIBERATELY, never on a code merge — so features can be
-# tested on accp first. It's triggered ONLY by the CMS "Deploy" button +
-# on-publish hooks (repository_dispatch), or a manual run. (Code merges to main
-# auto-deploy accp via deploy-accp.yml; the prod build then picks up that code
-# whenever it's next published.)
+# Branch → environment: `main` is the production line and deploys HERE; code
+# reaches it by merging `develop` (which deploys accp — see deploy-accp.yml), so
+# everything is exercised on accp first. Pushing code straight to main skips that
+# check AND leaves production running ahead of the CMS/API it snapshots content
+# from, so always merge develop → main.
+#
+# Content changes never deploy on their own: publishing a page only decides what
+# the NEXT build ships. Editors ship it with the CMS "Deploy now" button
+# (repository_dispatch), which is also how a content-only release happens with no
+# code change. A manual run from the Actions tab does the same.
 #
 # Self-contained (inlined) copy of the fleet pipeline. Canonical source:
 # rinsly-com/rinsly-template/.github/workflows/site-deploy.yml — kept in sync by
 # the fleet tooling. Custom domains live in the Cloudflare dashboard, so an
 # account-level CLOUDFLARE_API_TOKEN suffices (no zone/Workers Routes perms).
 
+run-name: Deploy prod — ${{ github.event.client_payload.reason || github.event_name }}
+
 on:
+  push:
+    branches: [main]
   repository_dispatch:
     types: [deploy-static]
   workflow_dispatch:
