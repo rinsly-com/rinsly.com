@@ -4,7 +4,9 @@ import { fileURLToPath } from 'url'
 import { buildSiteConfig } from '@rinsly-com/site-core/config'
 import { siteConfig } from '@/site.config'
 
+import { CheckAanvragen } from './collections/CheckAanvragen'
 import { Offertes } from './collections/Offertes'
+import { checkAanvraagHandler } from './endpoints/checkAanvraag'
 import { offerteHandler } from './endpoints/offerte'
 import { deployHandler } from './endpoints/deploy'
 import { triggerDeploy } from './hooks/triggerStaticDeploy'
@@ -20,9 +22,11 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
  */
 export default buildSiteConfig({
   siteConfig,
-  extraCollections: [Offertes],
+  extraCollections: [Offertes, CheckAanvragen],
   extraEndpoints: [
     { path: '/offerte', method: 'post', handler: offerteHandler },
+    // POST /api/check-aanvraag — lead form on the generic /check page.
+    { path: '/check-aanvraag', method: 'post', handler: checkAanvraagHandler },
     // POST /api/deploy — manual "rebuild production" trigger (endpoints/deploy.ts).
     { path: '/deploy', method: 'post', handler: deployHandler },
   ],

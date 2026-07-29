@@ -49,6 +49,16 @@
   // (/cdn-cgi/image) — enable it on the rinsly.com zone. See src/lib/image.ts.
   "r2_buckets": [
     { "binding": "R2", "bucket_name": "rinsly-accp" },
+    // LeadLens scorecards for the personal /check/<token> pages. LeadLens (the
+    // sales tool) writes `<token>/scorecard.json` + `<token>/desktop.png` +
+    // `<token>/mobile.png`; this worker only reads. Create the bucket once:
+    //   wrangler r2 bucket create leadlens-checks
+    // The PUBLIC URL (rinsly.com/check/<token>) needs a zone route to THIS
+    // worker — the static rinsly.com worker has no runtime. In the dashboard,
+    // add route `rinsly.com/check/*` -> rinsly-accp (same dashboard-not-CI
+    // reasoning as the custom domain above). Until then, LeadLens can link to
+    // accp.rinsly.com/check/<token>.
+    { "binding": "LEADLENS_CHECKS", "bucket_name": "leadlens-checks" },
   ],
   "vars": {
     // GitHub repository_dispatch endpoint the CMS "Deploy" button POSTs to (see

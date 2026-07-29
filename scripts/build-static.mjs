@@ -20,8 +20,14 @@ const API_URL = (process.env.PAYLOAD_API_URL || 'http://localhost:3000').replace
 const LOCALES = ['nl', 'en']
 const DEFAULT_LOCALE = 'nl'
 
-// Server-only route group to hide during the static export.
-const EXCLUDED = [{ live: 'src/app/(payload)', stashed: 'app__payload' }]
+// Server-only routes to hide during the static export: the (payload) admin/API
+// group, and the personal LeadLens scorecard pages (/check/<token>), which read
+// R2 at request time — the runtime lives on accp (see wrangler.jsonc's
+// LEADLENS_CHECKS notes). The generic /check page IS exported.
+const EXCLUDED = [
+  { live: 'src/app/(payload)', stashed: 'app__payload' },
+  { live: 'src/app/(frontend)/check/[token]', stashed: 'app__frontend_check_token' },
+]
 
 const stash = () => {
   mkdirSync(backupDir, { recursive: true })

@@ -50,4 +50,24 @@ if (!isStatic) {
   nextConfig.redirects = async () => [{ source: '/', destination: '/nl', permanent: false }]
 }
 
-export default isStatic ? nextConfig : withPayload(nextConfig, { devBundleServerPackages: false })
+const config = isStatic ? nextConfig : withPayload(nextConfig, { devBundleServerPackages: false })
+
+if (!isStatic) {
+  // withPayload adds Accept-CH/Critical-CH (Sec-CH-Prefers-Color-Scheme) on
+  // every route for the admin's server-side theming. A Critical-CH response
+  // makes Chromium RESTART the navigation to resend the hint — a full extra
+  // round trip on every first visit. The /check funnel pages (LeadLens
+  // scorecards) theme via pure CSS prefers-color-scheme and are exactly where
+  // we sell speed, so carve them out of Payload's catch-all header entry.
+  const payloadHeaders = config.headers?.bind(config)
+  config.headers = async () => {
+    const entries = payloadHeaders ? await payloadHeaders() : []
+    return entries.map((entry) =>
+      entry.source === '/:path*' && entry.headers?.some((h) => h.key === 'Critical-CH')
+        ? { ...entry, source: '/((?!check).*)' }
+        : entry,
+    )
+  }
+}
+
+export default config
