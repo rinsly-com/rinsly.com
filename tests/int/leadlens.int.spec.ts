@@ -2,9 +2,10 @@
 // Unit tests for the LeadLens datacontract layer behind /check/<token>
 // (src/lib/leadlens.ts): JSON validation, expiry and the e-mail-matching
 // grade-pill thresholds.
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { TOKEN_RE, gradeTone, isExpired, parseScorecard } from '@/lib/leadlens'
+import { TOKEN_RE, getScorecard, gradeTone, isExpired, parseScorecard } from '@/lib/leadlens'
+import { DEMO_TOKEN, demoEnabled, demoScorecard } from '@/lib/leadlensDemo'
 
 const valid = () => ({
   version: 1,
@@ -88,6 +89,32 @@ describe('gradeTone — the e-mail pill thresholds (green ≥65, blue 40–64, g
     [0, 'low'],
   ] as const)('%i → %s', (score, tone) => {
     expect(gradeTone(score)).toBe(tone)
+  })
+})
+
+describe('demo lead (/check/demo, dev only)', () => {
+  afterEach(() => vi.unstubAllEnvs())
+
+  it('is gated to NODE_ENV=development', () => {
+    expect(demoEnabled()).toBe(false) // vitest runs with NODE_ENV=test
+    vi.stubEnv('NODE_ENV', 'development')
+    expect(demoEnabled()).toBe(true)
+    vi.stubEnv('NODE_ENV', 'production')
+    expect(demoEnabled()).toBe(false)
+  })
+
+  it('getScorecard treats "demo" as unknown outside development (no R2 touched)', async () => {
+    // DEMO_TOKEN fails TOKEN_RE, so this resolves before any binding lookup.
+    await expect(getScorecard(DEMO_TOKEN)).resolves.toEqual({ status: 'not_found' })
+  })
+
+  it('the demo fixture satisfies the datacontract parser', () => {
+    const demo = demoScorecard()
+    expect(demo.status).toBe('ok')
+    if (demo.status === 'ok') {
+      expect(parseScorecard(demo.scorecard)).not.toBeNull()
+      expect(isExpired(demo.scorecard)).toBe(false)
+    }
   })
 })
 

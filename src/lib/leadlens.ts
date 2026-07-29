@@ -1,6 +1,7 @@
 import { cache } from 'react'
 
 import { getBindings } from './bindings'
+import { DEMO_TOKEN, demoEnabled, demoScorecard } from './leadlensDemo'
 
 /**
  * LeadLens → website datacontract (v1). LeadLens publishes one folder per lead
@@ -101,6 +102,9 @@ export function parseScorecard(raw: unknown): Scorecard | null {
  * generateMetadata and the page component share one R2 round-trip.
  */
 export const getScorecard = cache(async (token: string): Promise<ScorecardResult> => {
+  // /check/demo — design preview with fixture data, `next dev` only. In
+  // production it falls through to the unknown-token path (regex mismatch).
+  if (token === DEMO_TOKEN && demoEnabled()) return demoScorecard()
   if (!TOKEN_RE.test(token)) return { status: 'not_found' }
 
   const env = await getBindings()
