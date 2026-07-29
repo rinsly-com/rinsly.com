@@ -139,8 +139,8 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
       title: t(locale, 'Uw website, volledig beheerd', 'Your website, fully managed'),
       intro: t(
         locale,
-        'U bent altijd eigenaar van uw site en data, maandelijks opzegbaar, gebouwd als maatwerk op het Cloudflare-platform — geen WordPress-template. Hosting is bij elk pakket inbegrepen. Onze tarieven zijn zakelijk en exclusief 21% btw.',
-        'You always own your site and data, cancel monthly, custom-built on the Cloudflare platform — not a WordPress template. Hosting is included in every plan. Our rates are for business customers and exclude 21% VAT.',
+        'U bent altijd eigenaar van uw site en data, maandelijks opzegbaar, gebouwd als maatwerk op het Cloudflare-platform — geen WordPress-template. Hosting is bij elk pakket inbegrepen. Bij een driejarige beheerovereenkomst bouwen we uw website gratis (afhankelijk van de omvang). Onze tarieven zijn zakelijk en exclusief 21% btw.',
+        'You always own your site and data, cancel monthly, custom-built on the Cloudflare platform — not a WordPress template. Hosting is included in every plan. With a three-year management agreement we build your website for free (depending on scale). Our rates are for business customers and exclude 21% VAT.',
       ),
     },
     tiers: [
@@ -252,6 +252,11 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
             locale,
             'Net gestart? In overleg kunnen de bouwkosten over het eerste jaar worden gespreid.',
             'Just starting out? By arrangement, the build cost can be spread over the first year.',
+          ),
+          t(
+            locale,
+            'Gaat u een beheerovereenkomst van drie jaar aan, dan bouwen we uw website gratis — afhankelijk van de omvang van de site.',
+            'If you commit to a three-year management agreement, we build your website for free — depending on the scale of the site.',
           ),
         ),
       },

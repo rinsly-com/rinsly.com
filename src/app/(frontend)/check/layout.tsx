@@ -38,7 +38,7 @@ export default function CheckLayout({ children }: { children: React.ReactNode })
           <div className="mx-auto flex w-full max-w-[1080px] items-center justify-between px-5 py-5 sm:px-8">
             <Link href="/nl" className="flex items-center gap-2.5" aria-label="Rinsly">
               {/* eslint-disable-next-line @next/next/no-img-element -- small static brand asset */}
-              <img src={siteConfig.logo} alt="" className="h-8 w-auto" />
+              <img src={siteConfig.logo} alt="" className="h-8 w-auto rounded-lg" />
               <span className="text-lg font-extrabold tracking-[-0.02em] text-ink">Rinsly</span>
             </Link>
             <span className="hidden text-sm text-muted sm:block">Gratis websitecheck</span>

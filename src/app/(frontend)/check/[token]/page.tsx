@@ -37,13 +37,15 @@ const STEPS = [
 /** Findings arrive lowercase from LeadLens; only the first letter is presentation. */
 const sentence = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
-// Soft pill treatments (tinted bg + toned text) rather than solid fills: the
-// solid --good/--accent fills fall below WCAG contrast with white text in the
-// dark palette, and the soft look stays consistent across both color schemes.
+// Traffic-light pills: green ≥65, orange 40–64, red <40. Soft treatments
+// (tinted bg + toned text) rather than solid fills — the tokens keep WCAG
+// contrast in both color schemes where solid fills with white text don't.
+// NOTE: diverges from the original mail spec (blue/grey mids and lows) — the
+// scorecard e-mail should adopt the same traffic-light colors.
 const PILL_TONES: Record<ReturnType<typeof gradeTone>, string> = {
   good: 'bg-good/15 text-good',
-  mid: 'bg-accent-soft text-accent',
-  low: 'border border-hair bg-paper text-muted',
+  mid: 'bg-warn/15 text-warn',
+  low: 'bg-bad/15 text-bad',
 }
 
 type Params = { params: Promise<{ token: string }> }
