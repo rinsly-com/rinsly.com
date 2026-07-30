@@ -47,9 +47,33 @@
   // payload.config.ts activates the R2 storage adapter once this binding exists.
   // Production rewrites these URLs through Cloudflare Image Transformations
   // (/cdn-cgi/image) — enable it on the rinsly.com zone. See src/lib/image.ts.
+  // Transactional mail (Payload auth mails + submission notifications) via
+  // Cloudflare Email Sending, as noreply@rinsly.com. The domain is onboarded
+  // (SPF/DKIM live on the cf-bounce subdomain, so TransIP's apex SPF for the
+  // contact@ mailbox is untouched). See src/email/cloudflareEmailAdapter.ts.
+  "send_email": [{ "name": "EMAIL" }],
   "r2_buckets": [
     { "binding": "R2", "bucket_name": "rinsly-accp" },
+    // LeadLens scorecards for the personal /check/<token> pages. LeadLens (the
+    // sales tool) writes `<token>/scorecard.json` + `<token>/desktop.png` +
+    // `<token>/mobile.png`; this worker only reads. Create the bucket once:
+    //   wrangler r2 bucket create leadlens-checks
+    // The PUBLIC URL (rinsly.com/check/<token>) needs a zone route to THIS
+    // worker — the static rinsly.com worker has no runtime. In the dashboard,
+    // add route `rinsly.com/check/*` -> rinsly-accp (same dashboard-not-CI
+    // reasoning as the custom domain above). Until then, LeadLens can link to
+    // accp.rinsly.com/check/<token>.
+    { "binding": "LEADLENS_CHECKS", "bucket_name": "leadlens-checks" },
   ],
+  // Self-service /check runs enrich with Google PageSpeed Insights when the
+  // PSI_API_KEY Worker SECRET is set (free key via Google Cloud console;
+  // keyless calls are 429'd). Without it the check degrades to probe-based
+  // speed heuristics: wrangler secret put PSI_API_KEY
+  //
+  // Rate limit: 5 scans per IP per day. Logged-in admin users are exempt, and
+  // so are IPs in the CHECK_RATE_EXEMPT_IPS secret (comma-separated), e.g.
+  // your own: wrangler secret put CHECK_RATE_EXEMPT_IPS
+  // Locally: put both in .dev.vars (read by the dev platform proxy).
   "vars": {
     // GitHub repository_dispatch endpoint the CMS "Deploy" button POSTs to (see
     // src/hooks/triggerStaticDeploy.ts). Non-secret. The paired

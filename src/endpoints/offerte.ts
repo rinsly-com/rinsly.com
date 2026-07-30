@@ -1,5 +1,7 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
 
+import { getRuntime } from '../lib/bindings'
+
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const SUBSCRIPTIONS = ['care', 'beheerd', 'partner', 'opmaat']
 const ADDITIONS = ['localization', 'email', 'design', 'seo', 'content', 'other']
@@ -64,6 +66,22 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
     return json({ ok: false, error: 'server' }, 500)
   }
 
-  // TODO: email the submission to contact@rinsly.com once Cloudflare Email is set up.
+  // Notify sales in the background; a mail failure never breaks the submission.
+  const { waitUntil } = await getRuntime()
+  waitUntil(
+    req.payload
+      .sendEmail({
+        to: 'contact@rinsly.com',
+        subject: `Nieuwe offerteaanvraag: ${bedrijf}`,
+        text: `Er is een nieuwe offerteaanvraag binnengekomen via de contactwizard.\n\nBedrijf: ${bedrijf}\nNaam: ${naam}\nE-mail: ${email}\nAbonnement: ${subscription}\n${bericht ? `\nBericht:\n${bericht}\n` : ''}\nDe aanvraag staat ook in het admin-panel onder Offerteaanvragen.`,
+      })
+      .catch((err: unknown) => {
+        req.payload.logger.error({
+          msg: '[offerte] notification mail failed',
+          err: err instanceof Error ? err.message : String(err),
+        })
+      }),
+  )
+
   return json({ ok: true })
 }

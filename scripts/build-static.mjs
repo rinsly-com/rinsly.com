@@ -20,8 +20,14 @@ const API_URL = (process.env.PAYLOAD_API_URL || 'http://localhost:3000').replace
 const LOCALES = ['nl', 'en']
 const DEFAULT_LOCALE = 'nl'
 
-// Server-only route group to hide during the static export.
-const EXCLUDED = [{ live: 'src/app/(payload)', stashed: 'app__payload' }]
+// Server-only routes to hide during the static export: the (payload) admin/API
+// group, and the personal LeadLens scorecard pages (/check/<token>), which read
+// R2 at request time — the runtime lives on accp (see wrangler.jsonc's
+// LEADLENS_CHECKS notes). The generic /check page IS exported.
+const EXCLUDED = [
+  { live: 'src/app/(payload)', stashed: 'app__payload' },
+  { live: 'src/app/(frontend)/check/[token]', stashed: 'app__frontend_check_token' },
+]
 
 const stash = () => {
   mkdirSync(backupDir, { recursive: true })
@@ -141,7 +147,9 @@ try {
       // Inlined into the client offerte form so it posts to the accp API
       // (cross-origin from rinsly.com; accp allows it via CORS).
       NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || API_URL,
-      NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --no-deprecation`.trim(),
+      // Same heap headroom as package.json's `build` script: page-data
+      // collection for the full page set can exceed node's default heap.
+      NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --no-deprecation --max-old-space-size=8000`.trim(),
     },
   })
 } finally {
@@ -157,7 +165,35 @@ if (existsSync(path.join(root, '.next-static'))) {
 }
 
 // The public site has no root page (routes live under /[locale]); redirect `/`
-// to the default locale at the edge (Cloudflare static-asset _redirects).
-writeFileSync(path.join(root, 'out', '_redirects'), `/    /${DEFAULT_LOCALE}    302\n`)
+// to the default locale at the edge (Cloudflare static-asset _redirects). The
+// /check funnel is locale-less — send locale-prefixed variants there too
+// (mirrors next.config.ts's dynamic-server redirects).
+writeFileSync(
+  path.join(root, 'out', '_redirects'),
+  [
+    `/    /${DEFAULT_LOCALE}    302`,
+    ...LOCALES.flatMap((l) => [`/${l}/check    /check    301`, `/${l}/check/*    /check/:splat    301`]),
+    '',
+  ].join('\n'),
+)
+
+// Security headers for every static response (Workers Static Assets _headers).
+// The CSP allows Next's inline hydration scripts/styles ('unsafe-inline' — a
+// static export cannot use nonces) and the accp origin for media images and
+// the form/check API calls.
+const apiOrigin = new URL(process.env.NEXT_PUBLIC_API_URL || API_URL).origin
+writeFileSync(
+  path.join(root, 'out', '_headers'),
+  [
+    '/*',
+    '  Strict-Transport-Security: max-age=31536000; includeSubDomains',
+    '  X-Content-Type-Options: nosniff',
+    '  X-Frame-Options: DENY',
+    '  Referrer-Policy: strict-origin-when-cross-origin',
+    '  Permissions-Policy: camera=(), microphone=(), geolocation=()',
+    `  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: ${apiOrigin}; font-src 'self' data:; connect-src 'self' ${apiOrigin}; frame-ancestors 'none'; base-uri 'self'; form-action 'self' ${apiOrigin}; object-src 'none'`,
+    '',
+  ].join('\n'),
+)
 
 console.log('\n✔ Static site built to ./out')

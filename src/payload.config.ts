@@ -4,7 +4,12 @@ import { fileURLToPath } from 'url'
 import { buildSiteConfig } from '@rinsly-com/site-core/config'
 import { siteConfig } from '@/site.config'
 
+import { CheckAanvragen } from './collections/CheckAanvragen'
+import { cloudflareEmailAdapter } from './email/cloudflareEmailAdapter'
+import { CheckRuns } from './collections/CheckRuns'
 import { Offertes } from './collections/Offertes'
+import { checkAanvraagHandler } from './endpoints/checkAanvraag'
+import { checkRunStartHandler, checkRunStatusHandler } from './endpoints/checkRun'
 import { offerteHandler } from './endpoints/offerte'
 import { deployHandler } from './endpoints/deploy'
 import { triggerDeploy } from './hooks/triggerStaticDeploy'
@@ -20,9 +25,17 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
  */
 export default buildSiteConfig({
   siteConfig,
-  extraCollections: [Offertes],
+  // Transactional mail (auth mails + submission notifications) as
+  // noreply@rinsly.com via Cloudflare Email Sending; logs when no binding.
+  email: cloudflareEmailAdapter({ defaultFromAddress: 'noreply@rinsly.com', defaultFromName: 'Rinsly' }),
+  extraCollections: [Offertes, CheckAanvragen, CheckRuns],
   extraEndpoints: [
     { path: '/offerte', method: 'post', handler: offerteHandler },
+    // POST /api/check-aanvraag — lead form on the generic /check page.
+    { path: '/check-aanvraag', method: 'post', handler: checkAanvraagHandler },
+    // Self-service website check: start + progress polling (see lib/siteCheck).
+    { path: '/check-run', method: 'post', handler: checkRunStartHandler },
+    { path: '/check-run/status', method: 'get', handler: checkRunStatusHandler },
     // POST /api/deploy — manual "rebuild production" trigger (endpoints/deploy.ts).
     { path: '/deploy', method: 'post', handler: deployHandler },
   ],
