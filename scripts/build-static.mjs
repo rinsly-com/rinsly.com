@@ -147,7 +147,9 @@ try {
       // Inlined into the client offerte form so it posts to the accp API
       // (cross-origin from rinsly.com; accp allows it via CORS).
       NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || API_URL,
-      NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --no-deprecation`.trim(),
+      // Same heap headroom as package.json's `build` script: page-data
+      // collection for the full page set can exceed node's default heap.
+      NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --no-deprecation --max-old-space-size=8000`.trim(),
     },
   })
 } finally {
