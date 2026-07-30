@@ -6,7 +6,7 @@ import { absoluteUrl } from '@rinsly-com/site-core/lib/siteUrl'
 import { DEFAULT_LOCALE, LOCALES, localePath } from '@rinsly-com/site-core/lib/locale'
 import { siteConfig } from '@/site.config'
 
-export const dynamic = 'force-static'
+export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = await getRenderablePages(config, DEFAULT_LOCALE)
