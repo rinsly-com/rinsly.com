@@ -92,10 +92,17 @@ export function parseHtmlSignals(html: string): SiteProbe['html'] {
     content(/<meta[^>]+property=["']og:site_name["'][^>]*>/i.exec(head)?.[0])?.trim() || undefined
   const generator = content(meta('generator'))?.trim() || undefined
 
-  // Highest year in a © / &copy; context — a stale year is a classic staleness tell.
-  const years = [...html.matchAll(/(?:©|&copy;|copyright)\s*(?:\d{4}\s*[-–]\s*)?(\d{4})/gi)]
-    .map((m) => Number(m[1]))
-    .filter((y) => y >= 1995 && y <= 2100)
+  // Highest year near a © / &copy; marker (a stale year is a classic staleness
+  // tell). Names and ranges may sit between the marker and the year ("© Rinsly
+  // 2026", "© 2004-2012 Jansen BV"), so scan a window after each marker.
+  const years: number[] = []
+  for (const marker of html.matchAll(/©|&copy;|copyright/gi)) {
+    const windowText = html.slice(marker.index, marker.index + 80)
+    for (const y of windowText.matchAll(/(?:19|20)\d{2}/g)) {
+      const year = Number(y[0])
+      if (year >= 1995 && year <= 2100) years.push(year)
+    }
+  }
   const copyrightYear = years.length ? Math.max(...years) : undefined
 
   return {

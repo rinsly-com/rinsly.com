@@ -7,8 +7,8 @@ import { extraRenderers } from '@/blockRenderers'
 // accp: any slug on demand. The static prod build (build-static.mjs) strips the
 // `dynamic` line and flips `dynamicParams` to false, so only the published slugs
 // (from generateStaticParams) are prerendered.
-export const dynamic = 'force-dynamic'
-export const dynamicParams = true
+export const dynamic = 'force-static'
+export const dynamicParams = false
 
 const route = createSlugRoute({ siteConfig, config, extraRenderers })
 

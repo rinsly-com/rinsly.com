@@ -85,6 +85,12 @@ describe('parseHtmlSignals', () => {
     expect(s.title).toBeUndefined()
     expect(s.copyrightYear).toBeUndefined()
   })
+
+  it('finds the copyright year when a name sits between © and the year', () => {
+    expect(parseHtmlSignals('<p>© Rinsly 2026 — Alle rechten voorbehouden.</p>').copyrightYear).toBe(2026)
+    expect(parseHtmlSignals('<p>Copyright Bakkerij Piet 2019</p>').copyrightYear).toBe(2019)
+    expect(parseHtmlSignals('<p>© 2004-2012 Kapsalon Jan</p>').copyrightYear).toBe(2012)
+  })
 })
 
 describe('deriveGrades', () => {

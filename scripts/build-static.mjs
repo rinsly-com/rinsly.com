@@ -175,4 +175,23 @@ writeFileSync(
   ].join('\n'),
 )
 
+// Security headers for every static response (Workers Static Assets _headers).
+// The CSP allows Next's inline hydration scripts/styles ('unsafe-inline' — a
+// static export cannot use nonces) and the accp origin for media images and
+// the form/check API calls.
+const apiOrigin = new URL(process.env.NEXT_PUBLIC_API_URL || API_URL).origin
+writeFileSync(
+  path.join(root, 'out', '_headers'),
+  [
+    '/*',
+    '  Strict-Transport-Security: max-age=31536000; includeSubDomains',
+    '  X-Content-Type-Options: nosniff',
+    '  X-Frame-Options: DENY',
+    '  Referrer-Policy: strict-origin-when-cross-origin',
+    '  Permissions-Policy: camera=(), microphone=(), geolocation=()',
+    `  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: ${apiOrigin}; font-src 'self' data:; connect-src 'self' ${apiOrigin}; frame-ancestors 'none'; base-uri 'self'; form-action 'self' ${apiOrigin}; object-src 'none'`,
+    '',
+  ].join('\n'),
+)
+
 console.log('\n✔ Static site built to ./out')

@@ -4,7 +4,7 @@ import { createOgImage } from '@rinsly-com/site-core/app'
 import { siteConfig } from '@/site.config'
 
 // force-dynamic on accp; build-static.mjs strips it for the static export.
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-static'
 
 const og = createOgImage({
   siteConfig,

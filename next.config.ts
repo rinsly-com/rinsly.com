@@ -68,11 +68,27 @@ if (!isStatic) {
   const payloadHeaders = config.headers?.bind(config)
   config.headers = async () => {
     const entries = payloadHeaders ? await payloadHeaders() : []
-    return entries.map((entry) =>
-      entry.source === '/:path*' && entry.headers?.some((h) => h.key === 'Critical-CH')
-        ? { ...entry, source: '/((?!check).*)' }
-        : entry,
-    )
+    return [
+      ...entries.map((entry) =>
+        entry.source === '/:path*' && entry.headers?.some((h) => h.key === 'Critical-CH')
+          ? { ...entry, source: '/((?!check).*)' }
+          : entry,
+      ),
+      // Security headers on every accp response. X-Frame-Options stays
+      // SAMEORIGIN (not DENY): the Payload admin's live preview iframes the
+      // frontend. The static rinsly.com worker gets its own stricter set via
+      // out/_headers (build-static.mjs).
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ]
   }
 }
 

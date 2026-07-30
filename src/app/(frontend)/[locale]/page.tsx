@@ -7,7 +7,7 @@ import { extraRenderers } from '@/blockRenderers'
 // force-dynamic on the accp worker (render live). The static prod build
 // (scripts/build-static.mjs) strips this line so `/[locale]` prerenders from
 // the layout's locale params.
-export const dynamic = 'force-dynamic'
+export const dynamic = 'force-static'
 
 const home = createHomeRoute({ siteConfig, config, extraRenderers })
 
