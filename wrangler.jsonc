@@ -64,6 +64,11 @@
   // PSI_API_KEY Worker SECRET is set (free key via Google Cloud console;
   // keyless calls are 429'd). Without it the check degrades to probe-based
   // speed heuristics: wrangler secret put PSI_API_KEY
+  //
+  // Rate limit: 5 scans per IP per day. Logged-in admin users are exempt, and
+  // so are IPs in the CHECK_RATE_EXEMPT_IPS secret (comma-separated), e.g.
+  // your own: wrangler secret put CHECK_RATE_EXEMPT_IPS
+  // Locally: put both in .dev.vars (read by the dev platform proxy).
   "vars": {
     // GitHub repository_dispatch endpoint the CMS "Deploy" button POSTs to (see
     // src/hooks/triggerStaticDeploy.ts). Non-secret. The paired

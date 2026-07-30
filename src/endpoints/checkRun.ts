@@ -10,14 +10,26 @@ function json(body: unknown, status = 200): Response {
   })
 }
 
-/** Runs per IP per hour before we ask people to slow down. */
+/** Five self-service scans per IP per day; staff and allowlisted IPs are exempt. */
 const RATE_LIMIT = 5
+const RATE_WINDOW_MS = 24 * 3600_000
 
-async function hashIp(req: PayloadRequest): Promise<string | undefined> {
+function clientIp(req: PayloadRequest): string | undefined {
   const ip = req.headers.get('cf-connecting-ip') || req.headers.get('x-forwarded-for')?.split(',')[0]
-  if (!ip) return undefined
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`rinsly-check:${ip.trim()}`))
+  return ip?.trim() || undefined
+}
+
+async function hashIp(ip: string): Promise<string> {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(`rinsly-check:${ip}`))
   return [...new Uint8Array(digest)].slice(0, 12).map((b) => b.toString(16).padStart(2, '0')).join('')
+}
+
+/** Comma-separated IPs in the CHECK_RATE_EXEMPT_IPS secret skip the limit. */
+function isExemptIp(ip: string | undefined, env: CloudflareEnv): boolean {
+  if (!ip) return false
+  const raw = (env as unknown as Record<string, string | undefined>).CHECK_RATE_EXEMPT_IPS
+  if (!raw) return false
+  return raw.split(',').map((v) => v.trim()).filter(Boolean).includes(ip)
 }
 
 /**
@@ -42,13 +54,18 @@ export const checkRunStartHandler: PayloadHandler = async (req: PayloadRequest) 
   const url = normalizeCheckUrl(String(body.url ?? ''))
   if (!url) return json({ ok: false, error: 'validation' }, 422)
 
-  const ipHash = await hashIp(req)
-  if (ipHash) {
+  const { env, waitUntil } = await getRuntime()
+
+  // Logged-in staff (accp admin session) and allowlisted IPs are never limited.
+  const ip = clientIp(req)
+  const exempt = Boolean(req.user) || isExemptIp(ip, env)
+  const ipHash = ip ? await hashIp(ip) : undefined
+  if (!exempt && ipHash) {
     const recent = await req.payload.count({
       collection: 'check-runs',
       where: {
         ipHash: { equals: ipHash },
-        createdAt: { greater_than: new Date(Date.now() - 3600_000).toISOString() },
+        createdAt: { greater_than: new Date(Date.now() - RATE_WINDOW_MS).toISOString() },
       },
       overrideAccess: true,
     })
@@ -72,13 +89,15 @@ export const checkRunStartHandler: PayloadHandler = async (req: PayloadRequest) 
     return json({ ok: false, error: 'server' }, 500)
   }
 
-  const { env, waitUntil } = await getRuntime()
   waitUntil(
     runSiteCheck({
       bucket: env.LEADLENS_CHECKS,
       token,
       url,
-      psiApiKey: process.env.PSI_API_KEY || undefined,
+      psiApiKey:
+        (env as unknown as Record<string, string | undefined>).PSI_API_KEY ||
+        process.env.PSI_API_KEY ||
+        undefined,
     }),
   )
 

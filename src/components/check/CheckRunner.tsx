@@ -56,7 +56,7 @@ export function CheckRunner() {
           kind: 'error',
           message:
             body.error === 'rate_limited'
-              ? 'U heeft het maximum aantal checks voor dit uur bereikt. Probeer het later nog eens, of laat uw gegevens achter via het formulier hieronder.'
+              ? 'U heeft het maximum aantal gratis checks voor vandaag bereikt. Probeer het morgen opnieuw, of laat uw gegevens achter via het formulier hieronder, dan kijken wij persoonlijk mee.'
               : body.error === 'validation'
                 ? 'Dat lijkt geen geldig websiteadres. Controleer de spelling (bijv. www.uwbedrijf.nl).'
                 : 'De check kon niet worden gestart. Probeer het nog eens, of gebruik het formulier hieronder.',
