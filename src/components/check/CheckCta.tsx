@@ -5,8 +5,10 @@ import { checkConfig } from '@/check.config'
 /**
  * Slate conversion banner for the /check funnel — same visual language as the
  * homepage "Klaar om online te gaan?" band (see site-core's Cta block). One
- * action: book the free intro call. Falls back to a prefilled mailto: while no
- * booking link is configured (check.config.ts), plus an optional phone line.
+ * action: get in touch for the free intro call. By deliberate choice there is
+ * no booking tool: the button opens a prefilled mail to contact@rinsly.com and
+ * the address is shown plainly next to it (check.config.ts documents this;
+ * setting bookingUrl would switch the button over).
  */
 export function CheckCta({ subject }: { subject: string }) {
   const bookingHref =
@@ -47,6 +49,14 @@ export function CheckCta({ subject }: { subject: string }) {
             Plan een gratis kennismaking
             <ArrowIcon />
           </a>
+          {!checkConfig.bookingUrl && (
+            <a
+              href={`mailto:${checkConfig.email}`}
+              className="text-sm font-semibold text-slate-ink hover:underline"
+            >
+              {checkConfig.email}
+            </a>
+          )}
           {checkConfig.phone && (
             <a
               href={`tel:${checkConfig.phone.replace(/[^+\d]/g, '')}`}

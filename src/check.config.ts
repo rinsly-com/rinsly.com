@@ -11,10 +11,10 @@ type CheckConfig = {
 
 export const checkConfig: CheckConfig = {
   /**
-   * Booking link for the "Plan een gratis kennismaking" CTA (e.g. a Cal.com
-   * event: https://cal.com/rinsly/kennismaking). While empty, the CTA falls
-   * back to a mailto: with a prefilled subject.
-   * TODO(yaron): create the booking event and fill this in.
+   * DELIBERATELY empty (Yaron, 2026-07-30): no booking tool. The CTA mails
+   * contact@rinsly.com with a prefilled subject and shows the address plainly.
+   * Should a scheduling tool ever land, any public booking URL here switches
+   * the CTA over; nothing else changes.
    */
   bookingUrl: '',
   /**
