@@ -60,6 +60,10 @@
     // accp.rinsly.com/check/<token>.
     { "binding": "LEADLENS_CHECKS", "bucket_name": "leadlens-checks" },
   ],
+  // Self-service /check runs enrich with Google PageSpeed Insights when the
+  // PSI_API_KEY Worker SECRET is set (free key via Google Cloud console;
+  // keyless calls are 429'd). Without it the check degrades to probe-based
+  // speed heuristics: wrangler secret put PSI_API_KEY
   "vars": {
     // GitHub repository_dispatch endpoint the CMS "Deploy" button POSTs to (see
     // src/hooks/triggerStaticDeploy.ts). Non-secret. The paired

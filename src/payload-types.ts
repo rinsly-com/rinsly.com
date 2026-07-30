@@ -72,6 +72,7 @@ export interface Config {
     pages: Page;
     offertes: Offerte;
     'check-aanvragen': CheckAanvragen;
+    'check-runs': CheckRun;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +85,7 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     offertes: OffertesSelect<false> | OffertesSelect<true>;
     'check-aanvragen': CheckAanvragenSelect<false> | CheckAanvragenSelect<true>;
+    'check-runs': CheckRunsSelect<false> | CheckRunsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -638,6 +640,18 @@ export interface CheckAanvragen {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "check-runs".
+ */
+export interface CheckRun {
+  id: number;
+  domain: string;
+  token: string;
+  ipHash?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -679,6 +693,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'check-aanvragen';
         value: number | CheckAanvragen;
+      } | null)
+    | ({
+        relationTo: 'check-runs';
+        value: number | CheckRun;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1045,6 +1063,17 @@ export interface CheckAanvragenSelect<T extends boolean = true> {
   url?: T;
   naam?: T;
   telefoon?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "check-runs_select".
+ */
+export interface CheckRunsSelect<T extends boolean = true> {
+  domain?: T;
+  token?: T;
+  ipHash?: T;
   updatedAt?: T;
   createdAt?: T;
 }

@@ -8,15 +8,27 @@ import { getCloudflareContext } from '@opennextjs/cloudflare'
  * mocks) — the same plumbing the engine uses in buildSiteConfig.ts, including
  * the obfuscated specifier so wrangler never ends up in the Worker bundle.
  */
-let proxy: Promise<{ env: unknown }> | undefined
+type Runtime = { env: CloudflareEnv; waitUntil: (p: Promise<unknown>) => void }
 
-export async function getBindings(): Promise<CloudflareEnv> {
+let proxy: Promise<{ env: unknown; ctx?: { waitUntil?: (p: Promise<unknown>) => void } }> | undefined
+
+export async function getRuntime(): Promise<Runtime> {
   try {
-    return (await getCloudflareContext({ async: true })).env as CloudflareEnv
+    const ctx = await getCloudflareContext({ async: true })
+    return { env: ctx.env as CloudflareEnv, waitUntil: (p) => ctx.ctx.waitUntil(p) }
   } catch {
     proxy ??= import(/* webpackIgnore: true */ `${'__wrangler'.replaceAll('_', '')}`).then(
       ({ getPlatformProxy }) => getPlatformProxy({ environment: process.env.CLOUDFLARE_ENV }),
     )
-    return (await proxy).env as CloudflareEnv
+    const local = await proxy
+    // Dev/node: no real ExecutionContext — the promise simply keeps running.
+    return {
+      env: local.env as CloudflareEnv,
+      waitUntil: (p) => void (local.ctx?.waitUntil ? local.ctx.waitUntil(p) : p.catch(() => {})),
+    }
   }
+}
+
+export async function getBindings(): Promise<CloudflareEnv> {
+  return (await getRuntime()).env
 }

@@ -5,8 +5,10 @@ import { buildSiteConfig } from '@rinsly-com/site-core/config'
 import { siteConfig } from '@/site.config'
 
 import { CheckAanvragen } from './collections/CheckAanvragen'
+import { CheckRuns } from './collections/CheckRuns'
 import { Offertes } from './collections/Offertes'
 import { checkAanvraagHandler } from './endpoints/checkAanvraag'
+import { checkRunStartHandler, checkRunStatusHandler } from './endpoints/checkRun'
 import { offerteHandler } from './endpoints/offerte'
 import { deployHandler } from './endpoints/deploy'
 import { triggerDeploy } from './hooks/triggerStaticDeploy'
@@ -22,11 +24,14 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
  */
 export default buildSiteConfig({
   siteConfig,
-  extraCollections: [Offertes, CheckAanvragen],
+  extraCollections: [Offertes, CheckAanvragen, CheckRuns],
   extraEndpoints: [
     { path: '/offerte', method: 'post', handler: offerteHandler },
     // POST /api/check-aanvraag — lead form on the generic /check page.
     { path: '/check-aanvraag', method: 'post', handler: checkAanvraagHandler },
+    // Self-service website check: start + progress polling (see lib/siteCheck).
+    { path: '/check-run', method: 'post', handler: checkRunStartHandler },
+    { path: '/check-run/status', method: 'get', handler: checkRunStatusHandler },
     // POST /api/deploy — manual "rebuild production" trigger (endpoints/deploy.ts).
     { path: '/deploy', method: 'post', handler: deployHandler },
   ],

@@ -1,20 +1,22 @@
 import type { Metadata } from 'next'
 
-import { Eyebrow, Icon, Section } from '@rinsly-com/site-core/ui'
+import { Eyebrow, Icon, Section, SectionHeading } from '@rinsly-com/site-core/ui'
 
 import { CheckAanvraagForm } from '@/components/check/CheckAanvraagForm'
+import { CheckRunner } from '@/components/check/CheckRunner'
 
 /**
- * Generic /check page — the fallback for the personal /check/<token> scorecard
- * pages: catches direct/organic visitors and expired or unknown tokens
- * (?link=verlopen shows a notice above the form). Fully static (part of the
- * rinsly.com export); the form posts to the accp API like the offerte wizard.
+ * Generic /check page — the self-service website check (visitor enters a
+ * domain, our pipeline generates a personal /check/<token> scorecard), plus
+ * the manual "wij kijken mee" lead form as secondary path and as the landing
+ * spot for expired personal links (?link=verlopen). Fully static (part of the
+ * rinsly.com export); both forms talk to the accp API cross-origin.
  */
 
 export const metadata: Metadata = {
   title: 'Gratis websitecheck — Rinsly',
   description:
-    'Wij beoordelen uw website gratis op moderniteit, snelheid, mobiel gebruik, vindbaarheid en veiligheid.',
+    'Test uw website gratis op moderniteit, snelheid, mobiel gebruik, vindbaarheid en veiligheid — direct resultaat.',
   robots: { index: false, follow: false },
 }
 
@@ -44,28 +46,28 @@ export default function CheckPage() {
               data-hero-title
               className="text-[clamp(32px,6vw,52px)] font-extrabold leading-[1.05] tracking-[-0.025em] text-ink"
             >
-              Wij beoordelen uw website — gratis
+              Test uw website — gratis en direct
             </h1>
             <p
               data-hero-el
               style={{ animationDelay: '0.18s' }}
               className="max-w-[60ch] text-[17px] leading-relaxed text-muted"
             >
-              Laat uw websiteadres achter en u ontvangt een persoonlijke scorecard: vijf
-              rapportcijfers, concrete bevindingen en wat wij eraan zouden doen. Vrijblijvend, u
-              zit nergens aan vast.
+              Vul uw websiteadres in en ontvang binnen een halve minuut een persoonlijke scorecard:
+              vijf rapportcijfers, concrete bevindingen en wat wij eraan zouden doen. Vrijblijvend,
+              u zit nergens aan vast.
             </p>
           </div>
         </Section>
       </div>
 
-      <Section className="pb-16 sm:pb-20">
+      <Section className="pb-12 sm:pb-16">
         <div className="grid items-start gap-8 lg:grid-cols-[3fr_2fr]">
           <div className="order-2 lg:order-1">
-            <CheckAanvraagForm />
+            <CheckRunner />
           </div>
           <div data-reveal className="order-1 flex flex-col gap-4 lg:order-2">
-            <h2 className="text-lg font-bold tracking-[-0.01em] text-ink">Wat we bekijken</h2>
+            <h2 className="text-lg font-bold tracking-[-0.01em] text-ink">Wat we testen</h2>
             <ul className="flex flex-col gap-2.5">
               {CHECKS.map((check) => (
                 <li key={check.label} className="flex items-center gap-3 text-[15px] text-ink">
@@ -77,10 +79,24 @@ export default function CheckPage() {
               ))}
             </ul>
             <p className="text-sm leading-relaxed text-muted">
-              U ontvangt de resultaten per e-mail of telefoon, met screenshots van uw huidige site
-              en een eerlijk advies — ook als dat advies is om niets te doen.
+              U krijgt het rapport meteen te zien, met een eerlijk advies — ook als dat advies is om
+              niets te doen.
             </p>
           </div>
+        </div>
+      </Section>
+
+      <Section className="pb-16 sm:pb-20">
+        <SectionHeading
+          header={{
+            eyebrow: 'Liever persoonlijk?',
+            title: 'Wij kijken graag met u mee',
+            intro:
+              'Laat uw gegevens achter en we nemen binnen één werkdag contact op — met een uitgebreidere beoordeling en concreet advies.',
+          }}
+        />
+        <div className="mt-8 max-w-xl">
+          <CheckAanvraagForm />
         </div>
       </Section>
     </>
