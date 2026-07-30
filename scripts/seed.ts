@@ -255,8 +255,8 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
           ),
           t(
             locale,
-            'Gaat u een beheerovereenkomst van drie jaar aan, dan bouwen we uw website gratis — afhankelijk van de omvang van de site.',
-            'If you commit to a three-year management agreement, we build your website for free — depending on the scale of the site.',
+            'Gaat u een beheerovereenkomst van drie jaar aan, dan bouwen we uw website gratis, afhankelijk van de omvang van de site.',
+            'If you commit to a three-year management agreement, we build your website for free, depending on the scale of the site.',
           ),
         ),
       },

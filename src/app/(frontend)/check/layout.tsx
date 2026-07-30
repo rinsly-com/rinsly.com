@@ -20,7 +20,7 @@ export const viewport: Viewport = { themeColor: siteConfig.themeColor }
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteConfig.url),
-  title: 'Gratis websitecheck — Rinsly',
+  title: 'Gratis websitecheck | Rinsly',
   description: 'Wij beoordelen uw website gratis op snelheid, vindbaarheid en veiligheid.',
   robots: { index: false, follow: false },
 }
@@ -47,7 +47,7 @@ export default function CheckLayout({ children }: { children: React.ReactNode })
         <main>{children}</main>
         <footer className="border-t border-hair">
           <div className="mx-auto flex w-full max-w-[1080px] flex-col items-start justify-between gap-2 px-5 py-8 text-sm text-muted sm:flex-row sm:items-center sm:px-8">
-            <p>© {new Date().getFullYear()} Rinsly — webontwikkeling & beheer</p>
+            <p>© {new Date().getFullYear()} Rinsly · webontwikkeling & beheer</p>
             <p>
               <Link href="/nl" className="text-accent hover:underline">
                 rinsly.com

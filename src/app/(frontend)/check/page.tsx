@@ -14,9 +14,9 @@ import { CheckRunner } from '@/components/check/CheckRunner'
  */
 
 export const metadata: Metadata = {
-  title: 'Gratis websitecheck — Rinsly',
+  title: 'Gratis websitecheck | Rinsly',
   description:
-    'Test uw website gratis op moderniteit, snelheid, mobiel gebruik, vindbaarheid en veiligheid — direct resultaat.',
+    'Test uw website gratis op moderniteit, snelheid, mobiel gebruik, vindbaarheid en veiligheid, met direct resultaat.',
   robots: { index: false, follow: false },
 }
 
@@ -46,7 +46,7 @@ export default function CheckPage() {
               data-hero-title
               className="text-[clamp(32px,6vw,52px)] font-extrabold leading-[1.05] tracking-[-0.025em] text-ink"
             >
-              Test uw website — gratis en direct
+              Test uw website, gratis en direct
             </h1>
             <p
               data-hero-el
@@ -79,7 +79,7 @@ export default function CheckPage() {
               ))}
             </ul>
             <p className="text-sm leading-relaxed text-muted">
-              U krijgt het rapport meteen te zien, met een eerlijk advies — ook als dat advies is om
+              U krijgt het rapport meteen te zien, met een eerlijk advies, ook als dat advies is om
               niets te doen.
             </p>
           </div>
@@ -92,7 +92,7 @@ export default function CheckPage() {
             eyebrow: 'Liever persoonlijk?',
             title: 'Wij kijken graag met u mee',
             intro:
-              'Laat uw gegevens achter en we nemen binnen één werkdag contact op — met een uitgebreidere beoordeling en concreet advies.',
+              'Laat uw gegevens achter en we nemen binnen één werkdag contact op, met een uitgebreidere beoordeling en concreet advies.',
           }}
         />
         <div className="mt-8 max-w-xl">

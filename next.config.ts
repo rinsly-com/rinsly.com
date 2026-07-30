@@ -45,9 +45,15 @@ const nextConfig: NextConfig = {
 }
 
 // The bare-root redirect needs a server; `output: export` forbids redirects(),
-// so the static site handles `/` via out/_redirects (written by build-static.mjs).
+// so the static site handles `/` via out/_redirects (written by build-static.mjs,
+// which also mirrors the locale-prefixed /check redirects below).
 if (!isStatic) {
-  nextConfig.redirects = async () => [{ source: '/', destination: '/nl', permanent: false }]
+  nextConfig.redirects = async () => [
+    { source: '/', destination: '/nl', permanent: false },
+    // /check is deliberately locale-less (short URL in the LeadLens mail, Dutch
+    // only) — catch intuitive locale-prefixed variants instead of 404ing.
+    { source: '/:locale(nl|en)/check/:path*', destination: '/check/:path*', permanent: true },
+  ]
 }
 
 const config = isStatic ? nextConfig : withPayload(nextConfig, { devBundleServerPackages: false })

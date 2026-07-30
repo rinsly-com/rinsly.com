@@ -163,7 +163,16 @@ if (existsSync(path.join(root, '.next-static'))) {
 }
 
 // The public site has no root page (routes live under /[locale]); redirect `/`
-// to the default locale at the edge (Cloudflare static-asset _redirects).
-writeFileSync(path.join(root, 'out', '_redirects'), `/    /${DEFAULT_LOCALE}    302\n`)
+// to the default locale at the edge (Cloudflare static-asset _redirects). The
+// /check funnel is locale-less — send locale-prefixed variants there too
+// (mirrors next.config.ts's dynamic-server redirects).
+writeFileSync(
+  path.join(root, 'out', '_redirects'),
+  [
+    `/    /${DEFAULT_LOCALE}    302`,
+    ...LOCALES.flatMap((l) => [`/${l}/check    /check    301`, `/${l}/check/*    /check/:splat    301`]),
+    '',
+  ].join('\n'),
+)
 
 console.log('\n✔ Static site built to ./out')

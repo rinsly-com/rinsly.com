@@ -25,7 +25,7 @@ const STEPS = [
   {
     icon: 'IconBrush',
     title: 'Ontwerp & bouw',
-    text: 'Wij ontwerpen en bouwen uw nieuwe site. U levert alleen teksten en foto’s aan — de rest doen wij.',
+    text: 'Wij ontwerpen en bouwen uw nieuwe site. U levert alleen teksten en foto’s aan. De rest doen wij.',
   },
   {
     icon: 'IconRocket',
@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const result = await getScorecard(token)
   if (result.status !== 'ok') return { robots: { index: false, follow: false } }
   return {
-    title: `Zo scoort ${result.scorecard.domain} — Rinsly`,
+    title: `Zo scoort ${result.scorecard.domain} | Rinsly`,
     robots: { index: false, follow: false },
   }
 }
@@ -129,7 +129,7 @@ export default async function CheckTokenPage({ params }: Params) {
           header={{
             eyebrow: 'Rapport',
             title: `De cijfers van ${scorecard.businessName}`,
-            intro: 'Vijf onderdelen, beoordeeld van 0 tot 100 — hoger is beter.',
+            intro: 'Vijf onderdelen, beoordeeld van 0 tot 100, hoger is beter.',
           }}
         />
         <div data-reveal-group className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -259,7 +259,7 @@ export default async function CheckTokenPage({ params }: Params) {
         </div>
       </Section>
 
-      <CheckCta subject={`Kennismaking — ${scorecard.domain}`} />
+      <CheckCta subject={`Kennismaking: ${scorecard.domain}`} />
     </>
   )
 }

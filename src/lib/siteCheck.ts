@@ -260,35 +260,35 @@ export function composeFindings(probe: SiteProbe, psi: PsiResult | null, now = n
   const add = (weight: number, text: string) => findings.push({ weight, text })
 
   if (!probe.reachable) {
-    return ['de site was tijdens onze controle niet bereikbaar via https — dat kost u élke bezoeker']
+    return ['de site was tijdens onze controle niet bereikbaar via https, en dat kost u élke bezoeker']
   }
 
   const { headers: hd, html } = probe
   if (probe.httpNotUpgraded)
-    add(95, 'de site is ook bereikbaar via onbeveiligd http:// — bezoekers worden niet naar https doorgestuurd')
+    add(95, 'de site is ook bereikbaar via onbeveiligd http://, bezoekers worden niet naar https doorgestuurd')
   if (!html.viewport)
-    add(90, 'geen mobiele weergave — meer dan de helft van uw bezoekers kijkt op een telefoon')
+    add(90, 'geen mobiele weergave, terwijl meer dan de helft van uw bezoekers op een telefoon kijkt')
   const yearsStale = html.copyrightYear ? now.getFullYear() - html.copyrightYear : 0
   if (html.copyrightYear && yearsStale >= 2)
-    add(80, `het copyrightjaar staat al ${yearsStale} jaar vast op ${html.copyrightYear} — dat wekt de indruk dat er niemand meer naar de site omkijkt`)
+    add(80, `het copyrightjaar staat al ${yearsStale} jaar vast op ${html.copyrightYear}. Dat wekt de indruk dat er niemand meer naar de site omkijkt`)
   if (psi?.fcpMs && psi.fcpMs > 3000)
     add(75, `bezoekers kijken ${fmtSec(psi.fcpMs)} naar een leeg scherm voordat er iets verschijnt`)
   if (psi?.lcpMs && psi.lcpMs > 2500)
-    add(70, `het belangrijkste beeld is pas na ${fmtSec(psi.lcpMs)} zichtbaar — Google rekent alles boven 2,5 s als traag`)
+    add(70, `het belangrijkste beeld is pas na ${fmtSec(psi.lcpMs)} zichtbaar. Google rekent alles boven 2,5 s als traag`)
   if (!psi && probe.ttfbMs !== undefined && probe.ttfbMs > 1000)
     add(70, `de server doet er ${fmtSec(probe.ttfbMs)} over voordat de pagina begint te laden`)
   if (!hd.hsts && !probe.httpNotUpgraded)
-    add(45, 'de browserbeveiliging (HSTS) ontbreekt — verbindingen zijn te onderscheppen bij een eerste bezoek')
+    add(45, 'de browserbeveiliging (HSTS) ontbreekt, waardoor verbindingen bij een eerste bezoek te onderscheppen zijn')
   if (!html.metaDescription)
-    add(40, 'er is geen meta-omschrijving — Google verzint dan zelf de tekst onder uw zoekresultaat')
-  if (!html.title) add(40, 'de pagina heeft geen titel — dat schaadt de vindbaarheid direct')
+    add(40, 'er is geen meta-omschrijving. Google verzint dan zelf de tekst onder uw zoekresultaat')
+  if (!html.title) add(40, 'de pagina heeft geen titel, en dat schaadt de vindbaarheid direct')
   if (html.wordpress && html.generator)
-    add(35, `de site draait op ${html.generator} — verouderde WordPress-installaties zijn het grootste inbraakrisico voor MKB-sites`)
+    add(35, `de site draait op ${html.generator}. Verouderde WordPress-installaties zijn het grootste inbraakrisico voor MKB-sites`)
   if (psi?.tbtMs && psi.tbtMs > 300)
     add(30, `scriptwerk blokkeert de pagina ${Math.round(psi.tbtMs)} ms tijdens het laden op mobiel`)
 
   if (findings.length === 0)
-    add(10, 'de technische basis staat er goed bij — de winst zit in de puntjes op de i (snelheid, vindbaarheid, conversie)')
+    add(10, 'de technische basis staat er goed bij. De winst zit in de puntjes op de i (snelheid, vindbaarheid, conversie)')
 
   return findings
     .sort((a, b) => b.weight - a.weight)
@@ -305,7 +305,7 @@ export function composePitch(grades: Scorecard['grades'], probe: SiteProbe): str
     vindbaarheid: 'de vindbaarheid in Google',
     veiligheid: 'de beveiliging',
   }
-  if (!probe.reachable) return 'We konden de site niet bereiken — juist dan is een gesprek zinvol.'
+  if (!probe.reachable) return 'We konden de site niet bereiken. Juist dan is een gesprek zinvol.'
   if (worst[1] >= 65)
     return 'De site staat er technisch goed bij. In een korte kennismaking kijken we graag mee waar nog winst zit.'
   return `Het grootste verbeterpunt is ${labels[worst[0]]}. In een gratis kennismaking laten we zien hoe wij dat oplossen.`

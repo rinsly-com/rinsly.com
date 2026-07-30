@@ -27,7 +27,7 @@ function ExpiredNotice() {
       role="status"
       className="mb-5 rounded-xl border border-accent/30 bg-accent-soft px-4 py-3 text-sm text-ink"
     >
-      Deze persoonlijke link is verlopen. Vraag hieronder een nieuwe gratis beoordeling aan — we
+      Deze persoonlijke link is verlopen. Vraag hieronder een nieuwe gratis beoordeling aan. We
       sturen u binnen één werkdag een verse scorecard.
     </div>
   )
@@ -145,7 +145,7 @@ export function CheckAanvraagForm() {
         </label>
         {touched && !valid && status !== 'submitting' && (
           <p className="text-sm text-muted" role="alert">
-            Vul uw websiteadres, naam en telefoonnummer in — dan kunnen we u bereiken.
+            Vul uw websiteadres, naam en telefoonnummer in, dan kunnen we u bereiken.
           </p>
         )}
         {status === 'error' && (

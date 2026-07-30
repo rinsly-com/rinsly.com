@@ -70,7 +70,7 @@ export function CheckRunner() {
       pollRef.current = setInterval(async () => {
         if (Date.now() - startedAt > 150_000) {
           if (pollRef.current) clearInterval(pollRef.current)
-          setPhase({ kind: 'error', message: 'De check duurt langer dan verwacht. Laat uw gegevens achter via het formulier hieronder — dan kijken wij er persoonlijk naar.' })
+          setPhase({ kind: 'error', message: 'De check duurt langer dan verwacht. Laat uw gegevens achter via het formulier hieronder, dan kijken wij er persoonlijk naar.' })
           return
         }
         try {
@@ -87,7 +87,7 @@ export function CheckRunner() {
             window.location.href = `${API_BASE}/check/${token}`
           } else if (data.status.state === 'error') {
             if (pollRef.current) clearInterval(pollRef.current)
-            setPhase({ kind: 'error', message: 'We konden de site niet volledig beoordelen. Laat uw gegevens achter via het formulier hieronder — dan kijken wij er persoonlijk naar.' })
+            setPhase({ kind: 'error', message: 'We konden de site niet volledig beoordelen. Laat uw gegevens achter via het formulier hieronder, dan kijken wij er persoonlijk naar.' })
           } else {
             setPhase({ kind: 'running', token, step: data.status.step })
           }

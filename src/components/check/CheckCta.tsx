@@ -33,7 +33,7 @@ export function CheckCta({ subject }: { subject: string }) {
             Klaar voor een site die wél klanten oplevert?
           </h2>
           <p className="max-w-[52ch] text-sm text-slate-ink/70">
-            15 minuten, gratis en vrijblijvend. U hoort direct wat er mogelijk is — beslissen kan
+            15 minuten, gratis en vrijblijvend. U hoort direct wat er mogelijk is. Beslissen kan
             altijd later.
           </p>
         </div>

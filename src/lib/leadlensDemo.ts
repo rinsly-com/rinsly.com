@@ -21,7 +21,7 @@ export const demoScorecard = (): ScorecardResult => ({
     grades: { moderniteit: 50, snelheid: 83, mobiel: 10, vindbaarheid: 83, veiligheid: 15 },
     findings: [
       'copyrightjaar staat al 14 jaar vast op 2012',
-      'geen mobiele weergave — site stamt van vóór het smartphone-tijdperk',
+      'geen mobiele weergave, de site stamt van vóór het smartphone-tijdperk',
       "geen HTTPS: browsers markeren de site als 'niet veilig'",
       'trage laadtijd: bezoekers wachten ruim 6 seconden op de homepage',
     ],
