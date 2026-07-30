@@ -1,5 +1,7 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
 
+import { getRuntime } from '../lib/bindings'
+
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -64,7 +66,22 @@ export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) 
     return json({ ok: false, error: 'server' }, 500)
   }
 
-  // TODO: notify yaron@rinsly.com once Cloudflare Email is set up (same TODO as
-  // /api/offerte) — until then requests are picked up in the admin panel.
+  // Notify sales in the background; a mail failure never breaks the submission.
+  const { waitUntil } = await getRuntime()
+  waitUntil(
+    req.payload
+      .sendEmail({
+        to: 'contact@rinsly.com',
+        subject: `Nieuwe websitecheck-aanvraag: ${url}`,
+        text: `Er is een nieuwe aanvraag binnengekomen via rinsly.com/check.\n\nWebsite: ${url}\nNaam: ${naam}\nTelefoon: ${telefoon}\n\nDe aanvraag staat ook in het admin-panel onder Websitecheck-aanvragen.`,
+      })
+      .catch((err: unknown) => {
+        req.payload.logger.error({
+          msg: '[check-aanvraag] notification mail failed',
+          err: err instanceof Error ? err.message : String(err),
+        })
+      }),
+  )
+
   return json({ ok: true })
 }

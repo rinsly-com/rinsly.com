@@ -47,6 +47,11 @@
   // payload.config.ts activates the R2 storage adapter once this binding exists.
   // Production rewrites these URLs through Cloudflare Image Transformations
   // (/cdn-cgi/image) — enable it on the rinsly.com zone. See src/lib/image.ts.
+  // Transactional mail (Payload auth mails + submission notifications) via
+  // Cloudflare Email Sending, as noreply@rinsly.com. The domain is onboarded
+  // (SPF/DKIM live on the cf-bounce subdomain, so TransIP's apex SPF for the
+  // contact@ mailbox is untouched). See src/email/cloudflareEmailAdapter.ts.
+  "send_email": [{ "name": "EMAIL" }],
   "r2_buckets": [
     { "binding": "R2", "bucket_name": "rinsly-accp" },
     // LeadLens scorecards for the personal /check/<token> pages. LeadLens (the
