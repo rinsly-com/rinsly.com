@@ -101,6 +101,27 @@ export const checkRunStartHandler: PayloadHandler = async (req: PayloadRequest) 
     }),
   )
 
+  // Data minimisation (privacyverklaring §2): the hash only matters within the
+  // rate window, so opportunistically strip it from older rows on each run.
+  waitUntil(
+    req.payload
+      .update({
+        collection: 'check-runs',
+        where: {
+          ipHash: { exists: true },
+          createdAt: { less_than: new Date(Date.now() - RATE_WINDOW_MS).toISOString() },
+        },
+        data: { ipHash: null },
+        overrideAccess: true,
+      })
+      .catch((err: unknown) => {
+        req.payload.logger.error({
+          msg: '[check-run] ipHash cleanup failed',
+          err: err instanceof Error ? err.message : String(err),
+        })
+      }),
+  )
+
   req.payload.logger.info({ msg: '[check-run] started', domain, token })
   return json({ ok: true, token })
 }

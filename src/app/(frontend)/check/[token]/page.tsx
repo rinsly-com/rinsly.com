@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
-import { Eyebrow, Icon, Section, SectionHeading } from '@rinsly-com/site-core/ui'
+import { ArrowIcon, Eyebrow, Icon, Section, SectionHeading } from '@rinsly-com/site-core/ui'
 
 import { checkConfig } from '@/check.config'
 import { CheckCta } from '@/components/check/CheckCta'
@@ -110,7 +111,11 @@ export default async function CheckTokenPage({ params }: Params) {
                 {sentence(highlight)}
               </p>
             )}
-            <div data-hero-el style={{ animationDelay: '0.28s' }}>
+            <div
+              data-hero-el
+              style={{ animationDelay: '0.28s' }}
+              className="flex flex-wrap items-center gap-5"
+            >
               <a
                 href="#kennismaking"
                 data-magnetic=""
@@ -118,6 +123,13 @@ export default async function CheckTokenPage({ params }: Params) {
               >
                 Plan een gratis kennismaking
               </a>
+              <Link
+                href="/check"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-accent transition-opacity hover:opacity-80"
+              >
+                Nieuwe scan
+                <ArrowIcon />
+              </Link>
             </div>
           </div>
         </Section>

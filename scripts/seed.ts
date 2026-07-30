@@ -452,12 +452,13 @@ const privacyNodes: Record<Locale, LegalNode[]> = {
     { ul: [
       '**Contactgegevens** die u zelf verstrekt via het contactformulier of per e-mail: uw naam, e-mailadres en de inhoud van uw bericht.',
       '**Technische gegevens** die automatisch worden vastgelegd wanneer u de site bezoekt: uw IP-adres, browsertype en technische log- en gebruiksgegevens.',
+      '**Websitecheck-gegevens** wanneer u onze gratis websitecheck gebruikt: het door u opgegeven websiteadres, het gegenereerde rapport en een versleutelde (gehashte) afgeleide van uw IP-adres. Die afgeleide gebruiken we uitsluitend om misbruik te voorkomen (maximaal aantal checks per dag) en verwijderen we binnen 24 uur; het rapport bewaren we 90 dagen. Uw volledige IP-adres slaan we niet op.',
     ] },
     { h: '3. Doeleinden en grondslagen' },
     { p: 'We verwerken uw gegevens uitsluitend voor de volgende doeleinden:' },
     { ul: [
       'Het beantwoorden van uw vraag of het opstellen van een offerte. Grondslag: de uitvoering van of stappen voorafgaand aan een overeenkomst (art. 6 lid 1 sub b AVG).',
-      'Het beveiligen, onderhouden en verbeteren van de website. Grondslag: ons gerechtvaardigd belang bij een veilige en goed werkende website (art. 6 lid 1 sub f AVG).',
+      'Het beveiligen, onderhouden en verbeteren van de website, waaronder het beperken van misbruik van de gratis websitecheck. Grondslag: ons gerechtvaardigd belang bij een veilige en goed werkende website (art. 6 lid 1 sub f AVG).',
       'Het voldoen aan wettelijke verplichtingen, zoals de fiscale bewaarplicht. Grondslag: een wettelijke plicht (art. 6 lid 1 sub c AVG).',
     ] },
     { h: '4. Cookies' },
@@ -484,12 +485,13 @@ const privacyNodes: Record<Locale, LegalNode[]> = {
     { ul: [
       '**Contact details** you provide yourself through the contact form or by email: your name, email address and the content of your message.',
       '**Technical data** recorded automatically when you visit the site: your IP address, browser type and technical log and usage data.',
+      '**Website-check data** when you use our free website check: the web address you submit, the generated report and an encrypted (hashed) derivative of your IP address. We use that derivative solely to prevent abuse (a daily maximum of checks) and delete it within 24 hours; the report is kept for 90 days. We do not store your full IP address.',
     ] },
     { h: '3. Purposes and legal bases' },
     { p: 'We process your data only for the following purposes:' },
     { ul: [
       'Answering your question or preparing a quote. Basis: performance of, or steps prior to, a contract (art. 6(1)(b) GDPR).',
-      'Securing, maintaining and improving the website. Basis: our legitimate interest in a secure, well-functioning website (art. 6(1)(f) GDPR).',
+      'Securing, maintaining and improving the website, including limiting abuse of the free website check. Basis: our legitimate interest in a secure, well-functioning website (art. 6(1)(f) GDPR).',
       'Complying with legal obligations, such as tax retention rules. Basis: a legal obligation (art. 6(1)(c) GDPR).',
     ] },
     { h: '4. Cookies' },
