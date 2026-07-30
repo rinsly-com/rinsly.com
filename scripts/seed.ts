@@ -139,8 +139,8 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
       title: t(locale, 'Uw website, volledig beheerd', 'Your website, fully managed'),
       intro: t(
         locale,
-        'U bent altijd eigenaar van uw site en data, maandelijks opzegbaar, gebouwd als maatwerk op het Cloudflare-platform — geen WordPress-template. Hosting is bij elk pakket inbegrepen. Onze tarieven zijn zakelijk en exclusief 21% btw.',
-        'You always own your site and data, cancel monthly, custom-built on the Cloudflare platform — not a WordPress template. Hosting is included in every plan. Our rates are for business customers and exclude 21% VAT.',
+        'U bent altijd eigenaar van uw site en data, maandelijks opzegbaar, gebouwd als maatwerk op het Cloudflare-platform — geen WordPress-template. Hosting is bij elk pakket inbegrepen. Bij een driejarige beheerovereenkomst bouwen we uw website gratis (afhankelijk van de omvang). Onze tarieven zijn zakelijk en exclusief 21% btw.',
+        'You always own your site and data, cancel monthly, custom-built on the Cloudflare platform — not a WordPress template. Hosting is included in every plan. With a three-year management agreement we build your website for free (depending on scale). Our rates are for business customers and exclude 21% VAT.',
       ),
     },
     tiers: [
@@ -252,6 +252,11 @@ const homeLayout = (locale: Locale, home: number): Block[] => {
             locale,
             'Net gestart? In overleg kunnen de bouwkosten over het eerste jaar worden gespreid.',
             'Just starting out? By arrangement, the build cost can be spread over the first year.',
+          ),
+          t(
+            locale,
+            'Gaat u een beheerovereenkomst van drie jaar aan, dan bouwen we uw website gratis, afhankelijk van de omvang van de site.',
+            'If you commit to a three-year management agreement, we build your website for free, depending on the scale of the site.',
           ),
         ),
       },
@@ -447,12 +452,13 @@ const privacyNodes: Record<Locale, LegalNode[]> = {
     { ul: [
       '**Contactgegevens** die u zelf verstrekt via het contactformulier of per e-mail: uw naam, e-mailadres en de inhoud van uw bericht.',
       '**Technische gegevens** die automatisch worden vastgelegd wanneer u de site bezoekt: uw IP-adres, browsertype en technische log- en gebruiksgegevens.',
+      '**Websitecheck-gegevens** wanneer u onze gratis websitecheck gebruikt: het door u opgegeven websiteadres, het gegenereerde rapport en een versleutelde (gehashte) afgeleide van uw IP-adres. Die afgeleide gebruiken we uitsluitend om misbruik te voorkomen (maximaal aantal checks per dag) en verwijderen we binnen 24 uur; het rapport bewaren we 90 dagen. Uw volledige IP-adres slaan we niet op.',
     ] },
     { h: '3. Doeleinden en grondslagen' },
     { p: 'We verwerken uw gegevens uitsluitend voor de volgende doeleinden:' },
     { ul: [
       'Het beantwoorden van uw vraag of het opstellen van een offerte. Grondslag: de uitvoering van of stappen voorafgaand aan een overeenkomst (art. 6 lid 1 sub b AVG).',
-      'Het beveiligen, onderhouden en verbeteren van de website. Grondslag: ons gerechtvaardigd belang bij een veilige en goed werkende website (art. 6 lid 1 sub f AVG).',
+      'Het beveiligen, onderhouden en verbeteren van de website, waaronder het beperken van misbruik van de gratis websitecheck. Grondslag: ons gerechtvaardigd belang bij een veilige en goed werkende website (art. 6 lid 1 sub f AVG).',
       'Het voldoen aan wettelijke verplichtingen, zoals de fiscale bewaarplicht. Grondslag: een wettelijke plicht (art. 6 lid 1 sub c AVG).',
     ] },
     { h: '4. Cookies' },
@@ -479,12 +485,13 @@ const privacyNodes: Record<Locale, LegalNode[]> = {
     { ul: [
       '**Contact details** you provide yourself through the contact form or by email: your name, email address and the content of your message.',
       '**Technical data** recorded automatically when you visit the site: your IP address, browser type and technical log and usage data.',
+      '**Website-check data** when you use our free website check: the web address you submit, the generated report and an encrypted (hashed) derivative of your IP address. We use that derivative solely to prevent abuse (a daily maximum of checks) and delete it within 24 hours; the report is kept for 90 days. We do not store your full IP address.',
     ] },
     { h: '3. Purposes and legal bases' },
     { p: 'We process your data only for the following purposes:' },
     { ul: [
       'Answering your question or preparing a quote. Basis: performance of, or steps prior to, a contract (art. 6(1)(b) GDPR).',
-      'Securing, maintaining and improving the website. Basis: our legitimate interest in a secure, well-functioning website (art. 6(1)(f) GDPR).',
+      'Securing, maintaining and improving the website, including limiting abuse of the free website check. Basis: our legitimate interest in a secure, well-functioning website (art. 6(1)(f) GDPR).',
       'Complying with legal obligations, such as tax retention rules. Basis: a legal obligation (art. 6(1)(c) GDPR).',
     ] },
     { h: '4. Cookies' },

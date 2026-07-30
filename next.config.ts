@@ -45,9 +45,51 @@ const nextConfig: NextConfig = {
 }
 
 // The bare-root redirect needs a server; `output: export` forbids redirects(),
-// so the static site handles `/` via out/_redirects (written by build-static.mjs).
+// so the static site handles `/` via out/_redirects (written by build-static.mjs,
+// which also mirrors the locale-prefixed /check redirects below).
 if (!isStatic) {
-  nextConfig.redirects = async () => [{ source: '/', destination: '/nl', permanent: false }]
+  nextConfig.redirects = async () => [
+    { source: '/', destination: '/nl', permanent: false },
+    // /check is deliberately locale-less (short URL in the LeadLens mail, Dutch
+    // only) — catch intuitive locale-prefixed variants instead of 404ing.
+    { source: '/:locale(nl|en)/check/:path*', destination: '/check/:path*', permanent: true },
+  ]
 }
 
-export default isStatic ? nextConfig : withPayload(nextConfig, { devBundleServerPackages: false })
+const config = isStatic ? nextConfig : withPayload(nextConfig, { devBundleServerPackages: false })
+
+if (!isStatic) {
+  // withPayload adds Accept-CH/Critical-CH (Sec-CH-Prefers-Color-Scheme) on
+  // every route for the admin's server-side theming. A Critical-CH response
+  // makes Chromium RESTART the navigation to resend the hint — a full extra
+  // round trip on every first visit. The /check funnel pages (LeadLens
+  // scorecards) theme via pure CSS prefers-color-scheme and are exactly where
+  // we sell speed, so carve them out of Payload's catch-all header entry.
+  const payloadHeaders = config.headers?.bind(config)
+  config.headers = async () => {
+    const entries = payloadHeaders ? await payloadHeaders() : []
+    return [
+      ...entries.map((entry) =>
+        entry.source === '/:path*' && entry.headers?.some((h) => h.key === 'Critical-CH')
+          ? { ...entry, source: '/((?!check).*)' }
+          : entry,
+      ),
+      // Security headers on every accp response. X-Frame-Options stays
+      // SAMEORIGIN (not DENY): the Payload admin's live preview iframes the
+      // frontend. The static rinsly.com worker gets its own stricter set via
+      // out/_headers (build-static.mjs).
+      {
+        source: '/:path*',
+        headers: [
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'X-Frame-Options', value: 'SAMEORIGIN' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
+        ],
+      },
+    ]
+  }
+}
+
+export default config

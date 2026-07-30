@@ -71,6 +71,8 @@ export interface Config {
     media: Media;
     pages: Page;
     offertes: Offerte;
+    'check-aanvragen': CheckAanvragen;
+    'check-runs': CheckRun;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -82,6 +84,8 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     offertes: OffertesSelect<false> | OffertesSelect<true>;
+    'check-aanvragen': CheckAanvragenSelect<false> | CheckAanvragenSelect<true>;
+    'check-runs': CheckRunsSelect<false> | CheckRunsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -624,6 +628,30 @@ export interface Offerte {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "check-aanvragen".
+ */
+export interface CheckAanvragen {
+  id: number;
+  url: string;
+  naam: string;
+  telefoon: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "check-runs".
+ */
+export interface CheckRun {
+  id: number;
+  domain: string;
+  token: string;
+  ipHash?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -661,6 +689,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'offertes';
         value: number | Offerte;
+      } | null)
+    | ({
+        relationTo: 'check-aanvragen';
+        value: number | CheckAanvragen;
+      } | null)
+    | ({
+        relationTo: 'check-runs';
+        value: number | CheckRun;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1016,6 +1052,28 @@ export interface OffertesSelect<T extends boolean = true> {
   additions?: T;
   additionsOther?: T;
   bericht?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "check-aanvragen_select".
+ */
+export interface CheckAanvragenSelect<T extends boolean = true> {
+  url?: T;
+  naam?: T;
+  telefoon?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "check-runs_select".
+ */
+export interface CheckRunsSelect<T extends boolean = true> {
+  domain?: T;
+  token?: T;
+  ipHash?: T;
   updatedAt?: T;
   createdAt?: T;
 }
