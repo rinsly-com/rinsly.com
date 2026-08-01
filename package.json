@@ -38,7 +38,7 @@
     "@payloadcms/storage-r2": "3.85.2",
     "@payloadcms/translations": "3.85.2",
     "@payloadcms/ui": "3.85.2",
-    "@rinsly-com/site-core": "^0.5.0",
+    "@rinsly-com/site-core": "^0.6.0",
     "@tabler/icons-react": "^3.44.0",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",

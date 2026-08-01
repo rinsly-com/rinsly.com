@@ -15,7 +15,7 @@ name: Deploy production (static)
 # code change. A manual run from the Actions tab does the same.
 #
 # Self-contained (inlined) copy of the fleet pipeline. Canonical source:
-# rinsly-com/rinsly-template/.github/workflows/site-deploy.yml — kept in sync by
+# rinsly-com/Template/.github/workflows/ (accp/prod split) — kept in sync by
 # the fleet tooling. Custom domains live in the Cloudflare dashboard, so an
 # account-level CLOUDFLARE_API_TOKEN suffices (no zone/Workers Routes perms).
 
