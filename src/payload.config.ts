@@ -52,4 +52,9 @@ export default buildSiteConfig({
   },
   importMapBaseDir: path.resolve(dirname),
   typesOutputFile: path.resolve(dirname, 'payload-types.ts'),
+  // Cloudflare traffic strip on the dashboard (unique visitors / page views).
+  // Needs the src/components/AnalyticsPanel.tsx re-export plus
+  // CLOUDFLARE_ZONE_ID + CLOUDFLARE_ANALYTICS_TOKEN; without those it renders
+  // nothing on a live site.
+  dashboardAnalytics: true,
 })
