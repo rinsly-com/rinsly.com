@@ -53,6 +53,10 @@ if (!isStatic) {
     // /check is deliberately locale-less (short URL in the LeadLens mail, Dutch
     // only) — catch intuitive locale-prefixed variants instead of 404ing.
     { source: '/:locale(nl|en)/check/:path*', destination: '/check/:path*', permanent: true },
+    // /partner is the opposite: it lives under a locale, because a studio worth
+    // recruiting may not be Dutch. Bare /partner keeps working — invites already
+    // sent carry that form, and Next preserves the ?token= query across this.
+    { source: '/partner', destination: '/nl/partner', permanent: false },
   ]
 }
 
