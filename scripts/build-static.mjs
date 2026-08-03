@@ -55,6 +55,7 @@ const DYNAMIC_ROUTES = [
   'src/app/(frontend)/[locale]/[slug]/page.tsx',
   'src/app/(frontend)/[locale]/opengraph-image.tsx',
   'src/app/(frontend)/[locale]/[slug]/opengraph-image.tsx',
+  'src/app/(frontend)/[locale]/partner/page.tsx',
   // sitemap.xml is force-dynamic on accp; static export reads the snapshot.
   'src/app/sitemap.ts',
 ]
