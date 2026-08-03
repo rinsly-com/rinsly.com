@@ -22,6 +22,12 @@ import { PartnerTokenGate } from '@/components/partner/PartnerTokenGate'
  * a token gets an explanation and an address, not a form.
  */
 
+// force-dynamic on the accp worker, like every other [locale] route: the locale
+// layout reads the header/footer globals from D1, which does not exist at build
+// time. The static prod build (scripts/build-static.mjs) strips this line and
+// prerenders from the layout's locale params.
+export const dynamic = 'force-dynamic'
+
 type Params = { locale: string }
 
 const COPY = {
