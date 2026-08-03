@@ -173,6 +173,9 @@ writeFileSync(
   [
     `/    /${DEFAULT_LOCALE}    302`,
     ...LOCALES.flatMap((l) => [`/${l}/check    /check    301`, `/${l}/check/*    /check/:splat    301`]),
+    // The mirror of next.config's /partner rule: bare /partner goes to the
+    // default locale, so an invite link without one still lands on the form.
+    `/partner    /${DEFAULT_LOCALE}/partner    302`,
     '',
   ].join('\n'),
 )
