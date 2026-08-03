@@ -92,7 +92,9 @@ export async function generateMetadata({
   const { locale } = await params
   const t = copyFor(locale)
   return {
-    title: `${t.title} | Rinsly`,
+    // The locale layout's title template appends the brand; adding it here too
+    // gives "… | Rinsly — Rinsly".
+    title: t.title,
     description: t.description,
     robots: { index: false, follow: false },
   }
@@ -140,7 +142,11 @@ export default async function PartnerPage({ params }: { params: Promise<Params> 
             </Suspense>
           </div>
 
-          <aside data-reveal className="order-1 flex flex-col gap-4 lg:order-2">
+          {/* No data-reveal: the engine's animator leaves those at opacity 0
+              until it scroll-reveals them, and this column IS the pitch. Same
+              reasoning as the /check layout, which drops the .anim class
+              wholesale so nothing on a conversion page waits for GSAP. */}
+          <aside className="order-1 flex flex-col gap-4 lg:order-2">
             <h2 className="text-lg font-bold tracking-[-0.01em] text-ink">{t.asideTitle}</h2>
             <p className="text-sm leading-relaxed text-muted">{t.asideBase}</p>
             <ul className="flex flex-col divide-y divide-hair rounded-xl border border-hair bg-card">
