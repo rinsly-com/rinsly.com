@@ -1,6 +1,7 @@
 import * as migration_20260718_152236 from './20260718_152236';
 import * as migration_20260729_181721_check_aanvragen from './20260729_181721_check_aanvragen';
 import * as migration_20260730_165530_check_runs from './20260730_165530_check_runs';
+import * as migration_20260803_201709_partner_aanvragen from './20260803_201709_partner_aanvragen';
 
 export const migrations = [
   {
@@ -16,6 +17,11 @@ export const migrations = [
   {
     up: migration_20260730_165530_check_runs.up,
     down: migration_20260730_165530_check_runs.down,
-    name: '20260730_165530_check_runs'
+    name: '20260730_165530_check_runs',
+  },
+  {
+    up: migration_20260803_201709_partner_aanvragen.up,
+    down: migration_20260803_201709_partner_aanvragen.down,
+    name: '20260803_201709_partner_aanvragen'
   },
 ];
