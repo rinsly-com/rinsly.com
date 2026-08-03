@@ -8,9 +8,16 @@ import { CheckAanvragen } from './collections/CheckAanvragen'
 import { cloudflareEmailAdapter } from './email/cloudflareEmailAdapter'
 import { CheckRuns } from './collections/CheckRuns'
 import { Offertes } from './collections/Offertes'
+import { PartnerAanvragen } from './collections/PartnerAanvragen'
 import { checkAanvraagHandler } from './endpoints/checkAanvraag'
 import { checkRunStartHandler, checkRunStatusHandler } from './endpoints/checkRun'
 import { offerteHandler } from './endpoints/offerte'
+import {
+  partnerAanvraagHandler,
+  partnerMarkHandler,
+  partnerPendingHandler,
+  partnerVerifyHandler,
+} from './endpoints/partnerAanvraag'
 import { deployHandler } from './endpoints/deploy'
 import { triggerDeploy } from './hooks/triggerStaticDeploy'
 
@@ -28,7 +35,7 @@ export default buildSiteConfig({
   // Transactional mail (auth mails + submission notifications) as
   // noreply@rinsly.com via Cloudflare Email Sending; logs when no binding.
   email: cloudflareEmailAdapter({ defaultFromAddress: 'noreply@rinsly.com', defaultFromName: 'Rinsly' }),
-  extraCollections: [Offertes, CheckAanvragen, CheckRuns],
+  extraCollections: [Offertes, CheckAanvragen, CheckRuns, PartnerAanvragen],
   extraEndpoints: [
     { path: '/offerte', method: 'post', handler: offerteHandler },
     // POST /api/check-aanvraag — lead form on the generic /check page.
@@ -36,6 +43,13 @@ export default buildSiteConfig({
     // Self-service website check: start + progress polling (see lib/siteCheck).
     { path: '/check-run', method: 'post', handler: checkRunStartHandler },
     { path: '/check-run/status', method: 'get', handler: checkRunStatusHandler },
+    // The partner funnel: Lens mints a signed invite link, the studio configures
+    // itself here, and Ledger pulls the result. See endpoints/partnerAanvraag.ts.
+    { path: '/partner-aanvraag', method: 'post', handler: partnerAanvraagHandler },
+    { path: '/partner-aanvraag/verify', method: 'get', handler: partnerVerifyHandler },
+    // Read/ack side, for `ledger partners --pull`. Bearer-guarded.
+    { path: '/partner-aanvraag/pending', method: 'get', handler: partnerPendingHandler },
+    { path: '/partner-aanvraag/mark', method: 'post', handler: partnerMarkHandler },
     // POST /api/deploy — manual "rebuild production" trigger (endpoints/deploy.ts).
     { path: '/deploy', method: 'post', handler: deployHandler },
   ],
