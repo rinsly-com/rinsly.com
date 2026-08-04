@@ -73,6 +73,7 @@ export interface Config {
     offertes: Offerte;
     'check-aanvragen': CheckAanvragen;
     'check-runs': CheckRun;
+    'partner-aanvragen': PartnerAanvragen;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     offertes: OffertesSelect<false> | OffertesSelect<true>;
     'check-aanvragen': CheckAanvragenSelect<false> | CheckAanvragenSelect<true>;
     'check-runs': CheckRunsSelect<false> | CheckRunsSelect<true>;
+    'partner-aanvragen': PartnerAanvragenSelect<false> | PartnerAanvragenSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -652,6 +654,51 @@ export interface CheckRun {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partner-aanvragen".
+ */
+export interface PartnerAanvragen {
+  id: number;
+  /**
+   * From the signed invite token — the identifier Lens and Ledger share.
+   */
+  domein: string;
+  bedrijfsnaam: string;
+  contactpersoon?: string | null;
+  email: string;
+  telefoon?: string | null;
+  adres?: string | null;
+  plaats?: string | null;
+  kvk?: string | null;
+  btwNummer?: string | null;
+  exclusiviteit?: boolean | null;
+  relatiebeheer?: boolean | null;
+  marketing?: boolean | null;
+  /**
+   * Required of every partner, so a "no" is a conversation, not a rejection.
+   */
+  figmaSeat?: boolean | null;
+  /**
+   * Comma-separated, e.g. kapper,restaurant. Empty means any branch.
+   */
+  branches?: string | null;
+  /**
+   * ISO 639-1, comma-separated, e.g. nl,de.
+   */
+  talen?: string | null;
+  /**
+   * ISO 3166-1 alpha-2, comma-separated, e.g. nl,be.
+   */
+  landen?: string | null;
+  opmerking?: string | null;
+  /**
+   * Set to "imported" by Ledger once the application has been turned into a tenant, so it stops appearing in the review queue.
+   */
+  status?: ('new' | 'imported' | 'declined') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -697,6 +744,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'check-runs';
         value: number | CheckRun;
+      } | null)
+    | ({
+        relationTo: 'partner-aanvragen';
+        value: number | PartnerAanvragen;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -1074,6 +1125,32 @@ export interface CheckRunsSelect<T extends boolean = true> {
   domain?: T;
   token?: T;
   ipHash?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partner-aanvragen_select".
+ */
+export interface PartnerAanvragenSelect<T extends boolean = true> {
+  domein?: T;
+  bedrijfsnaam?: T;
+  contactpersoon?: T;
+  email?: T;
+  telefoon?: T;
+  adres?: T;
+  plaats?: T;
+  kvk?: T;
+  btwNummer?: T;
+  exclusiviteit?: T;
+  relatiebeheer?: T;
+  marketing?: T;
+  figmaSeat?: T;
+  branches?: T;
+  talen?: T;
+  landen?: T;
+  opmerking?: T;
+  status?: T;
   updatedAt?: T;
   createdAt?: T;
 }

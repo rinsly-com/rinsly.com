@@ -55,6 +55,7 @@ const DYNAMIC_ROUTES = [
   'src/app/(frontend)/[locale]/[slug]/page.tsx',
   'src/app/(frontend)/[locale]/opengraph-image.tsx',
   'src/app/(frontend)/[locale]/[slug]/opengraph-image.tsx',
+  'src/app/(frontend)/[locale]/partner/page.tsx',
   // sitemap.xml is force-dynamic on accp; static export reads the snapshot.
   'src/app/sitemap.ts',
 ]
@@ -173,6 +174,9 @@ writeFileSync(
   [
     `/    /${DEFAULT_LOCALE}    302`,
     ...LOCALES.flatMap((l) => [`/${l}/check    /check    301`, `/${l}/check/*    /check/:splat    301`]),
+    // The mirror of next.config's /partner rule: bare /partner goes to the
+    // default locale, so an invite link without one still lands on the form.
+    `/partner    /${DEFAULT_LOCALE}/partner    302`,
     '',
   ].join('\n'),
 )

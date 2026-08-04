@@ -11,7 +11,7 @@ name: Deploy ACCP (CMS)
 # static build snapshots its content from.
 #
 # Self-contained (inlined) copy of the fleet pipeline. Canonical source:
-# rinsly-com/rinsly-template/.github/workflows/site-deploy.yml — kept in sync by
+# rinsly-com/Template/.github/workflows/ (accp/prod split) — kept in sync by
 # the fleet tooling. (Inlined rather than referenced because GitHub's private
 # cross-repo reusable-workflow access was unreliable for this org.)
 #
