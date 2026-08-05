@@ -36,8 +36,8 @@ const COPY = {
     description:
       'Stel samen wat je wilt oppakken en wat je daarvoor terugkrijgt van de doorlopende omzet.',
     eyebrow: 'Partnerprogramma',
-    heading: 'Jullie ontwerpen. Wij bouwen en houden het draaiend.',
-    lede: 'Breng je klanten bij ons onder en krijg een deel van de doorlopende omzet — elke maand, zolang die klant blijft. Hoeveel je krijgt bepaal je zelf, door te kiezen wat je op je neemt.',
+    heading: 'Jullie ontwerpen. Wij bouwen het en houden het draaiend.',
+    lede: 'Jij levert het ontwerp in Figma, wij bouwen het als applicatie op ons platform en draaien het daarna. Van de doorlopende hostingomzet gaat een deel naar jou, zolang die klant blijft: hoeveel bepaal je zelf, door te kiezen wat je op je neemt. Je kiest ook hoe het gefactureerd wordt. Wij factureren de klant en betalen jou uit zodra die betaald heeft, op zijn eigen factuurritme, of je zet de hosting op je eigen factuur en koopt bij ons in tegen de prijs min jouw percentage.',
     checking: 'Even je link controleren…',
     asideTitle: 'Hoe het tarief werkt',
     asideBase:
@@ -61,7 +61,7 @@ const COPY = {
       'Choose what you want to take on, and see what it earns you from the recurring revenue.',
     eyebrow: 'Partner programme',
     heading: 'You design. We build it and keep it running.',
-    lede: 'Bring us your clients and take a share of the recurring revenue — every month, for as long as that client stays. How much is up to you: it follows from what you take on.',
+    lede: 'You deliver the design in Figma, we build it as an application on our platform and run it from there. A share of the recurring hosting revenue comes to you for as long as the client stays: how much is up to you, and follows from what you take on. You also choose how it is invoiced: we bill the client and pay you once they have paid, on their own billing rhythm, or you put the hosting on your own invoice and buy from us at list minus your percentage.',
     checking: 'Just checking your link…',
     asideTitle: 'How the rate works',
     asideBase:

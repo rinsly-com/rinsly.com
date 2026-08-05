@@ -39,7 +39,7 @@ export const PartnerAanvragen: CollectionConfig = {
       type: 'text',
       required: true,
       index: true,
-      admin: { description: 'From the signed invite token — the identifier Lens and Ledger share.' },
+      admin: { description: 'From the signed invite token: the identifier Lens and Ledger share.' },
     },
     { name: 'bedrijfsnaam', label: { en: 'Company', nl: 'Bedrijfsnaam' }, type: 'text', required: true },
     { name: 'contactpersoon', label: { en: 'Contact', nl: 'Contactpersoon' }, type: 'text' },

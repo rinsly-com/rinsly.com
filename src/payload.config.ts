@@ -9,11 +9,14 @@ import { cloudflareEmailAdapter } from './email/cloudflareEmailAdapter'
 import { CheckRuns } from './collections/CheckRuns'
 import { Offertes } from './collections/Offertes'
 import { PartnerAanvragen } from './collections/PartnerAanvragen'
+import { diagramBlock } from './blocks/Diagram'
+import { revenueCalculatorBlock } from './blocks/RevenueCalculator'
 import { checkAanvraagHandler } from './endpoints/checkAanvraag'
 import { checkRunStartHandler, checkRunStatusHandler } from './endpoints/checkRun'
 import { offerteHandler } from './endpoints/offerte'
 import {
   partnerAanvraagHandler,
+  partnerInteresseHandler,
   partnerMarkHandler,
   partnerPendingHandler,
   partnerVerifyHandler,
@@ -36,6 +39,9 @@ export default buildSiteConfig({
   // noreply@rinsly.com via Cloudflare Email Sending; logs when no binding.
   email: cloudflareEmailAdapter({ defaultFromAddress: 'noreply@rinsly.com', defaultFromName: 'Rinsly' }),
   extraCollections: [Offertes, CheckAanvragen, CheckRuns, PartnerAanvragen],
+  // Site-specific blocks: both encode Rinsly's own commercial model or its
+  // mechanics, so they stay app-side rather than going into the shared engine.
+  extraBlocks: [revenueCalculatorBlock, diagramBlock],
   extraEndpoints: [
     { path: '/offerte', method: 'post', handler: offerteHandler },
     // POST /api/check-aanvraag — lead form on the generic /check page.
@@ -46,6 +52,9 @@ export default buildSiteConfig({
     // The partner funnel: Lens mints a signed invite link, the studio configures
     // itself here, and Ledger pulls the result. See endpoints/partnerAanvraag.ts.
     { path: '/partner-aanvraag', method: 'post', handler: partnerAanvraagHandler },
+    // POST /api/partner-interesse — a studio that arrived on /contact by itself,
+    // so there is no signed link to verify. Same collection, unverified domain.
+    { path: '/partner-interesse', method: 'post', handler: partnerInteresseHandler },
     { path: '/partner-aanvraag/verify', method: 'get', handler: partnerVerifyHandler },
     // Read/ack side, for `ledger partners --pull`. Bearer-guarded.
     { path: '/partner-aanvraag/pending', method: 'get', handler: partnerPendingHandler },
