@@ -27,7 +27,7 @@ const DUTIES = {
       pct: 10,
       title: 'Exclusiviteit',
       blurb:
-        'Nieuwe websites en webapplicaties breng je bij ons onder. Klanten die al ergens anders draaien mogen blijven waar ze zijn — pas bij een grote update kijken we samen naar een migratie.',
+        'Nieuwe websites en webapplicaties breng je bij ons onder. Klanten die al ergens anders draaien mogen blijven waar ze zijn. Pas bij een grote update kijken we samen naar een migratie.',
     },
     {
       key: 'relatiebeheer' as const,
@@ -49,7 +49,7 @@ const DUTIES = {
       pct: 10,
       title: 'Exclusivity',
       blurb:
-        'New websites and web apps come to us. Clients already hosted elsewhere may stay where they are — only on a big update do we look at migrating together.',
+        'New websites and web apps come to us. Clients already hosted elsewhere may stay where they are. Only on a big update do we look at migrating together.',
     },
     {
       key: 'relatiebeheer' as const,
@@ -76,7 +76,7 @@ const T = {
       'Uitnodigingen verlopen na een tijdje. Mail ons even, dan sturen we een nieuwe.',
     brokenBody:
       'Misschien is er iets misgegaan met kopiëren. Mail ons de link even, dan zoeken we het uit.',
-    doneTitle: 'Dank je — we hebben alles binnen.',
+    doneTitle: 'Dank je, we hebben alles binnen.',
     doneBody:
       'We nemen het door en bellen je om het af te stemmen. Daarna sturen we het contract, met precies de verantwoordelijkheden die je hier hebt gekozen.',
     dutiesLegend: 'Wat wil je oppakken?',
@@ -84,7 +84,7 @@ const T = {
       'De basis is 0%. Elke verantwoordelijkheid die je op je neemt verhoogt je aandeel in de doorlopende omzet. Daarbovenop komen de omzetniveaus: boven €1.000 per maand +5%, boven €5.000 +10%, boven €25.000 +15%.',
     rateLabel: 'Jouw tarief bij aanvang',
     zeroNote:
-      'Zonder verantwoordelijkheden staat het tarief op 0%. Dat mag — je kunt je ook eerst aanmelden en later kiezen.',
+      'Zonder verantwoordelijkheden staat het tarief op 0%. Dat mag: je kunt je ook eerst aanmelden en later kiezen.',
     detailsLegend: 'Jullie gegevens',
     company: 'Bedrijfsnaam',
     contact: 'Contactpersoon',
@@ -104,7 +104,7 @@ const T = {
     countriesHint: 'Waar je klanten zitten.',
     figmaTitle: 'We hebben Figma met Dev Mode',
     figmaBlurb:
-      'Ontwerpen leveren we in Figma aan. Heb je het nog niet, vink dit dan niet aan — dan bespreken we het gewoon.',
+      'Ontwerpen leveren we in Figma aan. Heb je het nog niet, vink dit dan niet aan, dan bespreken we het gewoon.',
     note: 'Nog iets dat we moeten weten?',
     invalid: 'Vul in ieder geval je bedrijfsnaam en een geldig e-mailadres in.',
     failed: 'Er ging iets mis bij het versturen. Probeer het nog eens, of mail ons op',
@@ -120,7 +120,7 @@ const T = {
     expiredBody: 'Invitations expire after a while. Drop us a line and we will send a fresh one.',
     brokenBody:
       'Something may have gone wrong copying it. Send us the link and we will sort it out.',
-    doneTitle: 'Thanks — we have everything.',
+    doneTitle: 'Thanks, we have everything.',
     doneBody:
       'We will go through it and call you to confirm. After that we send the contract, with exactly the responsibilities you picked here.',
     dutiesLegend: 'What do you want to take on?',
@@ -128,7 +128,7 @@ const T = {
       'The base is 0%. Every responsibility you take on raises your share of the recurring revenue. On top of that come the revenue levels: above €1.000 a month +5%, above €5.000 +10%, above €25.000 +15%.',
     rateLabel: 'Your rate at the start',
     zeroNote:
-      'With no responsibilities the rate is 0%. That is fine — you can sign up first and choose later.',
+      'With no responsibilities the rate is 0%. That is fine: you can sign up first and choose later.',
     detailsLegend: 'Your details',
     company: 'Company name',
     contact: 'Contact person',
@@ -148,7 +148,7 @@ const T = {
     countriesHint: 'Where your clients are.',
     figmaTitle: 'We have Figma with Dev Mode',
     figmaBlurb:
-      'Designs are delivered in Figma. If you do not have it yet, leave this unticked — we will just talk it through.',
+      'Designs are delivered in Figma. If you do not have it yet, leave this unticked, we will just talk it through.',
     note: 'Anything else we should know?',
     invalid: 'Please give at least your company name and a valid e-mail address.',
     failed: 'Something went wrong sending this. Try again, or mail us at',

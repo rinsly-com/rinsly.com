@@ -210,6 +210,8 @@ export interface Page {
         | ButtonRowBlock
         | RichTextBlock
         | NoteBlock
+        | RevenueCalculatorBlock
+        | DiagramBlock
       )[]
     | null;
   meta?: {
@@ -271,6 +273,10 @@ export interface HeroBlock {
         id?: string | null;
       }[]
     | null;
+  /**
+   * Visual treatment only. Use Spotlight once, on the home page.
+   */
+  variant?: ('default' | 'spotlight' | 'offset' | 'centered' | 'quiet') | null;
   /**
    * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
    */
@@ -614,6 +620,43 @@ export interface NoteBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RevenueCalculatorBlock".
+ */
+export interface RevenueCalculatorBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  intro?: string | null;
+  /**
+   * Small print under the result: use it for the caveats, not for selling.
+   */
+  footnote?: string | null;
+  /**
+   * Optional #id so the section can be linked to.
+   */
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'revenueCalculator';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DiagramBlock".
+ */
+export interface DiagramBlock {
+  kind: 'figmaToProduction' | 'oneEngineFleet' | 'invoicingRoutes';
+  eyebrow?: string | null;
+  title?: string | null;
+  /**
+   * Read by screen readers as the figure’s description, so say what the diagram shows: do not leave it empty.
+   */
+  caption?: string | null;
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'diagram';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "offertes".
  */
 export interface Offerte {
@@ -659,7 +702,7 @@ export interface CheckRun {
 export interface PartnerAanvragen {
   id: number;
   /**
-   * From the signed invite token — the identifier Lens and Ledger share.
+   * From the signed invite token: the identifier Lens and Ledger share.
    */
   domein: string;
   bedrijfsnaam: string;
@@ -852,6 +895,8 @@ export interface PagesSelect<T extends boolean = true> {
         buttonRow?: T | ButtonRowBlockSelect<T>;
         richText?: T | RichTextBlockSelect<T>;
         note?: T | NoteBlockSelect<T>;
+        revenueCalculator?: T | RevenueCalculatorBlockSelect<T>;
+        diagram?: T | DiagramBlockSelect<T>;
       };
   meta?:
     | T
@@ -889,6 +934,7 @@ export interface HeroBlockSelect<T extends boolean = true> {
         newTab?: T;
         id?: T;
       };
+  variant?: T;
   anchor?: T;
   id?: T;
   blockName?: T;
@@ -1087,6 +1133,32 @@ export interface RichTextBlockSelect<T extends boolean = true> {
  */
 export interface NoteBlockSelect<T extends boolean = true> {
   text?: T;
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "RevenueCalculatorBlock_select".
+ */
+export interface RevenueCalculatorBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  footnote?: T;
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DiagramBlock_select".
+ */
+export interface DiagramBlockSelect<T extends boolean = true> {
+  kind?: T;
+  eyebrow?: T;
+  title?: T;
+  caption?: T;
   anchor?: T;
   id?: T;
   blockName?: T;

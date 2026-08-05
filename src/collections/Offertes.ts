@@ -34,7 +34,9 @@ export const Offertes: CollectionConfig = {
       options: [
         { label: { en: 'Care', nl: 'Care' }, value: 'care' },
         { label: { en: 'Managed', nl: 'Managed' }, value: 'beheerd' },
-        { label: { en: 'Partner', nl: 'Partner' }, value: 'partner' },
+        // Label only — the stored value stays `partner` until the enum migration
+        // (see FACILITATOR-MIGRATION.md). "Partner" now means a design studio.
+        { label: { en: 'Growth', nl: 'Growth' }, value: 'partner' },
         { label: { en: 'Custom', nl: 'Op maat' }, value: 'opmaat' },
       ],
     },

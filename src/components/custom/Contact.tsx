@@ -1,6 +1,6 @@
 import type { Page } from '@/payload-types'
 import type { Locale } from '@rinsly-com/site-core'
-import { Section, SectionHeading, Buttons, Icon } from '@rinsly-com/site-core/ui'
+import { Section, SectionHeading, Buttons, Icon, type LinkFields } from '@rinsly-com/site-core/ui'
 
 import { OfferteForm } from '@/components/OfferteForm'
 
@@ -67,7 +67,15 @@ export function Contact({ header, items, buttons, locale }: Props) {
             </ul>
           ) : null}
           {buttons?.length ? (
-            <Buttons buttons={buttons} locale={locale} className="mt-2 flex flex-wrap items-center gap-5" />
+            <Buttons
+              // The app's generated `Page` type now carries this site's custom
+              // blocks, so its link fields no longer match the engine's
+              // structurally identical `LinkFields` (which reference the engine's
+              // core-only `Page`). Same data, divergent types.
+              buttons={buttons as unknown as LinkFields[]}
+              locale={locale}
+              className="mt-2 flex flex-wrap items-center gap-5"
+            />
           ) : null}
         </div>
 

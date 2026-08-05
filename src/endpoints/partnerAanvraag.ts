@@ -158,7 +158,7 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
       data.marketing && 'marketing',
     ]
       .filter(Boolean)
-      .join(', ') || 'geen — alleen aangemeld'
+      .join(', ') || 'geen: alleen aangemeld'
 
   // Tell Rinsly in the background; a mail failure never costs the application.
   const { waitUntil } = await getRuntime()
@@ -169,19 +169,19 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
         subject: `Partneraanvraag: ${data.bedrijfsnaam}`,
         text:
           `${data.bedrijfsnaam} (${data.domein}) heeft het partnerformulier ingevuld.\n\n` +
-          `Contact:      ${data.contactpersoon || '—'}\n` +
+          `Contact:      ${data.contactpersoon || ','}\n` +
           `E-mail:       ${data.email}\n` +
-          `Telefoon:     ${data.telefoon || '—'}\n` +
-          `Plaats:       ${data.plaats || '—'}\n` +
-          `KvK:          ${data.kvk || '—'}\n\n` +
+          `Telefoon:     ${data.telefoon || ','}\n` +
+          `Plaats:       ${data.plaats || ','}\n` +
+          `KvK:          ${data.kvk || ','}\n\n` +
           `Wil oppakken: ${chosen}\n` +
-          `Figma:        ${data.figmaSeat ? 'ja' : 'nee — nog bespreken'}\n` +
+          `Figma:        ${data.figmaSeat ? 'ja' : 'nee: nog bespreken'}\n` +
           `Branches:     ${data.branches || 'alle'}\n` +
           `Talen:        ${data.talen}\n` +
           `Landen:       ${data.landen}\n\n` +
           `${data.opmerking ? `Opmerking:\n${data.opmerking}\n\n` : ''}` +
           `Haal 'm binnen met \`ledger partners --pull\` en bekijk 'm onder [8] Tenants.\n` +
-          `Let op: dit is een aanvraag, geen afspraak — het tarief staat pas vast als jij het contract maakt.`,
+          `Let op: dit is een aanvraag, geen afspraak: het tarief staat pas vast als jij het contract maakt.`,
       })
       .catch((err: unknown) => {
         req.payload.logger.error({
@@ -262,5 +262,102 @@ export const partnerMarkHandler: PayloadHandler = async (req: PayloadRequest) =>
   } catch {
     return json({ ok: false, error: 'not_found' }, 404)
   }
+  return json({ ok: true })
+}
+
+/**
+ * POST /api/partner-interesse — a studio that found Rinsly by itself.
+ *
+ * The sibling `partnerAanvraagHandler` is deliberately token-gated: it is the
+ * configurator a *recruited* studio fills in, and the domain comes from the
+ * signed link rather than the body so a link cannot be replayed. That leaves no
+ * route for a studio that simply arrived on /contact, which is what this is.
+ *
+ * It writes the same `partner-aanvragen` collection so there is one review
+ * queue, and marks itself in `opmerking` as self-reported. Two deliberate
+ * differences from the invited flow:
+ *
+ * - `domein` comes from the body (their own website), so it is NOT evidence of
+ *   anything. Treat these rows as leads to qualify, not as verified studios.
+ * - The three qualifying answers — do they build sites themselves, do they
+ *   already sell hosting, do they hold a Figma Dev Mode seat — are what decide
+ *   whether there is a deal at all, so they are asked here rather than on the
+ *   first call. Only `figmaSeat` has a column; the other two go into
+ *   `opmerking` until the collection grows fields for them (see
+ *   FACILITATOR-MIGRATION.md).
+ */
+export const partnerInteresseHandler: PayloadHandler = async (req: PayloadRequest) => {
+  let body: Record<string, unknown> = {}
+  try {
+    body = typeof req.json === 'function' ? ((await req.json()) as Record<string, unknown>) : {}
+  } catch {
+    return json({ ok: false, error: 'invalid_body' }, 400)
+  }
+
+  // Honeypot. Note the field is `honeypot` here, not `website`: a studio's own
+  // website is a real, wanted answer on this form.
+  if (typeof body.honeypot === 'string' && body.honeypot.trim() !== '') {
+    return json({ ok: true })
+  }
+
+  const email = str(body.email)
+  const bedrijfsnaam = str(body.bedrijfsnaam)
+  const domein = str(body.domein, 253).replace(/^https?:\/\//i, '').replace(/\/.*$/, '').toLowerCase()
+  if (!isEmail(email) || !bedrijfsnaam || !domein) {
+    return json({ ok: false, error: 'validation' }, 422)
+  }
+
+  const bouwtZelf = bool(body.bouwtZelf)
+  const verkooptHosting = bool(body.verkooptHosting)
+  const note = str(body.opmerking, 2000)
+
+  // Until the collection has its own columns, the qualifying answers live in
+  // the note — prefixed so they are impossible to miss in the review queue.
+  const opmerking = [
+    'Zelf aangemeld via /contact.',
+    `Bouwt zelf websites: ${bouwtZelf ? 'JA' : 'nee'}.`,
+    `Verkoopt zelf hosting: ${verkooptHosting ? 'JA' : 'nee'}.`,
+    note && `\n${note}`,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .slice(0, 2000)
+
+  const data = {
+    domein,
+    bedrijfsnaam,
+    contactpersoon: str(body.contactpersoon),
+    email,
+    telefoon: str(body.telefoon, 40),
+    figmaSeat: bool(body.figmaSeat),
+    opmerking,
+    status: 'new' as const,
+  }
+
+  try {
+    // One open application per domain, same as the invited flow: a second
+    // submission replaces the first rather than filling the queue.
+    const existing = await req.payload.find({
+      collection: 'partner-aanvragen',
+      where: { and: [{ domein: { equals: domein } }, { status: { equals: 'new' } }] },
+      limit: 1,
+      overrideAccess: true,
+    })
+    const previous = existing.docs[0] as { id: string | number } | undefined
+    if (previous) {
+      await req.payload.update({
+        collection: 'partner-aanvragen',
+        id: previous.id,
+        data,
+        overrideAccess: true,
+      })
+    } else {
+      await req.payload.create({ collection: 'partner-aanvragen', data, overrideAccess: true })
+    }
+  } catch (err) {
+    req.payload.logger.error({ err }, 'partner-interesse: could not store application')
+    return json({ ok: false, error: 'server' }, 500)
+  }
+
   return json({ ok: true })
 }
