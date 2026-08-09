@@ -150,8 +150,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
     ),
     t(
       locale,
-      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates, back-ups en monitoring. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
-      'Rinsly is the build-and-run department design studios don’t have. You deliver the design in Figma, we build it as a real application and run it from there: hosting, updates, backups and monitoring. Every time the client pays, a share of it comes to you.',
+      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates en back-ups. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
+      'Rinsly is the build-and-run department design studios don’t have. You deliver the design in Figma, we build it as a real application and run it from there: hosting, updates and backups. Every time the client pays, a share of it comes to you.',
     ),
     [
       pageLink(t(locale, 'Word partner', 'Become a partner'), ids, SLUG.partner, { variant: 'primary' }),
@@ -199,15 +199,15 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
       },
       {
         icon: 'IconServer2',
-        title: t(locale, 'Draaien op Cloudflare', 'Running on Cloudflare'),
+        title: t(locale, 'Draaien aan de edge', 'Running at the edge'),
         description: t(
           locale,
-          'Eén Worker per site, aan de edge, met limieten die we gewoon opschrijven. Data desgewenst in de EU.',
-          'One Worker per site, at the edge, with limits we simply write down. Data in the EU on request.',
+          'Eén omgeving per site, aan de edge, met limieten die we gewoon opschrijven.',
+          'One environment per site, at the edge, with limits we simply write down.',
         ),
         features: [
-          feature(t(locale, 'Edge-hosting, SSL & monitoring', 'Edge hosting, SSL & monitoring')),
-          feature(t(locale, 'Automatische back-ups', 'Automated backups')),
+          feature(t(locale, 'Edge-hosting & SSL', 'Edge hosting & SSL')),
+          feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
         ],
       },
     ],
@@ -304,8 +304,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, '3. Wij draaien het', '3. We run it'),
         description: t(
           locale,
-          'Updates, back-ups, monitoring, support. Jij hoeft nooit meer een CMS te patchen of op zondag een storing op te lossen.',
-          'Updates, backups, monitoring, support. You never patch a CMS or fix a Sunday outage again.',
+          'Updates, back-ups, support. Jij hoeft nooit meer een CMS te patchen of op zondag een storing op te lossen.',
+          'Updates, backups, support. You never patch a CMS or fix a Sunday outage again.',
         ),
         features: [feature(t(locale, 'Jij krijgt je deel van de omzet', 'You get your share of the revenue'))],
       },
@@ -373,7 +373,7 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
             { p: 'Wil je niets met facturatie te maken hebben, of wil je juist alles op je eigen factuur? Beide kan, en het maakt voor ons niets uit.' },
             { ul: [
               '**Wij factureren de klant.** Jij hoeft niets in te kopen. Zodra de klant betaald heeft, betalen wij jouw deel uit, op het factuurritme van die klant: betaalt hij per maand, dan word jij per maand betaald.',
-              '**Jij factureert je eigen klant.** Je koopt bij ons in tegen de prijs min jouw percentage en zet hosting op je eigen factuur, naast je ontwerpwerk. Je bepaalt dan zelf je prijs en desgewenst je eigen abonnementsvorm, en je mag ons noemen zoals iedereen Cloudflare noemt.',
+              '**Jij factureert je eigen klant.** Je koopt bij ons in tegen de prijs min jouw percentage en zet hosting op je eigen factuur, naast je ontwerpwerk. Je bepaalt dan zelf je prijs en desgewenst je eigen abonnementsvorm, en je mag ons noemen zoals je elke infrastructuurpartij zou noemen.',
             ] },
             { p: 'Wat in beide gevallen hetzelfde blijft: de overeenkomst over de website loopt tussen Rinsly en de eindklant. Dat is er niet om jou buiten te sluiten, maar om jou vrij te laten: **wil je een klant niet langer onder je houden, dan gaat die zonder onderbreking verder als klant van Rinsly**: zelfde site, zelfde voorwaarden, zelfde prijs. Je kunt dus weglopen zonder dat jouw klant iets kwijtraakt.' },
           ]
@@ -381,7 +381,7 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
             { p: 'Want nothing to do with invoicing, or want everything on your own invoice? Both work, and it makes no difference to us.' },
             { ul: [
               '**We invoice the client.** You buy nothing. As soon as the client has paid, we pay out your share, on that client’s billing rhythm: if they pay monthly, you are paid monthly.',
-              '**You invoice your own client.** You buy from us at the price minus your percentage and put hosting on your own invoice, next to your design work. You then set your own price, and your own tiers if you want, and you may name us the way anyone names Cloudflare.',
+              '**You invoice your own client.** You buy from us at the price minus your percentage and put hosting on your own invoice, next to your design work. You then set your own price, and your own tiers if you want, and you may name us the way you would credit any infrastructure provider.',
             ] },
             { p: 'What stays the same either way: the agreement about the website runs between Rinsly and the end client. That is not there to cut you out but to leave you free: **if you no longer want to carry a client, they simply carry on as a Rinsly client**: same site, same terms, same price. So you can walk away without your client losing anything.' },
           ],
@@ -497,8 +497,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Ja. Factureer je zelf, dan koop je bij ons in en bepaal je je eigen prijs en abonnementsvorm, en je mag ons noemen zoals iedereen Cloudflare noemt. Ook het dashboard waarin je klant werkt kan in jullie huisstijl. Wat niet meebeweegt is de overeenkomst: die blijft tussen Rinsly en de eindklant.',
-            'Yes. If you invoice, you buy from us and set your own price and tiers, and you may name us the way anyone names Cloudflare. The dashboard your client works in can carry your house style too. What does not move is the agreement. That stays between Rinsly and the end client.',
+            'Ja. Factureer je zelf, dan koop je bij ons in en bepaal je je eigen prijs en abonnementsvorm, en je mag ons noemen zoals je elke infrastructuurpartij zou noemen. Wat niet meebeweegt is de overeenkomst: die blijft tussen Rinsly en de eindklant.',
+            'Yes. If you invoice, you buy from us and set your own price and tiers, and you may name us the way you would credit any infrastructure provider. What does not move is the agreement. That stays between Rinsly and the end client.',
           ),
         ),
       },
@@ -578,15 +578,15 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
       },
       {
         icon: 'IconServer2',
-        title: t(locale, 'Cloudflare, aan de edge', 'Cloudflare, at the edge'),
+        title: t(locale, 'Eén platform, aan de edge', 'One platform, at the edge'),
         description: t(
           locale,
-          'Eén Worker per site, met de database en de media op hetzelfde platform. Geen server die van u is en waar u wakker van ligt.',
-          'One Worker per site, with the database and the media on the same platform. No server of your own to lie awake about.',
+          'Eén omgeving per site, met de database en de media op hetzelfde platform. Geen server die van u is en waar u wakker van ligt.',
+          'One environment per site, with the database and the media on the same platform. No server of your own to lie awake about.',
         ),
         features: [
-          feature(t(locale, 'SSL & uptime-monitoring', 'SSL & uptime monitoring')),
-          feature(t(locale, 'Automatische back-ups', 'Automated backups')),
+          feature(t(locale, 'SSL, aan de edge', 'SSL, at the edge')),
+          feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
           feature(t(locale, 'Vaste opslag- en verkeerslimieten', 'Stated storage and traffic limits')),
         ],
       },
@@ -602,36 +602,6 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
       'Every client site is a thin application on the same versioned engine. A security fix is made once and rolled out across the whole fleet, without a site losing its own design.',
     ),
   ),
-  {
-    blockType: 'richText',
-    anchor: 'europa',
-    width: 'wide',
-    header: {
-      eyebrow: t(locale, 'Dataresidentie', 'Data residency'),
-      title: t(locale, 'Uw data in de EU: als u dat wilt', 'Your data in the EU: if you want it'),
-    },
-    content: proseRich(
-      locale === 'nl'
-        ? [
-            { p: 'Op verzoek zetten we uw site op met een **database en mediaopslag in de EU-jurisdictie** van Cloudflare. Dat is geen instelling die we mooier maken dan hij is, dus hier staat precies wat het wel en niet betekent.' },
-            { ul: [
-              '**Wat we garanderen:** uw database en uw bestanden staan opgeslagen binnen de EU, en eventuele leesreplica’s blijven ook binnen de EU. Dat is een harde beperking van het platform, geen voorkeursinstelling.',
-              '**Wat we niet beweren:** dat elk verzoek aan uw website in de EU wordt verwerkt. De applicatie draait op het wereldwijde netwerk van Cloudflare; verwerking volledig binnen één regio dwingen vergt een Enterprise-uitbreiding die wij niet afnemen.',
-              '**Wat u verder moet weten:** Cloudflare is een Amerikaans bedrijf. Voor zover er persoonsgegevens buiten de EER worden verwerkt, gebeurt dat onder de gebruikelijke waarborgen: zie onze privacyverklaring.',
-            ] },
-            { p: 'Eén praktisch punt: de jurisdictie wordt vastgelegd op het moment dat we de database en de opslag aanmaken en is daarna niet meer te wijzigen. **Geef het dus vóór de bouw aan.** Voor een bestaande site is het een migratie, niet een vinkje.' },
-          ]
-        : [
-            { p: 'On request we set your site up with its **database and media storage in Cloudflare’s EU jurisdiction**. That is not a setting we want to dress up, so here is exactly what it does and does not mean.' },
-            { ul: [
-              '**What we guarantee:** your database and your files are stored within the EU, and any read replicas stay within the EU too. That is a hard platform constraint, not a preference.',
-              '**What we do not claim:** that every request to your website is processed in the EU. The application runs on Cloudflare’s global network; forcing processing entirely within one region requires an Enterprise add-on we do not buy.',
-              '**What else you should know:** Cloudflare is a US company. Where personal data is processed outside the EEA, that happens under the usual safeguards: see our privacy statement.',
-            ] },
-            { p: 'One practical point: the jurisdiction is fixed when we create the database and the storage, and cannot be changed afterwards. **So say so before the build.** For an existing site it is a migration, not a checkbox.' },
-          ],
-    ),
-  },
   {
     blockType: 'accordion',
     anchor: 'techniek',
@@ -655,8 +625,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'We maken automatisch back-ups: wekelijks op Care en Managed, dagelijks op Growth en Op maat, en houden de uptime in de gaten. We spannen ons in voor goede beschikbaarheid; een gegarandeerde ononderbroken beschikbaarheid bestaat niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
-            'We back up automatically: weekly on Care and Managed, daily on Growth and Op maat, and watch uptime. We work hard for good availability; guaranteed uninterrupted availability does not exist, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
+            'Voor de database geldt dit voor elk pakket, zonder onderscheid: een ingebouwde Time Travel-functie geeft doorlopend puntherstel naar elk moment binnen de laatste dertig dagen. Voor mediabestanden (afbeeldingen, uploads) bestaat op dit moment geen automatische back-up; dat is een bewuste vermelding, geen kleine letters. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid, maar voeren zelf geen actieve uptime-monitoring uit; een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
+            'For the database this is the same for every plan, no distinction: a built-in Time Travel feature gives continuous point-in-time recovery to any moment within the last thirty days. For media files (images, uploads) there is currently no automated backup; that is a deliberate disclosure, not fine print. We run on a global edge network and work hard for good availability, but do not run our own active uptime monitoring; a guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
           ),
         ),
       },
@@ -737,10 +707,11 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           feature(t(locale, 'Tot 5 GB media', 'Up to 5 GB media')),
           feature(t(locale, 'Tot 250 MB database', 'Up to 250 MB database')),
           feature(t(locale, 'Tot 1 miljoen requests per maand', 'Up to 1 million requests a month')),
-          feature(t(locale, 'Edge-hosting, SSL & monitoring', 'Edge hosting, SSL & monitoring')),
+          feature(t(locale, 'Edge-hosting & SSL', 'Edge hosting & SSL')),
           feature(t(locale, 'Beveiligings- & CMS-updates', 'Security & CMS updates')),
-          feature(t(locale, 'Wekelijkse back-ups', 'Weekly backups')),
-          feature(t(locale, 'Ticketsupport', 'Ticket support')),
+          feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
+          feature(t(locale, 'E-mailsupport, reactie binnen 1 week', 'Email support, reply within a week')),
+          feature(t(locale, 'Staging-omgeving', 'Staging environment')),
           feature(t(locale, 'Wijzigingen inbegrepen', 'Changes included'), false),
         ],
       },
@@ -773,9 +744,9 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           feature(t(locale, 'Tot 5 GB database', 'Up to 5 GB database')),
           feature(t(locale, 'Tot 25 miljoen requests per maand', 'Up to 25 million requests a month')),
           feature(t(locale, 'Alles uit Managed', 'Everything in Managed')),
-          feature(t(locale, 'Dagelijkse back-ups', 'Daily backups')),
           feature(t(locale, 'Tot 4 uur/mnd doorontwikkeling', 'Up to 4 hrs/mo development')),
           feature(t(locale, 'SEO- & performance-optimalisatie', 'SEO & performance optimisation')),
+          feature(t(locale, 'Kwartaalreview & roadmap', 'Quarterly review & roadmap')),
         ],
       },
       {
@@ -789,7 +760,6 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           feature(t(locale, 'Opslag, database en verkeer op maat', 'Storage, database and traffic to measure')),
           feature(t(locale, 'Alles uit Growth', 'Everything in Growth')),
           feature(t(locale, 'SLA met gegarandeerde reactietijden', 'SLA with guaranteed response times')),
-          feature(t(locale, 'Staging-omgeving', 'Staging environment')),
           feature(t(locale, 'Verwerkersovereenkomst (AVG)', 'Data-processing agreement (GDPR)')),
         ],
       },
@@ -903,8 +873,8 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Hosting en onderhoud inbegrepen', 'Hosting and maintenance included'),
         description: t(
           locale,
-          'Eén maandbedrag voor hosting, SSL, monitoring, back-ups en updates. Geen losse rekeningen voor een plugin-update.',
-          'One monthly fee for hosting, SSL, monitoring, backups and updates. No separate bills for a plugin update.',
+          'Eén maandbedrag voor hosting, SSL, databaseherstel en updates. Geen losse rekeningen voor een plugin-update.',
+          'One monthly fee for hosting, SSL, database recovery and updates. No separate bills for a plugin update.',
         ),
         features: [
           feature(t(locale, 'Vaste limieten, vooraf bekend', 'Stated limits, known up front')),
@@ -1231,7 +1201,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '9. Uw rechten' },
     { p: 'U heeft het recht op inzage, rectificatie, verwijdering, beperking van de verwerking, bezwaar tegen de verwerking en gegevensoverdraagbaarheid. Stuur uw verzoek naar contact@rinsly.com; we reageren binnen de wettelijke termijn. Bent u het niet eens met hoe we met uw gegevens omgaan, dan kunt u een klacht indienen bij de Autoriteit Persoonsgegevens.' },
     { h: '10. Beveiliging' },
-    { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer en regelmatige back-ups.' },
+    { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer en doorlopend puntherstel van de database via Cloudflare Time Travel. Een back-up van mediabestanden is op dit moment niet geautomatiseerd.' },
     { h: '11. Wijzigingen' },
     { p: 'We kunnen deze privacyverklaring van tijd tot tijd aanpassen. De actuele versie staat altijd op deze pagina, met de datum van de laatste wijziging bovenaan.' },
   ],
@@ -1274,7 +1244,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '9. Your rights' },
     { p: 'You have the right to access, rectification, erasure, restriction of processing, objection to processing and data portability. Send your request to contact@rinsly.com; we will respond within the statutory period. If you disagree with how we handle your data, you may lodge a complaint with the Dutch Data Protection Authority (Autoriteit Persoonsgegevens).' },
     { h: '10. Security' },
-    { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control and regular backups.' },
+    { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control and continuous point-in-time database recovery via Cloudflare Time Travel. A backup of media files is not currently automated.' },
     { h: '11. Changes' },
     { p: 'We may update this privacy policy from time to time. The current version is always available on this page, with the date of the last change shown at the top.' },
   ],
@@ -1318,13 +1288,13 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
     { h: 'Artikel 6: Hosting en diensten van derden' },
     { ol: [
-      'De website wordt gehost op het Cloudflare-platform. Op de diensten van Cloudflare zijn diens eigen voorwaarden van toepassing.',
-      'Rinsly is niet aansprakelijk voor storingen, wijzigingen of uitval die aan Cloudflare of andere toeleveranciers zijn toe te rekenen.',
+      'De website wordt gehost op een extern hostingplatform, aan de edge. Op de diensten van die hostingpartij zijn diens eigen voorwaarden van toepassing.',
+      'Rinsly is niet aansprakelijk voor storingen, wijzigingen of uitval die aan de hostingpartij of andere toeleveranciers zijn toe te rekenen.',
     ] },
     { h: 'Artikel 7: Beschikbaarheid en onderhoud' },
     { ol: [
-      'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Een specifieke of ononderbroken beschikbaarheid wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
-      'Rinsly maakt periodiek back-ups zodat herstel bij dataverlies redelijkerwijs mogelijk is.',
+      'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly voert daarbij zelf geen actieve uptime-monitoring uit. Een specifieke of ononderbroken beschikbaarheid wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
+      'De database van de website is doorlopend herstelbaar naar elk moment binnen de laatste dertig dagen via Cloudflare Time Travel. Een back-up van mediabestanden is op dit moment niet geautomatiseerd.',
       'Storingen kunnen per e-mail worden gemeld; Rinsly reageert binnen de in de overeenkomst of SLA genoemde termijn.',
     ] },
     { h: 'Artikel 8: Meerwerk' },
@@ -1351,12 +1321,12 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Artikel 12: Aansprakelijkheid' },
     { ol: [
       'De aansprakelijkheid van Rinsly is beperkt tot directe schade en tot ten hoogste het bedrag dat opdrachtgever in de twaalf maanden voorafgaand aan de schadeveroorzakende gebeurtenis uit hoofde van de overeenkomst heeft betaald.',
-      'Rinsly is niet aansprakelijk voor indirecte schade, waaronder gevolgschade, gederfde omzet en dataverlies buiten de laatst beschikbare back-up.',
+      'Rinsly is niet aansprakelijk voor indirecte schade, waaronder gevolgschade, gederfde omzet en dataverlies dat niet kan worden hersteld via Cloudflare Time Travel. Voor mediabestanden geldt dat er op dit moment geen back-up bestaat om op terug te vallen.',
       'Deze beperkingen gelden niet bij opzet of bewuste roekeloosheid van Rinsly.',
     ] },
     { h: 'Artikel 13: Overmacht' },
     { ol: [
-      'Bij overmacht worden de verplichtingen opgeschort. Onder overmacht valt mede het uitvallen van of storingen bij toeleveranciers zoals Cloudflare.',
+      'Bij overmacht worden de verplichtingen opgeschort. Onder overmacht valt mede het uitvallen van of storingen bij toeleveranciers, waaronder de hostingpartij.',
     ] },
     { h: 'Artikel 14: Geheimhouding' },
     { ol: [
@@ -1413,13 +1383,13 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
     { h: 'Article 6: Hosting and third-party services' },
     { ol: [
-      "The website is hosted on the Cloudflare platform. Cloudflare's own terms apply to its services.",
-      'Rinsly is not liable for outages, changes or downtime attributable to Cloudflare or other suppliers.',
+      "The website is hosted on an external hosting platform, at the edge. That provider's own terms apply to its services.",
+      'Rinsly is not liable for outages, changes or downtime attributable to the hosting provider or other suppliers.',
     ] },
     { h: 'Article 7: Availability and maintenance' },
     { ol: [
-      'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. No specific or uninterrupted availability is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
-      'Rinsly makes periodic backups so that recovery from data loss is reasonably possible.',
+      'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly does not run its own active uptime monitoring. No specific or uninterrupted availability is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
+      "The website's database is continuously recoverable to any point within the last thirty days via Cloudflare Time Travel. A backup of media files is not currently automated.",
       'Incidents may be reported by email; Rinsly responds within the period stated in the agreement or SLA.',
     ] },
     { h: 'Article 8: Additional work' },
@@ -1446,12 +1416,12 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Article 12: Liability' },
     { ol: [
       "Rinsly's liability is limited to direct damage and to at most the amount the client paid under the agreement in the twelve months preceding the event causing the damage.",
-      'Rinsly is not liable for indirect damage, including consequential loss, lost revenue and data loss beyond the last available backup.',
+      'Rinsly is not liable for indirect damage, including consequential loss, lost revenue and data loss that cannot be recovered via Cloudflare Time Travel. For media files, there is currently no backup to fall back on at all.',
       "These limitations do not apply in the event of intent or deliberate recklessness on Rinsly's part.",
     ] },
     { h: 'Article 13: Force majeure' },
     { ol: [
-      'In the event of force majeure the obligations are suspended. Force majeure includes the failure of or disruptions at suppliers such as Cloudflare.',
+      'In the event of force majeure the obligations are suspended. Force majeure includes the failure of or disruptions at suppliers, including the hosting provider.',
     ] },
     { h: 'Article 14: Confidentiality' },
     { ol: [
