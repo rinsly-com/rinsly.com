@@ -27,20 +27,20 @@ const DUTIES = {
       pct: 10,
       title: 'Exclusiviteit',
       blurb:
-        'Nieuwe websites en webapplicaties breng je bij ons onder. Klanten die al ergens anders draaien mogen blijven waar ze zijn. Pas bij een grote update kijken we samen naar een migratie.',
+        'Nieuw werk breng je bij ons onder. Klanten die al ergens anders draaien mogen blijven tot een grote update, of tot hun hostingcontract daar afloopt: dan bied je ons opnieuw aan.',
     },
     {
       key: 'relatiebeheer' as const,
       pct: 5,
       title: 'Relatiebeheer',
       blurb:
-        'Jij bent het aanspreekpunt van je klant. Hij belt of mailt jou, jij zet een ticket bij ons. Wij nemen geen direct contact op met jouw klanten.',
+        'Jij bent het aanspreekpunt van je klant en reageert hem inhoudelijk binnen een week. Wat technisch werk vraagt, meld je per e-mail aan ons. Wij nemen geen direct contact op met jouw klanten.',
     },
     {
       key: 'marketing' as const,
       pct: 5,
       title: 'Marketing',
-      blurb: 'Je noemt Rinsly als je hostingpartner en verkoopt ons actief mee.',
+      blurb: 'Een vaste vermelding op je eigen site, en Rinsly genoemd in elk voorstel waar hosting in voorkomt.',
     },
   ],
   en: [
@@ -49,20 +49,20 @@ const DUTIES = {
       pct: 10,
       title: 'Exclusivity',
       blurb:
-        'New websites and web apps come to us. Clients already hosted elsewhere may stay where they are. Only on a big update do we look at migrating together.',
+        'New work comes to us. Clients already hosted elsewhere may stay until a big update, or until their hosting contract elsewhere comes up for renewal: at that point you offer us again.',
     },
     {
       key: 'relatiebeheer' as const,
       pct: 5,
       title: 'Relation & first-line support',
       blurb:
-        'You are your client\u2019s point of contact. They call or mail you, you file a ticket with us. We do not contact your clients directly.',
+        'You are your client\u2019s point of contact and reply to them within a week. Whatever needs our technical work, you email us. We do not contact your clients directly.',
     },
     {
       key: 'marketing' as const,
       pct: 5,
       title: 'Marketing',
-      blurb: 'You name Rinsly as your hosting partner and actively sell us along.',
+      blurb: 'A standing mention on your own site, and Rinsly named in every proposal that includes hosting.',
     },
   ],
 } as const
