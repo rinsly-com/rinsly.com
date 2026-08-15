@@ -181,14 +181,36 @@ writeFileSync(
   ].join('\n'),
 )
 
-// Security headers for every static response (Workers Static Assets _headers).
-// The CSP allows Next's inline hydration scripts/styles ('unsafe-inline' — a
-// static export cannot use nonces) and the accp origin for media images and
-// the form/check API calls.
+// Security AND caching headers for every static response (Workers Static Assets
+// _headers). Written here rather than committed as public/_headers, because
+// this script owns out/_headers: anything in public/ is copied there by the
+// export and then overwritten by this write. A cache rule shipped in public/
+// therefore looks correct in the repo and silently never reaches production —
+// which is exactly what happened once.
+//
+// Cache rules come FIRST for readability only. Workers Assets MERGES every
+// matching rule rather than stopping at the first, so ordering carries no
+// meaning; what matters is that the `/*` block below sets no Cache-Control of
+// its own. If it ever gains one, it would be appended to these and browsers
+// would honour the most restrictive, quietly cancelling the caching.
+//
+// /_next/static is content-hashed, so the filename changes whenever the bytes
+// do and it can be cached forever. /images and /fonts are stable author-chosen
+// paths, so they are deliberately NOT immutable: a replaced file has to be able
+// to reach people. Rename it if it must change immediately.
 const apiOrigin = new URL(process.env.NEXT_PUBLIC_API_URL || API_URL).origin
 writeFileSync(
   path.join(root, 'out', '_headers'),
   [
+    '/_next/static/*',
+    '  Cache-Control: public, max-age=31536000, immutable',
+    '',
+    '/images/*',
+    '  Cache-Control: public, max-age=604800, stale-while-revalidate=86400',
+    '',
+    '/fonts/*',
+    '  Cache-Control: public, max-age=31536000, immutable',
+    '',
     '/*',
     '  Strict-Transport-Security: max-age=31536000; includeSubDomains',
     '  X-Content-Type-Options: nosniff',
