@@ -80,6 +80,11 @@ export default buildSiteConfig({
   // CLOUDFLARE_ZONE_ID + CLOUDFLARE_ANALYTICS_TOKEN; without those it renders
   // nothing on a live site.
   dashboardAnalytics: true,
+  // Rinsly's own uptime monitor on the dashboard (online/offline, 30/90-day
+  // percentages, 90-day strip). Needs the src/components/UptimePanel.tsx
+  // re-export plus RINSLY_UPTIME_TOKEN on the accp worker; without the token
+  // it renders nothing on a live site.
+  dashboardUptime: true,
   // TOTP two-factor authentication: login code field, /admin/two-factor
   // enrolment screen, and admins are steered into enrolling (never locked
   // out). Needs the src/components/TotpAuth.tsx re-export. This is what makes

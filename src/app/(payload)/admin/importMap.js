@@ -30,6 +30,7 @@ import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c08
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { TotpNavLink as TotpNavLink_3eac456c969beca2d499479aae53d595 } from '../../../components/TotpAuth'
 import { DeployNavLink as DeployNavLink_49051cef4f4f73eec296efbbf5e2838c } from '../../../components/DeployNavLink'
+import { UptimePanel as UptimePanel_566caef98c488f68fb0b3021bf7d559e } from '../../../components/UptimePanel'
 import { AnalyticsPanel as AnalyticsPanel_71cc5ad6f30b06ab26deec6ee09e3575 } from '../../../components/AnalyticsPanel'
 import { TotpGate as TotpGate_3eac456c969beca2d499479aae53d595 } from '../../../components/TotpAuth'
 import { R2ClientUploadHandler as R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d } from '@payloadcms/storage-r2/client'
@@ -72,6 +73,7 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "/components/TotpAuth#TotpNavLink": TotpNavLink_3eac456c969beca2d499479aae53d595,
   "/components/DeployNavLink#DeployNavLink": DeployNavLink_49051cef4f4f73eec296efbbf5e2838c,
+  "/components/UptimePanel#UptimePanel": UptimePanel_566caef98c488f68fb0b3021bf7d559e,
   "/components/AnalyticsPanel#AnalyticsPanel": AnalyticsPanel_71cc5ad6f30b06ab26deec6ee09e3575,
   "/components/TotpAuth#TotpGate": TotpGate_3eac456c969beca2d499479aae53d595,
   "@payloadcms/storage-r2/client#R2ClientUploadHandler": R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d,
