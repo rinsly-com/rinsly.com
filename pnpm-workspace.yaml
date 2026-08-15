@@ -29,6 +29,6 @@ allowBuilds:
   workerd: true
 minimumReleaseAgeExclude:
   - '@rinsly-com/site-core'
-  - '@rinsly-com/ui@0.1.1'
+  - '@rinsly-com/ui@0.1.1 || 0.1.2'
 patchedDependencies:
   '@payloadcms/drizzle@3.85.2': patches/@payloadcms__drizzle@3.85.2.patch
