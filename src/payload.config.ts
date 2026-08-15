@@ -76,18 +76,18 @@ export default buildSiteConfig({
   importMapBaseDir: path.resolve(dirname),
   typesOutputFile: path.resolve(dirname, 'payload-types.ts'),
   // Cloudflare traffic strip on the dashboard (unique visitors / page views).
-  // Needs the src/components/AnalyticsPanel.tsx re-export plus
+  // Needs the src/components/RinslyAdmin.tsx barrel plus
   // CLOUDFLARE_ZONE_ID + CLOUDFLARE_ANALYTICS_TOKEN; without those it renders
   // nothing on a live site.
   dashboardAnalytics: true,
   // Rinsly's own uptime monitor on the dashboard (online/offline, 30/90-day
-  // percentages, 90-day strip). Needs the src/components/UptimePanel.tsx
-  // re-export plus RINSLY_UPTIME_TOKEN on the accp worker; without the token
+  // percentages, 90-day strip). Needs the src/components/RinslyAdmin.tsx
+  // barrel plus RINSLY_UPTIME_TOKEN on the accp worker; without the token
   // it renders nothing on a live site.
   dashboardUptime: true,
   // TOTP two-factor authentication: login code field, /admin/two-factor
   // enrolment screen, and admins are steered into enrolling (never locked
-  // out). Needs the src/components/TotpAuth.tsx re-export. This is what makes
+  // out). Needs the src/components/RinslyAdmin.tsx barrel. This is what makes
   // the DPA's "tweefactorauthenticatie voor beheertoegang" sentence true.
   totp: { require: 'admin' },
 })

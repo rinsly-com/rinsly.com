@@ -10,7 +10,17 @@ overrides:
   # 5.0.9, not 5.0.8: the advisory was revised on 2026-08-04 to include 5.0.8,
   # so a ^5.0.8 floor would let a fresh resolution land back on a vulnerable one.
   'brace-expansion@5': ^5.0.9
-  'postcss@8': ^8.5.18
+  # 8.5.23, raised from 8.5.18: GHSA revision of 2026-08 added a second
+  # (moderate) advisory fixed in 8.5.23.
+  'postcss@8': ^8.5.23
+  #   js-yaml    GHSA (high) — fixed 4.3.1
+  #   fast-uri   GHSA (high) — fixed 3.1.5
+  #   nanoid     GHSA (high) — fixed 3.3.16
+  #   dompurify  GHSA (moderate) — fixed 3.4.13
+  'js-yaml@4': ^4.3.1
+  'fast-uri@3': ^3.1.5
+  'nanoid@3': ^3.3.16
+  'dompurify@3': ^3.4.13
 allowBuilds:
   core-js-pure: true
   esbuild: true
