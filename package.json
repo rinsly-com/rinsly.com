@@ -39,7 +39,7 @@
     "@payloadcms/storage-r2": "3.85.2",
     "@payloadcms/translations": "3.85.2",
     "@payloadcms/ui": "3.85.2",
-    "@rinsly-com/site-core": "^0.10.0",
+    "@rinsly-com/site-core": "^0.11.0",
     "@tabler/icons-react": "^3.44.0",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
@@ -68,7 +68,8 @@
     "typescript": "5.7.3",
     "vite-tsconfig-paths": "6.0.5",
     "vitest": "4.0.18",
-    "wrangler": "^4.108.0"
+    "wrangler": "^4.108.0",
+    "sass": "^1.77.4"
   },
   "engines": {
     "node": "^18.20.2 || >=20.9.0",
