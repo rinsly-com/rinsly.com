@@ -49,8 +49,8 @@ importers:
         specifier: 3.85.2
         version: 3.85.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.85.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
       '@rinsly-com/site-core':
-        specifier: ^0.12.1
-        version: 0.12.1(5a23d8da4716ce67ac153d7bd6a9b20c)
+        specifier: ^0.14.0
+        version: 0.14.0(5a23d8da4716ce67ac153d7bd6a9b20c)
       '@tabler/icons-react':
         specifier: ^3.44.0
         version: 3.44.0(react@19.2.6)
@@ -1994,8 +1994,8 @@ packages:
   '@preact/signals-core@1.14.4':
     resolution: {integrity: sha512-HNB6HYeYKhQbJ1aKl+YRjrS4+QWHLKX6qKoUsfS/m0vqzsVaEBiZiaKbG/e+NKk2ch5ALQr/ihWaMHxiCuuWHA==}
 
-  '@rinsly-com/site-core@0.12.1':
-    resolution: {integrity: sha512-N+BYn4Rg7QUYSxnkZiAFgVDghA+uy6KsEuQS5glqj2xFKlWrvfHP3JAiCmqEFvma4Y1Qaz3CyIlM7sOnnlFR3w==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.12.1/8a3b15bc0116311bc5a94b415dcec629a109598c}
+  '@rinsly-com/site-core@0.14.0':
+    resolution: {integrity: sha512-J9dWQYrC1MieXmg4my2ZTY4kLaLltUNlbXNnkZ2QRJP9PIGrluaNYI0vFiAwkHxTDp5O1kiUNaQpxLzuT/bNOw==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.14.0/b3676ef9a454f737ac2556b0f925789bf37b8825}
     peerDependencies:
       '@opennextjs/cloudflare': ^1.20.1
       '@payloadcms/db-d1-sqlite': 3.85.2
@@ -2012,8 +2012,8 @@ packages:
       sharp: 0.34.2
       wrangler: ^4.108.0
 
-  '@rinsly-com/ui@0.1.1':
-    resolution: {integrity: sha512-0K7NHDq8A+8iSgd050nJM6GyYeC1cTzA6vMCfDBognnGDHc8dOi3psGpAuetihi4Gkk1sP7p8GMnJK1NRuRIBA==, tarball: https://npm.pkg.github.com/download/@rinsly-com/ui/0.1.1/71eb3e5a107c3e4bfe77873020c29ec491ff5e2d}
+  '@rinsly-com/ui@0.1.2':
+    resolution: {integrity: sha512-TZko22gCBGJhIIvP5VFPPfer92ZZ3hNqtu2IzrC4Z/8VEVOcmoSPPlUVGWqxgeMWkWvXC5s6US9YBHRhkH01zA==, tarball: https://npm.pkg.github.com/download/@rinsly-com/ui/0.1.2/3bf9481707194b4773a89427247ae9aa63e6e065}
     peerDependencies:
       next: '>=16'
       react: '>=19'
@@ -7867,7 +7867,7 @@ snapshots:
 
   '@preact/signals-core@1.14.4': {}
 
-  '@rinsly-com/site-core@0.12.1(5a23d8da4716ce67ac153d7bd6a9b20c)':
+  '@rinsly-com/site-core@0.14.0(5a23d8da4716ce67ac153d7bd6a9b20c)':
     dependencies:
       '@gsap/react': 2.1.2(gsap@3.15.0)(react@19.2.6)
       '@opennextjs/cloudflare': 1.20.1(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(wrangler@4.111.0)
@@ -7877,7 +7877,7 @@ snapshots:
       '@payloadcms/storage-r2': 3.85.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.85.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
       '@payloadcms/translations': 3.85.2
       '@payloadcms/ui': 3.85.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.85.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
-      '@rinsly-com/ui': 0.1.1(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@rinsly-com/ui': 0.1.2(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tabler/icons-react': 3.46.0(react@19.2.6)
       graphql: 16.14.2
       gsap: 3.15.0
@@ -7889,7 +7889,7 @@ snapshots:
       sharp: 0.34.2
       wrangler: 4.111.0
 
-  '@rinsly-com/ui@0.1.1(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@rinsly-com/ui@0.1.2(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
     dependencies:
       '@tabler/icons-react': 3.46.0(react@19.2.6)
       next: 16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
