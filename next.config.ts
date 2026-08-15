@@ -13,7 +13,9 @@ const isStatic = process.env.BUILD_STATIC === 'true'
 
 const nextConfig: NextConfig = {
   // The engine ships as TypeScript/JSX source; Next must transpile it.
-  transpilePackages: ['@rinsly-com/site-core'],
+  // @rinsly-com/ui joined in site-core 0.8.0 (the primitives split out into
+  // their own package) and needs the same treatment.
+  transpilePackages: ['@rinsly-com/site-core', '@rinsly-com/ui'],
   images: {
     // Static export can't use the Next image optimizer.
     unoptimized: isStatic,

@@ -3,6 +3,7 @@
 /* Scan the engine's block/UI components (node_modules) so Tailwind generates
  * their utility classes. This project's own src/ is auto-scanned. */
 @source "../../../node_modules/@rinsly-com/site-core/src";
+@source "../../../node_modules/@rinsly-com/ui/src";
 
 /*
  * Rinsly design system — ported from the proposal artifact (Voorstel — Hosting
@@ -19,6 +20,7 @@
   --color-hair: var(--hair);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
   --color-slate: var(--slate);
   --color-slate-ink: var(--slate-ink);
   --color-good: var(--good);
@@ -37,8 +39,15 @@
   --ink: #14212e;
   --muted: #566573;
   --hair: #dfe6eb;
-  --accent: #2c7ea8;
+  /* Nudged one step darker than the original #2c7ea8: white text on that ramp
+   * measured 4.509:1, a hair above the 4.5 AA floor with no rendering margin.
+   * This ramp is 4.909:1, visually indistinguishable from the original. */
+  --accent: #28789f;
   --accent-soft: #e7f1f7;
+  /* Text drawn on a solid --accent fill (e.g. the header/pricing Button from
+   * @rinsly-com/ui). The dark ramp lightens --accent enough that white drops
+   * to ~2.3:1, so dark mode needs its own ink. */
+  --accent-ink: #ffffff;
   --slate: #152b3c;
   --slate-ink: #eaf2f7;
   --good: #2e7d57;
@@ -56,6 +65,7 @@
     --hair: #24384a;
     --accent: #4fa8d4;
     --accent-soft: #12242f;
+    --accent-ink: #14212e;
     --slate: #1b2e3d;
     --slate-ink: #eaf2f7;
     --good: #56c08a;
@@ -71,8 +81,9 @@
   --ink: #14212e;
   --muted: #566573;
   --hair: #dfe6eb;
-  --accent: #2c7ea8;
+  --accent: #28789f;
   --accent-soft: #e7f1f7;
+  --accent-ink: #ffffff;
   --slate: #152b3c;
   --slate-ink: #eaf2f7;
   --good: #2e7d57;
@@ -89,6 +100,7 @@
   --hair: #24384a;
   --accent: #4fa8d4;
   --accent-soft: #12242f;
+  --accent-ink: #14212e;
   --slate: #1b2e3d;
   --slate-ink: #eaf2f7;
   --good: #56c08a;

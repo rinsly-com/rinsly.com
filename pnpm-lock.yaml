@@ -45,8 +45,8 @@ importers:
         specifier: 3.85.2
         version: 3.85.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.85.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
       '@rinsly-com/site-core':
-        specifier: ^0.7.5
-        version: 0.7.5(5a23d8da4716ce67ac153d7bd6a9b20c)
+        specifier: ^0.10.0
+        version: 0.10.0(5a23d8da4716ce67ac153d7bd6a9b20c)
       '@tabler/icons-react':
         specifier: ^3.44.0
         version: 3.44.0(react@19.2.6)
@@ -1987,8 +1987,8 @@ packages:
   '@preact/signals-core@1.14.4':
     resolution: {integrity: sha512-HNB6HYeYKhQbJ1aKl+YRjrS4+QWHLKX6qKoUsfS/m0vqzsVaEBiZiaKbG/e+NKk2ch5ALQr/ihWaMHxiCuuWHA==}
 
-  '@rinsly-com/site-core@0.7.5':
-    resolution: {integrity: sha512-zOgaJjQXgP/L/0Oe2hfgJ4xcPXfQiSk8B8bHKgq2k32vpHKxzPsbLU3VufVZsj7Os14UUEwBXafdnfdMD/sd7A==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.7.5/568b9b82f9baf05b0d8ed0308cd059ac85ee3a2b}
+  '@rinsly-com/site-core@0.10.0':
+    resolution: {integrity: sha512-77HCTlg9VwD8nuKF5Iu3BVbOZmF9oQo5/vrjyjmKmpAVgDLsz6EVU5//1m4cbIKrN57CoByGsn3U6m29JabhmQ==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.10.0/12ba3dfacadb7657a6ca87d3ca225343bd79e190}
     peerDependencies:
       '@opennextjs/cloudflare': ^1.20.1
       '@payloadcms/db-d1-sqlite': 3.85.2
@@ -2004,6 +2004,13 @@ packages:
       react-dom: '>=19'
       sharp: 0.34.2
       wrangler: ^4.108.0
+
+  '@rinsly-com/ui@0.1.1':
+    resolution: {integrity: sha512-0K7NHDq8A+8iSgd050nJM6GyYeC1cTzA6vMCfDBognnGDHc8dOi3psGpAuetihi4Gkk1sP7p8GMnJK1NRuRIBA==, tarball: https://npm.pkg.github.com/download/@rinsly-com/ui/0.1.1/71eb3e5a107c3e4bfe77873020c29ec491ff5e2d}
+    peerDependencies:
+      next: '>=16'
+      react: '>=19'
+      react-dom: '>=19'
 
   '@rolldown/pluginutils@1.0.0-beta.11':
     resolution: {integrity: sha512-L/gAA/hyCSuzTF1ftlzUSI/IKr2POHsv1Dd78GfqkR83KMNuswWD61JxGV2L7nRwBBBSDr6R1gCkdTmoN7W4ag==}
@@ -4861,6 +4868,9 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
+
+  qrcode-generator@2.0.4:
+    resolution: {integrity: sha512-mZSiP6RnbHl4xL2Ap5HfkjLnmxfKcPWpWe/c+5XxCuetEenqmNFf1FH/ftXPCtFG5/TDobjsjz6sSNL0Sr8Z9g==}
 
   qs-esm@8.0.1:
     resolution: {integrity: sha512-eZ7l+0ZVy3He9c85pEM9KEBR9DFA4jrmWvIjm9wpcHvScwc/vgZDl2TNOF0pm0JsWKw24XBUZOY0Wxn7/nvJnw==}
@@ -7850,7 +7860,7 @@ snapshots:
 
   '@preact/signals-core@1.14.4': {}
 
-  '@rinsly-com/site-core@0.7.5(5a23d8da4716ce67ac153d7bd6a9b20c)':
+  '@rinsly-com/site-core@0.10.0(5a23d8da4716ce67ac153d7bd6a9b20c)':
     dependencies:
       '@gsap/react': 2.1.2(gsap@3.15.0)(react@19.2.6)
       '@opennextjs/cloudflare': 1.20.1(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(wrangler@4.111.0)
@@ -7860,15 +7870,24 @@ snapshots:
       '@payloadcms/storage-r2': 3.85.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.85.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
       '@payloadcms/translations': 3.85.2
       '@payloadcms/ui': 3.85.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.85.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
+      '@rinsly-com/ui': 0.1.1(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@tabler/icons-react': 3.46.0(react@19.2.6)
       graphql: 16.14.2
       gsap: 3.15.0
       next: 16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
       payload: 3.85.2(graphql@16.14.2)(typescript@5.7.3)
+      qrcode-generator: 2.0.4
       react: 19.2.6
       react-dom: 19.2.6(react@19.2.6)
       sharp: 0.34.2
       wrangler: 4.111.0
+
+  '@rinsly-com/ui@0.1.1(next@16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+    dependencies:
+      '@tabler/icons-react': 3.46.0(react@19.2.6)
+      next: 16.2.6(@babel/core@7.29.7)(@playwright/test@1.58.2)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
+      react: 19.2.6
+      react-dom: 19.2.6(react@19.2.6)
 
   '@rolldown/pluginutils@1.0.0-beta.11': {}
 
@@ -11021,6 +11040,8 @@ snapshots:
       once: 1.4.0
 
   punycode@2.3.1: {}
+
+  qrcode-generator@2.0.4: {}
 
   qs-esm@8.0.1: {}
 

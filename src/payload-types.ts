@@ -143,6 +143,21 @@ export interface User {
    * Editors manage content. Admins also manage users.
    */
   roles: ('admin' | 'editor')[];
+  totpSecret?: string | null;
+  totpLastCounter?: number | null;
+  totpRecovery?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  /**
+   * Set up via the Two-factor authentication screen. Empty means not enrolled.
+   */
+  totpConfirmedAt?: string | null;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -840,6 +855,10 @@ export interface PayloadMigration {
  */
 export interface UsersSelect<T extends boolean = true> {
   roles?: T;
+  totpSecret?: T;
+  totpLastCounter?: T;
+  totpRecovery?: T;
+  totpConfirmedAt?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
