@@ -28,9 +28,13 @@ import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c08
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
+import { TotpNavLink as TotpNavLink_3eac456c969beca2d499479aae53d595 } from '../../../components/TotpAuth'
 import { DeployNavLink as DeployNavLink_49051cef4f4f73eec296efbbf5e2838c } from '../../../components/DeployNavLink'
 import { AnalyticsPanel as AnalyticsPanel_71cc5ad6f30b06ab26deec6ee09e3575 } from '../../../components/AnalyticsPanel'
+import { TotpGate as TotpGate_3eac456c969beca2d499479aae53d595 } from '../../../components/TotpAuth'
 import { R2ClientUploadHandler as R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d } from '@payloadcms/storage-r2/client'
+import { TotpLoginView as TotpLoginView_3eac456c969beca2d499479aae53d595 } from '../../../components/TotpAuth'
+import { TotpSetupView as TotpSetupView_3eac456c969beca2d499479aae53d595 } from '../../../components/TotpAuth'
 import { DeployView as DeployView_703d11826258ff65bac24c5c38c83090 } from '../../../components/DeployView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -66,9 +70,13 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
+  "/components/TotpAuth#TotpNavLink": TotpNavLink_3eac456c969beca2d499479aae53d595,
   "/components/DeployNavLink#DeployNavLink": DeployNavLink_49051cef4f4f73eec296efbbf5e2838c,
   "/components/AnalyticsPanel#AnalyticsPanel": AnalyticsPanel_71cc5ad6f30b06ab26deec6ee09e3575,
+  "/components/TotpAuth#TotpGate": TotpGate_3eac456c969beca2d499479aae53d595,
   "@payloadcms/storage-r2/client#R2ClientUploadHandler": R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d,
+  "/components/TotpAuth#TotpLoginView": TotpLoginView_3eac456c969beca2d499479aae53d595,
+  "/components/TotpAuth#TotpSetupView": TotpSetupView_3eac456c969beca2d499479aae53d595,
   "/components/DeployView#DeployView": DeployView_703d11826258ff65bac24c5c38c83090,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

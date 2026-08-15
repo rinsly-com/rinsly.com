@@ -80,4 +80,9 @@ export default buildSiteConfig({
   // CLOUDFLARE_ZONE_ID + CLOUDFLARE_ANALYTICS_TOKEN; without those it renders
   // nothing on a live site.
   dashboardAnalytics: true,
+  // TOTP two-factor authentication: login code field, /admin/two-factor
+  // enrolment screen, and admins are steered into enrolling (never locked
+  // out). Needs the src/components/TotpAuth.tsx re-export. This is what makes
+  // the DPA's "tweefactorauthenticatie voor beheertoegang" sentence true.
+  totp: { require: 'admin' },
 })

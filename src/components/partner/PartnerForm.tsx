@@ -219,10 +219,13 @@ function Field({
 export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 'nl' | 'en' }) {
   const t = T[locale]
   const duties = DUTIES[locale]
+  // A missing token is known before the first render, so it is initial state
+  // rather than something an effect discovers (the effect-side setState also
+  // trips the react-hooks cascading-renders rule).
   const [state, setState] = useState<'checking' | 'invalid' | 'ready' | 'sending' | 'done' | 'error'>(
-    'checking',
+    token ? 'checking' : 'invalid',
   )
-  const [reason, setReason] = useState<string>('')
+  const [reason, setReason] = useState<string>(token ? '' : 'missing')
   const [f, setF] = useState<Fields>({
     bedrijfsnaam: '',
     contactpersoon: '',
@@ -247,11 +250,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
   // Check the link before showing a form that would fail on submit.
   useEffect(() => {
     let cancelled = false
-    if (!token) {
-      setState('invalid')
-      setReason('missing')
-      return
-    }
+    if (!token) return // already 'invalid'/'missing' from initial state
     fetch(`${API_BASE}/api/partner-aanvraag/verify?token=${encodeURIComponent(token)}`)
       .then((r) => r.json() as Promise<{ ok: boolean; reason?: string; prefill?: Prefill }>)
       .then((body) => {
