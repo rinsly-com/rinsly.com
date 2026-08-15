@@ -1,0 +1,22 @@
+/**
+ * Admin-panel styling. The Rinsly whitelabel theme lives in the engine, so all
+ * a site does is import it — colours, typography, radii and every component's
+ * chrome follow. A client site rebrands by overriding the seeds AFTER the
+ * import:
+ *
+ *     :root {
+ *       --rinsly-accent: #b4531f;
+ *       --rinsly-ink: #241a14;
+ *     }
+ *
+ * rinsly.com is the brand the theme was designed against, so the only seed that
+ * moves here is the accent: the frontend's `globals.css` uses #28789f where the
+ * engine defaults to #2c7ea8. Keeping the two in sync is the point — the panel
+ * and the site are one product, and an editor should not be able to tell where
+ * one ends.
+ */
+@import '@rinsly-com/site-core/styles/admin.scss';
+
+:root {
+  --rinsly-accent: #28789f;
+}
