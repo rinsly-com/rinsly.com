@@ -9,7 +9,15 @@ import { extraRenderers } from '@/blockRenderers'
 // the layout's locale params.
 export const dynamic = 'force-dynamic'
 
-const home = createHomeRoute({ siteConfig, config, extraRenderers })
+const home = createHomeRoute({
+  siteConfig,
+  config,
+  extraRenderers,
+  // A loader, not an import. The shell is a client module reaching this site's
+  // block renderers and, through them, the whole icon barrel; importing it here
+  // would ship all of that to every public visitor.
+  loadPreviewShell: () => import('@/components/PreviewShell'),
+})
 
 export const generateMetadata = home.generateMetadata
 export default home.Page

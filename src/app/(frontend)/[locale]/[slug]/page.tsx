@@ -10,7 +10,13 @@ import { extraRenderers } from '@/blockRenderers'
 export const dynamic = 'force-dynamic'
 export const dynamicParams = true
 
-const route = createSlugRoute({ siteConfig, config, extraRenderers })
+const route = createSlugRoute({
+  siteConfig,
+  config,
+  extraRenderers,
+  // A loader, not an import — see the home route.
+  loadPreviewShell: () => import('@/components/PreviewShell'),
+})
 
 export const generateStaticParams = route.generateStaticParams
 export const generateMetadata = route.generateMetadata
