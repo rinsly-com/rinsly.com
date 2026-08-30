@@ -80,4 +80,11 @@
     // DEPLOY_DISPATCH_TOKEN is a Worker SECRET (never stored here).
     "DEPLOY_DISPATCH_URL": "https://api.github.com/repos/rinsly-com/rinsly.com/dispatches",
   },
+  // Workers Observability — Payload admin/API failures (save throws, D1/R2 errors)
+  // don't surface on homepage uptime checks. head_sampling_rate 1 matches current
+  // accp traffic; dial back only if log volume shows on a bill.
+  "observability": {
+    "enabled": true,
+    "logs": { "invocation_logs": true, "head_sampling_rate": 1 },
+  },
 }
