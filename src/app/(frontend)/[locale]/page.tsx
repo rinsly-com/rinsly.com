@@ -3,13 +3,14 @@ import config from '@payload-config'
 import { createHomeRoute } from '@rinsly-com/site-core/app'
 import { siteConfig } from '@/site.config'
 import { extraRenderers } from '@/blockRenderers'
+import { PreviewShell } from '@/components/PreviewShell'
 
 // force-dynamic on the accp worker (render live). The static prod build
 // (scripts/build-static.mjs) strips this line so `/[locale]` prerenders from
 // the layout's locale params.
 export const dynamic = 'force-dynamic'
 
-const home = createHomeRoute({ siteConfig, config, extraRenderers })
+const home = createHomeRoute({ siteConfig, config, extraRenderers, PreviewShell })
 
 export const generateMetadata = home.generateMetadata
 export default home.Page
