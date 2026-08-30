@@ -68,9 +68,22 @@ const staticizeRoutes = () => {
     savedRouteSrc.set(file, src)
     // Swap force-dynamic -> force-static (output: export requires routes that
     // fetch to declare themselves static) and pin dynamicParams to false.
+    //
+    // Also drop `loadPreviewShell`. Live preview cannot run in the static export
+    // at all — the engine's resolvePreview() returns false under BUILD_STATIC —
+    // but the shell is a 'use client' module importing this site's block
+    // renderers, and those reach `Icon`, which namespace-imports the whole
+    // @tabler/icons-react barrel. Under `output: export` the reference is
+    // bundled into the page's client JS whether it is a static import or a
+    // dynamic one, so neither React.lazy nor a loader keeps it out: measured at
+    // 3,29 MB of eagerly loaded JS per page with the line present and 684 KB
+    // without it, a 4,8x difference for code no public visitor can ever run.
+    // On accp (a Worker, not this export) preview is untouched.
     const patched = src
       .replace(/^export const dynamic = ['"]force-dynamic['"]/m, "export const dynamic = 'force-static'")
       .replace(/^export const dynamicParams = true\b.*$/m, 'export const dynamicParams = false')
+      .replace(/^\s*\/\/ A loader[\s\S]*?\n\s*loadPreviewShell: .*$/m, '')
+      .replace(/^\s*loadPreviewShell: .*$/m, '')
     writeFileSync(file, patched)
   }
 }
