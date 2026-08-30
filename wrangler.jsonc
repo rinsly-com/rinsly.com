@@ -87,4 +87,7 @@
     "enabled": true,
     "logs": { "invocation_logs": true, "head_sampling_rate": 1 },
   },
+  // Failures mail yaron via rinsly-alerts (Tail Worker). Accp only — not the
+  // static production Worker (no runtime logic; bot-crawled).
+  "tail_consumers": [{ "service": "rinsly-alerts" }],
 }
