@@ -10,6 +10,7 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { staticContentSecurityPolicy } from './staticCsp.mjs'
 
 const root = process.cwd()
 const backupDir = path.join(root, '.static-build-backup')
@@ -211,7 +212,7 @@ writeFileSync(
 // do and it can be cached forever. /images and /fonts are stable author-chosen
 // paths, so they are deliberately NOT immutable: a replaced file has to be able
 // to reach people. Rename it if it must change immediately.
-const apiOrigin = new URL(process.env.NEXT_PUBLIC_API_URL || API_URL).origin
+const apiOrigin = process.env.NEXT_PUBLIC_API_URL || API_URL
 writeFileSync(
   path.join(root, 'out', '_headers'),
   [
@@ -230,7 +231,7 @@ writeFileSync(
     '  X-Frame-Options: DENY',
     '  Referrer-Policy: strict-origin-when-cross-origin',
     '  Permissions-Policy: camera=(), microphone=(), geolocation=()',
-    `  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: ${apiOrigin}; font-src 'self' data:; connect-src 'self' ${apiOrigin}; frame-ancestors 'none'; base-uri 'self'; form-action 'self' ${apiOrigin}; object-src 'none'`,
+    `  Content-Security-Policy: ${staticContentSecurityPolicy(apiOrigin)}`,
     '',
   ].join('\n'),
 )
