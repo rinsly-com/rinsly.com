@@ -65,6 +65,21 @@
     // accp.rinsly.com/check/<token>.
     { "binding": "LEADLENS_CHECKS", "bucket_name": "leadlens-checks" },
   ],
+  // Shared fleet read tokens (Cloudflare Secrets Store). Mid-migration both
+  // these bindings and the classic Worker secrets may exist — site-core 0.17+
+  // prefers the binding. After a green panel check, delete the Worker copies.
+  "secrets_store_secrets": [
+    {
+      "binding": "RINSLY_UPTIME_TOKEN",
+      "store_id": "f412ff4156b241719d0932b621ff9c26",
+      "secret_name": "FLEET_UPTIME_READ_TOKEN",
+    },
+    {
+      "binding": "RINSLY_BACKUPS_TOKEN",
+      "store_id": "f412ff4156b241719d0932b621ff9c26",
+      "secret_name": "FLEET_BACKUPS_READ_TOKEN",
+    },
+  ],
   // Self-service /check runs enrich with Google PageSpeed Insights when the
   // PSI_API_KEY Worker SECRET is set (free key via Google Cloud console;
   // keyless calls are 429'd). Without it the check degrades to probe-based
