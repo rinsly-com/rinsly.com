@@ -24,9 +24,10 @@
     "seed": "node scripts/lint-content.mjs && cross-env NODE_OPTIONS=--no-deprecation payload run scripts/seed.ts",
     "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview ${CLOUDFLARE_ENV:+--env=$CLOUDFLARE_ENV}",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "pnpm run test:int && pnpm run test:e2e",
+    "test": "pnpm run test:unit && pnpm run test:int && pnpm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
     "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts",
+    "test:unit": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.unit.config.mts",
     "lint:content": "node scripts/lint-content.mjs"
   },
   "dependencies": {
@@ -39,7 +40,7 @@
     "@payloadcms/storage-r2": "3.85.2",
     "@payloadcms/translations": "3.85.2",
     "@payloadcms/ui": "3.85.2",
-    "@rinsly-com/site-core": "^0.16.0",
+    "@rinsly-com/site-core": "^0.17.0",
     "@tabler/icons-react": "^3.44.0",
     "cross-env": "^7.0.3",
     "dotenv": "16.4.7",
