@@ -1002,7 +1002,7 @@ const overLayout = (locale: Locale, ids: PageIds): Block[] => [
       { kind: 'email', label: 'E-mail', value: 'contact@rinsly.com' },
       { kind: 'address', label: t(locale, 'Adres', 'Address'), value: 'Kazernestraat 6, 3441 BB Woerden' },
       { kind: 'text', label: 'KvK', value: '85578835' },
-      { kind: 'text', label: t(locale, 'BTW', 'VAT'), value: 'NL248209085B01' },
+      { kind: 'text', label: t(locale, 'BTW', 'VAT'), value: 'NL004117041B25' },
     ],
     buttons: [pageLink(t(locale, 'Neem contact op', 'Get in touch'), ids, SLUG.contact, { variant: 'primary' })],
   },
@@ -1079,7 +1079,7 @@ const footerLocalized = (locale: Locale) => ({
 const footerShared = {
   email: 'contact@rinsly.com',
   kvk: '85578835',
-  btw: 'NL248209085B01',
+  btw: 'NL004117041B25',
 }
 
 /* -------------------------------------------------------------------------- */

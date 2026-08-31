@@ -15,6 +15,7 @@ export {
   AdminIcon,
   AnalyticsPanel,
   UptimePanel,
+  BackupsPanel,
   TotpLoginView,
   TotpSetupView,
   TotpGate,

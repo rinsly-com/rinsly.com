@@ -107,6 +107,9 @@ export interface Config {
   };
   locale: 'nl' | 'en';
   widgets: {
+    'rinsly-backups': RinslyBackupsWidget;
+    'rinsly-uptime': RinslyUptimeWidget;
+    'rinsly-analytics': RinslyAnalyticsWidget;
     collections: CollectionsWidget;
   };
   user: User;
@@ -1442,6 +1445,36 @@ export interface FooterSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rinsly-backups_widget".
+ */
+export interface RinslyBackupsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rinsly-uptime_widget".
+ */
+export interface RinslyUptimeWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'small' | 'medium' | 'large' | 'x-large' | 'full';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "rinsly-analytics_widget".
+ */
+export interface RinslyAnalyticsWidget {
+  data?: {
+    [k: string]: unknown;
+  };
+  width: 'medium' | 'large' | 'x-large' | 'full';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
