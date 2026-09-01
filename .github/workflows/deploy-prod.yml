@@ -69,6 +69,8 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
 
       - name: Build + deploy (static)
+        # deploy:static → build out/, then versions upload + deploy @ 100%
+        # (scripts/deploy-static.mjs — PLAN-zero-downtime-deploys.md)
         run: pnpm run deploy:static
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
