@@ -77,4 +77,5 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
           PAYLOAD_API_URL: https://accp.rinsly.com
+          DISPATCH_NAMESPACE: rinsly-fleet
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
