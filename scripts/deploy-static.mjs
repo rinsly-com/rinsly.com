@@ -10,11 +10,15 @@
  * Override with DEPLOY_VERSION_TAG / DEPLOY_VERSION_MESSAGE.
  *
  * Plan: Web/Core/PLAN-zero-downtime-deploys.md
+ * WfP: set DISPATCH_NAMESPACE (e.g. rinsly-fleet) to upload into a dispatch
+ * namespace instead of the account Worker cap. PLAN-workers-for-platforms.md §7.
  */
 
 import { execFileSync } from 'node:child_process'
 
 const CONFIG = 'wrangler.static.jsonc'
+
+const dispatchNs = process.env.DISPATCH_NAMESPACE?.trim() || ''
 
 const tag =
   process.env.DEPLOY_VERSION_TAG?.trim() ||
@@ -31,6 +35,15 @@ const run = (args) =>
     stdio: 'inherit',
     env: process.env,
   })
+
+if (dispatchNs) {
+  // User Workers in a dispatch namespace: wrangler deploy --dispatch-namespace.
+  // versions upload/deploy does not accept --dispatch-namespace (wrangler 4.x);
+  // WfP user Workers also lack gradual-deploy parity (PLAN-workers-for-platforms §7).
+  console.log(`deploy-static: namespace deploy → ${dispatchNs}`)
+  run(['deploy', '--config', CONFIG, '--dispatch-namespace', dispatchNs])
+  process.exit(0)
+}
 
 console.log(`deploy-static: upload tag=${tag}`)
 run([
