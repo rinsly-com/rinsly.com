@@ -56,7 +56,10 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
 
       - name: Build + deploy
-        run: pnpm run deploy
+        run: |
+          pnpm run deploy:database
+          pnpm exec opennextjs-cloudflare build
+          pnpm exec wrangler deploy --dispatch-namespace rinsly-fleet
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
