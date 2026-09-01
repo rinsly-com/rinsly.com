@@ -19,7 +19,6 @@ type Data = {
   subscription: string
   additions: string[]
   additionsOther: string
-  euData: boolean
   // Partner path
   domein: string
   telefoon: string
@@ -53,9 +52,6 @@ const COPY = {
     domein: 'Je eigen website',
     additionsHint: 'Wat wilt u nog meer? (optioneel)',
     other: 'Anders, namelijk…',
-    euData: 'Database en bestanden in de EU',
-    euDataHint:
-      'Wordt bij de bouw vastgelegd en is daarna niet te wijzigen: geef het dus nu aan. Wat het wel en niet betekent, staat op onze platformpagina.',
     bericht: 'Aanvullende toelichting (optioneel)',
     partnerBericht: 'Waar werk je aan, en wat wil je weten? (optioneel)',
     qualHint: 'Drie vragen die bepalen of dit voor jou werkt. Eerlijk antwoorden helpt jou het meest.',
@@ -96,9 +92,6 @@ const COPY = {
     domein: 'Your own website',
     additionsHint: 'Anything else you need? (optional)',
     other: 'Other, namely…',
-    euData: 'Database and files in the EU',
-    euDataHint:
-      'Fixed during the build and cannot be changed afterwards, so say so now. What it does and does not mean is on our platform page.',
     bericht: 'Additional notes (optional)',
     partnerBericht: 'What are you working on, and what would you like to know? (optional)',
     qualHint: 'Three questions that decide whether this works for you. Answering honestly helps you most.',
@@ -155,7 +148,6 @@ const EMPTY: Data = {
   subscription: '',
   additions: [],
   additionsOther: '',
-  euData: false,
   domein: '',
   telefoon: '',
   bouwtZelf: false,
@@ -232,11 +224,6 @@ export function OfferteForm({ locale }: { locale: Locale }) {
     if (status === 'submitting') return
     setStatus('submitting')
 
-    // EU data residency has no column on Offertes yet, so it rides along in the
-    // free-text note rather than being silently dropped. See
-    // FACILITATOR-MIGRATION.md — it deserves a real field.
-    const clientBericht = [data.euData ? `[${c.euData}]` : '', data.bericht].filter(Boolean).join('\n')
-
     const url = isPartner ? '/api/partner-interesse' : '/api/offerte'
     const payload = isPartner
       ? {
@@ -259,7 +246,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
           subscription: data.subscription,
           additions: data.additions,
           additionsOther: data.additionsOther,
-          bericht: clientBericht,
+          bericht: data.bericht,
         }
 
     try {
@@ -524,12 +511,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
               aria-label={c.other}
             />
           )}
-          <Check
-            label={c.euData}
-            checked={data.euData}
-            onChange={(v) => set('euData', v)}
-            hint={c.euDataHint}
-          />
+
         </div>
       )}
 
@@ -544,12 +526,11 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             <Row
               label={steps[3]}
               value={
-                [
-                  ...data.additions.map((v) =>
+                data.additions
+                  .map((v) =>
                     v === 'other' && data.additionsOther ? data.additionsOther : addLabel(v),
-                  ),
-                  ...(data.euData ? [c.euData] : []),
-                ].join(', ') || c.none
+                  )
+                  .join(', ') || c.none
               }
             />
           </dl>

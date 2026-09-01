@@ -33,7 +33,18 @@ type Locale = 'nl' | 'en'
 
 const t = <T,>(locale: Locale, nl: T, en: T): T => (locale === 'nl' ? nl : en)
 
-/** Lexical richText value: one paragraph per string. */
+/** Split a string on `**bold**` markers into Lexical text nodes. */
+const inlineText = (s: string) =>
+  s
+    .split(/(\*\*[^*]+\*\*)/g)
+    .filter(Boolean)
+    .map((part) =>
+      part.startsWith('**') && part.endsWith('**')
+        ? { type: 'text', detail: 0, format: 1, mode: 'normal', style: '', text: part.slice(2, -2), version: 1 }
+        : { type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text: part, version: 1 },
+    )
+
+/** Lexical richText value: one paragraph per string; `**bold**` is parsed inline. */
 const richBody = (...paragraphs: string[]) => ({
   root: {
     type: 'root',
@@ -49,7 +60,7 @@ const richBody = (...paragraphs: string[]) => ({
       direction: 'ltr' as const,
       textFormat: 0,
       textStyle: '',
-      children: [{ type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text, version: 1 }],
+      children: inlineText(text),
     })),
   },
 })
@@ -92,6 +103,43 @@ const pageLink = (
   page: ids[slug],
   ...(opts.anchor ? { anchor: opts.anchor } : {}),
   ...(opts.variant ? { variant: opts.variant } : {}),
+})
+
+const externalLink = (
+  label: string,
+  url: string,
+  opts: { variant?: string; newTab?: boolean } = {},
+): Block => ({
+  label,
+  type: 'external',
+  url,
+  newTab: opts.newTab ?? false,
+  ...(opts.variant ? { variant: opts.variant } : {}),
+})
+
+const checkCta = (locale: Locale): Block => ({
+  blockType: 'cta',
+  anchor: 'websitecheck',
+  eyebrow: t(locale, 'Meten', 'Measure'),
+  title: t(locale, 'Vijf rapportcijfers in een halve minuut', 'Five grades in half a minute'),
+  text: t(
+    locale,
+    'Wij meten websites voor het echte werk: crawlen, scoren en Lighthouse op schaal. Probeer het op elke URL, gratis en zonder account.',
+    'We measure websites for real: crawling, scoring and Lighthouse at scale. Try it on any URL, free and without an account.',
+  ),
+  button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
+})
+
+const partnerCheckCta = (locale: Locale): Block => ({
+  blockType: 'cta',
+  eyebrow: t(locale, 'Proef onze meting', 'Try our measurement'),
+  title: t(locale, 'Meet een site in een halve minuut', 'Measure a site in half a minute'),
+  text: t(
+    locale,
+    'Elke lead die wij aanleveren komt met vijf rapportcijfers en een screenshot. Probeer de meting zelf op elke URL.',
+    'Every lead we supply comes with five grades and a screenshot. Try the measurement yourself on any URL.',
+  ),
+  button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
 })
 
 const feature = (text: string, included = true) => ({ text, included })
@@ -150,8 +198,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
     ),
     t(
       locale,
-      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates en back-ups. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
-      'Rinsly is the build-and-run department design studios don’t have. You deliver the design in Figma, we build it as a real application and run it from there: hosting, updates and backups. Every time the client pays, a share of it comes to you.',
+      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates, databaseherstel en dagelijkse mediaback-up. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
+      'Rinsly is the build-and-run department design studios don’t have. You deliver the design in Figma, we build it as a real application and run it from there: hosting, updates, database recovery and daily media backup. Every time the client pays, a share of it comes to you.',
     ),
     [
       pageLink(t(locale, 'Word partner', 'Become a partner'), ids, SLUG.partner, { variant: 'primary' }),
@@ -212,14 +260,15 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
       },
     ],
   },
+  checkCta(locale),
   {
     blockType: 'cta',
     eyebrow: t(locale, 'De techniek', 'The technical part'),
     title: t(locale, 'Eén fix, de hele fleet', 'One fix, the whole fleet'),
     text: t(
       locale,
-      'Hoe die engine werkt, wat er in een release gebeurt en waar uw data staat. Dat leggen we liever uit dan dat we het samenvatten.',
-      'How that engine works, what happens in a release, and where your data lives: we would rather explain it than summarise it.',
+      'Hoe die engine werkt, wat er in een release gebeurt en waar de data staat. Dat leggen we liever uit dan dat we het samenvatten.',
+      'How that engine works, what happens in a release, and where the data lives: we would rather explain it than summarise it.',
     ),
     button: pageLink(t(locale, 'Zo werkt het platform', 'How the platform works'), ids, SLUG.platform, { variant: 'primary' }),
   },
@@ -273,6 +322,73 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
   ),
   {
     blockType: 'services',
+    anchor: 'waarom',
+    header: {
+      eyebrow: t(locale, 'Waarom Rinsly', 'Why Rinsly'),
+      title: t(locale, 'Niet nog een websitebouwer', 'Not another website builder'),
+      intro: t(
+        locale,
+        'Geen thema, geen pagebuilder, geen tien losse WordPress-installaties. Eén geversioneerde engine, een hele fleet, en cijfers in plaats van bijvoeglijke naamwoorden.',
+        'No theme, no page builder, no ten separate WordPress installs. One versioned engine, a whole fleet, and numbers instead of adjectives.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconPackages',
+        title: t(locale, 'Eén engine, hele fleet', 'One engine, whole fleet'),
+        description: t(
+          locale,
+          'Elke site is een dunne app op dezelfde geversioneerde engine. Een beveiligingsfix maken we één keer en rollen uit over alle klanten tegelijk.',
+          'Every site is a thin app on the same versioned engine. A security fix is made once and rolled out to every client at once.',
+        ),
+        features: [
+          feature(t(locale, 'Geen plugin-sprawl', 'No plugin sprawl')),
+          feature(t(locale, 'Fix in één release', 'Fixed in one release')),
+        ],
+      },
+      {
+        icon: 'IconBrandFigma',
+        title: t(locale, 'Van Figma naar productie', 'From Figma to production'),
+        description: t(
+          locale,
+          'We bouwen uit Dev Mode: type-scale, spacing en motion zitten in de engine, dus het ontwerp overleeft de bouw.',
+          'We build from Dev Mode: type scale, spacing and motion live in the engine, so the design survives the build.',
+        ),
+        features: [
+          feature('Payload CMS, Next.js & React'),
+          feature(t(locale, 'Getypeerd, met tests', 'Typed, with tests')),
+        ],
+      },
+      {
+        icon: 'IconBolt',
+        title: t(locale, 'Gemeten snelheid', 'Measured speed'),
+        description: t(
+          locale,
+          'Performance is geen marketingwoord maar een meting. Vijf rapportcijfers op elke URL, gratis via onze websitecheck.',
+          'Performance is not a marketing word but a measurement. Five grades on any URL, free through our website check.',
+        ),
+        features: [
+          feature(t(locale, 'Edge-hosting, geen WordPress-bloat', 'Edge hosting, no WordPress bloat')),
+          feature(t(locale, 'Gratis websitecheck op /check', 'Free website check at /check')),
+        ],
+      },
+      {
+        icon: 'IconServer2',
+        title: t(locale, 'Operatie met harde cijfers', 'Operations in hard numbers'),
+        description: t(
+          locale,
+          'Limieten in gigabytes en requests, doorlopend databaseherstel, dagelijkse mediaback-up. Geen "ruime opslag", geen kleine letters.',
+          'Limits in gigabytes and requests, continuous database recovery, daily media backup. No "generous storage", no fine print.',
+        ),
+        features: [
+          feature(t(locale, 'Staging bij elke site', 'Staging on every site')),
+          feature(t(locale, 'Klant is eigenaar van site en data', 'Client owns site and data')),
+        ],
+      },
+    ],
+  },
+  {
+    blockType: 'services',
     anchor: 'hoe',
     header: {
       eyebrow: t(locale, 'Hoe het werkt', 'How it works'),
@@ -297,17 +413,20 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
           'Wij maken er een getypeerde applicatie van op onze engine en zetten die live. De klant sluit de overeenkomst bij Rinsly.',
           'We turn it into a typed application on our engine and take it live. The client’s agreement is with Rinsly.',
         ),
-        features: [feature(t(locale, 'Gratis bouw bij drie jaar hosting', 'Free build on three years of hosting'))],
+        features: [feature(t(locale, 'Gratis bouw voor uw klant bij 3 jaar', 'Free client build on 3 years'))],
       },
       {
         icon: 'IconRefresh',
         title: t(locale, '3. Wij draaien het', '3. We run it'),
         description: t(
           locale,
-          'Updates, back-ups, support. Jij hoeft nooit meer een CMS te patchen of op zondag een storing op te lossen.',
-          'Updates, backups, support. You never patch a CMS or fix a Sunday outage again.',
+          'Updates, databaseherstel, dagelijkse mediaback-up, support. Jij hoeft nooit meer een CMS te patchen of op zondag een storing op te lossen. Na onboarding krijg je toegang tot het partnerportaal.',
+          'Updates, database recovery, daily media backup, support. You never patch a CMS or fix a Sunday outage again. After onboarding you get access to the partner portal.',
         ),
-        features: [feature(t(locale, 'Jij krijgt je deel van de omzet', 'You get your share of the revenue'))],
+        features: [
+          feature(t(locale, 'Jij krijgt je deel van de omzet', 'You get your share of the revenue')),
+          feature(t(locale, 'Portaal: klanten, leads en tarief', 'Portal: clients, leads and rate')),
+        ],
       },
     ],
   },
@@ -317,8 +436,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
     t(locale, 'Drie stappen, en maar één ervan is van jou', 'Three steps, and only one of them is yours'),
     t(
       locale,
-      'Jullie leveren het Figma-bestand met Dev Mode aan. Rinsly bouwt het als getypeerde applicatie op de gedeelde engine en zet het live, en draait daarna de hosting, het CMS en de back-ups.',
-      'You hand over the Figma file with Dev Mode. Rinsly builds it as a typed application on the shared engine and takes it live, then runs the hosting, the CMS and the backups.',
+      'Jullie leveren het Figma-bestand met Dev Mode aan. Rinsly bouwt het als getypeerde applicatie op de gedeelde engine en zet het live, en draait daarna de hosting, het CMS, databaseherstel en dagelijkse mediaback-up.',
+      'You hand over the Figma file with Dev Mode. Rinsly builds it as a typed application on the shared engine and takes it live, then runs the hosting, the CMS, database recovery and daily media backup.',
     ),
   ),
   {
@@ -340,6 +459,36 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
             { p: 'The base is **0%**, and that is not a bargaining trick: the fee does not pay for an introduction you make once, it pays for work that continues every month. Every percentage point is bought with a responsibility, or with volume.' },
             { p: 'The volume levels stack, so the maximum is **35%** of the recurring subscription revenue, excluding VAT. One-off build fees and additional work are not shared.' },
             { p: 'Ten clients on **Managed** with exclusivity and relationship management is 15% of €990: about €149 a month, for designs you had already made. Add an eleventh and your portfolio passes €1.000, which adds a volume level, so 20%. Work it out yourself below.' },
+          ],
+    ),
+  },
+  {
+    blockType: 'richText',
+    anchor: 'verantwoordelijkheden',
+    width: 'wide',
+    header: {
+      eyebrow: t(locale, 'Hoe je percentage stijgt', 'How your percentage rises'),
+      title: t(locale, 'Verantwoordelijkheden en omzet', 'Responsibilities and volume'),
+    },
+    content: proseRich(
+      locale === 'nl'
+        ? [
+            { p: 'Bovenop de **0%** basis koop je elk procentpunt met een keuze die je maandelijks blijft doen, of met groeiende omzet. De drie keuzes:' },
+            { ul: [
+              '**Exclusiviteit (+10%):** nieuw klantwerk breng je bij ons onder. Klanten die al ergens anders draaien mogen blijven tot een grote update, of tot hun hostingcontract daar afloopt; dan bied je ons opnieuw aan.',
+              '**Relatiebeheer (+5%):** jij bent het aanspreekpunt van je klant en reageert inhoudelijk binnen een week. Wat technisch werk vraagt, meld je per e-mail aan ons; wij nemen geen direct contact op met jouw klanten.',
+              '**Marketing (+5%):** een vaste vermelding op je eigen site, en Rinsly genoemd in elk voorstel waar hosting in voorkomt.',
+            ] },
+            { p: 'Daarbovenop tellen **omzetniveaus** cumulatief mee: portfolio boven €1.000 per maand +5%, boven €5.000 +10%, boven €25.000 +15%. Samen met alle drie de keuzes is het maximum **35%** van de doorlopende abonnementsomzet, exclusief btw.' },
+          ]
+        : [
+            { p: 'On top of the **0%** base, every point is bought with a choice you keep making every month, or with growing volume. The three choices:' },
+            { ul: [
+              '**Exclusivity (+10%):** new client work comes to us. Clients already hosted elsewhere may stay until a big update, or until their hosting contract elsewhere comes up for renewal; at that point you offer us again.',
+              '**Relation & first-line support (+5%):** you are your client’s point of contact and reply to them within a week. Whatever needs our technical work, you email us; we do not contact your clients directly.',
+              '**Marketing (+5%):** a standing mention on your own site, and Rinsly named in every proposal that includes hosting.',
+            ] },
+            { p: 'On top of that, **volume levels** stack: portfolio above €1.000 a month +5%, above €5.000 +10%, above €25.000 +15%. With all three choices taken, the maximum is **35%** of recurring subscription revenue, excluding VAT.' },
           ],
     ),
   },
@@ -397,6 +546,7 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
       'Route A: Rinsly invoices the end client at list and pays out your share. Route B: you invoice your own client and buy from us at list minus your percentage. Either way, the agreement about the website runs between Rinsly and the end client.',
     ),
   ),
+  partnerCheckCta(locale),
   {
     blockType: 'services',
     anchor: 'leads',
@@ -405,8 +555,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
       title: t(locale, 'Sneller groeien dan je eigen boek toelaat', 'Grow faster than your own book allows'),
       intro: t(
         locale,
-        'Wij meten websites op grote schaal: we sporen bedrijven op, scoren hun site tegen de huidige stand van het web en laten de beste kandidaten door een model beoordelen. Als partner krijg je daar elke maand een deel van, zonder dat het je iets kost, en heb je er meer nodig, dan maken we ze op aanvraag aan.',
-        'We measure websites at scale: we find businesses, score their site against current web practice and have a model judge the best candidates. As a partner you get a share of that every month at no cost, and if you need more, we generate them on request.',
+        'Wij meten websites op grote schaal: we sporen bedrijven op, scoren hun site op moderniteit, snelheid, mobiel, vindbaarheid en veiligheid, en selecteren de beste kandidaten. Als partner krijg je daar elke maand een deel van, zonder dat het je iets kost; heb je er meer nodig, dan maken we ze op aanvraag aan.',
+        'We measure websites at scale: we find businesses, score their site on modernity, speed, mobile, findability and security, and pick the best candidates. As a partner you get a share of that every month at no cost; if you need more, we generate them on request.',
       ),
     },
     cards: [
@@ -611,6 +761,16 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
     },
     items: [
       {
+        title: t(locale, 'Hoe beheer ik mijn site?', 'How do I manage my site?'),
+        body: richBody(
+          t(
+            locale,
+            'Elke site heeft een volwaardig CMS (Payload, Rinsly CMS): u beheert teksten, pagina’s en media zelf. Daarnaast krijgt elke site een staging-omgeving op een apart subdomein, zodat u wijzigingen kunt bekijken vóór ze live gaan. De live site draait aan de edge; publicatie is een bewuste stap, geen automatische sync.',
+            'Every site has a full CMS (Payload, Rinsly CMS): you manage words, pages and media yourself. Each site also gets a staging environment on a separate subdomain, so you can review changes before they go live. The live site runs at the edge; publishing is a deliberate step, not an automatic sync.',
+          ),
+        ),
+      },
+      {
         title: t(locale, 'Waarom geen WordPress?', 'Why not WordPress?'),
         body: richBody(
           t(
@@ -621,12 +781,12 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         ),
       },
       {
-        title: t(locale, 'Hoe zit het met back-ups en storingen?', 'What about backups and outages?'),
+        title: t(locale, 'Hoe zit het met databaseherstel en storingen?', 'What about database recovery and outages?'),
         body: richBody(
           t(
             locale,
-            'Voor de database geldt dit voor elk pakket, zonder onderscheid: een ingebouwde Time Travel-functie geeft doorlopend puntherstel naar elk moment binnen de laatste dertig dagen. Voor mediabestanden (afbeeldingen, uploads) bestaat op dit moment geen automatische back-up; dat is een bewuste vermelding, geen kleine letters. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid, maar voeren zelf geen actieve uptime-monitoring uit; een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
-            'For the database this is the same for every plan, no distinction: a built-in Time Travel feature gives continuous point-in-time recovery to any moment within the last thirty days. For media files (images, uploads) there is currently no automated backup; that is a deliberate disclosure, not fine print. We run on a global edge network and work hard for good availability, but do not run our own active uptime monitoring; a guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
+            'Voor de database geldt dit voor elk pakket, zonder onderscheid: Cloudflare Time Travel geeft doorlopend puntherstel naar elk moment binnen de laatste dertig dagen. Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid, maar voeren zelf geen actieve uptime-monitoring uit; een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
+            'For the database this is the same for every plan, no distinction: Cloudflare Time Travel gives continuous point-in-time recovery to any moment within the last thirty days. Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability, but do not run our own active uptime monitoring; a guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
           ),
         ),
       },
@@ -657,17 +817,17 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
       },
     ],
   },
-  cta(
-    locale,
-    ids,
-    t(locale, 'Verder lezen', 'Read on'),
-    t(locale, 'Wat kost het, en wat levert het op?', 'What does it cost, and what does it earn?'),
-    t(
+  {
+    blockType: 'cta',
+    eyebrow: t(locale, 'Meten', 'Measure'),
+    title: t(locale, 'Vijf rapportcijfers in een halve minuut', 'Five grades in half a minute'),
+    text: t(
       locale,
-      'De pakketten met hun grenzen staan op de prijzenpagina; wat een ontwerpstudio eraan overhoudt, staat bij het partnerprogramma.',
-      'The plans and their limits are on the pricing page; what a design studio earns from it is on the partner programme page.',
+      'Probeer onze meting op elke URL. Gratis, zonder account.',
+      'Try our measurement on any URL. Free, without an account.',
     ),
-  ),
+    button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'primary' }),
+  },
 ]
 
 /* -------------------------------- /prijzen -------------------------------- */
@@ -710,6 +870,7 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           feature(t(locale, 'Edge-hosting & SSL', 'Edge hosting & SSL')),
           feature(t(locale, 'Beveiligings- & CMS-updates', 'Security & CMS updates')),
           feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
+          feature(t(locale, 'Dagelijkse mediaback-up', 'Daily media backup')),
           feature(t(locale, 'E-mailsupport, reactie binnen 1 week', 'Email support, reply within a week')),
           feature(t(locale, 'Staging-omgeving', 'Staging environment')),
           feature(t(locale, 'Wijzigingen inbegrepen', 'Changes included'), false),
@@ -786,13 +947,18 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Een maatwerksite start vanaf €2.500 (excl. btw); de exacte prijs hangt af van de omvang en complexiteit. Op basis van uw wensen maken we vooraf een heldere offerte.',
-            'A custom site starts from €2,500 (excl. VAT); the exact price depends on the size and complexity. Based on your needs we prepare a clear quote up front.',
+            'Twee routes. **Betaalde bouw:** een maatwerksite vanaf €2.500 (excl. btw); de exacte prijs hangt af van omvang en complexiteit. U krijgt vooraf een heldere offerte, en het hostingabonnement is daarna maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar.',
+            'Two routes. **Paid build:** a custom site from €2,500 (excl. VAT); the exact price depends on size and complexity. You receive a clear quote up front, and the hosting subscription is cancellable monthly afterwards with one month’s notice. A paid build can, by arrangement, be spread over the first year.',
           ),
           t(
             locale,
-            'Legt u zich voor drie jaar vast op het hostingabonnement, dan bouwen wij de website gratis, afhankelijk van de omvang. Betaalt u de bouw zelf, dan blijft het abonnement maandelijks opzegbaar. Beide routes bestaan echt; de drie jaar is wat de gratis bouw betaalt.',
-            'If you commit to three years of the hosting subscription, we build the website for free, depending on its scale. If you pay for the build yourself, the subscription stays cancellable monthly. Both routes are real; the three years is what pays for the free build.',
+            '**Gratis bouw:** legt u zich voor **drie jaar (36 maanden)** vast op het hostingabonnement, dan bouwen wij zonder bouwkosten bij een normale bedrijfs- of brochurewebsite.',
+            '**Free build:** if you commit to **three years (36 months)** of the hosting subscription, we build at no build fee for a typical business or brochure site.',
+          ),
+          t(
+            locale,
+            'Beide routes bestaan echt. De minimumlooptijd van drie jaar is wat de gratis bouw betaalt; daarna loopt het abonnement door en is het net zo goed maandelijks opzegbaar.',
+            'Both routes are real. The three-year minimum term is what pays for the free build; after that the subscription continues and is just as monthly-cancellable.',
           ),
         ),
       },
@@ -813,6 +979,26 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
             locale,
             'Van Rinsly, of van de ontwerpstudio die uw site maakte. Dat kiest de studio. Factureert de studio zelf, dan spreekt u de prijs met haar af. Uw overeenkomst over de website loopt in beide gevallen via Rinsly, en dat is precies wat u beschermt: stopt de studio ermee, dan gaat uw site zonder onderbreking bij ons verder.',
             'From Rinsly, or from the design studio that made your site: the studio chooses. Where the studio invoices you, you agree the price with them. Your agreement about the website runs through Rinsly either way, which is what protects you: if the studio stops, your site carries on with us without interruption.',
+          ),
+        ),
+      },
+      {
+        title: t(locale, 'Wat valt onder de inbegrepen wijzigingen?', 'What counts as included changes?'),
+        body: richBody(
+          t(
+            locale,
+            'Bij **Managed** en **Growth** zit een vast aantal uren per maand voor klein layout- en bugfixwerk door ons. Teksten, foto’s en pagina’s beheert u zelf in het CMS; dat is de bedoeling. Wilt u dat wij content aanpassen, dan kan dat binnen die uren, maar het komt uit dezelfde pot. Ongebruikte uren vervallen aan het eind van de maand. Bij **Care** zit geen inbegrepen tijd: u doet content zelf, en technisch werk offreren we apart.',
+            'On **Managed** and **Growth**, a fixed number of hours each month covers small layout and bugfix work by us. Words, pictures and pages you manage yourself in the CMS; that is the design. If you want us to change content, we can do that within those hours, but it draws from the same pool. Unused hours expire at the end of the month. **Care** has no included time: you handle content yourself, and we quote technical work separately.',
+          ),
+        ),
+      },
+      {
+        title: t(locale, 'Wat kost werk buiten het abonnement?', 'What does work outside the plan cost?'),
+        body: richBody(
+          t(
+            locale,
+            'Alles buiten de inbegrepen uren, en al het werk op **Care**, is **meerwerk** tegen **€95 per uur** (excl. btw), vooraf afgestemd. Grote uitbreidingen of nieuwe functionaliteit offreren we apart, met een heldere scope.',
+            'Anything beyond the included hours, and all work on **Care**, is **additional work** at **€95 an hour** (excl. VAT), agreed up front. Larger extensions or new functionality we quote separately, with a clear scope.',
           ),
         ),
       },
@@ -878,7 +1064,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
         ),
         features: [
           feature(t(locale, 'Vaste limieten, vooraf bekend', 'Stated limits, known up front')),
-          feature(t(locale, 'Data desgewenst in de EU', 'Data in the EU on request')),
+          feature(t(locale, 'Staging vóór elke livegang', 'Staging before every go-live')),
         ],
       },
       {
@@ -908,21 +1094,19 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
       locale === 'nl'
         ? [
             { ol: [
-              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: vanaf €2.500 voor de bouw, of gratis als u zich voor drie jaar vastlegt op de hosting.',
+              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: vanaf €2.500 (excl. btw) voor de bouw, met maandelijks opzegbaar hosting, of gratis bouw als u zich drie jaar vastlegt.',
               'Er komt een ontwerp: van uw eigen ontwerper, van een partner van ons, of op basis van wat u aanlevert.',
               'Wij bouwen het en zetten het live, inclusief domein en e-mailrouting.',
               'Daarna draaien wij het. U beheert de teksten en foto’s zelf in het CMS; het technische deel hoeft u nooit aan te raken.',
             ] },
-            { p: 'Wilt u dat uw database en bestanden binnen de EU staan, geef dat dan **voordat we beginnen** aan. Dat wordt bij de bouw vastgelegd en is daarna niet meer om te zetten. Wat die keuze precies wel en niet betekent, staat op de platformpagina.' },
           ]
         : [
             { ol: [
-              'You tell us what you need. We tell you what it costs: from €2,500 for the build, or free if you commit to three years of hosting.',
+              'You tell us what you need. We tell you what it costs: from €2,500 (excl. VAT) for the build with monthly-cancellable hosting, or a free build if you commit to three years.',
               'A design appears: from your own designer, from one of our partners, or based on what you supply.',
               'We build it and take it live, domain and email routing included.',
               'After that we run it. You manage the words and pictures yourself in the CMS; you never have to touch the technical part.',
             ] },
-            { p: 'If you want your database and files stored within the EU, say so **before we start**: it is fixed during the build and cannot be switched afterwards. Exactly what that choice does and does not mean is on the platform page.' },
           ],
     ),
   },
@@ -931,7 +1115,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
     alignment: 'left',
     buttons: [
       pageLink(t(locale, 'Bekijk de prijzen', 'See the pricing'), ids, SLUG.prijzen, { variant: 'primary' }),
-      pageLink(t(locale, 'Gratis websitecheck', 'Free website check'), ids, SLUG.contact, { variant: 'secondary' }),
+      externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
     ],
   },
   cta(
@@ -984,6 +1168,14 @@ const overLayout = (locale: Locale, ids: PageIds): Block[] => [
         'We genuinely measure websites: crawling, scoring and Lighthouse at scale. Hence the free website check on this site: five grades in half a minute.',
       ),
     ),
+  },
+  {
+    blockType: 'buttonRow',
+    alignment: 'left',
+    buttons: [
+      externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'primary' }),
+      pageLink(t(locale, 'Neem contact op', 'Get in touch'), ids, SLUG.contact, { variant: 'secondary' }),
+    ],
   },
   {
     blockType: 'contact',
@@ -1047,6 +1239,7 @@ const headerData = (locale: Locale, ids: PageIds) => ({
     pageLink(t(locale, 'Partnerprogramma', 'Partner programme'), ids, SLUG.partner),
     pageLink(t(locale, 'Prijzen', 'Pricing'), ids, SLUG.prijzen),
     pageLink(t(locale, 'Over ons', 'About'), ids, SLUG.over),
+    externalLink(t(locale, 'Websitecheck', 'Website check'), '/check'),
   ],
   cta: pageLink('Contact', ids, SLUG.contact),
 })
@@ -1063,6 +1256,7 @@ const footerLocalized = (locale: Locale) => ({
     { label: t(locale, 'Prijzen', 'Pricing'), url: `/${locale}/${SLUG.prijzen}` },
     { label: t(locale, 'Website bij Rinsly', 'A website from Rinsly'), url: `/${locale}/${SLUG.website}` },
     { label: t(locale, 'Over ons', 'About'), url: `/${locale}/${SLUG.over}` },
+    { label: t(locale, 'Websitecheck', 'Website check'), url: '/check' },
     { label: 'Contact', url: `/${locale}/${SLUG.contact}` },
   ],
   infoLinks: [
@@ -1096,17 +1290,6 @@ const footerShared = {
 /* -------------------------------------------------------------------------- */
 
 type ProseNode = { h: string } | { p: string } | { ul: string[] } | { ol: string[] }
-
-/** Split a string on `**bold**` markers into Lexical text nodes. */
-const inlineText = (s: string) =>
-  s
-    .split(/(\*\*[^*]+\*\*)/g)
-    .filter(Boolean)
-    .map((part) =>
-      part.startsWith('**') && part.endsWith('**')
-        ? { type: 'text', detail: 0, format: 1, mode: 'normal', style: '', text: part.slice(2, -2), version: 1 }
-        : { type: 'text', detail: 0, format: 0, mode: 'normal', style: '', text: part, version: 1 },
-    )
 
 const proseRich = (nodes: ProseNode[]) => ({
   root: {
@@ -1202,7 +1385,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '9. Uw rechten' },
     { p: 'U heeft het recht op inzage, rectificatie, verwijdering, beperking van de verwerking, bezwaar tegen de verwerking en gegevensoverdraagbaarheid. Stuur uw verzoek naar contact@rinsly.com; we reageren binnen de wettelijke termijn. Bent u het niet eens met hoe we met uw gegevens omgaan, dan kunt u een klacht indienen bij de Autoriteit Persoonsgegevens.' },
     { h: '10. Beveiliging' },
-    { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer en doorlopend puntherstel van de database via Cloudflare Time Travel. Een back-up van mediabestanden is op dit moment niet geautomatiseerd.' },
+    { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer, doorlopend puntherstel van de database via Cloudflare Time Travel en een dagelijkse back-up van mediabestanden naar aparte opslag.' },
     { h: '11. Wijzigingen' },
     { p: 'We kunnen deze privacyverklaring van tijd tot tijd aanpassen. De actuele versie staat altijd op deze pagina, met de datum van de laatste wijziging bovenaan.' },
   ],
@@ -1246,7 +1429,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '9. Your rights' },
     { p: 'You have the right to access, rectification, erasure, restriction of processing, objection to processing and data portability. Send your request to contact@rinsly.com; we will respond within the statutory period. If you disagree with how we handle your data, you may lodge a complaint with the Dutch Data Protection Authority (Autoriteit Persoonsgegevens).' },
     { h: '10. Security' },
-    { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control and continuous point-in-time database recovery via Cloudflare Time Travel. A backup of media files is not currently automated.' },
+    { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control, continuous point-in-time database recovery via Cloudflare Time Travel and a daily backup of media files to separate storage.' },
     { h: '11. Changes' },
     { p: 'We may update this privacy policy from time to time. The current version is always available on this page, with the date of the last change shown at the top.' },
   ],
@@ -1296,7 +1479,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Artikel 7: Beschikbaarheid en onderhoud' },
     { ol: [
       'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly voert daarbij zelf geen actieve uptime-monitoring uit. Een specifieke of ononderbroken beschikbaarheid wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
-      'De database van de website is doorlopend herstelbaar naar elk moment binnen de laatste dertig dagen via Cloudflare Time Travel. Een back-up van mediabestanden is op dit moment niet geautomatiseerd.',
+      'De database van de website is doorlopend herstelbaar naar elk moment binnen de laatste dertig dagen via Cloudflare Time Travel. Mediabestanden worden dagelijks naar aparte opslag geback-upt.',
       'Storingen kunnen per e-mail worden gemeld; Rinsly reageert binnen de in de overeenkomst of SLA genoemde termijn.',
     ] },
     { h: 'Artikel 8: Meerwerk' },
@@ -1323,7 +1506,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Artikel 12: Aansprakelijkheid' },
     { ol: [
       'De aansprakelijkheid van Rinsly is beperkt tot directe schade en tot ten hoogste het bedrag dat opdrachtgever in de twaalf maanden voorafgaand aan de schadeveroorzakende gebeurtenis uit hoofde van de overeenkomst heeft betaald.',
-      'Rinsly is niet aansprakelijk voor indirecte schade, waaronder gevolgschade, gederfde omzet en dataverlies dat niet kan worden hersteld via Cloudflare Time Travel. Voor mediabestanden geldt dat er op dit moment geen back-up bestaat om op terug te vallen.',
+      'Rinsly is niet aansprakelijk voor indirecte schade, waaronder gevolgschade, gederfde omzet en dataverlies dat niet kan worden hersteld via Cloudflare Time Travel of de dagelijkse mediaback-up binnen de bewaartermijn van die back-up.',
       'Deze beperkingen gelden niet bij opzet of bewuste roekeloosheid van Rinsly.',
     ] },
     { h: 'Artikel 13: Overmacht' },
@@ -1391,7 +1574,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Article 7: Availability and maintenance' },
     { ol: [
       'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly does not run its own active uptime monitoring. No specific or uninterrupted availability is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
-      "The website's database is continuously recoverable to any point within the last thirty days via Cloudflare Time Travel. A backup of media files is not currently automated.",
+      "The website's database is continuously recoverable to any point within the last thirty days via Cloudflare Time Travel. Media files are backed up daily to separate storage.",
       'Incidents may be reported by email; Rinsly responds within the period stated in the agreement or SLA.',
     ] },
     { h: 'Article 8: Additional work' },
@@ -1418,7 +1601,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Article 12: Liability' },
     { ol: [
       "Rinsly's liability is limited to direct damage and to at most the amount the client paid under the agreement in the twelve months preceding the event causing the damage.",
-      'Rinsly is not liable for indirect damage, including consequential loss, lost revenue and data loss that cannot be recovered via Cloudflare Time Travel. For media files, there is currently no backup to fall back on at all.',
+      'Rinsly is not liable for indirect damage, including consequential loss, lost revenue and data loss that cannot be recovered via Cloudflare Time Travel or the daily media backup within that backup’s retention period.',
       "These limitations do not apply in the event of intent or deliberate recklessness on Rinsly's part.",
     ] },
     { h: 'Article 13: Force majeure' },
