@@ -1,7 +1,7 @@
 /**
- * Reset an admin user's password, e.g. after a forgotten login. The CMS has no
- * e-mail adapter (yet), so Payload's own forgot-password flow can't deliver a
- * reset link; this does it directly via the local API.
+ * Reset an admin user's password, e.g. after a forgotten login when the mail
+ * path is unavailable. Prefer Payload's forgot-password flow on accp once
+ * Cloudflare Email Sending is wired (see PLAN-admin-account-recovery.md).
  *
  * Local dev DB:
  *   RESET_EMAIL=dev@rinsly.local RESET_PASSWORD='...' pnpm payload run scripts/reset-password.ts

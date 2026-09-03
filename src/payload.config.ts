@@ -35,9 +35,11 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
  */
 export default buildSiteConfig({
   siteConfig,
+  // Accp origin for auth mails (forgot-password links). Not the static public URL.
+  serverURL: process.env.PAYLOAD_SERVER_URL || 'https://accp.rinsly.com',
   // Transactional mail (auth mails + submission notifications) as
   // noreply@rinsly.com via Cloudflare Email Sending; logs when no binding.
-  email: cloudflareEmailAdapter({ defaultFromAddress: 'noreply@rinsly.com', defaultFromName: 'Rinsly' }),
+  email: cloudflareEmailAdapter,
   extraCollections: [Offertes, CheckAanvragen, CheckRuns, PartnerAanvragen],
   // Site-specific blocks: both encode Rinsly's own commercial model or its
   // mechanics, so they stay app-side rather than going into the shared engine.
