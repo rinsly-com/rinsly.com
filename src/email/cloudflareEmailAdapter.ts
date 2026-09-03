@@ -1,4 +1,4 @@
-import type { EmailAdapter, SendEmailOptions } from 'payload'
+import { createCloudflareEmailSendingAdapter } from '@rinsly-com/site-core/email/cloudflareEmailSending'
 
 import { getBindings } from '../lib/bindings'
 
@@ -13,70 +13,16 @@ import { getBindings } from '../lib/bindings'
  * Workers runtime mock, or an older deploy) the mail is logged instead of
  * sent, mirroring Payload's no-adapter behaviour without breaking the caller.
  */
+export const cloudflareEmailAdapter = createCloudflareEmailSendingAdapter({
+  defaultFromAddress: 'noreply@rinsly.com',
+  defaultFromName: 'Rinsly',
+  getSendBinding: async () => {
+    const env = (await getBindings()) as CloudflareEnv & {
+      EMAIL?: { send: (msg: Record<string, unknown>) => Promise<unknown> }
+    }
+    return typeof env.EMAIL?.send === 'function' ? env.EMAIL : null
+  },
+})
 
-type Address = { email: string; name?: string }
-
-/** Normalize nodemailer-style recipients (string | {address,name} | arrays). */
-export function toAddressList(value: SendEmailOptions['to']): string[] {
-  if (!value) return []
-  const list = Array.isArray(value) ? value : [value]
-  return list
-    .map((entry) =>
-      typeof entry === 'string'
-        ? entry
-        : (entry as { address?: string; email?: string }).address ??
-          (entry as { email?: string }).email ??
-        '',
-    )
-    .map((s) => s.trim())
-    .filter(Boolean)
-}
-
-export const cloudflareEmailAdapter =
-  ({ defaultFromAddress, defaultFromName }: { defaultFromAddress: string; defaultFromName: string }): EmailAdapter =>
-  ({ payload }) => ({
-    name: 'cloudflare-email-sending',
-    defaultFromAddress,
-    defaultFromName,
-    sendEmail: async (message) => {
-      const to = toAddressList(message.to)
-      if (to.length === 0) {
-        payload.logger.warn({ msg: '[email] dropped message without recipients', subject: message.subject })
-        return
-      }
-
-      const from: Address =
-        typeof message.from === 'string'
-          ? { email: message.from }
-          : message.from
-            ? { email: (message.from as { address: string }).address, name: (message.from as { name?: string }).name }
-            : { email: defaultFromAddress, name: defaultFromName }
-
-      const env = (await getBindings()) as CloudflareEnv & {
-        EMAIL?: { send: (msg: Record<string, unknown>) => Promise<unknown> }
-      }
-
-      if (typeof env.EMAIL?.send !== 'function') {
-        payload.logger.info({
-          msg: '[email] EMAIL binding unavailable — logging instead of sending',
-          to,
-          subject: message.subject,
-          text: typeof message.text === 'string' ? message.text.slice(0, 500) : undefined,
-        })
-        return
-      }
-
-      await env.EMAIL.send({
-        to: to.length === 1 ? to[0] : to,
-        from,
-        subject: message.subject ?? '',
-        ...(message.html ? { html: String(message.html) } : {}),
-        // Always include a text part (deliverability; some clients are text-only).
-        text:
-          typeof message.text === 'string' && message.text.trim() !== ''
-            ? message.text
-            : String(message.html ?? '').replace(/<[^>]+>/g, ' '),
-        ...(message.replyTo ? { replyTo: toAddressList(message.replyTo as SendEmailOptions['to'])[0] } : {}),
-      })
-    },
-  })
+/** @deprecated Prefer importing from site-core; kept for local tests. */
+export { toAddressList } from '@rinsly-com/site-core/email/cloudflareEmailSending'
