@@ -1,13 +1,13 @@
 /**
- * Reset an admin user's password, e.g. after a forgotten login when the mail
- * path is unavailable. Prefer Payload's forgot-password flow on accp once
- * Cloudflare Email Sending is wired (see PLAN-admin-account-recovery.md).
+ * Break-glass password reset when the editor cannot use forgot-password mail
+ * (Email Sending down, wrong inbox, etc.). Preferred path on accp:
+ * /admin → Forgot password → branded reset mail (site-core ≥ 0.17.4) → still
+ * enter TOTP (or a recovery code). This script never clears 2FA.
  *
- * Local dev DB:
+ * Local:
  *   RESET_EMAIL=dev@rinsly.local RESET_PASSWORD='...' pnpm payload run scripts/reset-password.ts
  *
- * Remote (accp) DB — NODE_ENV=production routes bindings to the real D1, the
- * same way seeding remotely works (requires a wrangler login):
+ * Accp D1 (wrangler login; NODE_ENV=production → real bindings):
  *   NODE_ENV=production PAYLOAD_SECRET=ignore RESET_EMAIL=yaron@rinsly.com \
  *     RESET_PASSWORD='...' pnpm payload run scripts/reset-password.ts
  */
