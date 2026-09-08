@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+import { Turnstile, turnstileHeaders } from '@rinsly-com/site-core/ui'
 
 // Empty on accp (same origin); the static rinsly.com build inlines the accp API
 // origin — same wiring as the other public forms. The final scorecard link uses
@@ -39,7 +39,6 @@ export function CheckRunner() {
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const turnstileRef = useRef<TurnstileHandle | null>(null)
 
   useEffect(() => () => {
     if (pollRef.current) clearInterval(pollRef.current)
@@ -48,19 +47,22 @@ export function CheckRunner() {
   async function start(e: React.FormEvent) {
     e.preventDefault()
     if (phase.kind === 'running' || !looksLikeSite(url)) return
+    // Capture then clear before unmount: running phase tears down Turnstile, so
+    // reset() would miss; remounted form must wait for a fresh token.
+    const tokenToSend = turnstileToken
+    setTurnstileToken(null)
     setPhase({ kind: 'running', token: '', step: 'probe' })
     try {
       const res = await fetch(`${API_BASE}/api/check-run`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...turnstileHeaders(turnstileToken),
+          ...turnstileHeaders(tokenToSend),
         },
         body: JSON.stringify({ url, bedrijfsnaam: honeypot }),
       })
       const body = (await res.json().catch(() => ({}))) as { ok?: boolean; token?: string; error?: string }
       if (!res.ok || !body.ok || !body.token) {
-        turnstileRef.current?.reset()
         setPhase({
           kind: 'error',
           message:
@@ -179,13 +181,7 @@ export function CheckRunner() {
             {phase.message}
           </p>
         )}
-        <Turnstile
-          action="check-run"
-          onToken={setTurnstileToken}
-          onReady={(h) => {
-            turnstileRef.current = h
-          }}
-        />
+        <Turnstile action="check-run" onToken={setTurnstileToken} />
         <button
           type="submit"
           disabled={!looksLikeSite(url) || (TURNSTILE_REQUIRED && !turnstileToken)}
