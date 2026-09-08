@@ -14,11 +14,12 @@ export function staticContentSecurityPolicy(apiOrigin) {
   const origin = new URL(apiOrigin).origin
   return [
     "default-src 'self'",
-    "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com",
+    "script-src 'self' 'unsafe-inline' https://static.cloudflareinsights.com https://challenges.cloudflare.com",
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: ${origin}`,
     "font-src 'self' data:",
-    `connect-src 'self' ${origin} https://cloudflareinsights.com`,
+    `connect-src 'self' ${origin} https://cloudflareinsights.com https://challenges.cloudflare.com`,
+    "frame-src https://challenges.cloudflare.com",
     "frame-ancestors 'none'",
     "base-uri 'self'",
     `form-action 'self' ${origin}`,

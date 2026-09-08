@@ -1,8 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 
 import type { Locale } from '@rinsly-com/site-core'
+import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -175,6 +176,8 @@ export function OfferteForm({ locale }: { locale: Locale }) {
   const [data, setData] = useState<Data>(EMPTY)
   const [status, setStatus] = useState<Status>('idle')
   const [trap, setTrap] = useState('')
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = useRef<TurnstileHandle | null>(null)
 
   const isPartner = audience === 'partner'
   const steps: readonly string[] = isPartner ? c.stepsPartner : c.stepsClient
@@ -252,13 +255,18 @@ export function OfferteForm({ locale }: { locale: Locale }) {
     try {
       const res = await fetch(`${API_BASE}${url}`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          ...turnstileHeaders(turnstileToken),
+        },
         body: JSON.stringify(payload),
       })
       const body = (await res.json().catch(() => ({}))) as { ok?: boolean }
       setStatus(res.ok && body.ok ? 'success' : 'error')
     } catch {
       setStatus('error')
+    } finally {
+      turnstileRef.current?.reset()
     }
   }
 
@@ -571,14 +579,27 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             {c.next}
           </button>
         ) : (
-          <button
-            type="button"
-            onClick={submit}
-            disabled={status === 'submitting'}
-            className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-          >
-            {status === 'submitting' ? c.sending : c.submit}
-          </button>
+          <div className="flex flex-col items-end gap-3">
+            <Turnstile
+              action={isPartner ? 'partner-interesse' : 'offerte'}
+              locale={locale}
+              onToken={setTurnstileToken}
+              onReady={(h) => {
+                turnstileRef.current = h
+              }}
+            />
+            <button
+              type="button"
+              onClick={submit}
+              disabled={
+                status === 'submitting' ||
+                (Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY) && !turnstileToken)
+              }
+              className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+            >
+              {status === 'submitting' ? c.sending : c.submit}
+            </button>
+          </div>
         )}
       </div>
     </div>

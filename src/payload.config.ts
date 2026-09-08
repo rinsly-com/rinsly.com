@@ -64,6 +64,12 @@ export default buildSiteConfig({
     // POST /api/deploy — manual "rebuild production" trigger (endpoints/deploy.ts).
     { path: '/deploy', method: 'post', handler: deployHandler },
   ],
+  // Turnstile on public form POSTs. Requires TURNSTILE_SECRET (Worker secret) +
+  // TURNSTILE_HOSTNAMES (vars) + NEXT_PUBLIC_TURNSTILE_SITEKEY (build). Widget
+  // create is human-only (turnstile-spin). Keep honeypots.
+  turnstile: {
+    protect: ['/offerte', '/check-aanvraag', '/check-run', '/partner-aanvraag', '/partner-interesse'],
+  },
   // Sidebar link + custom view for the manual production static deploy.
   adminComponents: {
     afterNavLinks: ['/components/DeployNavLink#DeployNavLink'],

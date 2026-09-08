@@ -1,12 +1,15 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import { Suspense, useState } from 'react'
+import { Suspense, useRef, useState } from 'react'
+
+import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and the form posts cross-origin (CORS-allowed) —
 // the same wiring as the OfferteForm quote wizard.
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
+const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)
 
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
@@ -41,6 +44,8 @@ export function CheckAanvraagForm() {
   const [data, setData] = useState({ url: '', naam: '', telefoon: '', bedrijfsnaam: '' })
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [touched, setTouched] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = useRef<TurnstileHandle | null>(null)
 
   const valid = looksLikeSite(data.url) && data.naam.trim() !== '' && isPhone(data.telefoon)
 
@@ -55,13 +60,18 @@ export function CheckAanvraagForm() {
     try {
       const res = await fetch(`${API_BASE}/api/check-aanvraag`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          ...turnstileHeaders(turnstileToken),
+        },
         body: JSON.stringify(data),
       })
       const body = (await res.json().catch(() => ({}))) as { ok?: boolean }
       setStatus(res.ok && body.ok ? 'success' : 'error')
     } catch {
       setStatus('error')
+    } finally {
+      turnstileRef.current?.reset()
     }
   }
 
@@ -157,9 +167,16 @@ export function CheckAanvraagForm() {
             .
           </p>
         )}
+        <Turnstile
+          action="check-aanvraag"
+          onToken={setTurnstileToken}
+          onReady={(h) => {
+            turnstileRef.current = h
+          }}
+        />
         <button
           type="submit"
-          disabled={status === 'submitting'}
+          disabled={status === 'submitting' || (TURNSTILE_REQUIRED && !turnstileToken)}
           data-magnetic=""
           className="inline-flex items-center justify-center gap-2 self-start rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
