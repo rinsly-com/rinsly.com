@@ -226,6 +226,8 @@ export function OfferteForm({ locale }: { locale: Locale }) {
   async function submit() {
     if (status === 'submitting') return
     setStatus('submitting')
+    const tokenToSend = turnstileToken
+    setTurnstileToken(null)
 
     const url = isPartner ? '/api/partner-interesse' : '/api/offerte'
     const payload = isPartner
@@ -257,7 +259,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...turnstileHeaders(turnstileToken),
+          ...turnstileHeaders(tokenToSend),
         },
         body: JSON.stringify(payload),
       })
