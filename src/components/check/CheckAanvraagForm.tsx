@@ -57,12 +57,14 @@ export function CheckAanvraagForm() {
     setTouched(true)
     if (!valid || status === 'submitting') return
     setStatus('submitting')
+    const tokenToSend = turnstileToken
+    setTurnstileToken(null)
     try {
       const res = await fetch(`${API_BASE}/api/check-aanvraag`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...turnstileHeaders(turnstileToken),
+          ...turnstileHeaders(tokenToSend),
         },
         body: JSON.stringify(data),
       })

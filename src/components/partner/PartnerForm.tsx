@@ -301,12 +301,14 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
     setTouched(true)
     if (!valid || state === 'sending') return
     setState('sending')
+    const tokenToSend = turnstileToken
+    setTurnstileToken(null)
     try {
       const res = await fetch(`${API_BASE}/api/partner-aanvraag`, {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...turnstileHeaders(turnstileToken),
+          ...turnstileHeaders(tokenToSend),
         },
         body: JSON.stringify({ ...f, token }),
       })
