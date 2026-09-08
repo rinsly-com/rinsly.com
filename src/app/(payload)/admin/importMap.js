@@ -1,3 +1,4 @@
+import { TotpAdminReset as TotpAdminReset_f080d585fcf30ba912897804a22f2f48 } from '../../../components/RinslyAdmin'
 import { SlugField as SlugField_2b8867833a34864a02ddf429b0728a40 } from '@payloadcms/next/client'
 import { IconSelector as IconSelector_0d40708c7ce43bde1d3e0df1b230c52c } from '../../../components/IconSelector'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -45,6 +46,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "/components/RinslyAdmin#TotpAdminReset": TotpAdminReset_f080d585fcf30ba912897804a22f2f48,
   "@payloadcms/next/client#SlugField": SlugField_2b8867833a34864a02ddf429b0728a40,
   "/components/IconSelector#IconSelector": IconSelector_0d40708c7ce43bde1d3e0df1b230c52c,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,

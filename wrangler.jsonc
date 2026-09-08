@@ -94,6 +94,9 @@
     // src/hooks/triggerStaticDeploy.ts). Non-secret. The paired
     // DEPLOY_DISPATCH_TOKEN is a Worker SECRET (never stored here).
     "DEPLOY_DISPATCH_URL": "https://api.github.com/repos/rinsly-com/rinsly.com/dispatches",
+    // Hostnames allowed on Turnstile siteverify (no localhost in production).
+    // Secret: wrangler secret put TURNSTILE_SECRET
+    "TURNSTILE_HOSTNAMES": "rinsly.com,www.rinsly.com,accp.rinsly.com",
   },
   // Workers Observability — Payload admin/API failures (save throws, D1/R2 errors)
   // don't surface on homepage uptime checks. head_sampling_rate 1 matches current

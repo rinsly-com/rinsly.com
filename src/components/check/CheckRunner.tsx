@@ -2,10 +2,13 @@
 
 import { useEffect, useRef, useState } from 'react'
 
+import { Turnstile, turnstileHeaders } from '@rinsly-com/site-core/ui'
+
 // Empty on accp (same origin); the static rinsly.com build inlines the accp API
 // origin — same wiring as the other public forms. The final scorecard link uses
 // the same base so it works before the rinsly.com/check/* zone route exists.
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
+const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)
 
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
@@ -35,6 +38,7 @@ export function CheckRunner() {
   const [honeypot, setHoneypot] = useState('')
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
 
   useEffect(() => () => {
     if (pollRef.current) clearInterval(pollRef.current)
@@ -43,11 +47,18 @@ export function CheckRunner() {
   async function start(e: React.FormEvent) {
     e.preventDefault()
     if (phase.kind === 'running' || !looksLikeSite(url)) return
+    // Capture then clear before unmount: running phase tears down Turnstile, so
+    // reset() would miss; remounted form must wait for a fresh token.
+    const tokenToSend = turnstileToken
+    setTurnstileToken(null)
     setPhase({ kind: 'running', token: '', step: 'probe' })
     try {
       const res = await fetch(`${API_BASE}/api/check-run`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          ...turnstileHeaders(tokenToSend),
+        },
         body: JSON.stringify({ url, bedrijfsnaam: honeypot }),
       })
       const body = (await res.json().catch(() => ({}))) as { ok?: boolean; token?: string; error?: string }
@@ -170,9 +181,10 @@ export function CheckRunner() {
             {phase.message}
           </p>
         )}
+        <Turnstile action="check-run" onToken={setTurnstileToken} />
         <button
           type="submit"
-          disabled={!looksLikeSite(url)}
+          disabled={!looksLikeSite(url) || (TURNSTILE_REQUIRED && !turnstileToken)}
           data-magnetic=""
           className="inline-flex items-center justify-center gap-2 self-start rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >

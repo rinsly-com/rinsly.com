@@ -1,10 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
+
+import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and posts cross-origin, same as the check forms.
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
+const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)
 
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
@@ -246,6 +249,8 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
     website: '',
   })
   const [touched, setTouched] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = useRef<TurnstileHandle | null>(null)
 
   // Check the link before showing a form that would fail on submit.
   useEffect(() => {
@@ -296,16 +301,23 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
     setTouched(true)
     if (!valid || state === 'sending') return
     setState('sending')
+    const tokenToSend = turnstileToken
+    setTurnstileToken(null)
     try {
       const res = await fetch(`${API_BASE}/api/partner-aanvraag`, {
         method: 'POST',
-        headers: { 'content-type': 'application/json' },
+        headers: {
+          'content-type': 'application/json',
+          ...turnstileHeaders(tokenToSend),
+        },
         body: JSON.stringify({ ...f, token }),
       })
       const body = (await res.json()) as { ok: boolean }
       setState(body.ok ? 'done' : 'error')
     } catch {
       setState('error')
+    } finally {
+      turnstileRef.current?.reset()
     }
   }
 
@@ -486,15 +498,24 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
         </p>
       )}
 
-      <div className="flex flex-wrap items-center gap-4">
-        <button
-          type="submit"
-          disabled={state === 'sending'}
-          className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
-        >
-          {state === 'sending' ? t.submitting : t.submit}
-        </button>
-        <p className="text-xs text-muted">{t.disclaimer}</p>
+      <div className="flex flex-col gap-3">
+        <Turnstile
+          action="partner-aanvraag"
+          onToken={setTurnstileToken}
+          onReady={(h) => {
+            turnstileRef.current = h
+          }}
+        />
+        <div className="flex flex-wrap items-center gap-4">
+          <button
+            type="submit"
+            disabled={state === 'sending' || (TURNSTILE_REQUIRED && !turnstileToken)}
+            className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
+          >
+            {state === 'sending' ? t.submitting : t.submit}
+          </button>
+          <p className="text-xs text-muted">{t.disclaimer}</p>
+        </div>
       </div>
     </form>
   )
