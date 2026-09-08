@@ -78,4 +78,5 @@ jobs:
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
           PAYLOAD_API_URL: https://accp.rinsly.com
           DISPATCH_NAMESPACE: rinsly-fleet
+          NEXT_PUBLIC_TURNSTILE_SITEKEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITEKEY }}
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
