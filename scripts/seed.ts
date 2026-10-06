@@ -124,8 +124,8 @@ const checkCta = (locale: Locale): Block => ({
   title: t(locale, 'Vijf rapportcijfers in een halve minuut', 'Five grades in half a minute'),
   text: t(
     locale,
-    'Wij meten websites voor het echte werk: crawlen, scoren en Lighthouse op schaal. Probeer het op elke URL, gratis en zonder account.',
-    'We measure websites for real: crawling, scoring and Lighthouse at scale. Try it on any URL, free and without an account.',
+    'Vijf rapportcijfers voor elke site in een halve minuut. Probeer het op elke URL, gratis en zonder account.',
+    'Five grades for any site in half a minute. Try it on any URL, free and without an account.',
   ),
   button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
 })
@@ -211,7 +211,7 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
     anchor: 'platform',
     header: {
       eyebrow: t(locale, 'Het platform', 'The platform'),
-      title: t(locale, 'Eén engine, de hele fleet', 'One engine, the whole fleet'),
+      title: t(locale, 'Eén engine, al onze sites', 'One engine, every site'),
       intro: t(
         locale,
         'Geen thema en geen pagebuilder. Elke site is een applicatie op één gedeelde, geversioneerde engine. Daarom kan een beveiligingsfix één keer gemaakt worden en over alle sites tegelijk uitgerold.',
@@ -228,8 +228,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
           'We build from Dev Mode. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.',
         ),
         features: [
-          feature('Payload CMS, Next.js & React'),
-          feature(t(locale, 'Meertalig, toegankelijk, getypeerd', 'Multilingual, accessible, typed')),
+          feature(t(locale, 'Next.js met Rinsly CMS', 'Next.js with Rinsly CMS')),
+          feature(t(locale, 'Meertalig, toegankelijk, gecontroleerd voordat het live gaat', 'Multilingual, accessible, checked before it goes live')),
         ],
       },
       {
@@ -237,8 +237,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Eén geversioneerde engine', 'One versioned engine'),
         description: t(
           locale,
-          'Een beveiligingsfix maken we één keer en rollen we uit over de hele fleet. Geen plugin-sprawl, geen WordPress.',
-          'A security fix is made once and rolled out across the whole fleet. No plugin sprawl, no WordPress.',
+          'Een beveiligingsfix maken we één keer en rollen we uit over al onze sites. Geen plugin-sprawl, geen WordPress.',
+          'A security fix is made once and rolled out to every site. No plugin sprawl, no WordPress.',
         ),
         features: [
           feature(t(locale, 'Fix in één release', 'Fixed in one release')),
@@ -264,7 +264,7 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
   {
     blockType: 'cta',
     eyebrow: t(locale, 'De techniek', 'The technical part'),
-    title: t(locale, 'Eén fix, de hele fleet', 'One fix, the whole fleet'),
+    title: t(locale, 'Eén fix, al onze sites', 'One fix, every site'),
     text: t(
       locale,
       'Hoe die engine werkt, wat er in een release gebeurt en waar de data staat. Dat leggen we liever uit dan dat we het samenvatten.',
@@ -328,18 +328,18 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
       title: t(locale, 'Niet nog een websitebouwer', 'Not another website builder'),
       intro: t(
         locale,
-        'Geen thema, geen pagebuilder, geen tien losse WordPress-installaties. Eén geversioneerde engine, een hele fleet, en cijfers in plaats van bijvoeglijke naamwoorden.',
-        'No theme, no page builder, no ten separate WordPress installs. One versioned engine, a whole fleet, and numbers instead of adjectives.',
+        'Geen thema, geen pagebuilder, geen tien losse WordPress-installaties. Eén geversioneerde engine voor al onze sites, en cijfers in plaats van bijvoeglijke naamwoorden.',
+        'No theme, no page builder, no ten separate WordPress installs. One versioned engine for every site, and numbers instead of adjectives.',
       ),
     },
     cards: [
       {
         icon: 'IconPackages',
-        title: t(locale, 'Eén engine, hele fleet', 'One engine, whole fleet'),
+        title: t(locale, 'Eén engine, al onze sites', 'One engine, every site'),
         description: t(
           locale,
-          'Elke site is een dunne app op dezelfde geversioneerde engine. Een beveiligingsfix maken we één keer en rollen uit over alle klanten tegelijk.',
-          'Every site is a thin app on the same versioned engine. A security fix is made once and rolled out to every client at once.',
+          'Elke site deelt één engine en houdt zijn eigen ontwerp. Een beveiligingsfix maken we één keer en rollen uit over alle klanten tegelijk.',
+          'Every site shares one engine and keeps its own design. A security fix is made once and rolled out to every client at once.',
         ),
         features: [
           feature(t(locale, 'Geen plugin-sprawl', 'No plugin sprawl')),
@@ -355,8 +355,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
           'We build from Dev Mode: type scale, spacing and motion live in the engine, so the design survives the build.',
         ),
         features: [
-          feature('Payload CMS, Next.js & React'),
-          feature(t(locale, 'Getypeerd, met tests', 'Typed, with tests')),
+          feature(t(locale, 'Next.js met Rinsly CMS', 'Next.js with Rinsly CMS')),
+          feature(t(locale, 'Gecontroleerd voordat het live gaat', 'Checked before it goes live')),
         ],
       },
       {
@@ -410,8 +410,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, '2. Wij bouwen en zetten live', '2. We build and launch'),
         description: t(
           locale,
-          'Wij maken er een getypeerde applicatie van op onze engine en zetten die live. De klant sluit de overeenkomst bij Rinsly.',
-          'We turn it into a typed application on our engine and take it live. The client’s agreement is with Rinsly.',
+          'Wij maken er een echte applicatie van op onze engine en zetten die live. De klant sluit de overeenkomst bij Rinsly.',
+          'We turn it into a real application on our engine and take it live. The client’s agreement is with Rinsly.',
         ),
         features: [feature(t(locale, 'Gratis bouw voor uw klant bij 3 jaar', 'Free client build on 3 years'))],
       },
@@ -436,8 +436,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
     t(locale, 'Drie stappen, en maar één ervan is van jou', 'Three steps, and only one of them is yours'),
     t(
       locale,
-      'Jullie leveren het Figma-bestand met Dev Mode aan. Rinsly bouwt het als getypeerde applicatie op de gedeelde engine en zet het live, en draait daarna de hosting, het CMS, databaseherstel en dagelijkse mediaback-up.',
-      'You hand over the Figma file with Dev Mode. Rinsly builds it as a typed application on the shared engine and takes it live, then runs the hosting, the CMS, database recovery and daily media backup.',
+      'Jullie leveren het Figma-bestand met Dev Mode aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna de hosting, het CMS, databaseherstel en dagelijkse mediaback-up.',
+      'You hand over the Figma file with Dev Mode. Rinsly builds it as a real application on the shared engine and takes it live, then runs the hosting, the CMS, database recovery and daily media backup.',
     ),
   ),
   {
@@ -683,7 +683,7 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
   pageHero(
     'default',
     t(locale, 'Het platform', 'The platform'),
-    t(locale, 'Eén engine, één fleet, één maandbedrag', 'One engine, one fleet, one monthly fee'),
+    t(locale, 'Eén engine, al onze sites, één maandbedrag', 'One engine, every site, one monthly fee'),
     t(
       locale,
       'Elke site die wij bouwen is een applicatie op dezelfde geversioneerde engine. Dat is geen technische voorkeur maar de reden dat we veel sites tegelijk kunnen onderhouden zonder dat het onderhoud ontspoort.',
@@ -707,9 +707,9 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
           'We build from Dev Mode. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.',
         ),
         features: [
-          feature('Payload CMS, Next.js & React'),
+          feature(t(locale, 'Next.js met Rinsly CMS', 'Next.js with Rinsly CMS')),
           feature(t(locale, 'Meertalig en toegankelijk', 'Multilingual and accessible')),
-          feature(t(locale, 'Getypeerd, met tests', 'Typed, with tests')),
+          feature(t(locale, 'Gecontroleerd voordat het live gaat', 'Checked before it goes live')),
         ],
       },
       {
@@ -717,11 +717,11 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Eén geversioneerde engine', 'One versioned engine'),
         description: t(
           locale,
-          'Elke site is een dunne app op @rinsly-com/site-core en bevat alleen wat die site eigen maakt. Een lek fixen we één keer.',
-          'Every site is a thin app on @rinsly-com/site-core and holds only what makes that site its own. A vulnerability is fixed once.',
+          'Elke site deelt één engine en houdt zijn eigen ontwerp. Een lek fixen we één keer.',
+          'Every site shares one engine and keeps its own design. A vulnerability is fixed once.',
         ),
         features: [
-          feature(t(locale, 'Fix in één release, uitrol over de fleet', 'Fixed in one release, rolled out fleet-wide')),
+          feature(t(locale, 'Fix in één release, uitrol over al onze sites', 'Fixed in one release, rolled out to every site')),
           feature(t(locale, 'Geen plugin-sprawl, geen WordPress', 'No plugin sprawl, no WordPress')),
           feature(t(locale, 'Elke site houdt zijn eigen ontwerp', 'Every site keeps its own design')),
         ],
@@ -744,12 +744,12 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
   },
   diagram(
     'oneEngineFleet',
-    t(locale, 'De fleet', 'The fleet'),
+    t(locale, 'Al onze sites', 'Every site'),
     t(locale, 'Eén release raakt elke site', 'One release reaches every site'),
     t(
       locale,
-      'Elke klantsite is een dunne applicatie op dezelfde geversioneerde engine. Een beveiligingsfix maken we één keer en rollen we uit over de hele fleet, zonder dat een site zijn eigen ontwerp verliest.',
-      'Every client site is a thin application on the same versioned engine. A security fix is made once and rolled out across the whole fleet, without a site losing its own design.',
+      'Elke site deelt één engine en houdt zijn eigen ontwerp. Een beveiligingsfix maken we één keer en rollen we uit over al onze sites.',
+      'Every site shares one engine and keeps its own design. A security fix is made once and rolled out to every site.',
     ),
   ),
   {
@@ -765,8 +765,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Elke site heeft een volwaardig CMS (Payload, Rinsly CMS): u beheert teksten, pagina’s en media zelf. Daarnaast krijgt elke site een staging-omgeving op een apart subdomein, zodat u wijzigingen kunt bekijken vóór ze live gaan. De live site draait aan de edge; publicatie is een bewuste stap, geen automatische sync.',
-            'Every site has a full CMS (Payload, Rinsly CMS): you manage words, pages and media yourself. Each site also gets a staging environment on a separate subdomain, so you can review changes before they go live. The live site runs at the edge; publishing is a deliberate step, not an automatic sync.',
+            'Elke site heeft een volwaardig CMS (Rinsly CMS): u beheert teksten, pagina’s en media zelf. Daarnaast krijgt elke site een staging-omgeving op een apart subdomein, zodat u wijzigingen kunt bekijken vóór ze live gaan. De live site draait aan de edge; publicatie is een bewuste stap, geen automatische sync.',
+            'Every site has a full CMS (Rinsly CMS): you manage words, pages and media yourself. Each site also gets a staging environment on a separate subdomain, so you can review changes before they go live. The live site runs at the edge; publishing is a deliberate step, not an automatic sync.',
           ),
         ),
       },
@@ -775,8 +775,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Omdat elke site bij ons op dezelfde geversioneerde engine draait. Een lek fixen we één keer en rollen we uit over de hele fleet. Tien losse WordPress-installaties met elk hun eigen plugins kun je zo niet onderhouden. Daarom is onderhoud daarop óf duur, óf gebeurt het niet.',
-            'Because every site here runs on the same versioned engine. A vulnerability is fixed once and rolled out across the whole fleet. Ten separate WordPress installs, each with its own plugins, cannot be maintained that way, which is why maintenance on them is either expensive or simply not happening.',
+            'Omdat elke site bij ons op dezelfde geversioneerde engine draait. Een lek fixen we één keer en rollen we uit over al onze sites. Tien losse WordPress-installaties met elk hun eigen plugins kun je zo niet onderhouden. Daarom is onderhoud daarop óf duur, óf gebeurt het niet.',
+            'Because every site here runs on the same versioned engine. A vulnerability is fixed once and rolled out to every site. Ten separate WordPress installs, each with its own plugins, cannot be maintained that way, which is why maintenance on them is either expensive or simply not happening.',
           ),
         ),
       },
@@ -785,8 +785,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Voor de database geldt dit voor elk pakket, zonder onderscheid: Cloudflare Time Travel geeft doorlopend puntherstel naar elk moment binnen de laatste dertig dagen. Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid, maar voeren zelf geen actieve uptime-monitoring uit; een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
-            'For the database this is the same for every plan, no distinction: Cloudflare Time Travel gives continuous point-in-time recovery to any moment within the last thirty days. Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability, but do not run our own active uptime monitoring; a guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
+            'Voor de database geldt dit voor elk pakket, zonder onderscheid: we kunnen uw database terugzetten naar hoe die was op elk moment in de laatste 30 dagen. Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid, maar voeren zelf geen actieve uptime-monitoring uit; een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
+            'For the database this is the same for every plan, no distinction: we can put your database back to how it was at any moment in the last 30 days. Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability, but do not run our own active uptime monitoring; a guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
           ),
         ),
       },
@@ -1164,8 +1164,8 @@ const overLayout = (locale: Locale, ids: PageIds): Block[] => [
       ),
       t(
         locale,
-        'We meten websites ook echt: crawlen, scoren en Lighthouse op grote schaal. Vandaar de gratis websitecheck op deze site: vijf rapportcijfers in een halve minuut.',
-        'We genuinely measure websites: crawling, scoring and Lighthouse at scale. Hence the free website check on this site: five grades in half a minute.',
+        'Vijf rapportcijfers voor elke site in een halve minuut. Vandaar de gratis websitecheck op deze site.',
+        'Five grades for any site in half a minute. Hence the free website check on this site.',
       ),
     ),
   },
