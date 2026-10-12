@@ -12,7 +12,10 @@ export function slugsForSitemap(pageSlugs: readonly (string | null | undefined)[
     'home',
     ...pageSlugs.filter(
       (slug): slug is string =>
-        Boolean(slug) && slug !== 'home' && !SITEMAP_EXCLUDED_SLUGS.has(slug),
+        typeof slug === 'string' &&
+        slug !== '' &&
+        slug !== 'home' &&
+        !SITEMAP_EXCLUDED_SLUGS.has(slug),
     ),
   ]
 }
