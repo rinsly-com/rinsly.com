@@ -17,7 +17,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const entries: MetadataRoute.Sitemap = []
   for (const slug of slugs) {
     const languages = Object.fromEntries(
-      LOCALES.map((l) => [l === 'nl' ? 'nl-NL' : 'en', absoluteUrl(siteConfig, localePath(l, slug))]),
+      LOCALES.map((l) => [
+        l === 'nl' ? 'nl-NL' : 'en',
+        absoluteUrl(siteConfig, localePath(l, slug)),
+      ]),
     )
     for (const locale of LOCALES) {
       entries.push({

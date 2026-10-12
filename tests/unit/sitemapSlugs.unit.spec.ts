@@ -17,7 +17,9 @@ const LIVE_SITEMAP_SLUGS = [
 
 const localePaths = (slugs: readonly string[]) =>
   slugs.flatMap((slug) =>
-    (['nl', 'en'] as const).map((locale) => (slug === 'home' ? `/${locale}` : `/${locale}/${slug}`)),
+    (['nl', 'en'] as const).map((locale) =>
+      slug === 'home' ? `/${locale}` : `/${locale}/${slug}`,
+    ),
   )
 
 describe('slugsForSitemap', () => {
@@ -54,10 +56,8 @@ describe('slugsForSitemap', () => {
   })
 
   it('keeps home first and preserves the order of the remaining pages', () => {
-    expect(slugsForSitemap(['privacy', 'contact', 'home', 'voorwaarden', 'over', null, ''])).toEqual([
-      'home',
-      'contact',
-      'over',
-    ])
+    expect(
+      slugsForSitemap(['privacy', 'contact', 'home', 'voorwaarden', 'over', null, '']),
+    ).toEqual(['home', 'contact', 'over'])
   })
 })
