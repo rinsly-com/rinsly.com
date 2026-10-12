@@ -4,16 +4,15 @@ import config from '@payload-config'
 import { getRenderablePages } from '@rinsly-com/site-core/lib/pages'
 import { absoluteUrl } from '@rinsly-com/site-core/lib/siteUrl'
 import { DEFAULT_LOCALE, LOCALES, localePath } from '@rinsly-com/site-core/lib/locale'
+import { slugsForSitemap } from '@/lib/sitemapSlugs'
 import { siteConfig } from '@/site.config'
 
 export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = await getRenderablePages(config, DEFAULT_LOCALE)
-  const slugs = [
-    'home',
-    ...pages.map((p) => p.slug).filter((s): s is string => Boolean(s) && s !== 'home'),
-  ]
+  // privacy and voorwaarden stay published; they are noindex and not listed here.
+  const slugs = slugsForSitemap(pages.map((p) => p.slug))
 
   const entries: MetadataRoute.Sitemap = []
   for (const slug of slugs) {
