@@ -21,6 +21,7 @@ export {
   TotpGate,
   TotpNavLink,
   TotpAdminReset,
+  ResetPasswordView,
   WorkflowAction,
   WorkflowStatusCell,
   VisualEditBridge,
