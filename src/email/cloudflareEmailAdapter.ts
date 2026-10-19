@@ -1,4 +1,7 @@
-import { createCloudflareEmailSendingAdapter } from '@rinsly-com/site-core/email/cloudflareEmailSending'
+import {
+  createCloudflareEmailSendingAdapter,
+  type EmailSendBinding,
+} from '@rinsly-com/site-core/email/cloudflareEmailSending'
 
 import { getBindings } from '../lib/bindings'
 
@@ -16,14 +19,15 @@ import { getBindings } from '../lib/bindings'
  * Wrangler types EMAIL as SendEmail. send() is overloaded on
  * EmailMessage | EmailMessageBuilder, which does not overlap
  * `(msg: Record<string, unknown>) => ...`, so intersecting CloudflareEnv
- * with that shape is TS2352. Narrow from unknown instead.
+ * with that shape is TS2352. Narrow from unknown straight to the engine's
+ * EmailSendBinding shape instead.
  */
-function isSendEmail(value: unknown): value is SendEmail {
+function isSendEmail(value: unknown): value is EmailSendBinding {
   if (typeof value !== 'object' || value === null) return false
   return typeof Reflect.get(value, 'send') === 'function'
 }
 
-function readSendBinding(env: CloudflareEnv): SendEmail | null {
+function readSendBinding(env: CloudflareEnv): EmailSendBinding | null {
   const candidate: unknown = env.EMAIL
   return isSendEmail(candidate) ? candidate : null
 }
