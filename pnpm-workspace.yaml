@@ -5,11 +5,11 @@ overrides:
   #   undici           GHSA-4cwx-7wf7-3272 (+4 medium) — in the Worker bundle
   #   brace-expansion  GHSA-mh99-v99m-4gvg — via minimatch, build tooling
   #   postcss          GHSA-r28c-9q8g-f849 — 8.4.31 is pinned by next
-  'undici@7': ^7.29.0
-  'brace-expansion@2': ^2.1.3
+  'undici@7': ^7.29.1
+  'brace-expansion@2': ^2.1.6
   # 5.0.9, not 5.0.8: the advisory was revised on 2026-08-04 to include 5.0.8,
   # so a ^5.0.8 floor would let a fresh resolution land back on a vulnerable one.
-  'brace-expansion@5': ^5.0.9
+  'brace-expansion@5': ^5.0.11
   # 8.5.23, raised from 8.5.18: GHSA revision of 2026-08 added a second
   # (moderate) advisory fixed in 8.5.23.
   'postcss@8': ^8.5.23
@@ -17,10 +17,19 @@ overrides:
   #   fast-uri   GHSA (high) — fixed 3.1.5
   #   nanoid     GHSA (high) — fixed 3.3.16
   #   dompurify  GHSA (moderate) — fixed 3.4.13
-  'js-yaml@4': ^4.3.1
-  'fast-uri@3': ^3.1.5
-  'nanoid@3': ^3.3.16
+  'js-yaml@4': ^4.3.2
+  'fast-uri@3': ^3.1.7
+  'nanoid@3': ^3.3.18
   'dompurify@3': ^3.4.13
+  # 2026-10-19 floors (pnpm audit --prod, site-core 0.22.1 prepare):
+  #   undici 7.29.1, brace-expansion 2.1.6 / 5.0.11, js-yaml 4.3.2,
+  #   fast-uri 3.1.7, nanoid 3.3.18 — raised in place above.
+  # proxy-addr GHSA-jqcg-44mw-7w3h (critical, IP spoofing) — fixed in 2.0.8.
+  # express@5 depends on ^2.0.7, which a fresh resolve already satisfies;
+  # the floor keeps a later exact pin from landing back on 2.0.7.
+  'proxy-addr@2': ^2.0.8
+  # source-map-js GHSA-68fv-2mgg-jv7q (event-loop DoS) — fixed in 1.2.2.
+  'source-map-js@1': ^1.2.2
 allowBuilds:
   core-js-pure: true
   esbuild: true
@@ -29,6 +38,6 @@ allowBuilds:
   workerd: true
 minimumReleaseAgeExclude:
   - '@rinsly-com/site-core'
-  - '@rinsly-com/ui@0.1.1 || 0.1.2'
+  - '@rinsly-com/ui@0.3.1'
 patchedDependencies:
-  '@payloadcms/drizzle@3.85.2': patches/@payloadcms__drizzle@3.85.2.patch
+  '@payloadcms/drizzle@3.90.2': patches/@payloadcms__drizzle@3.90.2.patch
