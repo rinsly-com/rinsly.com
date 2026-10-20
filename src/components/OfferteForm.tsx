@@ -556,6 +556,22 @@ export function OfferteForm({ locale }: { locale: Locale }) {
         </div>
       )}
 
+      {/* Bot check on the last step, in its own full-width row so the 300px
+          widget never squeezes into the button row or overflows the card. */}
+      {step !== 0 && step === lastStep && (
+        <div className="mt-6 flex min-w-0 justify-center overflow-hidden">
+          <Turnstile
+            className="max-w-full [&_iframe]:max-w-full"
+            action={isPartner ? 'partner-interesse' : 'offerte'}
+            locale={locale}
+            onToken={setTurnstileToken}
+            onReady={(h) => {
+              turnstileRef.current = h
+            }}
+          />
+        </div>
+      )}
+
       {/* Navigation. Step 0 has no Next: choosing an audience advances it. */}
       <div className="mt-6 flex items-center justify-between gap-3">
         <button
@@ -581,27 +597,17 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             {c.next}
           </button>
         ) : (
-          <div className="flex flex-col items-end gap-3">
-            <Turnstile
-              action={isPartner ? 'partner-interesse' : 'offerte'}
-              locale={locale}
-              onToken={setTurnstileToken}
-              onReady={(h) => {
-                turnstileRef.current = h
-              }}
-            />
-            <button
-              type="button"
-              onClick={submit}
-              disabled={
-                status === 'submitting' ||
-                (Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY) && !turnstileToken)
-              }
-              className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
-            >
-              {status === 'submitting' ? c.sending : c.submit}
-            </button>
-          </div>
+          <button
+            type="button"
+            onClick={submit}
+            disabled={
+              status === 'submitting' ||
+              (Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY) && !turnstileToken)
+            }
+            className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
+          >
+            {status === 'submitting' ? c.sending : c.submit}
+          </button>
         )}
       </div>
     </div>
