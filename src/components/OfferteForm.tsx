@@ -4,6 +4,10 @@ import { useRef, useState } from 'react'
 
 import type { Locale } from '@rinsly-com/site-core'
 import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+import { Button } from '@rinsly-com/ui/button'
+import { Checkbox } from '@rinsly-com/ui/checkbox'
+import { Field } from '@rinsly-com/ui/field'
+import { Input } from '@rinsly-com/ui/input'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -140,6 +144,64 @@ const ADDITIONS = [
 
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
+
+// Base UI has no Textarea part; Field.Control renders one.
+const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props as object)} />
+
+/** Placeholder stays the visible label. The sr-only label keeps `for` wired to an explicit id. */
+function TextField({
+  id,
+  label,
+  value,
+  onValue,
+  type = 'text',
+}: {
+  id: string
+  label: string
+  value: string
+  onValue: (value: string) => void
+  type?: string
+}) {
+  return (
+    <Field.Root>
+      <Field.Label className="sr-only">{label}</Field.Label>
+      <Input
+        id={id}
+        type={type}
+        value={value}
+        onChange={(e) => onValue(e.target.value)}
+        placeholder={label}
+        className={inputClass}
+      />
+    </Field.Root>
+  )
+}
+
+function NoteField({
+  id,
+  label,
+  value,
+  onValue,
+}: {
+  id: string
+  label: string
+  value: string
+  onValue: (value: string) => void
+}) {
+  return (
+    <Field.Root>
+      <Field.Label className="sr-only">{label}</Field.Label>
+      <Textarea
+        id={id}
+        value={value}
+        onChange={(e) => onValue(e.target.value)}
+        rows={3}
+        placeholder={label}
+        className={`${inputClass} block resize-y`}
+      />
+    </Field.Root>
+  )
+}
 
 const EMPTY: Data = {
   bedrijf: '',
@@ -334,7 +396,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
               { key: 'client', title: c.clientCard, sub: c.clientCardSub },
             ] as const
           ).map((option) => (
-            <button
+            <Button
               key={option.key}
               type="button"
               onClick={() => choose(option.key)}
@@ -342,7 +404,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             >
               <span className="text-sm font-semibold text-ink">{option.title}</span>
               <span className="text-xs text-muted">{option.sub}</span>
-            </button>
+            </Button>
           ))}
         </div>
       )}
@@ -351,41 +413,21 @@ export function OfferteForm({ locale }: { locale: Locale }) {
 
       {isPartner && step === 1 && (
         <div className="flex flex-col gap-3">
-          <input
-            value={data.bedrijf}
-            onChange={(e) => set('bedrijf', e.target.value)}
-            placeholder={c.studio}
-            className={inputClass}
-            aria-label={c.studio}
-          />
-          <input
-            value={data.domein}
-            onChange={(e) => set('domein', e.target.value)}
-            placeholder={c.domein}
-            className={inputClass}
-            aria-label={c.domein}
-          />
-          <input
-            value={data.naam}
-            onChange={(e) => set('naam', e.target.value)}
-            placeholder={c.naam}
-            className={inputClass}
-            aria-label={c.naam}
-          />
-          <input
+          <TextField id="offerte-studio" label={c.studio} value={data.bedrijf} onValue={(v) => set('bedrijf', v)} />
+          <TextField id="offerte-domein" label={c.domein} value={data.domein} onValue={(v) => set('domein', v)} />
+          <TextField id="offerte-partner-naam" label={c.naam} value={data.naam} onValue={(v) => set('naam', v)} />
+          <TextField
+            id="offerte-partner-email"
+            label={c.email}
             value={data.email}
-            onChange={(e) => set('email', e.target.value)}
+            onValue={(v) => set('email', v)}
             type="email"
-            placeholder={c.email}
-            className={inputClass}
-            aria-label={c.email}
           />
-          <input
+          <TextField
+            id="offerte-partner-telefoon"
+            label={c.telefoon}
             value={data.telefoon}
-            onChange={(e) => set('telefoon', e.target.value)}
-            placeholder={c.telefoon}
-            className={inputClass}
-            aria-label={c.telefoon}
+            onValue={(v) => set('telefoon', v)}
           />
         </div>
       )}
@@ -394,14 +436,21 @@ export function OfferteForm({ locale }: { locale: Locale }) {
         <div className="flex flex-col gap-2.5">
           <p className="text-sm text-muted">{c.qualHint}</p>
           <Check
+            id="offerte-figma"
             label={c.figmaSeat}
             checked={data.figmaSeat}
             onChange={(v) => set('figmaSeat', v)}
             hint={c.figmaNote}
           />
-          <Check label={c.bouwtZelf} checked={data.bouwtZelf} onChange={(v) => set('bouwtZelf', v)} />
+          <Check
+            id="offerte-bouwt"
+            label={c.bouwtZelf}
+            checked={data.bouwtZelf}
+            onChange={(v) => set('bouwtZelf', v)}
+          />
           {data.bouwtZelf && <Warn text={c.buildWarn} />}
           <Check
+            id="offerte-hosting"
             label={c.verkooptHosting}
             checked={data.verkooptHosting}
             onChange={(v) => set('verkooptHosting', v)}
@@ -421,13 +470,11 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             <Row label={c.bouwtZelf} value={yn(data.bouwtZelf)} />
             <Row label={c.verkooptHosting} value={yn(data.verkooptHosting)} />
           </dl>
-          <textarea
+          <NoteField
+            id="offerte-partner-bericht"
+            label={c.partnerBericht}
             value={data.bericht}
-            onChange={(e) => set('bericht', e.target.value)}
-            rows={3}
-            placeholder={c.partnerBericht}
-            className={`${inputClass} resize-y`}
-            aria-label={c.partnerBericht}
+            onValue={(v) => set('bericht', v)}
           />
           {status === 'error' && <p className="text-sm text-red-600">{c.error}</p>}
         </div>
@@ -437,27 +484,14 @@ export function OfferteForm({ locale }: { locale: Locale }) {
 
       {!isPartner && step === 1 && (
         <div className="flex flex-col gap-3">
-          <input
-            value={data.bedrijf}
-            onChange={(e) => set('bedrijf', e.target.value)}
-            placeholder={c.bedrijf}
-            className={inputClass}
-            aria-label={c.bedrijf}
-          />
-          <input
-            value={data.naam}
-            onChange={(e) => set('naam', e.target.value)}
-            placeholder={c.naam}
-            className={inputClass}
-            aria-label={c.naam}
-          />
-          <input
+          <TextField id="offerte-bedrijf" label={c.bedrijf} value={data.bedrijf} onValue={(v) => set('bedrijf', v)} />
+          <TextField id="offerte-naam" label={c.naam} value={data.naam} onValue={(v) => set('naam', v)} />
+          <TextField
+            id="offerte-email"
+            label={c.email}
             value={data.email}
-            onChange={(e) => set('email', e.target.value)}
+            onValue={(v) => set('email', v)}
             type="email"
-            placeholder={c.email}
-            className={inputClass}
-            aria-label={c.email}
           />
         </div>
       )}
@@ -467,7 +501,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
           {SUBSCRIPTIONS.map((s) => {
             const selected = data.subscription === s.value
             return (
-              <button
+              <Button
                 key={s.value}
                 type="button"
                 onClick={() => set('subscription', s.value)}
@@ -495,7 +529,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
                 >
                   {selected ? '✓' : ''}
                 </span>
-              </button>
+              </Button>
             )
           })}
         </div>
@@ -507,18 +541,18 @@ export function OfferteForm({ locale }: { locale: Locale }) {
           {ADDITIONS.map((a) => (
             <Check
               key={a.value}
+              id={`offerte-add-${a.value}`}
               label={locale === 'nl' ? a.nl : a.en}
               checked={data.additions.includes(a.value)}
               onChange={() => toggleAddition(a.value)}
             />
           ))}
           {data.additions.includes('other') && (
-            <input
+            <TextField
+              id="offerte-other"
+              label={c.other}
               value={data.additionsOther}
-              onChange={(e) => set('additionsOther', e.target.value)}
-              placeholder={c.other}
-              className={inputClass}
-              aria-label={c.other}
+              onValue={(v) => set('additionsOther', v)}
             />
           )}
 
@@ -544,14 +578,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
               }
             />
           </dl>
-          <textarea
-            value={data.bericht}
-            onChange={(e) => set('bericht', e.target.value)}
-            rows={3}
-            placeholder={c.bericht}
-            className={`${inputClass} resize-y`}
-            aria-label={c.bericht}
-          />
+          <NoteField id="offerte-bericht" label={c.bericht} value={data.bericht} onValue={(v) => set('bericht', v)} />
           {status === 'error' && <p className="text-sm text-red-600">{c.error}</p>}
         </div>
       )}
@@ -574,7 +601,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
 
       {/* Navigation. Step 0 has no Next: choosing an audience advances it. */}
       <div className="mt-6 flex items-center justify-between gap-3">
-        <button
+        <Button
           type="button"
           onClick={() => {
             if (step === 1) setAudience('')
@@ -584,20 +611,20 @@ export function OfferteForm({ locale }: { locale: Locale }) {
           className="rounded-pill px-4 py-2.5 text-sm font-semibold text-muted transition-colors hover:text-ink disabled:invisible"
         >
           {c.back}
-        </button>
+        </Button>
         {step === 0 ? (
           <span />
         ) : step < lastStep ? (
-          <button
+          <Button
             type="button"
             onClick={() => stepValid(step) && setStep((s) => s + 1)}
             disabled={!stepValid(step)}
             className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
           >
             {c.next}
-          </button>
+          </Button>
         ) : (
-          <button
+          <Button
             type="button"
             onClick={submit}
             disabled={
@@ -607,7 +634,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
           >
             {status === 'submitting' ? c.sending : c.submit}
-          </button>
+          </Button>
         )}
       </div>
     </div>
@@ -625,46 +652,63 @@ function Row({ label, value }: { label: string; value: string }) {
 
 /** A checkbox styled as a card row, with an optional explanatory line. */
 function Check({
+  id,
   label,
   checked,
   onChange,
   hint,
 }: {
+  id: string
   label: string
   checked: boolean
   onChange: (value: boolean) => void
   hint?: string
 }) {
+  const hintId = hint ? `${id}-hint` : undefined
   return (
-    <label
-      className={[
-        'flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 text-sm transition-colors',
-        checked ? 'border-accent bg-accent-soft' : 'border-hair hover:border-accent/50',
-      ].join(' ')}
-    >
-      <input type="checkbox" checked={checked} onChange={() => onChange(!checked)} className="sr-only" />
-      <span
-        aria-hidden
+    <Field.Root>
+      <Field.Label
         className={[
-          'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border transition-all',
-          checked ? 'border-accent bg-accent text-white' : 'border-hair bg-paper text-transparent',
+          'flex cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 text-sm transition-colors',
+          checked ? 'border-accent bg-accent-soft' : 'border-hair hover:border-accent/50',
         ].join(' ')}
       >
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-          <path
-            d="M5 12.5l4.5 4.5L19 7.5"
-            stroke="currentColor"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </span>
-      <span className="flex flex-col gap-0.5">
-        <span className="text-ink">{label}</span>
-        {hint && <span className="text-xs text-muted">{hint}</span>}
-      </span>
-    </label>
+        <Checkbox.Root
+          id={id}
+          // Keep the native button. `nativeButton={false}` puts the id on the hidden
+          // input, and the visible control's generated id no longer matches the label.
+          nativeButton
+          checked={checked}
+          onCheckedChange={onChange}
+          render={<button type="button" />}
+          aria-describedby={hintId}
+          className={[
+            'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border p-0 transition-all',
+            checked ? 'border-accent bg-accent text-white' : 'border-hair bg-paper text-transparent',
+          ].join(' ')}
+        >
+          <Checkbox.Indicator keepMounted>
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path
+                d="M5 12.5l4.5 4.5L19 7.5"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </Checkbox.Indicator>
+        </Checkbox.Root>
+        <span className="flex flex-col gap-0.5">
+          <span className="text-ink">{label}</span>
+          {hint ? (
+            <Field.Description id={hintId} className="m-0 text-xs text-muted">
+              {hint}
+            </Field.Description>
+          ) : null}
+        </span>
+      </Field.Label>
+    </Field.Root>
   )
 }
 

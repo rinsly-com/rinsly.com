@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Turnstile, turnstileHeaders } from '@rinsly-com/site-core/ui'
+import { Button } from '@rinsly-com/ui/button'
+import { Field } from '@rinsly-com/ui/field'
+import { Input } from '@rinsly-com/ui/input'
 
 // Empty on accp (same origin); the static rinsly.com build inlines the accp API
 // origin — same wiring as the other public forms. The final scorecard link uses
@@ -164,9 +167,10 @@ export function CheckRunner() {
           aria-hidden
           className="hidden"
         />
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-          Uw websiteadres
-          <input
+        <Field.Root className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
+          <Field.Label>Uw websiteadres</Field.Label>
+          <Input
+            id="check-run-url"
             type="url"
             name="url"
             required
@@ -175,21 +179,21 @@ export function CheckRunner() {
             onChange={(e) => setUrl(e.target.value)}
             className={inputClass}
           />
-        </label>
+        </Field.Root>
         {phase.kind === 'error' && (
           <p className="rounded-xl border border-bad/30 bg-bad/10 px-4 py-3 text-sm text-ink" role="alert">
             {phase.message}
           </p>
         )}
         <Turnstile action="check-run" onToken={setTurnstileToken} />
-        <button
+        <Button
           type="submit"
           disabled={!looksLikeSite(url) || (TURNSTILE_REQUIRED && !turnstileToken)}
           data-magnetic=""
           className="inline-flex items-center justify-center gap-2 self-start rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           Test mijn website nu
-        </button>
+        </Button>
         <p className="text-xs text-muted">
           Direct resultaat, geen gegevens nodig. We bewaren alleen het domein en het rapport.
         </p>
