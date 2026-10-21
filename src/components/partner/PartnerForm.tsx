@@ -6,7 +6,6 @@ import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/s
 import { Button } from '@rinsly-com/ui/button'
 import { Field } from '@rinsly-com/ui/field'
 import { Input } from '@rinsly-com/ui/input'
-import { Textarea } from '@rinsly-com/ui/textarea'
 
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and posts cross-origin, same as the check forms.
@@ -15,6 +14,9 @@ const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)
 
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
+
+// Base UI has no Textarea part; Field.Control renders one.
+const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props as object)} />
 
 const isEmail = (v: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.trim())
 
@@ -234,7 +236,7 @@ function NoteInput({
   return (
     <Field.Root className="block">
       <Field.Label className="mb-1.5 block text-sm font-medium text-ink">{label}</Field.Label>
-      <Textarea id={id} className={inputClass} rows={rows} value={value} onChange={onChange} />
+      <Textarea id={id} className={`${inputClass} block`} rows={rows} value={value} onChange={onChange} />
     </Field.Root>
   )
 }

@@ -27,7 +27,7 @@ vi.mock('@rinsly-com/site-core/ui', () => ({
  */
 const roots: Root[] = []
 
-function labelPointsAtControl(root: ParentNode) {
+function labelPointsAtControl(root: Element) {
   const labels = [...root.querySelectorAll('label')]
   expect(labels.length).toBeGreaterThan(0)
   for (const label of labels) {

@@ -8,7 +8,6 @@ import { Button } from '@rinsly-com/ui/button'
 import { Checkbox } from '@rinsly-com/ui/checkbox'
 import { Field } from '@rinsly-com/ui/field'
 import { Input } from '@rinsly-com/ui/input'
-import { Textarea } from '@rinsly-com/ui/textarea'
 
 type Status = 'idle' | 'submitting' | 'success' | 'error'
 
@@ -146,6 +145,9 @@ const ADDITIONS = [
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
 
+// Base UI has no Textarea part; Field.Control renders one.
+const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props as object)} />
+
 /** Placeholder stays the visible label. The sr-only label keeps `for` wired to an explicit id. */
 function TextField({
   id,
@@ -195,7 +197,7 @@ function NoteField({
         onChange={(e) => onValue(e.target.value)}
         rows={3}
         placeholder={label}
-        className={`${inputClass} resize-y`}
+        className={`${inputClass} block resize-y`}
       />
     </Field.Root>
   )
