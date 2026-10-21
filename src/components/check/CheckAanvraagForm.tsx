@@ -4,6 +4,9 @@ import { useSearchParams } from 'next/navigation'
 import { Suspense, useRef, useState } from 'react'
 
 import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+import { Button } from '@rinsly-com/ui/button'
+import { Field } from '@rinsly-com/ui/field'
+import { Input } from '@rinsly-com/ui/input'
 
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and the form posts cross-origin (CORS-allowed) —
@@ -117,9 +120,10 @@ export function CheckAanvraagForm() {
           aria-hidden
           className="hidden"
         />
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-          Uw website
-          <input
+        <Field.Root className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
+          <Field.Label>Uw website</Field.Label>
+          <Input
+            id="check-url"
             type="url"
             name="url"
             required
@@ -128,10 +132,11 @@ export function CheckAanvraagForm() {
             onChange={set('url')}
             className={inputClass}
           />
-        </label>
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-          Uw naam
-          <input
+        </Field.Root>
+        <Field.Root className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
+          <Field.Label>Uw naam</Field.Label>
+          <Input
+            id="check-naam"
             type="text"
             name="naam"
             required
@@ -141,10 +146,11 @@ export function CheckAanvraagForm() {
             onChange={set('naam')}
             className={inputClass}
           />
-        </label>
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-          Telefoonnummer
-          <input
+        </Field.Root>
+        <Field.Root className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
+          <Field.Label>Telefoonnummer</Field.Label>
+          <Input
+            id="check-telefoon"
             type="tel"
             name="telefoon"
             required
@@ -154,7 +160,7 @@ export function CheckAanvraagForm() {
             onChange={set('telefoon')}
             className={inputClass}
           />
-        </label>
+        </Field.Root>
         {touched && !valid && status !== 'submitting' && (
           <p className="text-sm text-muted" role="alert">
             Vul uw websiteadres, naam en telefoonnummer in, dan kunnen we u bereiken.
@@ -176,14 +182,14 @@ export function CheckAanvraagForm() {
             turnstileRef.current = h
           }}
         />
-        <button
+        <Button
           type="submit"
           disabled={status === 'submitting' || (TURNSTILE_REQUIRED && !turnstileToken)}
           data-magnetic=""
           className="inline-flex items-center justify-center gap-2 self-start rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {status === 'submitting' ? 'Versturen…' : 'Vraag de gratis check aan'}
-        </button>
+        </Button>
         <p className="text-xs text-muted">
           We gebruiken uw gegevens alleen om contact op te nemen over uw websitecheck.
         </p>

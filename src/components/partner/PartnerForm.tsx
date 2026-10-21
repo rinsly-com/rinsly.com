@@ -3,6 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+import { Button } from '@rinsly-com/ui/button'
+import { Field } from '@rinsly-com/ui/field'
+import { Input } from '@rinsly-com/ui/input'
+import { Textarea } from '@rinsly-com/ui/textarea'
 
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and posts cross-origin, same as the check forms.
@@ -190,21 +194,48 @@ type Fields = {
   website: string
 }
 
-function Field({
+function TextInput({
+  id,
   label,
   hint,
-  children,
+  ...props
 }: {
+  id: string
   label: string
   hint?: string
-  children: React.ReactNode
+} & Omit<React.ComponentProps<'input'>, 'id'>) {
+  const hintId = hint ? `${id}-hint` : undefined
+  return (
+    <Field.Root className="block">
+      <Field.Label className="mb-1.5 block text-sm font-medium text-ink">{label}</Field.Label>
+      <Input {...props} id={id} className={inputClass} aria-describedby={hintId} />
+      {hint ? (
+        <Field.Description id={hintId} className="m-0 mt-1 block text-xs text-muted">
+          {hint}
+        </Field.Description>
+      ) : null}
+    </Field.Root>
+  )
+}
+
+function NoteInput({
+  id,
+  label,
+  value,
+  onChange,
+  rows,
+}: {
+  id: string
+  label: string
+  value: string
+  onChange: (event: React.ChangeEvent<HTMLTextAreaElement>) => void
+  rows?: number
 }) {
   return (
-    <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-ink">{label}</span>
-      {children}
-      {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
-    </label>
+    <Field.Root className="block">
+      <Field.Label className="mb-1.5 block text-sm font-medium text-ink">{label}</Field.Label>
+      <Textarea id={id} className={inputClass} rows={rows} value={value} onChange={onChange} />
+    </Field.Root>
   )
 }
 
@@ -359,7 +390,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
         {duties.map((d) => {
           const on = f[d.key]
           return (
-            <button
+            <Button
               type="button"
               key={d.key}
               onClick={toggle(d.key)}
@@ -383,7 +414,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
                 </span>
                 <span className="mt-0.5 block text-sm text-muted">{d.blurb}</span>
               </span>
-            </button>
+            </Button>
           )
         })}
         <div className="flex items-baseline justify-between rounded-xl border border-hair bg-card px-4 py-3">
@@ -398,57 +429,52 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
       {/* ── who you are ──────────────────────────────────────────────── */}
       <fieldset className="grid gap-4 sm:grid-cols-2">
         <legend className="mb-1 text-sm font-semibold text-ink">{t.detailsLegend}</legend>
-        <Field label={t.company}>
-          <input className={inputClass} value={f.bedrijfsnaam} onChange={set('bedrijfsnaam')} />
-        </Field>
-        <Field label={t.contact}>
-          <input className={inputClass} value={f.contactpersoon} onChange={set('contactpersoon')} />
-        </Field>
-        <Field label={t.email}>
-          <input
-            className={inputClass}
-            type="email"
-            value={f.email}
-            onChange={set('email')}
-            aria-invalid={touched && !isEmail(f.email)}
-          />
-        </Field>
-        <Field label={t.phone}>
-          <input className={inputClass} value={f.telefoon} onChange={set('telefoon')} />
-        </Field>
-        <Field label={t.address}>
-          <input className={inputClass} value={f.adres} onChange={set('adres')} />
-        </Field>
-        <Field label={t.city}>
-          <input className={inputClass} value={f.plaats} onChange={set('plaats')} />
-        </Field>
-        <Field label={t.kvk}>
-          <input className={inputClass} value={f.kvk} onChange={set('kvk')} />
-        </Field>
-        <Field label={t.vat}>
-          <input className={inputClass} value={f.btwNummer} onChange={set('btwNummer')} />
-        </Field>
+        <TextInput id="partner-company" label={t.company} value={f.bedrijfsnaam} onChange={set('bedrijfsnaam')} />
+        <TextInput id="partner-contact" label={t.contact} value={f.contactpersoon} onChange={set('contactpersoon')} />
+        <TextInput
+          id="partner-email"
+          label={t.email}
+          type="email"
+          value={f.email}
+          onChange={set('email')}
+          aria-invalid={touched && !isEmail(f.email)}
+        />
+        <TextInput id="partner-phone" label={t.phone} value={f.telefoon} onChange={set('telefoon')} />
+        <TextInput id="partner-address" label={t.address} value={f.adres} onChange={set('adres')} />
+        <TextInput id="partner-city" label={t.city} value={f.plaats} onChange={set('plaats')} />
+        <TextInput id="partner-kvk" label={t.kvk} value={f.kvk} onChange={set('kvk')} />
+        <TextInput id="partner-vat" label={t.vat} value={f.btwNummer} onChange={set('btwNummer')} />
       </fieldset>
 
       {/* ── how we should match you ──────────────────────────────────── */}
       <fieldset className="grid gap-4 sm:grid-cols-2">
         <legend className="mb-1 text-sm font-semibold text-ink">{t.whereLegend}</legend>
-        <Field label={t.branches} hint={t.branchesHint}>
-          <input
-            className={inputClass}
-            value={f.branches}
-            onChange={set('branches')}
-            placeholder={t.branchesPlaceholder}
-          />
-        </Field>
-        <Field label={t.languages} hint={t.languagesHint}>
-          <input className={inputClass} value={f.talen} onChange={set('talen')} placeholder="nl, de" />
-        </Field>
-        <Field label={t.countries} hint={t.countriesHint}>
-          <input className={inputClass} value={f.landen} onChange={set('landen')} placeholder="nl, be" />
-        </Field>
+        <TextInput
+          id="partner-branches"
+          label={t.branches}
+          hint={t.branchesHint}
+          value={f.branches}
+          onChange={set('branches')}
+          placeholder={t.branchesPlaceholder}
+        />
+        <TextInput
+          id="partner-languages"
+          label={t.languages}
+          hint={t.languagesHint}
+          value={f.talen}
+          onChange={set('talen')}
+          placeholder="nl, de"
+        />
+        <TextInput
+          id="partner-countries"
+          label={t.countries}
+          hint={t.countriesHint}
+          value={f.landen}
+          onChange={set('landen')}
+          placeholder="nl, be"
+        />
         <div className="sm:col-span-2">
-          <button
+          <Button
             type="button"
             onClick={toggle('figmaSeat')}
             aria-pressed={f.figmaSeat}
@@ -468,12 +494,10 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
               <span className="font-semibold text-ink">{t.figmaTitle}</span>
               <span className="mt-0.5 block text-sm text-muted">{t.figmaBlurb}</span>
             </span>
-          </button>
+          </Button>
         </div>
         <div className="sm:col-span-2">
-          <Field label={t.note}>
-            <textarea className={inputClass} rows={4} value={f.opmerking} onChange={set('opmerking')} />
-          </Field>
+          <NoteInput id="partner-note" label={t.note} rows={4} value={f.opmerking} onChange={set('opmerking')} />
         </div>
       </fieldset>
 
@@ -507,13 +531,13 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
           }}
         />
         <div className="flex flex-wrap items-center gap-4">
-          <button
+          <Button
             type="submit"
             disabled={state === 'sending' || (TURNSTILE_REQUIRED && !turnstileToken)}
             className="rounded-lg bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-opacity disabled:opacity-60"
           >
             {state === 'sending' ? t.submitting : t.submit}
-          </button>
+          </Button>
           <p className="text-xs text-muted">{t.disclaimer}</p>
         </div>
       </div>
