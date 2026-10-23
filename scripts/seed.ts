@@ -1498,7 +1498,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
     { h: 'Artikel 7: Beschikbaarheid en onderhoud' },
     { ol: [
-      'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly voert daarbij zelf geen actieve uptime-monitoring uit. Een specifieke of ononderbroken beschikbaarheid wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
+      'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly controleert de beschikbaarheid van de website doorlopend met externe uptime-monitoring en krijgt een melding als de website onbereikbaar is. Een specifieke of ononderbroken beschikbaarheid, of een reactie- of hersteltijd, wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
       'De database van de website is doorlopend herstelbaar naar elk moment binnen de laatste dertig dagen via Cloudflare Time Travel. Mediabestanden worden dagelijks naar aparte opslag geback-upt.',
       'Storingen kunnen per e-mail worden gemeld; Rinsly reageert binnen de in de overeenkomst of SLA genoemde termijn.',
       'Afwezigheid van Yaron Schaeffer wordt vooraf aangekondigd, zoals bij vakantie, enkele dagen van tevoren. Waar nodig wordt een geschikte vervanger aangesteld.',
@@ -1594,7 +1594,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
     { h: 'Article 7: Availability and maintenance' },
     { ol: [
-      'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly does not run its own active uptime monitoring. No specific or uninterrupted availability is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
+      'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly continuously checks the availability of the website with external uptime monitoring and is alerted when the website is unreachable. No specific or uninterrupted availability, and no response or fix time, is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
       "The website's database is continuously recoverable to any point within the last thirty days via Cloudflare Time Travel. Media files are backed up daily to separate storage.",
       'Incidents may be reported by email; Rinsly responds within the period stated in the agreement or SLA.',
       'Absences of Yaron Schaeffer are announced in advance, as with a holiday, a few days ahead. Where needed, a suitable replacement is appointed.',
