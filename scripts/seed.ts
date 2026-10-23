@@ -785,8 +785,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Voor de database geldt dit voor elk pakket, zonder onderscheid: we kunnen uw database terugzetten naar hoe die was op elk moment in de laatste 30 dagen. Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid, maar voeren zelf geen actieve uptime-monitoring uit; een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
-            'For the database this is the same for every plan, no distinction: we can put your database back to how it was at any moment in the last 30 days. Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability, but do not run our own active uptime monitoring; a guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
+            'Voor de database geldt dit voor elk pakket, zonder onderscheid: we kunnen uw database terugzetten naar hoe die was op elk moment in de laatste 30 dagen. Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid. Externe uptime-monitoring controleert uw site dag en nacht en waarschuwt ons als die onbereikbaar is. Dat is geen belofte van een reactie- of hersteltijd. Een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
+            'For the database this is the same for every plan, no distinction: we can put your database back to how it was at any moment in the last 30 days. Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability. External uptime monitoring checks your site around the clock and alerts us when it goes down. That is not a promised response or fix time. A guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
           ),
         ),
       },
@@ -1164,8 +1164,8 @@ const overLayout = (locale: Locale, ids: PageIds): Block[] => [
       ),
       t(
         locale,
-        'Vijf rapportcijfers voor elke site in een halve minuut. Vandaar de gratis websitecheck op deze site.',
-        'Five grades for any site in half a minute. Hence the free website check on this site.',
+        'Vijf rapportcijfers voor elke site in een halve minuut: probeer de gratis websitecheck op deze site.',
+        'Five grades for any site in half a minute: try the free website check on this site.',
       ),
     ),
   },
@@ -1478,7 +1478,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
     { h: 'Artikel 7: Beschikbaarheid en onderhoud' },
     { ol: [
-      'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly voert daarbij zelf geen actieve uptime-monitoring uit. Een specifieke of ononderbroken beschikbaarheid wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
+      'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly controleert de beschikbaarheid van de website doorlopend met externe uptime-monitoring en krijgt een melding als de website onbereikbaar is. Een specifieke of ononderbroken beschikbaarheid, of een reactie- of hersteltijd, wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
       'De database van de website is doorlopend herstelbaar naar elk moment binnen de laatste dertig dagen via Cloudflare Time Travel. Mediabestanden worden dagelijks naar aparte opslag geback-upt.',
       'Storingen kunnen per e-mail worden gemeld; Rinsly reageert binnen de in de overeenkomst of SLA genoemde termijn.',
     ] },
@@ -1573,7 +1573,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
     { h: 'Article 7: Availability and maintenance' },
     { ol: [
-      'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly does not run its own active uptime monitoring. No specific or uninterrupted availability is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
+      'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly continuously checks the availability of the website with external uptime monitoring and is alerted when the website is unreachable. No specific or uninterrupted availability, and no response or fix time, is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
       "The website's database is continuously recoverable to any point within the last thirty days via Cloudflare Time Travel. Media files are backed up daily to separate storage.",
       'Incidents may be reported by email; Rinsly responds within the period stated in the agreement or SLA.',
     ] },
