@@ -806,6 +806,16 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         ),
       },
       {
+        title: t(locale, 'Hoe wordt afwezigheid aangekondigd?', 'How are absences announced?'),
+        body: richBody(
+          t(
+            locale,
+            'Afwezigheid van Yaron wordt vooraf aangekondigd, zoals bij vakantie, enkele dagen van tevoren. Waar nodig wordt een geschikte vervanger aangesteld.',
+            'Yaron’s absences are announced in advance, like a holiday, a few days ahead. Where needed, a suitable replacement is appointed.',
+          ),
+        ),
+      },
+      {
         title: t(locale, 'Werken jullie ook met een andere techniek?', 'Do you work with other technology?'),
         body: richBody(
           t(
@@ -871,7 +881,7 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           feature(t(locale, 'Beveiligings- & CMS-updates', 'Security & CMS updates')),
           feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
           feature(t(locale, 'Dagelijkse mediaback-up', 'Daily media backup')),
-          feature(t(locale, 'E-mailsupport, reactie binnen 1 week', 'Email support, reply within a week')),
+          feature(t(locale, 'E-mailantwoord op vragen binnen een week', 'Email reply to questions within a week')),
           feature(t(locale, 'Staging-omgeving', 'Staging environment')),
           feature(t(locale, 'Wijzigingen inbegrepen', 'Changes included'), false),
         ],
@@ -952,13 +962,13 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           ),
           t(
             locale,
-            '**Gratis bouw:** legt u zich voor **drie jaar (36 maanden)** vast op het hostingabonnement, dan bouwen wij zonder bouwkosten bij een normale bedrijfs- of brochurewebsite.',
+            '**Gratis bouw:** verbindt u zich voor **drie jaar (36 maanden)** aan het hostingabonnement, dan bouwen wij zonder bouwkosten bij een normale bedrijfs- of brochurewebsite.',
             '**Free build:** if you commit to **three years (36 months)** of the hosting subscription, we build at no build fee for a typical business or brochure site.',
           ),
           t(
             locale,
-            'Beide routes bestaan echt. De minimumlooptijd van drie jaar is wat de gratis bouw betaalt; daarna loopt het abonnement door en is het net zo goed maandelijks opzegbaar.',
-            'Both routes are real. The three-year minimum term is what pays for the free build; after that the subscription continues and is just as monthly-cancellable.',
+            'Beide routes bestaan echt. De minimumlooptijd van drie jaar is wat de gratis bouw betaalt. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website. Daarna loopt het abonnement door en is het net zo goed maandelijks opzegbaar.',
+            'Both routes are real. The three-year minimum term is what pays for the free build. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website. After that the subscription continues and is just as monthly-cancellable.',
           ),
         ),
       },
@@ -967,8 +977,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Dat hangt af van welke route u kiest. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Kiest u de gratis bouw, dan geldt een minimumlooptijd van 36 maanden op het abonnement; daarna is het net zo goed maandelijks opzegbaar.',
-            'That depends on the route you choose. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice. If you choose the free build, a minimum term of 36 months applies to the subscription; after that it is just as monthly-cancellable.',
+            'Dat hangt af van welke route u kiest. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Kiest u de gratis bouw, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website. Daarna is het net zo goed maandelijks opzegbaar.',
+            'That depends on the route you choose. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice. If you choose the free build, a minimum term of 36 months applies to the subscription. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website. After that it is just as monthly-cancellable.',
           ),
         ),
       },
@@ -999,6 +1009,16 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
             locale,
             'Alles buiten de inbegrepen uren, en al het werk op **Care**, is **meerwerk** tegen **€95 per uur** (excl. btw), vooraf afgestemd. Grote uitbreidingen of nieuwe functionaliteit offreren we apart, met een heldere scope.',
             'Anything beyond the included hours, and all work on **Care**, is **additional work** at **€95 an hour** (excl. VAT), agreed up front. Larger extensions or new functionality we quote separately, with a clear scope.',
+          ),
+        ),
+      },
+      {
+        title: t(locale, 'Gaat de week ook over storingen?', 'Does the week cover outages too?'),
+        body: richBody(
+          t(
+            locale,
+            'Op Care is de week de reactietijd voor gewone vragen. Storingen lopen niet op die termijn.',
+            'On Care, the week is the reply time for normal questions. Outages are not handled on that timeline.',
           ),
         ),
       },
@@ -1437,7 +1457,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
 
 const voorwaardenNodes: Record<Locale, ProseNode[]> = {
   nl: [
-    { p: 'Laatst bijgewerkt: 17 juli 2026.' },
+    { p: 'Laatst bijgewerkt: 6 oktober 2026.' },
     { h: 'Artikel 1: Definities' },
     { ul: [
       '**Rinsly:** de eenmanszaak Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, KvK 85578835, gebruiker van deze algemene voorwaarden.',
@@ -1481,6 +1501,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
       'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly controleert de beschikbaarheid van de website doorlopend met externe uptime-monitoring en krijgt een melding als de website onbereikbaar is. Een specifieke of ononderbroken beschikbaarheid, of een reactie- of hersteltijd, wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
       'De database van de website is doorlopend herstelbaar naar elk moment binnen de laatste dertig dagen via Cloudflare Time Travel. Mediabestanden worden dagelijks naar aparte opslag geback-upt.',
       'Storingen kunnen per e-mail worden gemeld; Rinsly reageert binnen de in de overeenkomst of SLA genoemde termijn.',
+      'Afwezigheid van Yaron Schaeffer wordt vooraf aangekondigd, zoals bij vakantie, enkele dagen van tevoren. Waar nodig wordt een geschikte vervanger aangesteld.',
     ] },
     { h: 'Artikel 8: Meerwerk' },
     { ol: [
@@ -1489,7 +1510,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Artikel 9: Looptijd en opzegging' },
     { ol: [
       'Onderhouds- en hostingovereenkomsten worden aangegaan voor onbepaalde tijd en zijn maandelijks opzegbaar met een opzegtermijn van één maand.',
-      'Is de website zonder eenmalige bouwkosten opgeleverd omdat opdrachtgever zich voor een minimumlooptijd heeft verbonden, dan geldt die minimumlooptijd: in beginsel 36 maanden, en is tussentijdse opzegging pas mogelijk na afloop daarvan. De minimumlooptijd wordt in het voorstel vastgelegd. Na afloop loopt de overeenkomst door voor onbepaalde tijd en geldt lid 1.',
+      'Is de website zonder eenmalige bouwkosten opgeleverd omdat opdrachtgever zich voor een minimumlooptijd heeft verbonden, dan geldt die minimumlooptijd: in beginsel 36 maanden. Tussentijdse opzegging is mogelijk via een afkoop, of opdrachtgever betaalt de resterende maanden van de minimumlooptijd van 36 maanden en behoudt de website. De minimumlooptijd wordt in het voorstel vastgelegd. Na afloop loopt de overeenkomst door voor onbepaalde tijd en geldt lid 1.',
       'Vooruitbetaalde vergoedingen over de periode na de opzegdatum worden naar rato terugbetaald.',
       'Elke partij kan de overeenkomst met onmiddellijke ingang ontbinden bij een wezenlijke, niet-herstelde tekortkoming van de andere partij of bij diens faillissement of surseance van betaling.',
     ] },
@@ -1497,7 +1518,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { ol: [
       'De website, de inhoud en de bijbehorende data blijven eigendom van opdrachtgever. Na volledige betaling verkrijgt opdrachtgever het recht op vrije overdracht van de website en de broncode.',
       'Door Rinsly gebruikte generieke onderdelen, hulpmiddelen en kennis blijven aan Rinsly voorbehouden.',
-      'Bij beëindiging verleent Rinsly redelijke medewerking aan de overdracht van de website, data en het domein en houdt de omgeving hiervoor nog dertig dagen beschikbaar.',
+      'Bij beëindiging ontvangt opdrachtgever alle data, de website, de broncode daarvan en een momentopname van de versie van de site-core-engine die de site gebruikte, zodat de broncode bruikbaar blijft. Vanaf beëindiging levert Rinsly geen engine-updates, geen beveiligingsupdates en geen ondersteuning meer. Rinsly verleent redelijke medewerking aan de overdracht van de website, data en het domein en houdt de omgeving hiervoor nog dertig dagen beschikbaar.',
     ] },
     { h: 'Artikel 11: Verwerking van persoonsgegevens' },
     { ol: [
@@ -1532,7 +1553,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
   ],
   en: [
-    { p: 'Last updated: 17 July 2026.' },
+    { p: 'Last updated: 6 October 2026.' },
     { h: 'Article 1: Definitions' },
     { ul: [
       '**Rinsly:** the sole proprietorship Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, the Netherlands, KvK 85578835, user of these terms.',
@@ -1576,6 +1597,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
       'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly continuously checks the availability of the website with external uptime monitoring and is alerted when the website is unreachable. No specific or uninterrupted availability, and no response or fix time, is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
       "The website's database is continuously recoverable to any point within the last thirty days via Cloudflare Time Travel. Media files are backed up daily to separate storage.",
       'Incidents may be reported by email; Rinsly responds within the period stated in the agreement or SLA.',
+      'Absences of Yaron Schaeffer are announced in advance, as with a holiday, a few days ahead. Where needed, a suitable replacement is appointed.',
     ] },
     { h: 'Article 8: Additional work' },
     { ol: [
@@ -1584,7 +1606,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Article 9: Term and termination' },
     { ol: [
       "Maintenance and hosting agreements are entered into for an indefinite term and are cancellable monthly with one month's notice.",
-      'Where the website was delivered without a one-off build fee because the client committed to a minimum term, that minimum term applies: in principle 36 months, and early termination is only possible once it has expired. The minimum term is recorded in the proposal. After it expires the agreement continues for an indefinite term and paragraph 1 applies.',
+      'Where the website was delivered without a one-off build fee because the client committed to a minimum term, that minimum term applies: in principle 36 months. Early termination is possible through a buy-out, or the client pays the remaining months of the 36-month term and keeps the website. The minimum term is recorded in the proposal. After it expires the agreement continues for an indefinite term and paragraph 1 applies.',
       'Fees prepaid for the period after the termination date are refunded pro rata.',
       'Either party may terminate the agreement with immediate effect in the event of a material, uncured breach by the other party or its bankruptcy or suspension of payment.',
     ] },
@@ -1592,7 +1614,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { ol: [
       "The website, its content and associated data remain the client's property. After full payment the client obtains the right to freely transfer the website and source code.",
       'Generic components, tools and know-how used by Rinsly remain reserved to Rinsly.',
-      'On termination Rinsly gives reasonable assistance with the transfer of the website, data and domain and keeps the environment available for a further thirty days.',
+      'On termination the client receives all data, the website, its source code and a snapshot of the site-core engine version the site used, so the source stays usable. From termination Rinsly provides no further engine updates, security updates or support. Rinsly gives reasonable assistance with the transfer of the website, data and domain and keeps the environment available for a further thirty days.',
     ] },
     { h: 'Article 11: Processing of personal data' },
     { ol: [
