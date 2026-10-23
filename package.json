@@ -40,7 +40,7 @@
     "@payloadcms/storage-r2": "3.90.2",
     "@payloadcms/translations": "3.90.2",
     "@payloadcms/ui": "3.90.2",
-    "@rinsly-com/site-core": "0.22.1",
+    "@rinsly-com/site-core": "0.23.0",
     "@rinsly-com/ui": "0.3.1",
     "@tabler/icons-react": "^3.44.0",
     "cross-env": "^7.0.3",
