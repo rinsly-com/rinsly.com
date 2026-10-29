@@ -9,6 +9,7 @@ import { cloudflareEmailAdapter } from './email/cloudflareEmailAdapter'
 import { CheckRuns } from './collections/CheckRuns'
 import { Offertes } from './collections/Offertes'
 import { PartnerAanvragen } from './collections/PartnerAanvragen'
+import { buildRoutesBlock } from './blocks/BuildRoutes'
 import { diagramBlock } from './blocks/Diagram'
 import { revenueCalculatorBlock } from './blocks/RevenueCalculator'
 import { checkAanvraagHandler } from './endpoints/checkAanvraag'
@@ -43,7 +44,7 @@ export default buildSiteConfig({
   extraCollections: [Offertes, CheckAanvragen, CheckRuns, PartnerAanvragen],
   // Site-specific blocks: both encode Rinsly's own commercial model or its
   // mechanics, so they stay app-side rather than going into the shared engine.
-  extraBlocks: [revenueCalculatorBlock, diagramBlock],
+  extraBlocks: [revenueCalculatorBlock, diagramBlock, buildRoutesBlock],
   extraEndpoints: [
     { path: '/offerte', method: 'post', handler: offerteHandler },
     // POST /api/check-aanvraag — lead form on the generic /check page.

@@ -6,6 +6,7 @@ import * as migration_20260805_203609 from './20260805_203609';
 import * as migration_20260805_211835 from './20260805_211835';
 import * as migration_20260815_154536 from './20260815_154536';
 import * as migration_20261013_162150_site_core_0_22 from './20261013_162150_site_core_0_22';
+import * as migration_20261029_140000_build_routes from './20261029_140000_build_routes';
 
 export const migrations = [
   {
@@ -47,5 +48,10 @@ export const migrations = [
     up: migration_20261013_162150_site_core_0_22.up,
     down: migration_20261013_162150_site_core_0_22.down,
     name: '20261013_162150_site_core_0_22'
+  },
+  {
+    up: migration_20261029_140000_build_routes.up,
+    down: migration_20261029_140000_build_routes.down,
+    name: '20261029_140000_build_routes',
   },
 ];

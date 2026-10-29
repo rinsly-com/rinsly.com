@@ -1,6 +1,7 @@
 import type { BlockRenderer } from '@rinsly-com/site-core'
 
 import type { Page } from '@/payload-types'
+import { BuildRoutes } from '@/components/custom/BuildRoutes'
 import { Contact } from '@/components/custom/Contact'
 import { Diagram } from '@/components/custom/Diagram'
 import { RevenueCalculator } from '@/components/custom/RevenueCalculator'
@@ -24,6 +25,9 @@ const as = <T,>(block: unknown) => block as T
  */
 export const extraRenderers: Record<string, BlockRenderer> = {
   contact: (block, locale) => <Contact {...as<BlockOf<'contact'>>(block)} locale={locale} />,
+  buildRoutes: (block, locale) => (
+    <BuildRoutes {...as<BlockOf<'buildRoutes'>>(block)} locale={locale} />
+  ),
   revenueCalculator: (block, locale) => (
     <RevenueCalculator {...as<BlockOf<'revenueCalculator'>>(block)} locale={locale} />
   ),

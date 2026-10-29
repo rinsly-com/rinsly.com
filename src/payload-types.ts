@@ -232,6 +232,7 @@ export interface Page {
         | NoteBlock
         | RevenueCalculatorBlock
         | DiagramBlock
+        | BuildRoutesBlock
       )[]
     | null;
   meta?: {
@@ -681,6 +682,42 @@ export interface DiagramBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BuildRoutesBlock".
+ */
+export interface BuildRoutesBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  intro?: string | null;
+  /**
+   * Shown first and largest. This is the route the page leads with.
+   */
+  primaryLabel: string;
+  primaryPrice: string;
+  primaryTerm: string;
+  /**
+   * Small line above the second route, e.g. “Or”. Leave empty to show none.
+   */
+  alternativeKicker?: string | null;
+  /**
+   * Shown second, smaller and quieter than the lead route.
+   */
+  alternativeLabel: string;
+  alternativePrice: string;
+  alternativeTerm: string;
+  /**
+   * Small print under both routes, such as VAT.
+   */
+  footnote?: string | null;
+  /**
+   * Optional #id so the section can be linked to.
+   */
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'buildRoutes';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "offertes".
  */
 export interface Offerte {
@@ -927,6 +964,7 @@ export interface PagesSelect<T extends boolean = true> {
         note?: T | NoteBlockSelect<T>;
         revenueCalculator?: T | RevenueCalculatorBlockSelect<T>;
         diagram?: T | DiagramBlockSelect<T>;
+        buildRoutes?: T | BuildRoutesBlockSelect<T>;
       };
   meta?:
     | T
@@ -1190,6 +1228,26 @@ export interface DiagramBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   title?: T;
   caption?: T;
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "BuildRoutesBlock_select".
+ */
+export interface BuildRoutesBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  primaryLabel?: T;
+  primaryPrice?: T;
+  primaryTerm?: T;
+  alternativeKicker?: T;
+  alternativeLabel?: T;
+  alternativePrice?: T;
+  alternativeTerm?: T;
+  footnote?: T;
   anchor?: T;
   id?: T;
   blockName?: T;
