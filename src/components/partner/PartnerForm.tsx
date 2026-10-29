@@ -7,6 +7,8 @@ import { Button } from '@rinsly-com/ui/button'
 import { Field } from '@rinsly-com/ui/field'
 import { Input } from '@rinsly-com/ui/input'
 
+import { partnerProgrammeCopy, type ChoiceField } from '@/lib/partnerLadder'
+
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and posts cross-origin, same as the check forms.
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
@@ -19,62 +21,6 @@ const inputClass =
 const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props as object)} />
 
 const isEmail = (v: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.trim())
-
-/**
- * The three responsibilities, and what each is worth.
- *
- * The percentages are duplicated here from Ledger's tenantRate.ts, which is a
- * real cost — but a partner deciding what to take on has to see the number next
- * to the commitment, and the alternative (an API call to a local SQLite file
- * that is not on the internet) does not exist. If the model changes, this list
- * and the contract generator change with it.
- */
-const DUTIES = {
-  nl: [
-    {
-      key: 'exclusiviteit' as const,
-      pct: 10,
-      title: 'Exclusiviteit',
-      blurb:
-        'Nieuw werk breng je bij ons onder. Klanten die al ergens anders draaien mogen blijven tot een grote update, of tot hun hostingcontract daar afloopt: dan bied je ons opnieuw aan.',
-    },
-    {
-      key: 'relatiebeheer' as const,
-      pct: 5,
-      title: 'Relatiebeheer',
-      blurb:
-        'Jij bent het aanspreekpunt van je klant en reageert hem inhoudelijk binnen een week. Wat technisch werk vraagt, meld je per e-mail aan ons. Wij nemen geen direct contact op met jouw klanten.',
-    },
-    {
-      key: 'marketing' as const,
-      pct: 5,
-      title: 'Marketing',
-      blurb: 'Een vaste vermelding op je eigen site, en Rinsly genoemd in elk voorstel waar hosting in voorkomt.',
-    },
-  ],
-  en: [
-    {
-      key: 'exclusiviteit' as const,
-      pct: 10,
-      title: 'Exclusivity',
-      blurb:
-        'New work comes to us. Clients already hosted elsewhere may stay until a big update, or until their hosting contract elsewhere comes up for renewal: at that point you offer us again.',
-    },
-    {
-      key: 'relatiebeheer' as const,
-      pct: 5,
-      title: 'Relation & first-line support',
-      blurb:
-        'You are your client\u2019s point of contact and reply to them within a week. Whatever needs our technical work, you email us. We do not contact your clients directly.',
-    },
-    {
-      key: 'marketing' as const,
-      pct: 5,
-      title: 'Marketing',
-      blurb: 'A standing mention on your own site, and Rinsly named in every proposal that includes hosting.',
-    },
-  ],
-} as const
 
 const T = {
   nl: {
@@ -89,11 +35,7 @@ const T = {
     doneBody:
       'We nemen het door en bellen je om het af te stemmen. Daarna sturen we het contract, met precies de verantwoordelijkheden die je hier hebt gekozen.',
     dutiesLegend: 'Wat wil je oppakken?',
-    dutiesIntro:
-      'De basis is 0%. Elke verantwoordelijkheid die je op je neemt verhoogt je aandeel in de doorlopende omzet. Daarbovenop komen de omzetniveaus: boven €1.000 per maand +5%, boven €5.000 +10%, boven €25.000 +15%.',
     rateLabel: 'Jouw tarief bij aanvang',
-    zeroNote:
-      'Zonder verantwoordelijkheden staat het tarief op 0%. Dat mag: je kunt je ook eerst aanmelden en later kiezen.',
     detailsLegend: 'Jullie gegevens',
     company: 'Bedrijfsnaam',
     contact: 'Contactpersoon',
@@ -111,9 +53,9 @@ const T = {
     languagesHint: 'Waarin je een klantgesprek voert.',
     countries: 'Landen',
     countriesHint: 'Waar je klanten zitten.',
-    figmaTitle: 'We hebben Figma met Dev Mode',
+    figmaTitle: 'We hebben een Figma-seat met Dev Mode',
     figmaBlurb:
-      'Ontwerpen leveren we in Figma aan. Heb je het nog niet, vink dit dan niet aan, dan bespreken we het gewoon.',
+      'Elke partner levert website-ontwerpen aan als Figma-bestanden. Dat is een voorwaarde, en het verandert het percentage niet.',
     note: 'Nog iets dat we moeten weten?',
     invalid: 'Vul in ieder geval je bedrijfsnaam en een geldig e-mailadres in.',
     failed: 'Er ging iets mis bij het versturen. Probeer het nog eens, of mail ons op',
@@ -133,11 +75,7 @@ const T = {
     doneBody:
       'We will go through it and call you to confirm. After that we send the contract, with exactly the responsibilities you picked here.',
     dutiesLegend: 'What do you want to take on?',
-    dutiesIntro:
-      'The base is 0%. Every responsibility you take on raises your share of the recurring revenue. On top of that come the revenue levels: above €1.000 a month +5%, above €5.000 +10%, above €25.000 +15%.',
     rateLabel: 'Your rate at the start',
-    zeroNote:
-      'With no responsibilities the rate is 0%. That is fine: you can sign up first and choose later.',
     detailsLegend: 'Your details',
     company: 'Company name',
     contact: 'Contact person',
@@ -155,9 +93,9 @@ const T = {
     languagesHint: 'The ones you can hold a client call in.',
     countries: 'Countries',
     countriesHint: 'Where your clients are.',
-    figmaTitle: 'We have Figma with Dev Mode',
+    figmaTitle: 'We hold a Figma seat with Dev Mode',
     figmaBlurb:
-      'Designs are delivered in Figma. If you do not have it yet, leave this unticked, we will just talk it through.',
+      'Every partner delivers website designs as Figma files. This is a precondition, and it does not change the percentage.',
     note: 'Anything else we should know?',
     invalid: 'Please give at least your company name and a valid e-mail address.',
     failed: 'Something went wrong sending this. Try again, or mail us at',
@@ -254,7 +192,10 @@ function NoteInput({
  */
 export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 'nl' | 'en' }) {
   const t = T[locale]
-  const duties = DUTIES[locale]
+  const commercial = partnerProgrammeCopy(locale)
+  const duties = commercial.ladder.rungs.filter(
+    (rung): rung is typeof rung & { field: ChoiceField } => rung.field != null,
+  )
   // A missing token is known before the first render, so it is initial state
   // rather than something an effect discovers (the effect-side setState also
   // trips the react-hooks cascading-renders rule).
@@ -318,8 +259,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
     }
   }, [token])
 
-  const pct =
-    (f.exclusiviteit ? 10 : 0) + (f.relatiebeheer ? 5 : 0) + (f.marketing ? 5 : 0)
+  const pct = duties.reduce((sum, rung) => sum + (f[rung.field] ? rung.pct : 0), 0)
   const valid = isEmail(f.email) && f.bedrijfsnaam.trim() !== ''
 
   const set =
@@ -388,14 +328,14 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
       {/* ── what you take on ─────────────────────────────────────────── */}
       <fieldset className="space-y-3">
         <legend className="text-sm font-semibold text-ink">{t.dutiesLegend}</legend>
-        <p className="text-sm text-muted">{t.dutiesIntro}</p>
+        <p className="text-sm text-muted">{commercial.formIntro}</p>
         {duties.map((d) => {
-          const on = f[d.key]
+          const on = f[d.field]
           return (
             <Button
               type="button"
-              key={d.key}
-              onClick={toggle(d.key)}
+              key={d.field}
+              onClick={toggle(d.field)}
               aria-pressed={on}
               className={`flex w-full gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
                 on ? 'border-accent bg-accent-soft' : 'border-hair bg-paper hover:border-accent/50'
@@ -414,7 +354,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
                   <span className="font-semibold text-ink">{d.title}</span>
                   <span className="text-sm font-bold text-accent">+{d.pct}%</span>
                 </span>
-                <span className="mt-0.5 block text-sm text-muted">{d.blurb}</span>
+                <span className="mt-0.5 block text-sm text-muted">{d.detail}</span>
               </span>
             </Button>
           )
@@ -424,7 +364,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
           <span className="text-2xl font-extrabold tabular-nums text-accent">{pct}%</span>
         </div>
         {pct === 0 && (
-          <p className="text-sm text-muted">{t.zeroNote}</p>
+          <p className="text-sm text-muted">{commercial.formZero}</p>
         )}
       </fieldset>
 
