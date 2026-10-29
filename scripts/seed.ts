@@ -812,13 +812,40 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
   pageHero(
     'centered',
     t(locale, 'Prijzen', 'Pricing'),
-    t(locale, 'Hosting en beheer, met limieten die vaststaan', 'Hosting and management, with limits that are stated'),
+    t(locale, 'Gratis bouw', 'Free build'),
     t(
       locale,
-      'Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
-      'The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
+      'De bouw is €0 bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
+      'The build is €0 for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
     ),
   ),
+  // Free build stays in the hero, the loudest block. The paid route is a
+  // `note`, the quieter block this page already uses under the plans.
+  // Not a second `pricing` block: the four tiers below are the one table D1
+  // can seed (see FACILITATOR-MIGRATION.md). `services` cards have no
+  // emphasis field, so two cards would read as peers.
+  {
+    blockType: 'richText',
+    anchor: 'bouw',
+    width: 'wide',
+    header: {
+      eyebrow: t(locale, 'De bouw', 'The build'),
+      title: t(locale, 'Twee routes', 'Two routes'),
+      intro: t(
+        locale,
+        'Gratis bouw. €0 bij een normale bedrijfs- of brochurewebsite. 36 maanden minimum, daarna maandelijks opzegbaar.',
+        'Free build. €0 for a typical business or brochure site. 36 months minimum, then monthly cancellable.',
+      ),
+    },
+  },
+  {
+    blockType: 'note',
+    text: t(
+      locale,
+      'Of betaal de bouw: vanaf €2.500, daarna doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar. Alle prijzen exclusief 21% btw. Een betaalde bouw schaalt met de complexiteit.',
+      'Or pay for the build: from €2,500, then ongoing and cancellable monthly with one month’s notice. A paid build can, by arrangement, be spread over the first year. All prices exclude 21% VAT. A paid build scales with complexity.',
+    ),
+  },
   {
     blockType: 'pricing',
     anchor: 'pakketten',
@@ -923,13 +950,13 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Twee routes. **Betaalde bouw:** een maatwerksite vanaf €2.500 (excl. btw); de exacte prijs hangt af van omvang en complexiteit. U krijgt vooraf een heldere offerte, en het hostingabonnement is daarna maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar.',
-            'Two routes. **Paid build:** a custom site from €2,500 (excl. VAT); the exact price depends on size and complexity. You receive a clear quote up front, and the hosting subscription is cancellable monthly afterwards with one month’s notice. A paid build can, by arrangement, be spread over the first year.',
+            '**Gratis bouw:** €0 bouwkosten bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar.',
+            '**Free build:** a €0 build fee for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable.',
           ),
           t(
             locale,
-            '**Gratis bouw:** verbindt u zich voor **drie jaar (36 maanden)** aan het hostingabonnement, dan bouwen wij zonder bouwkosten bij een normale bedrijfs- of brochurewebsite.',
-            '**Free build:** if you commit to **three years (36 months)** of the hosting subscription, we build at no build fee for a typical business or brochure site.',
+            '**Betaal de bouw:** vanaf €2.500 (excl. btw). De prijs schaalt met de complexiteit. Het hostingabonnement is doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar.',
+            '**Pay the build:** from €2,500 (excl. VAT). The price scales with complexity. The hosting subscription is ongoing and cancellable monthly with one month’s notice. A paid build can, by arrangement, be spread over the first year.',
           ),
           t(
             locale,
@@ -943,8 +970,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Dat hangt af van welke route u kiest. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Kiest u de gratis bouw, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website. Daarna is het net zo goed maandelijks opzegbaar.',
-            'That depends on the route you choose. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice. If you choose the free build, a minimum term of 36 months applies to the subscription. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website. After that it is just as monthly-cancellable.',
+            'Dat hangt af van welke route u kiest. Kiest u de gratis bouw, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website; daarna is het maandelijks opzegbaar. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
+            'That depends on the route you choose. If you choose the free build, a minimum term of 36 months applies to the subscription. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website; after that it is monthly cancellable. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
           ),
         ),
       },

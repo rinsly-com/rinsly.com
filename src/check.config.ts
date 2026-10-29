@@ -34,7 +34,7 @@ export const checkConfig: CheckConfig = {
     title: 'Transparant over de kosten',
     lines: [
       'Gaat u een beheerovereenkomst van drie jaar aan? Dan bouwen we uw website gratis bij een normale bedrijfs- of brochurewebsite.',
-      'Liever niet vastzitten? Dan bouwen we vanaf €2.500 eenmalig (desgewenst gespreid over het eerste jaar) en kunt u maandelijks opzeggen.',
+      'Liever niet vastzitten? Dan bouwen we vanaf €2.500 eenmalig (desgewenst in overleg gespreid over het eerste jaar) en kunt u maandelijks opzeggen.',
       'Het beheer is vanaf €49 per maand, alles inbegrepen: hosting, beveiliging, updates, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke mediaback-up.',
     ],
     note: 'Zakelijke tarieven, excl. 21% btw. U bent altijd eigenaar van uw site en data.',
