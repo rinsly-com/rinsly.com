@@ -62,7 +62,7 @@ const T: Record<'nl' | 'en', { figma: FigmaLabels; fleet: FleetLabels; routes: R
     },
   },
   en: {
-    figma: { a: 'Figma file', aSub: 'Dev Mode', b: 'Rinsly builds', bSub: 'typed app on the engine', c: 'Live site', cSub: 'edge · CMS · D1 restore' },
+    figma: { a: 'Figma file', aSub: 'Dev Mode', b: 'Rinsly builds', bSub: 'typed app on the engine', c: 'Live site', cSub: 'edge · CMS · point-in-time restore' },
     fleet: { engine: '@rinsly-com/site-core', fix: 'one fix', sites: 'every client site', release: 'one release' },
     routes: {
       a: 'Rinsly invoices',
