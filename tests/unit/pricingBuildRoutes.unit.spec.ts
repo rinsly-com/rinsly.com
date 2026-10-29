@@ -22,7 +22,7 @@ describe('pricing page build routes', () => {
 
   it('puts the free build before the paid alternative, and both before the plans', () => {
     const free = layout.indexOf("t(locale, 'Gratis bouw', 'Free build')")
-    const paid = layout.indexOf('Betaal de bouw, vanaf €2.500')
+    const paid = layout.indexOf('betaal de bouw: vanaf €2.500')
 
     expect(free).toBeGreaterThan(-1)
     expect(paid).toBeGreaterThan(free)
@@ -35,8 +35,8 @@ describe('pricing page build routes', () => {
     expect(layout).toContain('36 maanden minimum, daarna maandelijks opzegbaar')
     expect(layout).toContain('36 months minimum, then monthly cancellable')
     expect(layout).toContain('from €2,500')
-    expect(layout).toContain('doorlopend, maandelijks opzegbaar met een opzegtermijn van één maand')
-    expect(layout).toContain('ongoing, cancel monthly with one month’s notice')
+    expect(layout).toContain('daarna doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand')
+    expect(layout).toContain('then ongoing and cancellable monthly with one month’s notice')
     expect(layout).toContain('Alle prijzen exclusief 21% btw.')
     expect(layout).toContain('All prices exclude 21% VAT.')
   })
@@ -45,9 +45,17 @@ describe('pricing page build routes', () => {
     const note = layout.indexOf("blockType: 'note'")
     expect(note).toBeGreaterThan(-1)
     expect(note).toBeLessThan(tiers)
-    expect(layout.slice(note, tiers)).toContain('Betaal de bouw, vanaf €2.500')
-    expect(layout).not.toContain('brochure')
-    expect(layout).not.toContain('eerste jaar')
-    expect(layout).not.toContain('first year')
+    expect(layout.slice(note, tiers)).toContain('betaal de bouw: vanaf €2.500')
+    expect(layout).toContain('bij een normale bedrijfs- of brochurewebsite')
+    expect(layout).toContain('typical business or brochure site')
+    expect(layout).toContain('gespreid worden over het eerste jaar')
+    expect(layout).toContain('spread over the first year')
+
+    const lock = layout.indexOf('Zit ik ergens aan vast?')
+    const lockIn = layout.slice(lock, lock + 1500)
+    expect(lockIn.indexOf('Eerder stoppen kan via een afkoop')).toBeLessThan(lockIn.indexOf('Betaalt u de bouw'))
+    expect(lockIn.indexOf('You can leave earlier through a buy-out')).toBeLessThan(
+      lockIn.indexOf('If you pay for the build'),
+    )
   })
 })
