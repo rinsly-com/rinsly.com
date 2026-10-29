@@ -198,8 +198,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
     ),
     t(
       locale,
-      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates, databaseherstel en dagelijkse mediaback-up. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
-      'Rinsly is the build-and-run department design studios don’t have. You deliver the design in Figma, we build it as a real application and run it from there: hosting, updates, database recovery and daily media backup. Every time the client pays, a share of it comes to you.',
+      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke mediaback-up. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
+      'Rinsly is the build-and-run department design studios don’t have. You deliver the design in Figma, we build it as a real application and run it from there: hosting, updates, continuous point-in-time restore of the database (Cloudflare D1 Time Travel) and a nightly media backup. Every time the client pays, a share of it comes to you.',
     ),
     [
       pageLink(t(locale, 'Word partner', 'Become a partner'), ids, SLUG.partner, { variant: 'primary' }),
@@ -255,7 +255,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
         ),
         features: [
           feature(t(locale, 'Edge-hosting & SSL', 'Edge hosting & SSL')),
-          feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
+          feature(t(locale, 'Doorlopend puntherstel (Cloudflare D1 Time Travel)', 'Continuous point-in-time restore (Cloudflare D1 Time Travel)')),
+          feature(t(locale, 'Nachtelijke mediaback-up', 'Nightly media backup')),
         ],
       },
     ],
@@ -377,8 +378,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Operatie met harde cijfers', 'Operations in hard numbers'),
         description: t(
           locale,
-          'Limieten in gigabytes en requests, doorlopend databaseherstel, dagelijkse mediaback-up. Geen "ruime opslag", geen kleine letters.',
-          'Limits in gigabytes and requests, continuous database recovery, daily media backup. No "generous storage", no fine print.',
+          'Limieten in gigabytes en requests, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up. Geen "ruime opslag", geen kleine letters.',
+          'Limits in gigabytes and requests, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup. No "generous storage", no fine print.',
         ),
         features: [
           feature(t(locale, 'Staging bij elke site', 'Staging on every site')),
@@ -420,8 +421,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, '3. Wij draaien het', '3. We run it'),
         description: t(
           locale,
-          'Updates, databaseherstel, dagelijkse mediaback-up, support. Jij hoeft nooit meer een CMS te patchen of op zondag een storing op te lossen. Na onboarding krijg je toegang tot het partnerportaal.',
-          'Updates, database recovery, daily media backup, support. You never patch a CMS or fix a Sunday outage again. After onboarding you get access to the partner portal.',
+          'Updates, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up, support. Jij hoeft nooit meer een CMS te patchen of op zondag een storing op te lossen. Na onboarding krijg je toegang tot het partnerportaal.',
+          'Updates, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup, support. You never patch a CMS or fix a Sunday outage again. After onboarding you get access to the partner portal.',
         ),
         features: [
           feature(t(locale, 'Jij krijgt je deel van de omzet', 'You get your share of the revenue')),
@@ -436,8 +437,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
     t(locale, 'Drie stappen, en maar één ervan is van jou', 'Three steps, and only one of them is yours'),
     t(
       locale,
-      'Jullie leveren het Figma-bestand met Dev Mode aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna de hosting, het CMS, databaseherstel en dagelijkse mediaback-up.',
-      'You hand over the Figma file with Dev Mode. Rinsly builds it as a real application on the shared engine and takes it live, then runs the hosting, the CMS, database recovery and daily media backup.',
+      'Jullie leveren het Figma-bestand met Dev Mode aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna de hosting, het CMS, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke mediaback-up.',
+      'You hand over the Figma file with Dev Mode. Rinsly builds it as a real application on the shared engine and takes it live, then runs the hosting, the CMS, continuous point-in-time restore of the database (Cloudflare D1 Time Travel) and a nightly media backup.',
     ),
   ),
   {
@@ -736,7 +737,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         ),
         features: [
           feature(t(locale, 'SSL, aan de edge', 'SSL, at the edge')),
-          feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
+          feature(t(locale, 'Doorlopend puntherstel (Cloudflare D1 Time Travel)', 'Continuous point-in-time restore (Cloudflare D1 Time Travel)')),
+          feature(t(locale, 'Nachtelijke mediaback-up', 'Nightly media backup')),
           feature(t(locale, 'Vaste opslag- en verkeerslimieten', 'Stated storage and traffic limits')),
         ],
       },
@@ -785,8 +787,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Voor de database geldt dit voor elk pakket, zonder onderscheid: we kunnen uw database terugzetten naar hoe die was op elk moment in de laatste 30 dagen. Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid. Externe uptime-monitoring controleert uw site dag en nacht en waarschuwt ons als die onbereikbaar is. Dat is geen belofte van een reactie- of hersteltijd. Een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
-            'For the database this is the same for every plan, no distinction: we can put your database back to how it was at any moment in the last 30 days. Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability. External uptime monitoring checks your site around the clock and alerts us when it goes down. That is not a promised response or fix time. A guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
+            'Voor de database geldt dit voor elk pakket, zonder onderscheid: de database heeft doorlopend puntherstel (Cloudflare D1 Time Travel). Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid. Externe uptime-monitoring controleert uw site dag en nacht en waarschuwt ons als die onbereikbaar is. Dat is geen belofte van een reactie- of hersteltijd. Een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
+            'For the database this is the same for every plan, no distinction: the database has continuous point-in-time restore (Cloudflare D1 Time Travel). Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability. External uptime monitoring checks your site around the clock and alerts us when it goes down. That is not a promised response or fix time. A guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
           ),
         ),
       },
@@ -879,8 +881,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           feature(t(locale, 'Tot 1 miljoen requests per maand', 'Up to 1 million requests a month')),
           feature(t(locale, 'Edge-hosting & SSL', 'Edge hosting & SSL')),
           feature(t(locale, 'Beveiligings- & CMS-updates', 'Security & CMS updates')),
-          feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
-          feature(t(locale, 'Dagelijkse mediaback-up', 'Daily media backup')),
+          feature(t(locale, 'Doorlopend puntherstel (Cloudflare D1 Time Travel)', 'Continuous point-in-time restore (Cloudflare D1 Time Travel)')),
+          feature(t(locale, 'Nachtelijke mediaback-up', 'Nightly media backup')),
           feature(t(locale, 'E-mailantwoord op vragen binnen een week', 'Email reply to questions within a week')),
           feature(t(locale, 'Staging-omgeving', 'Staging environment')),
           feature(t(locale, 'Wijzigingen inbegrepen', 'Changes included'), false),
@@ -1079,8 +1081,8 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Hosting en onderhoud inbegrepen', 'Hosting and maintenance included'),
         description: t(
           locale,
-          'Eén maandbedrag voor hosting, SSL, databaseherstel en updates. Geen losse rekeningen voor een plugin-update.',
-          'One monthly fee for hosting, SSL, database recovery and updates. No separate bills for a plugin update.',
+          'Eén maandbedrag voor hosting, SSL, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up en updates. Geen losse rekeningen voor een plugin-update.',
+          'One monthly fee for hosting, SSL, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup and updates. No separate bills for a plugin update.',
         ),
         features: [
           feature(t(locale, 'Vaste limieten, vooraf bekend', 'Stated limits, known up front')),
@@ -1366,7 +1368,7 @@ const legalLayout = (eyebrow: string, title: string, nodes: ProseNode[]): Block[
 
 const privacyNodes: Record<Locale, ProseNode[]> = {
   nl: [
-    { p: 'Laatst bijgewerkt: 15 augustus 2026.' },
+    { p: 'Laatst bijgewerkt: 29 oktober 2026.' },
     { p: 'Rinsly hecht veel waarde aan de bescherming van uw persoonsgegevens. In deze privacyverklaring leggen we uit welke gegevens we verwerken wanneer u onze website bezoekt of contact met ons opneemt, en ook wanneer wij de website van uw bedrijf hebben gemeten zonder dat u zich bij ons had gemeld (zie artikel 7), met welk doel en op welke grondslag, en welke rechten u heeft.' },
     { h: '1. Verwerkingsverantwoordelijke' },
     { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden. KvK 85578835. E-mail: contact@rinsly.com. Rinsly is de verwerkingsverantwoordelijke voor de verwerking van persoonsgegevens via deze website.' },
@@ -1405,12 +1407,12 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '9. Uw rechten' },
     { p: 'U heeft het recht op inzage, rectificatie, verwijdering, beperking van de verwerking, bezwaar tegen de verwerking en gegevensoverdraagbaarheid. Stuur uw verzoek naar contact@rinsly.com; we reageren binnen de wettelijke termijn. Bent u het niet eens met hoe we met uw gegevens omgaan, dan kunt u een klacht indienen bij de Autoriteit Persoonsgegevens.' },
     { h: '10. Beveiliging' },
-    { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer, doorlopend puntherstel van de database via Cloudflare Time Travel en een dagelijkse back-up van mediabestanden naar aparte opslag.' },
+    { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke back-up van mediabestanden naar aparte opslag.' },
     { h: '11. Wijzigingen' },
     { p: 'We kunnen deze privacyverklaring van tijd tot tijd aanpassen. De actuele versie staat altijd op deze pagina, met de datum van de laatste wijziging bovenaan.' },
   ],
   en: [
-    { p: 'Last updated: 15 August 2026.' },
+    { p: 'Last updated: 29 October 2026.' },
     { p: 'Rinsly takes the protection of your personal data seriously. This privacy policy explains which data we process when you visit our website or contact us, and also when we have measured your company’s website without you having contacted us (see section 7), for what purpose and on what legal basis, and what rights you have.' },
     { h: '1. Controller' },
     { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, the Netherlands. Chamber of Commerce (KvK) 85578835. Email: contact@rinsly.com. Rinsly is the controller for the processing of personal data through this website.' },
@@ -1449,7 +1451,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '9. Your rights' },
     { p: 'You have the right to access, rectification, erasure, restriction of processing, objection to processing and data portability. Send your request to contact@rinsly.com; we will respond within the statutory period. If you disagree with how we handle your data, you may lodge a complaint with the Dutch Data Protection Authority (Autoriteit Persoonsgegevens).' },
     { h: '10. Security' },
-    { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control, continuous point-in-time database recovery via Cloudflare Time Travel and a daily backup of media files to separate storage.' },
+    { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control, continuous point-in-time restore of the database (Cloudflare D1 Time Travel) and a nightly backup of media files to separate storage.' },
     { h: '11. Changes' },
     { p: 'We may update this privacy policy from time to time. The current version is always available on this page, with the date of the last change shown at the top.' },
   ],
@@ -1457,7 +1459,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
 
 const voorwaardenNodes: Record<Locale, ProseNode[]> = {
   nl: [
-    { p: 'Laatst bijgewerkt: 6 oktober 2026.' },
+    { p: 'Laatst bijgewerkt: 29 oktober 2026.' },
     { h: 'Artikel 1: Definities' },
     { ul: [
       '**Rinsly:** de eenmanszaak Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, KvK 85578835, gebruiker van deze algemene voorwaarden.',
@@ -1499,7 +1501,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Artikel 7: Beschikbaarheid en onderhoud' },
     { ol: [
       'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly controleert de beschikbaarheid van de website doorlopend met externe uptime-monitoring en krijgt een melding als de website onbereikbaar is. Een specifieke of ononderbroken beschikbaarheid, of een reactie- of hersteltijd, wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
-      'De database van de website is doorlopend herstelbaar naar elk moment binnen de laatste dertig dagen via Cloudflare Time Travel. Mediabestanden worden dagelijks naar aparte opslag geback-upt.',
+      'De database van de website heeft doorlopend puntherstel (Cloudflare D1 Time Travel). Mediabestanden worden elke nacht naar aparte opslag geback-upt.',
       'Storingen kunnen per e-mail worden gemeld; Rinsly reageert binnen de in de overeenkomst of SLA genoemde termijn.',
       'Afwezigheid van Yaron Schaeffer wordt vooraf aangekondigd, zoals bij vakantie, enkele dagen van tevoren. Waar nodig wordt een geschikte vervanger aangesteld.',
     ] },
@@ -1527,7 +1529,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Artikel 12: Aansprakelijkheid' },
     { ol: [
       'De aansprakelijkheid van Rinsly is beperkt tot directe schade en tot ten hoogste het bedrag dat opdrachtgever in de twaalf maanden voorafgaand aan de schadeveroorzakende gebeurtenis uit hoofde van de overeenkomst heeft betaald.',
-      'Rinsly is niet aansprakelijk voor indirecte schade, waaronder gevolgschade, gederfde omzet en dataverlies dat niet kan worden hersteld via Cloudflare Time Travel of de dagelijkse mediaback-up binnen de bewaartermijn van die back-up.',
+      'Rinsly is niet aansprakelijk voor indirecte schade, waaronder gevolgschade, gederfde omzet en dataverlies dat niet kan worden hersteld via Cloudflare D1 Time Travel of de nachtelijke mediaback-up.',
       'Deze beperkingen gelden niet bij opzet of bewuste roekeloosheid van Rinsly.',
     ] },
     { h: 'Artikel 13: Overmacht' },
@@ -1553,7 +1555,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
   ],
   en: [
-    { p: 'Last updated: 6 October 2026.' },
+    { p: 'Last updated: 29 October 2026.' },
     { h: 'Article 1: Definitions' },
     { ul: [
       '**Rinsly:** the sole proprietorship Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, the Netherlands, KvK 85578835, user of these terms.',
@@ -1595,7 +1597,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Article 7: Availability and maintenance' },
     { ol: [
       'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly continuously checks the availability of the website with external uptime monitoring and is alerted when the website is unreachable. No specific or uninterrupted availability, and no response or fix time, is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
-      "The website's database is continuously recoverable to any point within the last thirty days via Cloudflare Time Travel. Media files are backed up daily to separate storage.",
+      "The website's database has continuous point-in-time restore (Cloudflare D1 Time Travel). Media files are backed up nightly to separate storage.",
       'Incidents may be reported by email; Rinsly responds within the period stated in the agreement or SLA.',
       'Absences of Yaron Schaeffer are announced in advance, as with a holiday, a few days ahead. Where needed, a suitable replacement is appointed.',
     ] },
@@ -1623,7 +1625,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Article 12: Liability' },
     { ol: [
       "Rinsly's liability is limited to direct damage and to at most the amount the client paid under the agreement in the twelve months preceding the event causing the damage.",
-      'Rinsly is not liable for indirect damage, including consequential loss, lost revenue and data loss that cannot be recovered via Cloudflare Time Travel or the daily media backup within that backup’s retention period.',
+      'Rinsly is not liable for indirect damage, including consequential loss, lost revenue and data loss that cannot be recovered via Cloudflare D1 Time Travel or the nightly media backup.',
       "These limitations do not apply in the event of intent or deliberate recklessness on Rinsly's part.",
     ] },
     { h: 'Article 13: Force majeure' },

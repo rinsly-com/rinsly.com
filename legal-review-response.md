@@ -157,7 +157,7 @@ beveiligingsmaatregelen`.
 ## Q4 — The "security" claim (detail)
 
 Bare "Security" as a feature is a substantiation risk. Reworded. State only what you
-actually do: Cloudflare WAF/SSL/TLS, weekly backups, security & CMS updates, uptime
+actually do: Cloudflare WAF/SSL/TLS, continuous point-in-time database restore (Cloudflare D1 Time Travel), nightly media backups, security & CMS updates, uptime
 monitoring. Marketing adjectives elsewhere ("snelle, veilige websites") are acceptable
 puffery — just don't pair "veilig/secure" with guarantee wording or an unheld
 certification.
