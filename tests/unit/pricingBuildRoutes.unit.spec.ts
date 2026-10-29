@@ -3,9 +3,9 @@ import { describe, expect, it } from 'vitest'
 
 /**
  * The pricing page must lead with the free build and keep the paid build as
- * the later, secondary route. Figures are the build-fee table in BUSINESS.md:
- * €0 / 36 months minimum, then monthly cancellable; or from €2.500, ongoing,
- * cancel monthly with one month's notice.
+ * the later, secondary route, using blocks that already exist. Figures are
+ * the build-fee table in BUSINESS.md: €0 / 36 months minimum, then monthly
+ * cancellable; or from €2.500, ongoing, cancel monthly with one month's notice.
  */
 const seed = readFileSync(new URL('../../scripts/seed.ts', import.meta.url), 'utf8')
 
@@ -18,18 +18,17 @@ function prijzenLayoutSource(): string {
 
 describe('pricing page build routes', () => {
   const layout = prijzenLayoutSource()
+  const tiers = layout.indexOf("blockType: 'pricing'")
 
-  it('puts the free build before the paid alternative', () => {
-    const free = layout.indexOf("primaryLabel: t(locale, 'Gratis bouw', 'Free build')")
-    const paid = layout.indexOf("alternativeLabel: t(locale, 'Betaal de bouw', 'Pay the build')")
-    const routes = layout.indexOf("blockType: 'buildRoutes'")
-    const tiers = layout.indexOf("blockType: 'pricing'")
+  it('puts the free build before the paid alternative, and both before the plans', () => {
+    const free = layout.indexOf("t(locale, 'Gratis bouw', 'Free build')")
+    const paid = layout.indexOf('Betaal de bouw, vanaf €2.500')
 
     expect(free).toBeGreaterThan(-1)
     expect(paid).toBeGreaterThan(free)
-    expect(routes).toBeGreaterThan(-1)
-    expect(routes).toBeLessThan(tiers)
-    expect(layout.indexOf('€0')).toBeLessThan(layout.indexOf('vanaf €2.500'))
+    expect(paid).toBeLessThan(tiers)
+    expect(layout.indexOf('€0')).toBeLessThan(paid)
+    expect(layout).not.toContain('buildRoutes')
   })
 
   it('states the build terms from the commercial table', () => {
@@ -42,7 +41,11 @@ describe('pricing page build routes', () => {
     expect(layout).toContain('All prices exclude 21% VAT.')
   })
 
-  it('does not limit the free build to a brochure site or a spread payment', () => {
+  it('keeps the paid route on the quieter note, not a new block', () => {
+    const note = layout.indexOf("blockType: 'note'")
+    expect(note).toBeGreaterThan(-1)
+    expect(note).toBeLessThan(tiers)
+    expect(layout.slice(note, tiers)).toContain('Betaal de bouw, vanaf €2.500')
     expect(layout).not.toContain('brochure')
     expect(layout).not.toContain('eerste jaar')
     expect(layout).not.toContain('first year')

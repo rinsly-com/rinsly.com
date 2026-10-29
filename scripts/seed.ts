@@ -853,32 +853,31 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
       'The build is €0 with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
     ),
   ),
-  // One small block, not a second pricing table: four tiers already sit on
-  // D1's per-query parameter limit. See FACILITATOR-MIGRATION.md.
+  // Free build stays in the hero, the loudest block. The paid route is a
+  // `note`, the quieter block this page already uses under the plans.
+  // Not a second `pricing` block: the four tiers below are the one table D1
+  // can seed (see FACILITATOR-MIGRATION.md). `services` cards have no
+  // emphasis field, so two cards would read as peers.
   {
-    blockType: 'buildRoutes',
+    blockType: 'richText',
     anchor: 'bouw',
-    eyebrow: t(locale, 'De bouw', 'The build'),
-    title: t(locale, 'Twee routes', 'Two routes'),
-    primaryLabel: t(locale, 'Gratis bouw', 'Free build'),
-    primaryPrice: '€0',
-    primaryTerm: t(
+    width: 'wide',
+    header: {
+      eyebrow: t(locale, 'De bouw', 'The build'),
+      title: t(locale, 'Twee routes', 'Two routes'),
+      intro: t(
+        locale,
+        'Gratis bouw. €0. 36 maanden minimum, daarna maandelijks opzegbaar.',
+        'Free build. €0. 36 months minimum, then monthly cancellable.',
+      ),
+    },
+  },
+  {
+    blockType: 'note',
+    text: t(
       locale,
-      '36 maanden minimum, daarna maandelijks opzegbaar',
-      '36 months minimum, then monthly cancellable',
-    ),
-    alternativeKicker: t(locale, 'Of', 'Or'),
-    alternativeLabel: t(locale, 'Betaal de bouw', 'Pay the build'),
-    alternativePrice: t(locale, 'vanaf €2.500', 'from €2,500'),
-    alternativeTerm: t(
-      locale,
-      'doorlopend, maandelijks opzegbaar met een opzegtermijn van één maand',
-      'ongoing, cancel monthly with one month’s notice',
-    ),
-    footnote: t(
-      locale,
-      'Alle prijzen exclusief 21% btw. Een betaalde bouw schaalt met de complexiteit.',
-      'All prices exclude 21% VAT. A paid build scales with complexity.',
+      'Of. Betaal de bouw, vanaf €2.500, doorlopend, maandelijks opzegbaar met een opzegtermijn van één maand. Alle prijzen exclusief 21% btw. Een betaalde bouw schaalt met de complexiteit.',
+      'Or. Pay the build, from €2,500, ongoing, cancel monthly with one month’s notice. All prices exclude 21% VAT. A paid build scales with complexity.',
     ),
   },
   {
