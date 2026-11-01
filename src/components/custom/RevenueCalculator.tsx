@@ -30,6 +30,8 @@ import {
 
 type Duty = keyof typeof DUTY_PCT
 
+const DUTY_KEYS = Object.keys(DUTY_PCT) as Duty[]
+
 /** Plan prices ex VAT per month. Care/Managed/Growth/Op maat. */
 const PLANS = [
   { key: 'care', label: 'Care', monthly: 49 },
@@ -115,7 +117,7 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
   const plan = PLANS.find((p) => p.key === planKey) ?? PLANS[1]
   const portfolio = plan.monthly * clients
 
-  const dutyPct = (Object.keys(DUTY_PCT) as Duty[]).reduce(
+  const dutyPct = DUTY_KEYS.reduce(
     (sum, key) => sum + (duties[key] ? DUTY_PCT[key] : 0),
     0,
   )
@@ -294,5 +296,3 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
     </Section>
   )
 }
-
-export default RevenueCalculator

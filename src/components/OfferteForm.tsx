@@ -720,5 +720,3 @@ function Warn({ text }: { text: string }) {
     </p>
   )
 }
-
-export default OfferteForm

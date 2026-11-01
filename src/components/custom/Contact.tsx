@@ -84,5 +84,3 @@ export function Contact({ header, items, buttons, locale }: Props) {
     </Section>
   )
 }
-
-export default Contact
