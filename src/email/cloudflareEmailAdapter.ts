@@ -6,21 +6,12 @@ import {
 import { getBindings } from '../lib/bindings'
 
 /**
- * Payload e-mail adapter on Cloudflare Email Sending (the EMAIL send_email
- * binding in wrangler.jsonc). Sender domain rinsly.com is onboarded (DKIM on
- * the cf-bounce selector), so DMARC aligns for noreply@rinsly.com.
+ * Payload mail via the EMAIL binding (noreply@rinsly.com). Auth mail and the
+ * form notifications use payload.sendEmail. With no binding (local `next dev`)
+ * the message is logged instead of sent.
  *
- * Powers Payload's own auth mails (forgot password, verification) and the
- * submission notifications in the offerte/check endpoints via
- * payload.sendEmail. When the binding is absent (local `next dev` without the
- * Workers runtime mock, or an older deploy) the mail is logged instead of
- * sent, mirroring Payload's no-adapter behaviour without breaking the caller.
- *
- * Wrangler types EMAIL as SendEmail. send() is overloaded on
- * EmailMessage | EmailMessageBuilder, which does not overlap
- * `(msg: Record<string, unknown>) => ...`, so intersecting CloudflareEnv
- * with that shape is TS2352. Narrow from unknown straight to the engine's
- * EmailSendBinding shape instead.
+ * Wrangler's SendEmail.send() does not overlap EmailSendBinding, so narrow
+ * from unknown instead of intersecting CloudflareEnv (that cast is TS2352).
  */
 function isSendEmail(value: unknown): value is EmailSendBinding {
   if (typeof value !== 'object' || value === null) return false
@@ -37,6 +28,3 @@ export const cloudflareEmailAdapter = createCloudflareEmailSendingAdapter({
   defaultFromName: 'Rinsly',
   getSendBinding: async () => readSendBinding(await getBindings()),
 })
-
-/** @deprecated Prefer importing from site-core; kept for local tests. */
-export { toAddressList } from '@rinsly-com/site-core/email/cloudflareEmailSending'

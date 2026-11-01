@@ -84,5 +84,3 @@ export const DeployPanel: React.FC = () => {
     </div>
   )
 }
-
-export default DeployPanel

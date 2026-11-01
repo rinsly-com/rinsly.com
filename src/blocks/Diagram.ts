@@ -1,19 +1,9 @@
 import type { Block } from 'payload'
 
 /**
- * `diagram` — a schematic, picked by name rather than uploaded.
- *
- * The drawings are inline SVG in `src/components/custom/Diagram.tsx`, not media
- * files, for three reasons that all matter more than editability:
- *
- *  - they use the site's design tokens, so they follow the light/dark theme and
- *    the brand accent instead of being baked at export time;
- *  - they stay crisp and weigh nothing, and need no R2 round-trip;
- *  - a diagram of how the business works is *documentation* — it should change in
- *    a reviewed commit alongside the thing it describes, not silently in a CMS.
- *
- * So the editor chooses which diagram and writes its caption; the drawing itself
- * is code. Adding one means a new `kind` here and a case in the renderer.
+ * `diagram` — the editor picks a kind and writes the caption. The drawing is
+ * inline SVG in Diagram.tsx (theme tokens, no media). A new kind is a new
+ * option here plus a case in the renderer.
  */
 export const diagramBlock: Block = {
   slug: 'diagram',

@@ -26,6 +26,9 @@ export const GRADE_LABELS = {
 
 export type GradeKey = keyof typeof GRADE_LABELS
 
+/** Insertion order of GRADE_LABELS. Hoisted so parse and render share one array. */
+export const GRADE_KEYS = Object.keys(GRADE_LABELS) as GradeKey[]
+
 export type Scorecard = {
   version: number
   token: string
@@ -70,7 +73,7 @@ export function parseScorecard(raw: unknown): Scorecard | null {
   const grades = data.grades
   if (typeof grades !== 'object' || grades === null) return null
   const parsedGrades = {} as Record<GradeKey, number>
-  for (const key of Object.keys(GRADE_LABELS) as GradeKey[]) {
+  for (const key of GRADE_KEYS) {
     const value = (grades as Record<string, unknown>)[key]
     if (typeof value !== 'number' || !Number.isFinite(value)) return null
     parsedGrades[key] = Math.max(0, Math.min(100, Math.round(value)))

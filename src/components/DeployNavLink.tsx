@@ -19,5 +19,3 @@ export const DeployNavLink: React.FC = () => {
     </Link>
   )
 }
-
-export default DeployNavLink

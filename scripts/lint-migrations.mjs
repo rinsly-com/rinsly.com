@@ -41,7 +41,7 @@ import { fileURLToPath, pathToFileURL } from 'url'
 // ---------------------------------------------------------------------------
 
 /** Strip backticks, double quotes or [brackets] from an identifier token. */
-export function stripIdent(token) {
+function stripIdent(token) {
   const t = token.trim()
   if (
     (t.startsWith('`') && t.endsWith('`')) ||
@@ -64,7 +64,7 @@ function firstToken(text) {
  * separators inside single-quoted strings, double-quoted or backtick-quoted
  * identifiers.
  */
-export function topLevelSplit(text, sep) {
+function topLevelSplit(text, sep) {
   const parts = []
   let depth = 0
   let quote = null
@@ -119,7 +119,7 @@ function lastTopLevelFrom(text) {
 }
 
 /** All double-quoted and backtick-quoted identifiers in a SQL fragment. */
-export function quotedIdents(text) {
+function quotedIdents(text) {
   // Remove single-quoted string literals first so their contents never match.
   const withoutLiterals = text.replace(/'(?:[^']|'')*'/g, "''")
   return {
@@ -144,7 +144,7 @@ export function extractSqlTemplates(sourceChunk) {
 }
 
 /** Split a migration source file into its up() and down() chunks. */
-export function splitUpDown(source) {
+function splitUpDown(source) {
   const upIdx = source.search(/export\s+async\s+function\s+up\b/)
   const downIdx = source.search(/export\s+async\s+function\s+down\b/)
   if (upIdx === -1) return { up: '', down: downIdx === -1 ? '' : source.slice(downIdx) }
@@ -155,7 +155,7 @@ export function splitUpDown(source) {
 }
 
 /** Split a sql`` template into individual statements (they may hold several). */
-export function splitStatements(sqlText) {
+function splitStatements(sqlText) {
   return topLevelSplit(sqlText, ';')
     .map((s) => s.trim())
     .filter(Boolean)
@@ -392,7 +392,7 @@ export function replayStatements(schema, statements) {
 }
 
 /** Diff the replayed schema model against a snapshot-derived schema. */
-export function diffSchemas(actual, expected) {
+function diffSchemas(actual, expected) {
   const problems = []
   for (const [table, cols] of expected) {
     if (!actual.has(table)) {

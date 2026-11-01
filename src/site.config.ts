@@ -1,8 +1,6 @@
 /**
- * site.config.ts — Rinsly's branding surface, passed into the shared engine
- * (@rinsly-com/site-core). SEO, URL, theme colour, logo and CORS all read here.
- * The visual palette lives in `src/app/(frontend)/globals.css` (keep `themeColor`
- * in sync with `--accent`).
+ * Branding passed into @rinsly-com/site-core (SEO, URL, theme, logo, CORS).
+ * Keep `themeColor` in sync with `--accent` in globals.css.
  */
 type Localized = { nl: string; en: string }
 
@@ -31,5 +29,3 @@ export const siteConfig = {
   // CMS's own origin.
   extraOrigins: ['https://accp.rinsly.com'] as string[],
 } as const
-
-export type SiteConfig = typeof siteConfig
