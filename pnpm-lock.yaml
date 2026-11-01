@@ -51,8 +51,8 @@ importers:
         specifier: 3.90.2
         version: 3.90.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.4.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.90.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
       '@rinsly-com/site-core':
-        specifier: 0.25.1
-        version: 0.25.1(236df23f0d7ff2c953137fb74053e548)
+        specifier: 0.26.4
+        version: 0.26.4(236df23f0d7ff2c953137fb74053e548)
       '@rinsly-com/ui':
         specifier: 0.3.1
         version: 0.3.1(@date-fns/tz@1.2.0)(@types/react@19.2.14)(date-fns@4.1.0)(next@16.4.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1881,8 +1881,8 @@ packages:
   '@preact/signals-core@1.14.4':
     resolution: {integrity: sha512-HNB6HYeYKhQbJ1aKl+YRjrS4+QWHLKX6qKoUsfS/m0vqzsVaEBiZiaKbG/e+NKk2ch5ALQr/ihWaMHxiCuuWHA==}
 
-  '@rinsly-com/site-core@0.25.1':
-    resolution: {integrity: sha512-Wws9g+18tIwpDvzDh+6TUcrAK6xCeL8YSnK9El1aJ9Oy+k9NOgWXvSPo6NgEOkjzHygZSW890buNPeaA7HhRtQ==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.25.1/252c2f16e0266f72a3321926504387e4a25ec87e}
+  '@rinsly-com/site-core@0.26.4':
+    resolution: {integrity: sha512-vzajWjP4VBijaRJ7BGlFfghsmtjhVqYCYkm4Jr4SKRjxToI3Sd8YHLZ3d/DRFFgA1GXBH+OI2sV81Rmuajis+w==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.26.4/9acb3be564bdeb07312345dacd7cbb008ae6994e}
     hasBin: true
     peerDependencies:
       '@opennextjs/cloudflare': ^1.20.2
@@ -2221,16 +2221,16 @@ packages:
     peerDependencies:
       react: '>= 16'
 
-  '@tabler/icons-react@3.49.0':
-    resolution: {integrity: sha512-Um59pm5RVNUaQjFUtG0r4oYJbZuBS3tGugAA2tgBg0WufMk34Eio3nsO30RUkLuL2giYPQUNdY9HvqltLLYyNA==}
+  '@tabler/icons-react@3.50.0':
+    resolution: {integrity: sha512-X9XhFbxAmSNimQ71VAd7opfd4z84x1pLrEbBT33VCIEsFs8zWVqdhh5r/Jyi/3iJjQ861kE5Wm9ixiJfS2nwBA==}
     peerDependencies:
       react: '>= 16'
 
   '@tabler/icons@3.46.0':
     resolution: {integrity: sha512-f2RYFl3fzPwj5WO82x6en0dmkjefxEfOm16D1ByM6cj/McNiwOkL4VaPUoP9VVIrXAD9WnTSVFr70px703b//A==}
 
-  '@tabler/icons@3.49.0':
-    resolution: {integrity: sha512-l+GnSkFETx0U26icxv1VUFnxxiTqXfCcVRiRAnyMwibupM2S2L/hSaZ9gmSgz01rkrsH/93NvLsxykqdanc6lw==}
+  '@tabler/icons@3.50.0':
+    resolution: {integrity: sha512-HflLxyrH1cqC7s7jzQGSjpsTAVIoaf7+/yHjbdM59rJQBMjliibp+LYhDPFxOMcwa1M8DNpOk6ENzQiWn9a1Dg==}
 
   '@tailwindcss/node@4.3.2':
     resolution: {integrity: sha512-yWP/sqEcBLaD8JuA6zNwxoYKr75qxTioYwlRwekj5Jr/I5GXnoJfjetH/psLUIv74cYTH2lBUEzBkinthoYcBg==}
@@ -7698,7 +7698,7 @@ snapshots:
 
   '@preact/signals-core@1.14.4': {}
 
-  '@rinsly-com/site-core@0.25.1(236df23f0d7ff2c953137fb74053e548)':
+  '@rinsly-com/site-core@0.26.4(236df23f0d7ff2c953137fb74053e548)':
     dependencies:
       '@gsap/react': 2.1.2(gsap@3.15.0)(react@19.2.6)
       '@opennextjs/cloudflare': 1.20.13(next@16.4.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(wrangler@4.153.0(@types/node@22.19.9))
@@ -7710,7 +7710,7 @@ snapshots:
       '@payloadcms/translations': 3.90.2
       '@payloadcms/ui': 3.90.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.4.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.90.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
       '@rinsly-com/ui': 0.3.1(@date-fns/tz@1.2.0)(@types/react@19.2.14)(date-fns@4.1.0)(next@16.4.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      '@tabler/icons-react': 3.49.0(react@19.2.6)
+      '@tabler/icons-react': 3.50.0(react@19.2.6)
       graphql: 16.14.2
       gsap: 3.15.0
       next: 16.4.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4)
@@ -8025,14 +8025,14 @@ snapshots:
       '@tabler/icons': 3.46.0
       react: 19.2.6
 
-  '@tabler/icons-react@3.49.0(react@19.2.6)':
+  '@tabler/icons-react@3.50.0(react@19.2.6)':
     dependencies:
-      '@tabler/icons': 3.49.0
+      '@tabler/icons': 3.50.0
       react: 19.2.6
 
   '@tabler/icons@3.46.0': {}
 
-  '@tabler/icons@3.49.0': {}
+  '@tabler/icons@3.50.0': {}
 
   '@tailwindcss/node@4.3.2':
     dependencies:
