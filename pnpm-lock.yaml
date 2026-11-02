@@ -51,8 +51,8 @@ importers:
         specifier: 3.90.2
         version: 3.90.2(@types/react@19.2.14)(monaco-editor@0.55.1)(next@16.4.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(payload@3.90.2(graphql@16.14.2)(typescript@5.7.3))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(typescript@5.7.3)
       '@rinsly-com/site-core':
-        specifier: 0.26.4
-        version: 0.26.4(236df23f0d7ff2c953137fb74053e548)
+        specifier: 0.26.7
+        version: 0.26.7(236df23f0d7ff2c953137fb74053e548)
       '@rinsly-com/ui':
         specifier: 0.3.1
         version: 0.3.1(@date-fns/tz@1.2.0)(@types/react@19.2.14)(date-fns@4.1.0)(next@16.4.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -1887,8 +1887,8 @@ packages:
   '@preact/signals-core@1.14.4':
     resolution: {integrity: sha512-HNB6HYeYKhQbJ1aKl+YRjrS4+QWHLKX6qKoUsfS/m0vqzsVaEBiZiaKbG/e+NKk2ch5ALQr/ihWaMHxiCuuWHA==}
 
-  '@rinsly-com/site-core@0.26.4':
-    resolution: {integrity: sha512-vzajWjP4VBijaRJ7BGlFfghsmtjhVqYCYkm4Jr4SKRjxToI3Sd8YHLZ3d/DRFFgA1GXBH+OI2sV81Rmuajis+w==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.26.4/9acb3be564bdeb07312345dacd7cbb008ae6994e}
+  '@rinsly-com/site-core@0.26.7':
+    resolution: {integrity: sha512-9XgrG50LR49cqOX5TsR37gRbYRSwQVFhSuwC+kgBVfkMtD8VphNXcBsA3jePvRUcIbTGDBLL5ucy8xFQFQL4rQ==, tarball: https://npm.pkg.github.com/download/@rinsly-com/site-core/0.26.7/c94b4e48233685b682bcaa71b59ef94f8743a026}
     hasBin: true
     peerDependencies:
       '@opennextjs/cloudflare': ^1.20.2
@@ -2068,6 +2068,7 @@ packages:
   '@smithy/core@3.29.4':
     resolution: {integrity: sha512-G1GRglAabzEhqghJMBAd54FkRS7SAFGHEwbhcI9r+O+LIMuFsLyXkLZkCoFSgAglRu8s/URVXJB0hglq3ZipIg==}
     engines: {node: '>=18.0.0'}
+    deprecated: Deprecated due to a bug in custom logger data redaction. See https://github.com/aws/aws-sdk-js-v3/issues/8393.
 
   '@smithy/credential-provider-imds@4.4.9':
     resolution: {integrity: sha512-2nfV4qRKiYeXU4zD2vvSCfg5dfp/BuhrM73vt7q9gzBhxs4rbPxXY21wo+kyI3bRmXcEGRnCLTaW8O437jzHIg==}
@@ -7704,9 +7705,8 @@ snapshots:
 
   '@preact/signals-core@1.14.4': {}
 
-  '@rinsly-com/site-core@0.26.4(236df23f0d7ff2c953137fb74053e548)':
+  '@rinsly-com/site-core@0.26.7(236df23f0d7ff2c953137fb74053e548)':
     dependencies:
-      '@gsap/react': 2.1.2(gsap@3.15.0)(react@19.2.6)
       '@opennextjs/cloudflare': 1.20.13(next@16.4.3(@babel/core@7.29.7)(@playwright/test@1.58.2)(@types/node@22.19.9)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(sass@1.77.4))(wrangler@4.153.0(@types/node@22.19.9))
       '@payloadcms/db-d1-sqlite': 3.90.2(payload@3.90.2(graphql@16.14.2)(typescript@5.7.3))
       '@payloadcms/live-preview': 3.90.2
