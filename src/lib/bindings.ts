@@ -1,5 +1,8 @@
 import { getCloudflareContext } from '@opennextjs/cloudflare'
 
+import { readServerEnv } from './env'
+import { logCaught } from './logCaught'
+
 /**
  * Request-time Cloudflare bindings for frontend route code (e.g. the
  * LEADLENS_CHECKS R2 bucket behind /check/<token>). On the deployed Worker
@@ -10,21 +13,57 @@ import { getCloudflareContext } from '@opennextjs/cloudflare'
  */
 type Runtime = { env: CloudflareEnv; waitUntil: (p: Promise<unknown>) => void }
 
-let proxy: Promise<{ env: unknown; ctx?: { waitUntil?: (p: Promise<unknown>) => void } }> | undefined
+type LocalProxy = {
+  env: unknown
+  ctx?: { waitUntil?: (promise: Promise<unknown>) => void }
+}
+
+let proxy: Promise<LocalProxy> | undefined
+let loggedProxyFallback = false
+
+type PlatformProxyModule = {
+  getPlatformProxy: (options: { environment?: string }) => Promise<LocalProxy>
+}
+
+function readPlatformProxy(mod: unknown): PlatformProxyModule['getPlatformProxy'] {
+  if (
+    typeof mod === 'object' &&
+    mod !== null &&
+    'getPlatformProxy' in mod &&
+    typeof mod.getPlatformProxy === 'function'
+  ) {
+    return mod.getPlatformProxy.bind(mod) as PlatformProxyModule['getPlatformProxy']
+  }
+  throw new Error('wrangler platform proxy is unavailable')
+}
 
 export async function getRuntime(): Promise<Runtime> {
   try {
     const ctx = await getCloudflareContext({ async: true })
-    return { env: ctx.env as CloudflareEnv, waitUntil: (p) => ctx.ctx.waitUntil(p) }
-  } catch {
-    proxy ??= import(/* webpackIgnore: true */ `${'__wrangler'.replaceAll('_', '')}`).then(
-      ({ getPlatformProxy }) => getPlatformProxy({ environment: process.env.CLOUDFLARE_ENV }),
+    return { env: ctx.env, waitUntil: (p) => { ctx.ctx.waitUntil(p); } }
+  } catch (err) {
+    if (!loggedProxyFallback) {
+      loggedProxyFallback = true
+      logCaught('[bindings] workers context unavailable, using the local proxy', err)
+    }
+    // Built at runtime. A plain specifier would make webpack bundle wrangler into the Worker.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-template-expression
+    proxy ??= import(/* webpackIgnore: true */ `${'__wrangler'.replaceAll('_', '')}`).then((mod) =>
+      readPlatformProxy(mod)({ environment: readServerEnv().CLOUDFLARE_ENV }),
     )
     const local = await proxy
     // Dev/node: no real ExecutionContext — the promise simply keeps running.
     return {
       env: local.env as CloudflareEnv,
-      waitUntil: (p) => void (local.ctx?.waitUntil ? local.ctx.waitUntil(p) : p.catch(() => {})),
+      waitUntil: (p) => {
+        if (local.ctx?.waitUntil) {
+          local.ctx.waitUntil(p)
+          return
+        }
+        void p.catch((err: unknown) => {
+          logCaught('[bindings] background task failed', err)
+        })
+      },
     }
   }
 }

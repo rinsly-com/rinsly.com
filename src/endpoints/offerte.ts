@@ -1,10 +1,33 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
+import { z } from 'zod'
 
 import { getRuntime } from '../lib/bindings'
+import { asJsonObject, asText, readRequestJson } from '../lib/json'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const SUBSCRIPTIONS = ['care', 'beheerd', 'partner', 'opmaat']
-const ADDITIONS = ['localization', 'email', 'design', 'seo', 'content', 'other']
+const SUBSCRIPTIONS = ['care', 'beheerd', 'partner', 'opmaat'] as const
+const ADDITIONS = ['localization', 'email', 'design', 'seo', 'content', 'other'] as const
+
+const text = z.unknown().optional().transform((value) => asText(value))
+const addition = z.enum(ADDITIONS)
+const subscription = z.enum(SUBSCRIPTIONS)
+
+const offerteSchema = z.object({
+  website: z.unknown().optional(),
+  bedrijf: text,
+  naam: text,
+  email: text,
+  subscription: text,
+  additionsOther: text,
+  bericht: text,
+  additions: z.unknown().optional().transform((value) => {
+    if (!Array.isArray(value)) return []
+    return value.flatMap((item) => {
+      const parsed = addition.safeParse(String(item))
+      return parsed.success ? [parsed.data] : []
+    })
+  }),
+})
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -19,28 +42,20 @@ function json(body: unknown, status = 200): Response {
  * a honeypot field (`website`) — when filled we pretend success without storing.
  */
 export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
-  let body: Record<string, unknown> = {}
-  try {
-    body = typeof req.json === 'function' ? ((await req.json()) as Record<string, unknown>) : {}
-  } catch {
-    return json({ ok: false, error: 'invalid_body' }, 400)
-  }
+  const raw = await readRequestJson(req)
+  if (!raw.ok) return json({ ok: false, error: 'invalid_body' }, 400)
+  if (asJsonObject(raw.value) === null) return json({ ok: false, error: 'invalid_body' }, 400)
+  const parsed = offerteSchema.safeParse(raw.value)
+  if (!parsed.success) return json({ ok: false, error: 'invalid_body' }, 400)
+  const body = parsed.data
 
   if (typeof body.website === 'string' && body.website.trim() !== '') {
     return json({ ok: true })
   }
 
-  const bedrijf = String(body.bedrijf ?? '').trim()
-  const naam = String(body.naam ?? '').trim()
-  const email = String(body.email ?? '').trim()
-  const subscription = String(body.subscription ?? '').trim()
-  const additionsOther = String(body.additionsOther ?? '').trim()
-  const bericht = String(body.bericht ?? '').trim()
-  const additions = Array.isArray(body.additions)
-    ? (body.additions as unknown[]).map(String).filter((v) => ADDITIONS.includes(v))
-    : []
-
-  if (!bedrijf || !naam || !EMAIL_RE.test(email) || !SUBSCRIPTIONS.includes(subscription)) {
+  const { bedrijf, naam, email, additionsOther, bericht, additions } = body
+  const chosen = subscription.safeParse(body.subscription)
+  if (!bedrijf || !naam || !EMAIL_RE.test(email) || !chosen.success) {
     return json({ ok: false, error: 'validation' }, 422)
   }
 
@@ -51,10 +66,10 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
         bedrijf,
         naam,
         email,
-        subscription: subscription as 'care' | 'beheerd' | 'partner' | 'opmaat',
-        additions: additions as ('localization' | 'email' | 'design' | 'seo' | 'content' | 'other')[],
-        additionsOther: additions.includes('other') ? additionsOther || undefined : undefined,
-        bericht: bericht || undefined,
+        subscription: chosen.data,
+        additions,
+        ...(additions.includes('other') && additionsOther ? { additionsOther } : {}),
+        ...(bericht ? { bericht } : {}),
       },
       overrideAccess: true,
     })
@@ -73,7 +88,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
       .sendEmail({
         to: 'contact@rinsly.com',
         subject: `Nieuwe offerteaanvraag: ${bedrijf}`,
-        text: `Er is een nieuwe offerteaanvraag binnengekomen via de contactwizard.\n\nBedrijf: ${bedrijf}\nNaam: ${naam}\nE-mail: ${email}\nAbonnement: ${subscription}\n${bericht ? `\nBericht:\n${bericht}\n` : ''}\nDe aanvraag staat ook in het admin-panel onder Offerteaanvragen.`,
+        text: `Er is een nieuwe offerteaanvraag binnengekomen via de contactwizard.\n\nBedrijf: ${bedrijf}\nNaam: ${naam}\nE-mail: ${email}\nAbonnement: ${chosen.data}\n${bericht ? `\nBericht:\n${bericht}\n` : ''}\nDe aanvraag staat ook in het admin-panel onder Offerteaanvragen.`,
       })
       .catch((err: unknown) => {
         req.payload.logger.error({

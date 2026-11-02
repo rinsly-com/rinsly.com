@@ -1,6 +1,8 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
+import { z } from 'zod'
 
 import { getRuntime } from '../lib/bindings'
+import { asJsonObject, asText, readRequestJson } from '../lib/json'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -8,6 +10,15 @@ function json(body: unknown, status = 200): Response {
     headers: { 'content-type': 'application/json' },
   })
 }
+
+const text = z.unknown().optional().transform((value) => asText(value))
+
+const checkAanvraagSchema = z.object({
+  bedrijfsnaam: z.unknown().optional(),
+  url: text,
+  naam: text,
+  telefoon: text,
+})
 
 /** Loose phone check: at least 8 digits once separators are stripped. */
 function isPhone(value: string): boolean {
@@ -33,20 +44,20 @@ function normalizeUrl(value: string): string | null {
  * when filled we pretend success without storing, same trick as /api/offerte.
  */
 export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) => {
-  let body: Record<string, unknown> = {}
-  try {
-    body = typeof req.json === 'function' ? ((await req.json()) as Record<string, unknown>) : {}
-  } catch {
-    return json({ ok: false, error: 'invalid_body' }, 400)
-  }
+  const raw = await readRequestJson(req)
+  if (!raw.ok) return json({ ok: false, error: 'invalid_body' }, 400)
+  if (asJsonObject(raw.value) === null) return json({ ok: false, error: 'invalid_body' }, 400)
+  const parsed = checkAanvraagSchema.safeParse(raw.value)
+  if (!parsed.success) return json({ ok: false, error: 'invalid_body' }, 400)
+  const body = parsed.data
 
   if (typeof body.bedrijfsnaam === 'string' && body.bedrijfsnaam.trim() !== '') {
     return json({ ok: true })
   }
 
-  const url = normalizeUrl(String(body.url ?? '').trim())
-  const naam = String(body.naam ?? '').trim()
-  const telefoon = String(body.telefoon ?? '').trim()
+  const url = normalizeUrl(body.url)
+  const naam = body.naam
+  const telefoon = body.telefoon
 
   if (!url || !naam || !isPhone(telefoon)) {
     return json({ ok: false, error: 'validation' }, 422)

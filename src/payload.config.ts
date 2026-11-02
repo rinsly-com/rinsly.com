@@ -23,6 +23,7 @@ import {
 } from './endpoints/partnerAanvraag'
 import { deployHandler } from './endpoints/deploy'
 import { triggerDeploy } from './hooks/triggerStaticDeploy'
+import { readServerEnv } from './lib/env'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -36,7 +37,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 export default buildSiteConfig({
   siteConfig,
   // Accp origin for auth mails (forgot-password links). Not the static public URL.
-  serverURL: process.env.PAYLOAD_SERVER_URL || 'https://accp.rinsly.com',
+  serverURL: readServerEnv().PAYLOAD_SERVER_URL || 'https://accp.rinsly.com',
   // Transactional mail (auth mails + submission notifications) as
   // noreply@rinsly.com via Cloudflare Email Sending; logs when no binding.
   email: cloudflareEmailAdapter,

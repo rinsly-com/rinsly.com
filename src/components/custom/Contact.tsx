@@ -23,7 +23,7 @@ const ICON: Record<string, string> = {
 
 function hrefFor(item: Item): string | undefined {
   if (item.kind === 'email') return `mailto:${item.value}`
-  if (item.kind === 'phone') return `tel:${item.value?.replace(/\s+/g, '')}`
+  if (item.kind === 'phone') return `tel:${item.value.replace(/\s+/g, '')}`
   return undefined
 }
 

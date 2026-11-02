@@ -12,7 +12,9 @@ type BlockOf<T extends string> = Extract<NonNullable<Page['layout']>[number], { 
  * block type needs a double assertion whenever that type has a required field
  * (`diagram.kind`). The dispatch key already guarantees the shape.
  */
-const as = <T,>(block: unknown) => block as T
+// The type parameter is how each call site names its block. The assertion is the use.
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+const as = <T,>(block: unknown): T => block as T
 
 /**
  * Rinsly's custom block renderers, passed to the engine's route factories.

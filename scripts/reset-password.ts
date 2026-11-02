@@ -14,9 +14,12 @@
 import { getPayload } from 'payload'
 
 import config from '../src/payload.config'
+import { readServerEnv } from '../src/lib/env'
+import { userRowSchema } from '../src/lib/rows'
 
-const email = process.env.RESET_EMAIL?.trim().toLowerCase()
-const password = process.env.RESET_PASSWORD
+const env = readServerEnv()
+const email = env.RESET_EMAIL?.trim().toLowerCase()
+const password = env.RESET_PASSWORD
 
 if (!email || !password) {
   console.error('Set RESET_EMAIL and RESET_PASSWORD.')
@@ -30,7 +33,11 @@ if (password.length < 8) {
 const payload = await getPayload({ config: await config })
 
 const { docs } = await payload.find({ collection: 'users', limit: 50, depth: 0 })
-const user = docs.find((u) => u.email?.toLowerCase() === email)
+const user = docs.find((u) => u.email.toLowerCase() === email)
+if (user && !userRowSchema.safeParse(user).success) {
+  console.error(`User row for ${email} failed validation.`)
+  process.exit(1)
+}
 
 if (!user) {
   console.error(`No user with email ${email}. Existing accounts:`)

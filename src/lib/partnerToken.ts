@@ -8,6 +8,16 @@
  * Web Crypto (not node:crypto) because this runs in a Worker.
  */
 
+import { z } from 'zod'
+
+const partnerTokenSchema = z.object({
+  d: z.string(),
+  n: z.string(),
+  c: z.string().optional(),
+  l: z.string().optional(),
+  exp: z.number(),
+})
+
 export interface PartnerTokenPayload {
   /** Domain of the studio — the identifier shared across all three systems. */
   d: string
@@ -36,7 +46,7 @@ function fromB64url(value: string): Uint8Array {
 function toB64url(bytes: ArrayBuffer): string {
   let binary = ''
   const view = new Uint8Array(bytes)
-  for (let i = 0; i < view.length; i++) binary += String.fromCharCode(view[i]!)
+  for (let i = 0; i < view.length; i++) binary += String.fromCharCode(view[i])
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
@@ -79,13 +89,10 @@ export async function verifyPartnerToken(
   }
   if (!safeEqual(provided, expected)) return { ok: false, reason: 'bad_signature' }
 
-  let payload: PartnerTokenPayload
+  let payload: z.infer<typeof partnerTokenSchema>
   try {
-    payload = JSON.parse(new TextDecoder().decode(fromB64url(encoded))) as PartnerTokenPayload
+    payload = partnerTokenSchema.parse(JSON.parse(new TextDecoder().decode(fromB64url(encoded))))
   } catch {
-    return { ok: false, reason: 'malformed' }
-  }
-  if (typeof payload.d !== 'string' || typeof payload.exp !== 'number') {
     return { ok: false, reason: 'malformed' }
   }
   if (payload.exp * 1000 < now.getTime()) return { ok: false, reason: 'expired' }

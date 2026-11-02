@@ -2,11 +2,11 @@
  * Branding passed into @rinsly-com/site-core (SEO, URL, theme, logo, CORS).
  * Keep `themeColor` in sync with `--accent` in globals.css.
  */
-type Localized = { nl: string; en: string }
+import { publicString } from '@/lib/env'
 
 export const siteConfig = {
   name: 'Rinsly',
-  url: (process.env.NEXT_PUBLIC_SITE_URL || 'https://rinsly.com').replace(/\/+$/, ''),
+  url: (publicString(process.env.NEXT_PUBLIC_SITE_URL) || 'https://rinsly.com').replace(/\/+$/, ''),
   themeColor: '#2c7ea8',
   logo: '/rinsly-logo.png',
   // Rinsly's only asset is the square mark, so the header renders the name as
@@ -22,7 +22,7 @@ export const siteConfig = {
     description: {
       nl: 'Rinsly bouwt en host websites voor ontwerpstudio’s. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en houden het draaiend.',
       en: 'Rinsly builds and hosts websites for design studios. You deliver the design in Figma, we build it as a real application and keep it running.',
-    } as Localized,
+    },
   },
   // `url` (rinsly.com) is the public static site — allow it so the accp CMS
   // accepts API calls from it (e.g. the offerte form). accp.rinsly.com is the

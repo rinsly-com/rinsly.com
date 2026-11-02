@@ -1,7 +1,6 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
 
 import { isAuthenticated } from '@rinsly-com/site-core/access'
-import type { User } from '@/payload-types'
 import { triggerDeploy } from '../hooks/triggerStaticDeploy'
 
 /**
@@ -13,7 +12,7 @@ import { triggerDeploy } from '../hooks/triggerStaticDeploy'
  * the manual path and the on-publish hooks fire the exact same GitHub dispatch.
  */
 export const deployHandler: PayloadHandler = async (req: PayloadRequest): Promise<Response> => {
-  const user = req.user as User | null
+  const user = req.user
 
   if (!isAuthenticated(user)) {
     return Response.json(

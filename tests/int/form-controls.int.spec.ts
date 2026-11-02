@@ -124,23 +124,25 @@ describe('form control ids survive hydration', () => {
   it('keeps partner labels and hints attached once the invite resolves', async () => {
     vi.stubGlobal(
       'fetch',
-      vi.fn(async (input: RequestInfo) => {
-        const url = String(input)
+      vi.fn((input: RequestInfo | URL) => {
+        const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
         if (url.includes('/api/partner-aanvraag/verify')) {
-          return new Response(
-            JSON.stringify({
-              ok: true,
-              prefill: {
-                domein: 'studio.nl',
-                bedrijfsnaam: 'Studio Voorbeeld',
-                plaats: 'Utrecht',
-                land: 'nl',
-              },
-            }),
-            { status: 200, headers: { 'content-type': 'application/json' } },
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                ok: true,
+                prefill: {
+                  domein: 'studio.nl',
+                  bedrijfsnaam: 'Studio Voorbeeld',
+                  plaats: 'Utrecht',
+                  land: 'nl',
+                },
+              }),
+              { status: 200, headers: { 'content-type': 'application/json' } },
+            ),
           )
         }
-        return new Response('{}', { status: 404 })
+        return Promise.resolve(new Response('{}', { status: 404 }))
       }),
     )
 
