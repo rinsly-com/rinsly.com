@@ -55,6 +55,34 @@ describe('partner token', () => {
     expect(result).toEqual({ ok: false, reason: 'expired' })
   })
 
+  async function mint(payload: unknown, secret: string): Promise<string> {
+    const encoded = btoa(JSON.stringify(payload)).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+    const key = await crypto.subtle.importKey(
+      'raw',
+      new TextEncoder().encode(secret),
+      { name: 'HMAC', hash: 'SHA-256' },
+      false,
+      ['sign'],
+    )
+    const mac = new Uint8Array(await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(encoded)))
+    let binary = ''
+    for (const byte of mac) binary += String.fromCharCode(byte)
+    const signature = btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+    return `${encoded}.${signature}`
+  }
+
+  it('rejects a signed token whose payload is not the schema', async () => {
+    const token = await mint({ d: 1, n: 'Studio', exp: 'soon' }, VECTOR.secret)
+    const result = await verifyPartnerToken(token, VECTOR.secret, BEFORE_EXPIRY)
+    expect(result).toEqual({ ok: false, reason: 'malformed' })
+  })
+
+  it('rejects a signed token that has no business name', async () => {
+    const token = await mint({ d: 'studio-voorbeeld.nl', exp: 1_800_000_000, l: 'nl' }, VECTOR.secret)
+    const result = await verifyPartnerToken(token, VECTOR.secret, BEFORE_EXPIRY)
+    expect(result).toEqual({ ok: false, reason: 'malformed' })
+  })
+
   it('rejects garbage without throwing', async () => {
     for (const junk of ['', '.', 'nodot', 'a.', '.b', 'not base64!.nope']) {
       const result = await verifyPartnerToken(junk, VECTOR.secret, BEFORE_EXPIRY)
@@ -64,6 +92,6 @@ describe('partner token', () => {
 
   it('refuses to verify when no secret is configured', async () => {
     const result = await verifyPartnerToken(VECTOR.token, '', BEFORE_EXPIRY)
-    expect(result.ok).toBe(false)
+    expect(result).toEqual({ ok: false, reason: 'bad_signature' })
   })
 })

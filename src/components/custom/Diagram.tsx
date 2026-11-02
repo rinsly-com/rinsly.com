@@ -258,7 +258,7 @@ export function Diagram({ kind, eyebrow, title, caption, locale }: Props) {
 
   return (
     <Section className="py-12 sm:py-16">
-      <SectionHeading header={{ eyebrow, title }} />
+      <SectionHeading header={{ eyebrow: eyebrow ?? null, title: title ?? null }} />
       <figure className={eyebrow || title ? 'mt-7' : undefined} data-reveal>
         {/* The drawing scrolls inside its own box rather than widening the page. */}
         <div

@@ -4,6 +4,7 @@ import React, { useCallback, useState } from 'react'
 import { Banner, Button, toast, useAuth } from '@payloadcms/ui'
 
 import { isAuthenticated } from '@rinsly-com/site-core/access'
+import type { User } from '@/payload-types'
 import type { DeployResult } from '../hooks/triggerStaticDeploy'
 import { deployResponseSchema, readJsonResponse } from '@/lib/json'
 import { logCaught } from '@/lib/logCaught'
@@ -26,7 +27,7 @@ export const DeployPanel: React.FC = () => {
   const { user } = useAuth()
   const [state, setState] = useState<PanelState>({ phase: 'idle' })
 
-  const canDeploy = isAuthenticated(user)
+  const canDeploy = isAuthenticated(user as User | null)
   const deploying = state.phase === 'deploying'
 
   const deploy = useCallback(async () => {

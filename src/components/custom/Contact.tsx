@@ -32,7 +32,7 @@ export function Contact({ header, items, buttons, locale }: Props) {
     <Section className="py-16 sm:py-20">
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
-          <SectionHeading header={header} />
+          <SectionHeading {...(header ? { header } : {})} />
           {items?.length ? (
             <ul data-reveal-group className="flex flex-col gap-4">
               {items.map((item, i) => {
@@ -72,7 +72,6 @@ export function Contact({ header, items, buttons, locale }: Props) {
               // blocks, so its link fields no longer match the engine's
               // structurally identical `LinkFields` (which reference the engine's
               // core-only `Page`). Same data, divergent types.
-              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- engine LinkFields reference its own Page, not this site's generated one
               buttons={buttons as unknown as LinkFields[]}
               locale={locale}
               className="mt-2 flex flex-wrap items-center gap-5"

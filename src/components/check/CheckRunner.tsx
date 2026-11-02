@@ -1,11 +1,11 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { useRouter } from 'next/navigation'
 
-import { Turnstile, turnstileHeaders } from '@rinsly-com/site-core/ui'
+import { Turnstile } from '@rinsly-com/site-core/ui'
 
 import { publicString } from '@/lib/env'
+import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
 import { checkPollSchema, checkStartSchema, readJsonResponse } from '@/lib/json'
 import { logCaught } from '@/lib/logCaught'
 import { Button } from '@rinsly-com/ui/button'
@@ -47,7 +47,6 @@ export function CheckRunner() {
   const [phase, setPhase] = useState<Phase>({ kind: 'idle' })
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
-  const router = useRouter()
 
   useEffect(() => () => {
     if (pollRef.current) clearInterval(pollRef.current)
@@ -66,7 +65,7 @@ export function CheckRunner() {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...turnstileHeaders(tokenToSend),
+          ...turnstileHeaderRecord(tokenToSend),
         },
         body: JSON.stringify({ url, bedrijfsnaam: honeypot }),
       })
@@ -109,11 +108,7 @@ export function CheckRunner() {
           if (data.status.state === 'done') {
             if (pollRef.current) clearInterval(pollRef.current)
             setPhase({ kind: 'done', token })
-            const destination = `${API_BASE}/check/${token}`
-            if (destination.startsWith('/')) router.push(destination)
-            // Static rinsly.com posts to accp, so the scorecard URL is cross-origin.
-            // eslint-disable-next-line @next/next/no-location-assign-relative-destination
-            else window.location.assign(destination)
+            window.location.assign(`${API_BASE}/check/${token}`)
           } else if (data.status.state === 'error') {
             if (pollRef.current) clearInterval(pollRef.current)
             setPhase({ kind: 'error', message: 'We konden de site niet volledig beoordelen. Laat uw gegevens achter via het formulier hieronder, dan kijken wij er persoonlijk naar.' })

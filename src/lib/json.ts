@@ -1,8 +1,6 @@
 import type { PayloadRequest } from 'payload'
 import { z } from 'zod'
 
-import { logCaught } from './logCaught'
-
 /** Coerce a JSON value the way the public forms always did, without stringifying objects. */
 export function asText(value: unknown, max?: number): string {
   const raw =
@@ -21,8 +19,8 @@ export async function readRequestJson(
   if (typeof req.json !== 'function') return { ok: true, value: {} }
   try {
     return { ok: true, value: await req.json() }
-  } catch (err) {
-    logCaught('[request] body was not JSON', err)
+  } catch {
+    console.error('[request] invalid_json')
     return { ok: false }
   }
 }
@@ -37,8 +35,8 @@ export function asJsonObject(value: unknown): Record<string, unknown> | null {
 export async function readJsonResponse(res: Response, context: string): Promise<unknown> {
   try {
     return await res.json()
-  } catch (err) {
-    logCaught(context, err)
+  } catch {
+    console.error(`${context} invalid_json`)
     return {}
   }
 }

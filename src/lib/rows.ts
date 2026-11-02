@@ -12,13 +12,36 @@ export const userRowSchema = z
   })
   .loose()
 
-/** Partner-aanvraag row fields Ledger and the resubmit path read back. */
+const nullableText = z.string().nullable().optional()
+const nullableBool = z.boolean().nullable().optional()
+
+/**
+ * Partner-aanvraag row as D1/Payload actually returns it. Optional text and
+ * checkbox columns are nullable; a row that still doesn't match is skipped
+ * by the pending handler instead of failing the whole pull.
+ */
 export const partnerRowSchema = z
   .object({
     id: z.number(),
     domein: z.string(),
     bedrijfsnaam: z.string(),
     email: z.string(),
+    contactpersoon: nullableText,
+    telefoon: nullableText,
+    adres: nullableText,
+    plaats: nullableText,
+    kvk: nullableText,
+    btwNummer: nullableText,
+    exclusiviteit: nullableBool,
+    relatiebeheer: nullableBool,
+    marketing: nullableBool,
+    figmaSeat: nullableBool,
+    branches: nullableText,
+    talen: nullableText,
+    landen: nullableText,
+    opmerking: nullableText,
     status: z.enum(['new', 'imported', 'declined']).nullable().optional(),
+    createdAt: z.string().optional(),
+    updatedAt: z.string().optional(),
   })
   .loose()

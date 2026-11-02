@@ -3,9 +3,10 @@
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useRef, useState } from 'react'
 
-import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
 import { publicString } from '@/lib/env'
+import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
 import { formAckSchema, readJsonResponse } from '@/lib/json'
 import { logCaught } from '@/lib/logCaught'
 import { Button } from '@rinsly-com/ui/button'
@@ -70,7 +71,7 @@ export function CheckAanvraagForm() {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...turnstileHeaders(tokenToSend),
+          ...turnstileHeaderRecord(tokenToSend),
         },
         body: JSON.stringify(data),
       })

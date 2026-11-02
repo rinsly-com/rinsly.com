@@ -33,6 +33,18 @@
       ],
       "@payload-config": [
         "./src/payload.config.ts"
+      ],
+      "@rinsly-com/site-core": [
+        "./node_modules/@rinsly-com/site-core/dist/index.d.ts",
+        "./types/rinsly/site-core/index.d.ts"
+      ],
+      "@rinsly-com/site-core/*": [
+        "./node_modules/@rinsly-com/site-core/dist/*.d.ts",
+        "./types/rinsly/site-core/*.d.ts"
+      ],
+      "@rinsly-com/ui/*": [
+        "./node_modules/@rinsly-com/ui/dist/*.d.ts",
+        "./types/rinsly/ui/*.d.ts"
       ]
     },
     "target": "ES2022"
@@ -47,6 +59,7 @@
     ".next/dev/types/**/*.ts"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "node_modules/@rinsly-com/**"
   ]
 }

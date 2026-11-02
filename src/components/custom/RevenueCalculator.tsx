@@ -134,7 +134,7 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
 
   return (
     <Section className="py-14 sm:py-20">
-      <SectionHeading header={{ eyebrow, title, intro }} />
+      <SectionHeading header={{ eyebrow: eyebrow ?? null, title: title ?? null, intro: intro ?? null }} />
 
       <div className="shadow-card mt-8 grid gap-0 overflow-hidden rounded-2xl border border-hair bg-card lg:grid-cols-[3fr_2fr]">
         {/* ── Inputs ─────────────────────────────────────────────────── */}

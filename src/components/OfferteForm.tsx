@@ -3,9 +3,10 @@
 import { useRef, useState } from 'react'
 
 import type { Locale } from '@rinsly-com/site-core'
-import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
 import { publicString } from '@/lib/env'
+import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
 import { formAckSchema, readJsonResponse } from '@/lib/json'
 import { logCaught } from '@/lib/logCaught'
 import { Button } from '@rinsly-com/ui/button'
@@ -150,7 +151,9 @@ const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
 
 // Base UI has no Textarea part; Field.Control renders one.
-const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props)} />
+const Textarea = (props: React.ComponentProps<'textarea'>) => (
+  <Field.Control render={<textarea {...props} />} />
+)
 
 /** Placeholder stays the visible label. The sr-only label keeps `for` wired to an explicit id. */
 function TextField({
@@ -323,7 +326,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...turnstileHeaders(tokenToSend),
+          ...turnstileHeaderRecord(tokenToSend),
         },
         body: JSON.stringify(payload),
       })
@@ -632,7 +635,9 @@ export function OfferteForm({ locale }: { locale: Locale }) {
         ) : (
           <Button
             type="button"
-            onClick={submit}
+            onClick={() => {
+              void submit()
+            }}
             disabled={
               status === 'submitting' ||
               (Boolean(publicString(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)) && !turnstileToken)
@@ -670,7 +675,6 @@ function Check({
   onChange: (value: boolean) => void
   hint?: string
 }) {
-  const hintId = hint ? `${id}-hint` : undefined
   return (
     <Field.Root>
       <Field.Label
@@ -687,7 +691,7 @@ function Check({
           checked={checked}
           onCheckedChange={onChange}
           render={<button type="button" />}
-          aria-describedby={hintId}
+          {...(hint ? { 'aria-describedby': `${id}-hint` } : {})}
           className={[
             'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border p-0 transition-all',
             checked ? 'border-accent bg-accent text-white' : 'border-hair bg-paper text-transparent',
@@ -708,7 +712,7 @@ function Check({
         <span className="flex flex-col gap-0.5">
           <span className="text-ink">{label}</span>
           {hint ? (
-            <Field.Description id={hintId} className="m-0 text-xs text-muted">
+            <Field.Description id={`${id}-hint`} className="m-0 text-xs text-muted">
               {hint}
             </Field.Description>
           ) : null}

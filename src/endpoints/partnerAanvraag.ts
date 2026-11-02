@@ -278,14 +278,15 @@ export const partnerPendingHandler: PayloadHandler = async (req: PayloadRequest)
     limit: 200,
     overrideAccess: true,
   })
+  const applications = []
   for (const doc of result.docs) {
-    const row = partnerRowSchema.safeParse(doc)
-    if (!row.success) {
-      logCaught('[partner-aanvraag] pending row failed validation', row.error)
-      return json({ ok: false, error: 'server' }, 500)
+    if (partnerRowSchema.safeParse(doc).success) {
+      applications.push(doc)
+      continue
     }
+    console.error('[partner-aanvraag] pending_row_skipped invalid_row')
   }
-  return json({ ok: true, applications: result.docs })
+  return json({ ok: true, applications })
 }
 
 /**

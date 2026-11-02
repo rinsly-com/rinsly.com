@@ -229,8 +229,9 @@ export async function fetchPsi(url: string, apiKey?: string): Promise<PsiResult 
       fcpMs: ms('first-contentful-paint'),
       tbtMs: ms('total-blocking-time'),
     }
-  } catch (err) {
-    logCaught('[site-check] PageSpeed request failed', err)
+  } catch {
+    // The thrown message includes the request URL, which carries the PSI key.
+    console.error('[site-check] psi_fetch_failed')
     return null
   } finally {
     clearTimeout(timer)
