@@ -1,7 +1,12 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
+import { z } from 'zod'
 
 import { getRuntime } from '../lib/bindings'
+import { readWorkerSecrets } from '../lib/env'
+import { asJsonObject, asText, readRequestJson } from '../lib/json'
+import { logCaught } from '../lib/logCaught'
 import { verifyPartnerToken } from '../lib/partnerToken'
+import { partnerRowSchema } from '../lib/rows'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -10,8 +15,51 @@ function json(body: unknown, status = 200): Response {
   })
 }
 
-const str = (v: unknown, max = 200): string => String(v ?? '').trim().slice(0, max)
+const str = (v: unknown, max = 200): string => asText(v, max)
 const bool = (v: unknown): boolean => v === true || v === 'true' || v === 'on' || v === 1
+const text = (max = 200) => z.unknown().optional().transform((value) => str(value, max))
+const flag = z.unknown().optional().transform((value) => bool(value))
+
+const partnerBodySchema = z.object({
+  website: z.unknown().optional(),
+  token: text(1024),
+  email: text(),
+  bedrijfsnaam: text(),
+  contactpersoon: text(),
+  telefoon: text(40),
+  adres: text(),
+  plaats: text(80),
+  kvk: text(40),
+  btwNummer: text(40),
+  exclusiviteit: flag,
+  relatiebeheer: flag,
+  marketing: flag,
+  figmaSeat: flag,
+  branches: text(400),
+  talen: text(100),
+  landen: text(100),
+  opmerking: text(2000),
+})
+
+const interesseSchema = z.object({
+  honeypot: z.unknown().optional(),
+  email: text(),
+  bedrijfsnaam: text(),
+  domein: text(253),
+  contactpersoon: text(),
+  telefoon: text(40),
+  figmaSeat: flag,
+  bouwtZelf: flag,
+  verkooptHosting: flag,
+  opmerking: text(2000),
+})
+
+const markSchema = z.object({
+  id: z.union([z.string(), z.number()]),
+  status: z.enum(['imported', 'declined']),
+})
+
+const verifyTokenSchema = z.string().max(1024)
 
 /** Loose e-mail check: something, an @, something with a dot. */
 function isEmail(value: string): boolean {
@@ -34,7 +82,7 @@ function slugList(value: string, max = 12): string {
 
 async function secret(): Promise<string> {
   const { env } = await getRuntime()
-  return (env as unknown as { PARTNER_TOKEN_SECRET?: string }).PARTNER_TOKEN_SECRET ?? ''
+  return readWorkerSecrets(env).PARTNER_TOKEN_SECRET ?? ''
 }
 
 /**
@@ -46,11 +94,9 @@ async function secret(): Promise<string> {
  * database is touched, because the token carries its own contents.
  */
 export const partnerVerifyHandler: PayloadHandler = async (req: PayloadRequest) => {
-  const token = req.query?.token
-  if (typeof token !== 'string' || token.length > 1024) {
-    return json({ ok: false, reason: 'malformed' }, 400)
-  }
-  const result = await verifyPartnerToken(token, await secret())
+  const token = verifyTokenSchema.safeParse(req.query['token'])
+  if (!token.success) return json({ ok: false, reason: 'malformed' }, 400)
+  const result = await verifyPartnerToken(token.data, await secret())
   if (!result.ok) return json({ ok: false, reason: result.reason }, 200)
   return json({
     ok: true,
@@ -76,12 +122,12 @@ export const partnerVerifyHandler: PayloadHandler = async (req: PayloadRequest) 
  * queue is where a human turns it into a tenant.
  */
 export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest) => {
-  let body: Record<string, unknown> = {}
-  try {
-    body = typeof req.json === 'function' ? ((await req.json()) as Record<string, unknown>) : {}
-  } catch {
-    return json({ ok: false, error: 'invalid_body' }, 400)
-  }
+  const raw = await readRequestJson(req)
+  if (!raw.ok) return json({ ok: false, error: 'invalid_body' }, 400)
+  if (asJsonObject(raw.value) === null) return json({ ok: false, error: 'invalid_body' }, 400)
+  const parsed = partnerBodySchema.safeParse(raw.value)
+  if (!parsed.success) return json({ ok: false, error: 'invalid_body' }, 400)
+  const body = parsed.data
 
   // Honeypot, visually hidden on the form. Same trick as /api/offerte: pretend
   // it worked so a bot has nothing to learn from the response.
@@ -89,14 +135,13 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
     return json({ ok: true })
   }
 
-  const token = str(body.token, 1024)
-  const verified = await verifyPartnerToken(token, await secret())
+  const verified = await verifyPartnerToken(body.token, await secret())
   if (!verified.ok) {
     return json({ ok: false, error: 'token', reason: verified.reason }, 403)
   }
 
-  const email = str(body.email)
-  const bedrijfsnaam = str(body.bedrijfsnaam) || verified.payload.n
+  const email = body.email
+  const bedrijfsnaam = body.bedrijfsnaam || verified.payload.n
   if (!isEmail(email) || !bedrijfsnaam) {
     return json({ ok: false, error: 'validation' }, 422)
   }
@@ -105,21 +150,21 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
     // From the token, not the body — this is the anti-replay bit.
     domein: verified.payload.d,
     bedrijfsnaam,
-    contactpersoon: str(body.contactpersoon),
+    contactpersoon: body.contactpersoon,
     email,
-    telefoon: str(body.telefoon, 40),
-    adres: str(body.adres),
-    plaats: str(body.plaats, 80) || (verified.payload.c ?? ''),
-    kvk: str(body.kvk, 40),
-    btwNummer: str(body.btwNummer, 40),
-    exclusiviteit: bool(body.exclusiviteit),
-    relatiebeheer: bool(body.relatiebeheer),
-    marketing: bool(body.marketing),
-    figmaSeat: bool(body.figmaSeat),
-    branches: slugList(str(body.branches, 400)),
-    talen: slugList(str(body.talen, 100), 8) || (verified.payload.l ?? 'nl'),
-    landen: slugList(str(body.landen, 100), 8) || (verified.payload.l ?? 'nl'),
-    opmerking: str(body.opmerking, 2000),
+    telefoon: body.telefoon,
+    adres: body.adres,
+    plaats: body.plaats || (verified.payload.c ?? ''),
+    kvk: body.kvk,
+    btwNummer: body.btwNummer,
+    exclusiviteit: body.exclusiviteit,
+    relatiebeheer: body.relatiebeheer,
+    marketing: body.marketing,
+    figmaSeat: body.figmaSeat,
+    branches: slugList(body.branches),
+    talen: slugList(body.talen, 8) || (verified.payload.l ?? 'nl'),
+    landen: slugList(body.landen, 8) || (verified.payload.l ?? 'nl'),
+    opmerking: body.opmerking,
     status: 'new' as const,
   }
 
@@ -132,11 +177,16 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
       limit: 1,
       overrideAccess: true,
     })
-    const previous = existing.docs[0] as { id: string | number } | undefined
-    if (previous) {
+    const previous = existing.docs[0]
+    const row = previous === undefined ? undefined : partnerRowSchema.safeParse(previous)
+    if (row && !row.success) {
+      logCaught('[partner-aanvraag] stored application failed validation', row.error)
+      return json({ ok: false, error: 'server' }, 500)
+    }
+    if (row?.success) {
       await req.payload.update({
         collection: 'partner-aanvragen',
-        id: previous.id,
+        id: row.data.id,
         data,
         overrideAccess: true,
       })
@@ -179,7 +229,7 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
           `Branches:     ${data.branches || 'alle'}\n` +
           `Talen:        ${data.talen}\n` +
           `Landen:       ${data.landen}\n\n` +
-          `${data.opmerking ? `Opmerking:\n${data.opmerking}\n\n` : ''}` +
+          (data.opmerking ? `Opmerking:\n${data.opmerking}\n\n` : '') +
           `Haal 'm binnen met \`ledger partners --pull\` en bekijk 'm onder [8] Tenants.\n` +
           `Let op: dit is een aanvraag, geen afspraak: het tarief staat pas vast als jij het contract maakt.`,
       })
@@ -206,9 +256,9 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
  */
 async function authorised(req: PayloadRequest): Promise<boolean> {
   const { env } = await getRuntime()
-  const expected = (env as unknown as { LEDGER_PULL_SECRET?: string }).LEDGER_PULL_SECRET ?? ''
+  const expected = readWorkerSecrets(env).LEDGER_PULL_SECRET ?? ''
   if (!expected) return false
-  const header = req.headers?.get('authorization') ?? ''
+  const header = req.headers.get('authorization') ?? ''
   const provided = header.startsWith('Bearer ') ? header.slice(7) : ''
   // Length-safe compare; both sides are short and this is not a timing oracle
   // worth optimising, but constant time costs nothing here.
@@ -228,6 +278,13 @@ export const partnerPendingHandler: PayloadHandler = async (req: PayloadRequest)
     limit: 200,
     overrideAccess: true,
   })
+  for (const doc of result.docs) {
+    const row = partnerRowSchema.safeParse(doc)
+    if (!row.success) {
+      logCaught('[partner-aanvraag] pending row failed validation', row.error)
+      return json({ ok: false, error: 'server' }, 500)
+    }
+  }
   return json({ ok: true, applications: result.docs })
 }
 
@@ -241,25 +298,20 @@ export const partnerPendingHandler: PayloadHandler = async (req: PayloadRequest)
  */
 export const partnerMarkHandler: PayloadHandler = async (req: PayloadRequest) => {
   if (!(await authorised(req))) return json({ ok: false, error: 'unauthorized' }, 401)
-  let body: Record<string, unknown> = {}
-  try {
-    body = typeof req.json === 'function' ? ((await req.json()) as Record<string, unknown>) : {}
-  } catch {
-    return json({ ok: false, error: 'invalid_body' }, 400)
-  }
-  const id = body.id
-  const status = String(body.status ?? '')
-  if ((typeof id !== 'string' && typeof id !== 'number') || !['imported', 'declined'].includes(status)) {
-    return json({ ok: false, error: 'validation' }, 422)
-  }
+  const raw = await readRequestJson(req)
+  if (!raw.ok) return json({ ok: false, error: 'invalid_body' }, 400)
+  if (asJsonObject(raw.value) === null) return json({ ok: false, error: 'invalid_body' }, 400)
+  const parsed = markSchema.safeParse(raw.value)
+  if (!parsed.success) return json({ ok: false, error: 'validation' }, 422)
   try {
     await req.payload.update({
       collection: 'partner-aanvragen',
-      id,
-      data: { status: status as 'imported' | 'declined' },
+      id: parsed.data.id,
+      data: { status: parsed.data.status },
       overrideAccess: true,
     })
-  } catch {
+  } catch (err) {
+    logCaught('[partner-aanvraag] mark failed', err)
     return json({ ok: false, error: 'not_found' }, 404)
   }
   return json({ ok: true })
@@ -287,12 +339,12 @@ export const partnerMarkHandler: PayloadHandler = async (req: PayloadRequest) =>
  *   FACILITATOR-MIGRATION.md).
  */
 export const partnerInteresseHandler: PayloadHandler = async (req: PayloadRequest) => {
-  let body: Record<string, unknown> = {}
-  try {
-    body = typeof req.json === 'function' ? ((await req.json()) as Record<string, unknown>) : {}
-  } catch {
-    return json({ ok: false, error: 'invalid_body' }, 400)
-  }
+  const raw = await readRequestJson(req)
+  if (!raw.ok) return json({ ok: false, error: 'invalid_body' }, 400)
+  if (asJsonObject(raw.value) === null) return json({ ok: false, error: 'invalid_body' }, 400)
+  const parsed = interesseSchema.safeParse(raw.value)
+  if (!parsed.success) return json({ ok: false, error: 'invalid_body' }, 400)
+  const body = parsed.data
 
   // Honeypot. Note the field is `honeypot` here, not `website`: a studio's own
   // website is a real, wanted answer on this form.
@@ -300,16 +352,16 @@ export const partnerInteresseHandler: PayloadHandler = async (req: PayloadReques
     return json({ ok: true })
   }
 
-  const email = str(body.email)
-  const bedrijfsnaam = str(body.bedrijfsnaam)
-  const domein = str(body.domein, 253).replace(/^https?:\/\//i, '').replace(/\/.*$/, '').toLowerCase()
+  const email = body.email
+  const bedrijfsnaam = body.bedrijfsnaam
+  const domein = body.domein.replace(/^https?:\/\//i, '').replace(/\/.*$/, '').toLowerCase()
   if (!isEmail(email) || !bedrijfsnaam || !domein) {
     return json({ ok: false, error: 'validation' }, 422)
   }
 
-  const bouwtZelf = bool(body.bouwtZelf)
-  const verkooptHosting = bool(body.verkooptHosting)
-  const note = str(body.opmerking, 2000)
+  const bouwtZelf = body.bouwtZelf
+  const verkooptHosting = body.verkooptHosting
+  const note = body.opmerking
 
   // Until the collection has its own columns, the qualifying answers live in
   // the note — prefixed so they are impossible to miss in the review queue.
@@ -326,10 +378,10 @@ export const partnerInteresseHandler: PayloadHandler = async (req: PayloadReques
   const data = {
     domein,
     bedrijfsnaam,
-    contactpersoon: str(body.contactpersoon),
+    contactpersoon: body.contactpersoon,
     email,
-    telefoon: str(body.telefoon, 40),
-    figmaSeat: bool(body.figmaSeat),
+    telefoon: body.telefoon,
+    figmaSeat: body.figmaSeat,
     opmerking,
     status: 'new' as const,
   }
@@ -343,11 +395,16 @@ export const partnerInteresseHandler: PayloadHandler = async (req: PayloadReques
       limit: 1,
       overrideAccess: true,
     })
-    const previous = existing.docs[0] as { id: string | number } | undefined
-    if (previous) {
+    const previous = existing.docs[0]
+    const row = previous === undefined ? undefined : partnerRowSchema.safeParse(previous)
+    if (row && !row.success) {
+      logCaught('[partner-interesse] stored application failed validation', row.error)
+      return json({ ok: false, error: 'server' }, 500)
+    }
+    if (row?.success) {
       await req.payload.update({
         collection: 'partner-aanvragen',
-        id: previous.id,
+        id: row.data.id,
         data,
         overrideAccess: true,
       })

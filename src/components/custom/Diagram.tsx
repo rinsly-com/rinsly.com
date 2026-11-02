@@ -7,10 +7,8 @@ import { Section, SectionHeading } from '@rinsly-com/site-core/ui'
  * A new kind needs an option in `src/blocks/Diagram.ts` and a case here.
  */
 
-type Kind = 'figmaToProduction' | 'oneEngineFleet' | 'invoicingRoutes'
-
 type Props = {
-  kind?: Kind | string | null
+  kind?: string | null
   eyebrow?: string | null
   title?: string | null
   caption?: string | null

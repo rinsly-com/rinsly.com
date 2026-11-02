@@ -4,8 +4,9 @@ import React, { useCallback, useState } from 'react'
 import { Banner, Button, toast, useAuth } from '@payloadcms/ui'
 
 import { isAuthenticated } from '@rinsly-com/site-core/access'
-import type { User } from '@/payload-types'
 import type { DeployResult } from '../hooks/triggerStaticDeploy'
+import { deployResponseSchema, readJsonResponse } from '@/lib/json'
+import { logCaught } from '@/lib/logCaught'
 
 type PanelState =
   | { phase: 'idle' }
@@ -25,7 +26,7 @@ export const DeployPanel: React.FC = () => {
   const { user } = useAuth()
   const [state, setState] = useState<PanelState>({ phase: 'idle' })
 
-  const canDeploy = isAuthenticated(user as User | null)
+  const canDeploy = isAuthenticated(user)
   const deploying = state.phase === 'deploying'
 
   const deploy = useCallback(async () => {
@@ -36,7 +37,18 @@ export const DeployPanel: React.FC = () => {
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
       })
-      const result = (await res.json()) as DeployResult & { message: string }
+      const parsed = deployResponseSchema.safeParse(await readJsonResponse(res, '[deploy] response was not JSON'))
+      if (!parsed.success) {
+        logCaught('[deploy] response failed validation', parsed.error)
+        throw new Error(`Request failed (HTTP ${res.status}).`)
+      }
+      const result: DeployResult = parsed.data.httpStatus
+        ? { status: parsed.data.status, httpStatus: parsed.data.httpStatus, message: parsed.data.message }
+        : parsed.data.status === 'failed'
+          ? { status: 'failed', message: parsed.data.message }
+          : parsed.data.status === 'skipped'
+            ? { status: 'skipped', message: parsed.data.message }
+            : { status: 'triggered', httpStatus: res.status, message: parsed.data.message }
       if (!res.ok && result.status !== 'skipped') {
         throw new Error(result.message || `Request failed (HTTP ${res.status}).`)
       }
@@ -44,7 +56,7 @@ export const DeployPanel: React.FC = () => {
       if (result.status === 'triggered') toast.success('Production rebuild triggered.')
       else if (result.status === 'skipped') toast.info(result.message)
     } catch (err) {
-      const message = (err as Error).message
+      const message = err instanceof Error ? err.message : String(err)
       setState({ phase: 'error', message })
       toast.error(message)
     }
@@ -63,7 +75,7 @@ export const DeployPanel: React.FC = () => {
         <Banner type="info">Sign in to trigger a production deploy.</Banner>
       ) : (
         <>
-          <Button buttonStyle="primary" disabled={deploying} onClick={deploy}>
+          <Button buttonStyle="primary" disabled={deploying} onClick={() => { void deploy() }}>
             {deploying ? 'Triggering…' : 'Deploy now'}
           </Button>
 

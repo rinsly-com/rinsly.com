@@ -4,6 +4,10 @@ import { useSearchParams } from 'next/navigation'
 import { Suspense, useRef, useState } from 'react'
 
 import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+
+import { publicString } from '@/lib/env'
+import { formAckSchema, readJsonResponse } from '@/lib/json'
+import { logCaught } from '@/lib/logCaught'
 import { Button } from '@rinsly-com/ui/button'
 import { Field } from '@rinsly-com/ui/field'
 import { Input } from '@rinsly-com/ui/input'
@@ -11,8 +15,8 @@ import { Input } from '@rinsly-com/ui/input'
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and the form posts cross-origin (CORS-allowed) —
 // the same wiring as the OfferteForm quote wizard.
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
-const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)
+const API_BASE = publicString(process.env.NEXT_PUBLIC_API_URL).replace(/\/+$/, '')
+const TURNSTILE_REQUIRED = Boolean(publicString(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY))
 
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
@@ -52,10 +56,9 @@ export function CheckAanvraagForm() {
 
   const valid = looksLikeSite(data.url) && data.naam.trim() !== '' && isPhone(data.telefoon)
 
-  const set = (key: keyof typeof data) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setData((d) => ({ ...d, [key]: e.target.value }))
+  const set = (key: keyof typeof data) => (e: React.ChangeEvent<HTMLInputElement>) => { setData((d) => ({ ...d, [key]: e.target.value })); }
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     setTouched(true)
     if (!valid || status === 'submitting') return
@@ -71,9 +74,11 @@ export function CheckAanvraagForm() {
         },
         body: JSON.stringify(data),
       })
-      const body = (await res.json().catch(() => ({}))) as { ok?: boolean }
-      setStatus(res.ok && body.ok ? 'success' : 'error')
-    } catch {
+      const parsed = formAckSchema.safeParse(await readJsonResponse(res, '[check-aanvraag] response was not JSON'))
+      if (!parsed.success) logCaught('[check-aanvraag] response failed validation', parsed.error)
+      setStatus(res.ok && parsed.success && parsed.data.ok ? 'success' : 'error')
+    } catch (err) {
+      logCaught('[check-aanvraag] submit failed', err)
       setStatus('error')
     } finally {
       turnstileRef.current?.reset()
@@ -108,7 +113,7 @@ export function CheckAanvraagForm() {
       <Suspense fallback={null}>
         <ExpiredNotice />
       </Suspense>
-      <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+      <form onSubmit={(event) => { void submit(event) }} noValidate className="flex flex-col gap-4">
         {/* Honeypot — hidden from real visitors; bots that fill it are ignored. */}
         <input
           type="text"

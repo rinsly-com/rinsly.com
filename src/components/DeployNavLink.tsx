@@ -11,7 +11,7 @@ import { useConfig } from '@payloadcms/ui'
  */
 export const DeployNavLink: React.FC = () => {
   const { config } = useConfig()
-  const adminRoute = config.routes?.admin || '/admin'
+  const adminRoute = config.routes.admin || '/admin'
 
   return (
     <Link className="nav__link" href={`${adminRoute}/deploy`} prefetch={false}>

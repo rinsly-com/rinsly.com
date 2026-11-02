@@ -1,5 +1,8 @@
 import { expect, test, type Frame, type Page } from '@playwright/test'
 
+import { readServerEnv } from '../../src/lib/env'
+import { logCaught } from '../../src/lib/logCaught'
+
 /**
  * Live preview, end to end. Each check failed once with `tsc` still green:
  * cookie auth requires an Origin (an iframe GET sends none); Lexical fields
@@ -8,26 +11,36 @@ import { expect, test, type Frame, type Page } from '@playwright/test'
  * `packages/site-core/src/preview/bridge.ts`.
  */
 
-const EMAIL = process.env.SEED_ADMIN_EMAIL || 'dev@rinsly.local'
-const PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'rinsly-dev'
+const env = readServerEnv()
+const EMAIL = env.SEED_ADMIN_EMAIL || 'dev@rinsly.local'
+const PASSWORD = env.SEED_ADMIN_PASSWORD || 'rinsly-dev'
 const RICH_TEXT_PAGE = '/admin/collections/pages/1'
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000'
+const BASE_URL = env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000'
 
 async function clearStaleLocks(page: Page) {
   await page.evaluate(async () => {
+    const isRecord = (value: unknown): value is Record<string, unknown> =>
+      typeof value === 'object' && value !== null
+    const isUnknownArray = (value: unknown): value is unknown[] => Array.isArray(value)
     const res = await fetch('/api/payload-locked-documents?limit=100&depth=0', {
       credentials: 'include',
       headers: { origin: window.location.origin },
     })
     if (!res.ok) return
-    const { docs } = (await res.json()) as { docs?: { id: number | string }[] }
+    const body: unknown = await res.json()
+    const docs = isRecord(body) && isUnknownArray(body['docs']) ? body['docs'] : []
     await Promise.all(
-      (docs ?? []).map((doc) =>
-        fetch(`/api/payload-locked-documents/${doc.id}`, {
+      docs.map((doc) => {
+        const id = isRecord(doc) ? doc['id'] : undefined
+        if (typeof id !== 'string' && typeof id !== 'number') return Promise.resolve()
+        return fetch(`/api/payload-locked-documents/${id}`, {
           method: 'DELETE',
           credentials: 'include',
-        }).catch(() => undefined),
-      ),
+        }).catch((err: unknown) => {
+          const detail = err instanceof Error ? err.message : String(err)
+          console.error(`[e2e] could not delete a document lock: ${detail}`)
+        })
+      }),
     )
   })
 }
@@ -63,7 +76,11 @@ async function login(page: Page) {
   }
 
   // The body is what says WHY, and a status alone has cost this file hours.
-  expect(res.ok(), `login failed: ${res.status()} ${await res.text().catch(() => '')}`).toBeTruthy()
+  const loginBody = await res.text().catch((err: unknown) => {
+    logCaught('[e2e] login response body unreadable', err)
+    return ''
+  })
+  expect(res.ok(), `login failed: ${res.status()} ${loginBody}`).toBeTruthy()
 
   await page.goto('/admin', { waitUntil: 'domcontentloaded' })
   await clearStaleLocks(page)
@@ -72,7 +89,9 @@ async function login(page: Page) {
 
 /** Navigating away releases Payload's per-session document lock. */
 async function releaseLock(page: Page) {
-  await page.goto('/admin', { waitUntil: 'domcontentloaded' }).catch(() => undefined)
+  await page.goto('/admin', { waitUntil: 'domcontentloaded' }).catch((err: unknown) => {
+    logCaught('[e2e] could not navigate away to release the lock', err)
+  })
 }
 
 /**
@@ -86,9 +105,14 @@ async function resetEditViewPreference(page: Page) {
       await fetch('/api/payload-preferences/collection-pages', {
         method: 'DELETE',
         credentials: 'include',
-      }).catch(() => undefined)
+      }).catch((err: unknown) => {
+        const detail = err instanceof Error ? err.message : String(err)
+        console.error(`[e2e] could not delete the edit-view preference: ${detail}`)
+      })
     })
-    .catch(() => undefined)
+    .catch((err: unknown) => {
+      logCaught('[e2e] preference reset failed', err)
+    })
 }
 
 async function openLivePreview(page: Page): Promise<void> {
@@ -111,7 +135,10 @@ async function openLivePreview(page: Page): Promise<void> {
           .first()
           .boundingBox()
           .then((b) => Math.round(b?.height ?? 0))
-          .catch(() => 0)
+          .catch((err: unknown) => {
+            logCaught('[e2e] preview box was not measurable yet', err)
+            return 0
+          })
       },
       { timeout: 120_000, intervals: [500] },
     )
@@ -122,7 +149,8 @@ async function openLivePreview(page: Page): Promise<void> {
 function frameOf(page: Page): Frame {
   const frame = previewFrame(page)
   expect(frame, 'preview frame').toBeTruthy()
-  return frame!
+  if (!frame) throw new Error('preview frame')
+  return frame
 }
 
 test.describe('live preview', () => {

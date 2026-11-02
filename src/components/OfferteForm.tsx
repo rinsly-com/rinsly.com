@@ -4,6 +4,10 @@ import { useRef, useState } from 'react'
 
 import type { Locale } from '@rinsly-com/site-core'
 import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+
+import { publicString } from '@/lib/env'
+import { formAckSchema, readJsonResponse } from '@/lib/json'
+import { logCaught } from '@/lib/logCaught'
 import { Button } from '@rinsly-com/ui/button'
 import { Checkbox } from '@rinsly-com/ui/checkbox'
 import { Field } from '@rinsly-com/ui/field'
@@ -37,7 +41,7 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 // On the dynamic accp site this is same-origin (empty base). On the static prod
 // site (rinsly.com) there is no API, so the build inlines the accp origin here
 // (NEXT_PUBLIC_API_URL) and the form posts cross-origin to accp (CORS-allowed).
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
+const API_BASE = publicString(process.env.NEXT_PUBLIC_API_URL).replace(/\/+$/, '')
 
 const COPY = {
   nl: {
@@ -146,7 +150,7 @@ const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
 
 // Base UI has no Textarea part; Field.Control renders one.
-const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props as object)} />
+const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props)} />
 
 /** Placeholder stays the visible label. The sr-only label keeps `for` wired to an explicit id. */
 function TextField({
@@ -169,7 +173,7 @@ function TextField({
         id={id}
         type={type}
         value={value}
-        onChange={(e) => onValue(e.target.value)}
+        onChange={(e) => { onValue(e.target.value); }}
         placeholder={label}
         className={inputClass}
       />
@@ -194,7 +198,7 @@ function NoteField({
       <Textarea
         id={id}
         value={value}
-        onChange={(e) => onValue(e.target.value)}
+        onChange={(e) => { onValue(e.target.value); }}
         rows={3}
         placeholder={label}
         className={`${inputClass} block resize-y`}
@@ -242,19 +246,17 @@ export function OfferteForm({ locale }: { locale: Locale }) {
   const turnstileRef = useRef<TurnstileHandle | null>(null)
 
   const isPartner = audience === 'partner'
-  const steps: readonly string[] = isPartner ? c.stepsPartner : c.stepsClient
+  const steps = isPartner ? c.stepsPartner : c.stepsClient
   const lastStep = audience === '' ? 0 : steps.length - 1
 
-  const set = <K extends keyof Data>(key: K, value: Data[K]) =>
-    setData((d) => ({ ...d, [key]: value }))
+  const set = <K extends keyof Data>(key: K, value: Data[K]) => { setData((d) => ({ ...d, [key]: value })); }
 
-  const toggleAddition = (value: string) =>
-    setData((d) => ({
+  const toggleAddition = (value: string) => { setData((d) => ({
       ...d,
       additions: d.additions.includes(value)
         ? d.additions.filter((v) => v !== value)
         : [...d.additions, value],
-    }))
+    })); }
 
   /** Picking an audience is itself the first step's answer, so advance with it. */
   const choose = (next: Audience) => {
@@ -325,9 +327,11 @@ export function OfferteForm({ locale }: { locale: Locale }) {
         },
         body: JSON.stringify(payload),
       })
-      const body = (await res.json().catch(() => ({}))) as { ok?: boolean }
-      setStatus(res.ok && body.ok ? 'success' : 'error')
-    } catch {
+      const parsed = formAckSchema.safeParse(await readJsonResponse(res, '[offerte] response was not JSON'))
+      if (!parsed.success) logCaught('[offerte] response failed validation', parsed.error)
+      setStatus(res.ok && parsed.success && parsed.data.ok ? 'success' : 'error')
+    } catch (err) {
+      logCaught('[offerte] submit failed', err)
       setStatus('error')
     } finally {
       turnstileRef.current?.reset()
@@ -377,7 +381,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
       <input
         type="text"
         value={trap}
-        onChange={(e) => setTrap(e.target.value)}
+        onChange={(e) => { setTrap(e.target.value); }}
         name="contact-extra"
         tabIndex={-1}
         autoComplete="off"
@@ -399,7 +403,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             <Button
               key={option.key}
               type="button"
-              onClick={() => choose(option.key)}
+              onClick={() => { choose(option.key); }}
               className="flex flex-col gap-1 rounded-xl border border-hair px-4 py-3.5 text-left transition-colors hover:border-accent/60 hover:bg-accent-soft"
             >
               <span className="text-sm font-semibold text-ink">{option.title}</span>
@@ -413,21 +417,21 @@ export function OfferteForm({ locale }: { locale: Locale }) {
 
       {isPartner && step === 1 && (
         <div className="flex flex-col gap-3">
-          <TextField id="offerte-studio" label={c.studio} value={data.bedrijf} onValue={(v) => set('bedrijf', v)} />
-          <TextField id="offerte-domein" label={c.domein} value={data.domein} onValue={(v) => set('domein', v)} />
-          <TextField id="offerte-partner-naam" label={c.naam} value={data.naam} onValue={(v) => set('naam', v)} />
+          <TextField id="offerte-studio" label={c.studio} value={data.bedrijf} onValue={(v) => { set('bedrijf', v); }} />
+          <TextField id="offerte-domein" label={c.domein} value={data.domein} onValue={(v) => { set('domein', v); }} />
+          <TextField id="offerte-partner-naam" label={c.naam} value={data.naam} onValue={(v) => { set('naam', v); }} />
           <TextField
             id="offerte-partner-email"
             label={c.email}
             value={data.email}
-            onValue={(v) => set('email', v)}
+            onValue={(v) => { set('email', v); }}
             type="email"
           />
           <TextField
             id="offerte-partner-telefoon"
             label={c.telefoon}
             value={data.telefoon}
-            onValue={(v) => set('telefoon', v)}
+            onValue={(v) => { set('telefoon', v); }}
           />
         </div>
       )}
@@ -439,21 +443,21 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             id="offerte-figma"
             label={c.figmaSeat}
             checked={data.figmaSeat}
-            onChange={(v) => set('figmaSeat', v)}
+            onChange={(v) => { set('figmaSeat', v); }}
             hint={c.figmaNote}
           />
           <Check
             id="offerte-bouwt"
             label={c.bouwtZelf}
             checked={data.bouwtZelf}
-            onChange={(v) => set('bouwtZelf', v)}
+            onChange={(v) => { set('bouwtZelf', v); }}
           />
           {data.bouwtZelf && <Warn text={c.buildWarn} />}
           <Check
             id="offerte-hosting"
             label={c.verkooptHosting}
             checked={data.verkooptHosting}
-            onChange={(v) => set('verkooptHosting', v)}
+            onChange={(v) => { set('verkooptHosting', v); }}
           />
           {data.verkooptHosting && <Warn text={c.hostingWarn} />}
         </div>
@@ -474,7 +478,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             id="offerte-partner-bericht"
             label={c.partnerBericht}
             value={data.bericht}
-            onValue={(v) => set('bericht', v)}
+            onValue={(v) => { set('bericht', v); }}
           />
           {status === 'error' && <p className="text-sm text-red-600">{c.error}</p>}
         </div>
@@ -484,13 +488,13 @@ export function OfferteForm({ locale }: { locale: Locale }) {
 
       {!isPartner && step === 1 && (
         <div className="flex flex-col gap-3">
-          <TextField id="offerte-bedrijf" label={c.bedrijf} value={data.bedrijf} onValue={(v) => set('bedrijf', v)} />
-          <TextField id="offerte-naam" label={c.naam} value={data.naam} onValue={(v) => set('naam', v)} />
+          <TextField id="offerte-bedrijf" label={c.bedrijf} value={data.bedrijf} onValue={(v) => { set('bedrijf', v); }} />
+          <TextField id="offerte-naam" label={c.naam} value={data.naam} onValue={(v) => { set('naam', v); }} />
           <TextField
             id="offerte-email"
             label={c.email}
             value={data.email}
-            onValue={(v) => set('email', v)}
+            onValue={(v) => { set('email', v); }}
             type="email"
           />
         </div>
@@ -504,7 +508,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
               <Button
                 key={s.value}
                 type="button"
-                onClick={() => set('subscription', s.value)}
+                onClick={() => { set('subscription', s.value); }}
                 className={[
                   'flex items-center justify-between gap-3 rounded-xl border px-4 py-3 text-left transition-colors',
                   selected ? 'border-accent bg-accent-soft' : 'border-hair hover:border-accent/50',
@@ -544,7 +548,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
               id={`offerte-add-${a.value}`}
               label={locale === 'nl' ? a.nl : a.en}
               checked={data.additions.includes(a.value)}
-              onChange={() => toggleAddition(a.value)}
+              onChange={() => { toggleAddition(a.value); }}
             />
           ))}
           {data.additions.includes('other') && (
@@ -552,7 +556,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
               id="offerte-other"
               label={c.other}
               value={data.additionsOther}
-              onValue={(v) => set('additionsOther', v)}
+              onValue={(v) => { set('additionsOther', v); }}
             />
           )}
 
@@ -578,7 +582,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
               }
             />
           </dl>
-          <NoteField id="offerte-bericht" label={c.bericht} value={data.bericht} onValue={(v) => set('bericht', v)} />
+          <NoteField id="offerte-bericht" label={c.bericht} value={data.bericht} onValue={(v) => { set('bericht', v); }} />
           {status === 'error' && <p className="text-sm text-red-600">{c.error}</p>}
         </div>
       )}
@@ -617,7 +621,9 @@ export function OfferteForm({ locale }: { locale: Locale }) {
         ) : step < lastStep ? (
           <Button
             type="button"
-            onClick={() => stepValid(step) && setStep((s) => s + 1)}
+            onClick={() => {
+              if (stepValid(step)) setStep((s) => s + 1)
+            }}
             disabled={!stepValid(step)}
             className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-40"
           >
@@ -629,7 +635,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             onClick={submit}
             disabled={
               status === 'submitting' ||
-              (Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY) && !turnstileToken)
+              (Boolean(publicString(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)) && !turnstileToken)
             }
             className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
           >

@@ -25,8 +25,10 @@ import { getPayload } from 'payload'
 import { sql } from '@payloadcms/db-d1-sqlite'
 
 import config from '../src/payload.config'
+import { readServerEnv } from '../src/lib/env'
+import { logCaught } from '../src/lib/logCaught'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
-import type { User } from '../src/payload-types'
+import { idRowSchema, userRowSchema } from '../src/lib/rows'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 type Block = Record<string, unknown>
@@ -644,7 +646,7 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
 
 /* -------------------------------- /platform ------------------------------- */
 
-const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
+const platformLayout = (locale: Locale, _ids: PageIds): Block[] => [
   pageHero(
     'default',
     t(locale, 'Het platform', 'The platform'),
@@ -1657,8 +1659,8 @@ async function repairOrphanedVersions(payload: PayloadInstance) {
           WHERE parent_id IS NULL AND EXISTS (SELECT 1 FROM pages p WHERE p.slug = _pages_v.version_slug)`,
     )
     await drizzle.run(sql`DELETE FROM _pages_v WHERE parent_id IS NULL`)
-  } catch {
-    /* healthy database — nothing to repair */
+  } catch (err) {
+    logCaught('[seed] orphaned-version repair skipped', err)
   }
 }
 
@@ -1668,21 +1670,26 @@ async function run() {
 
   // Admin user
   const users = await payload.find({ collection: 'users', limit: 1, sort: 'createdAt' })
-  let user = users.docs[0] as User | undefined
+  const existingUser = users.docs[0]
+  if (existingUser !== undefined && !userRowSchema.safeParse(existingUser).success) {
+    throw new Error('seed: user row failed validation')
+  }
+  let user = existingUser
   if (!user) {
-    const email = process.env.SEED_ADMIN_EMAIL || 'dev@rinsly.local'
-    const password = process.env.SEED_ADMIN_PASSWORD || 'rinsly-dev'
-    user = (await payload.create({
+    const env = readServerEnv()
+    const email = env.SEED_ADMIN_EMAIL || 'dev@rinsly.local'
+    const password = env.SEED_ADMIN_PASSWORD || 'rinsly-dev'
+    user = await payload.create({
       collection: 'users',
       data: { email, password, roles: ['admin'] },
-    })) as User
+    })
     console.log(`Created admin ${email}`)
-  } else if (!user.roles?.includes('admin')) {
-    user = (await payload.update({
+  } else if (!user.roles.includes('admin')) {
+    user = await payload.update({
       collection: 'users',
       id: user.id,
-      data: { roles: [...(user.roles ?? []), 'admin'] },
-    })) as User
+      data: { roles: [...user.roles, 'admin'] },
+    })
   }
   console.log(`Seeding as ${user.email}`)
 
@@ -1729,17 +1736,30 @@ async function run() {
       limit: 1,
       depth: 0,
     })
-    let doc = existing.docs.find((d) => d?.id != null) as { id: number } | undefined
-    if (!doc) {
-      doc = (await payload.create({
-        collection: 'pages',
-        draft: true,
-        locale: 'nl',
-        data: { slug: page.slug, title: page.title('nl') } as never,
-        user,
-      })) as { id: number }
+    const found = existing.docs[0]
+    const stored = found === undefined ? undefined : idRowSchema.safeParse(found)
+    if (stored && !stored.success) throw new Error(`seed: page row ${page.slug} failed validation`)
+    let pageId = stored?.success ? stored.data.id : undefined
+    if (pageId === undefined) {
+      const created = idRowSchema.safeParse(
+        await payload.create({
+          collection: 'pages',
+          draft: true,
+          locale: 'nl',
+          data: { slug: page.slug, title: page.title('nl') },
+          user,
+        }),
+      )
+      if (!created.success) throw new Error(`seed: created page ${page.slug} failed validation`)
+      pageId = created.data.id
     }
-    ids[page.slug] = doc.id
+    ids[page.slug] = pageId
+  }
+
+  const idFor = (slug: string): number => {
+    const id = ids[slug]
+    if (id === undefined) throw new Error(`seed: no page id for ${slug}`)
+    return id
   }
 
   // Pass 2 — write both locales' layouts, then publish.
@@ -1747,16 +1767,16 @@ async function run() {
     for (const locale of ['nl', 'en'] as Locale[]) {
       await payload.update({
         collection: 'pages',
-        id: ids[page.slug],
+        id: idFor(page.slug),
         draft: true,
         locale,
-        data: { title: page.title(locale), layout: page.layout(locale, ids) } as never,
+        data: { title: page.title(locale), layout: page.layout(locale, ids) },
         user,
       })
     }
     await payload.update({
       collection: 'pages',
-      id: ids[page.slug],
+      id: idFor(page.slug),
       data: { _status: 'published' } as never,
       user,
     })
@@ -1764,15 +1784,15 @@ async function run() {
   }
 
   // Globals
-  await payload.updateGlobal({ slug: 'header', locale: 'nl', data: headerData('nl', ids) as never, user })
-  await payload.updateGlobal({ slug: 'header', locale: 'en', data: headerData('en', ids) as never, user })
+  await payload.updateGlobal({ slug: 'header', locale: 'nl', data: headerData('nl', ids), user })
+  await payload.updateGlobal({ slug: 'header', locale: 'en', data: headerData('en', ids), user })
   await payload.updateGlobal({
     slug: 'footer',
     locale: 'nl',
-    data: { ...footerShared, ...footerLocalized('nl') } as never,
+    data: { ...footerShared, ...footerLocalized('nl') },
     user,
   })
-  await payload.updateGlobal({ slug: 'footer', locale: 'en', data: footerLocalized('en') as never, user })
+  await payload.updateGlobal({ slug: 'footer', locale: 'en', data: footerLocalized('en'), user })
   console.log('Globals seeded (header, footer)')
 
   console.log('Seed complete.')

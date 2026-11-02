@@ -5,6 +5,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 
 import {
   applyStatement,
@@ -16,7 +17,18 @@ import {
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
-type Finding = { severity: 'critical' | 'error' | 'unchecked'; message: string }
+const findingSchema = z
+  .object({
+    severity: z.enum(['critical', 'error', 'unchecked']),
+    message: z.string(),
+  })
+  .loose()
+
+type Finding = z.infer<typeof findingSchema>
+
+function asFindings(value: unknown): Finding[] {
+  return z.array(findingSchema).parse(value)
+}
 
 const navItemsSchema = () =>
   new Map([
@@ -32,7 +44,7 @@ describe('migration linter — INSERT ... SELECT copy validation', () => {
       'INSERT INTO `__new_header_nav_items`("_order", "_parent_id", "id", "label", "type", "page_id", "url", "new_tab") ' +
       'SELECT "_order", "_parent_id", "id", "label", "type", "page_id", "url", "new_tab" FROM `header_nav_items`'
 
-    const findings: Finding[] = applyStatement(navItemsSchema(), buggy)
+    const findings = asFindings(applyStatement(navItemsSchema(), buggy))
     const critical = findings.filter((f) => f.severity === 'critical')
 
     expect(critical).toHaveLength(3)
@@ -40,7 +52,7 @@ describe('migration linter — INSERT ... SELECT copy validation', () => {
     expect(critical.map((f) => f.message).join('\n')).toContain('"page_id"')
     expect(critical.map((f) => f.message).join('\n')).toContain('"new_tab"')
     // The message must explain the silent-literal trap, not just name the column.
-    expect(critical[0].message).toMatch(/string literal/)
+    expect(critical[0]?.message).toMatch(/string literal/)
   })
 
   it('accepts the hand-fixed copy (COALESCE + explicit literals)', () => {
@@ -55,7 +67,7 @@ describe('migration linter — INSERT ... SELECT copy validation', () => {
     const mismatched =
       'INSERT INTO `__new_header_nav_items`("_order", "_parent_id", "id") SELECT "_order", "_parent_id" FROM `header_nav_items`'
 
-    const findings: Finding[] = applyStatement(navItemsSchema(), mismatched)
+    const findings = asFindings(applyStatement(navItemsSchema(), mismatched))
     expect(findings.some((f) => f.message.includes('3 target column(s) but 2 SELECT'))).toBe(true)
   })
 
@@ -66,7 +78,7 @@ describe('migration linter — INSERT ... SELECT copy validation', () => {
 
   it('flags an UPDATE touching a nonexistent column', () => {
     const stmt = 'UPDATE `header_nav_items` SET `missing_col` = 1'
-    const findings: Finding[] = applyStatement(navItemsSchema(), stmt)
+    const findings = asFindings(applyStatement(navItemsSchema(), stmt))
     expect(findings.some((f) => f.severity === 'error')).toBe(true)
   })
 })
@@ -86,7 +98,7 @@ describe('migration linter — schema replay', () => {
   })
 
   it('reports statements it cannot parse as unchecked instead of passing them', () => {
-    const findings: Finding[] = applyStatement(new Map(), 'CREATE VIEW v AS SELECT 1')
+    const findings = asFindings(applyStatement(new Map(), 'CREATE VIEW v AS SELECT 1'))
     expect(findings).toEqual([expect.objectContaining({ severity: 'unchecked' })])
   })
 
@@ -96,10 +108,19 @@ describe('migration linter — schema replay', () => {
   })
 
   it('builds a schema model from a drizzle snapshot', () => {
-    const schema = schemaFromSnapshot({
+    const schema: unknown = schemaFromSnapshot({
       tables: { t: { name: 't', columns: { id: { name: 'id' }, label: { name: 'label' } } } },
     })
-    expect([...schema.get('t')!]).toEqual(['id', 'label'])
+    // A Map from untyped JavaScript is Map<any, any>.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    const columns = schema instanceof Map ? schema.get('t') : undefined
+    const names: string[] = []
+    if (columns instanceof Set) {
+      for (const column of columns) {
+        if (typeof column === 'string') names.push(column)
+      }
+    }
+    expect(names).toEqual(['id', 'label'])
   })
 })
 

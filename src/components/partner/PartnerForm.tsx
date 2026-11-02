@@ -3,6 +3,10 @@
 import { useEffect, useRef, useState } from 'react'
 
 import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+
+import { publicString } from '@/lib/env'
+import { formAckSchema, partnerVerifySchema, readJsonResponse } from '@/lib/json'
+import { logCaught } from '@/lib/logCaught'
 import { Button } from '@rinsly-com/ui/button'
 import { Field } from '@rinsly-com/ui/field'
 import { Input } from '@rinsly-com/ui/input'
@@ -11,14 +15,14 @@ import { partnerProgrammeCopy, type ChoiceField } from '@/lib/partnerLadder'
 
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and posts cross-origin, same as the check forms.
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
-const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)
+const API_BASE = publicString(process.env.NEXT_PUBLIC_API_URL).replace(/\/+$/, '')
+const TURNSTILE_REQUIRED = Boolean(publicString(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY))
 
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
 
 // Base UI has no Textarea part; Field.Control renders one.
-const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props as object)} />
+const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props)} />
 
 const isEmail = (v: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.trim())
 
@@ -230,25 +234,33 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
   useEffect(() => {
     let cancelled = false
     if (!token) return // already 'invalid'/'missing' from initial state
-    fetch(`${API_BASE}/api/partner-aanvraag/verify?token=${encodeURIComponent(token)}`)
-      .then((r) => r.json() as Promise<{ ok: boolean; reason?: string; prefill?: Prefill }>)
-      .then((body) => {
+    void fetch(`${API_BASE}/api/partner-aanvraag/verify?token=${encodeURIComponent(token)}`)
+      .then(async (r) => partnerVerifySchema.safeParse(await r.json()))
+      .then((parsed) => {
         if (cancelled) return
-        if (!body.ok || !body.prefill) {
+        if (!parsed.success) {
+          logCaught('[partner] verify response failed validation', parsed.error)
           setState('invalid')
-          setReason(body.reason ?? 'malformed')
+          setReason('malformed')
+          return
+        }
+        const prefill = parsed.data.prefill
+        if (!parsed.data.ok || !prefill) {
+          setState('invalid')
+          setReason(parsed.data.reason ?? 'malformed')
           return
         }
         setF((prev) => ({
           ...prev,
-          bedrijfsnaam: body.prefill!.bedrijfsnaam,
-          plaats: body.prefill!.plaats,
-          talen: body.prefill!.land || 'nl',
-          landen: body.prefill!.land || 'nl',
+          bedrijfsnaam: prefill.bedrijfsnaam,
+          plaats: prefill.plaats,
+          talen: prefill.land || 'nl',
+          landen: prefill.land || 'nl',
         }))
         setState('ready')
       })
-      .catch(() => {
+      .catch((err: unknown) => {
+        logCaught('[partner] verify failed', err)
         if (!cancelled) {
           setState('invalid')
           setReason('network')
@@ -264,12 +276,11 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
 
   const set =
     (key: keyof Fields) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-      setF((d) => ({ ...d, [key]: e.target.value }))
+    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { setF((d) => ({ ...d, [key]: e.target.value })); }
 
-  const toggle = (key: keyof Fields) => () => setF((d) => ({ ...d, [key]: !d[key] }))
+  const toggle = (key: keyof Fields) => () => { setF((d) => ({ ...d, [key]: !d[key] })); }
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     setTouched(true)
     if (!valid || state === 'sending') return
@@ -285,9 +296,11 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
         },
         body: JSON.stringify({ ...f, token }),
       })
-      const body = (await res.json()) as { ok: boolean }
-      setState(body.ok ? 'done' : 'error')
-    } catch {
+      const parsed = formAckSchema.safeParse(await readJsonResponse(res, '[partner] response was not JSON'))
+      if (!parsed.success) logCaught('[partner] response failed validation', parsed.error)
+      setState(parsed.success && parsed.data.ok ? 'done' : 'error')
+    } catch (err) {
+      logCaught('[partner] submit failed', err)
       setState('error')
     } finally {
       turnstileRef.current?.reset()
@@ -324,7 +337,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
   }
 
   return (
-    <form onSubmit={submit} className="space-y-8" noValidate>
+    <form onSubmit={(event) => { void submit(event) }} className="space-y-8" noValidate>
       {/* ── what you take on ─────────────────────────────────────────── */}
       <fieldset className="space-y-3">
         <legend className="text-sm font-semibold text-ink">{t.dutiesLegend}</legend>

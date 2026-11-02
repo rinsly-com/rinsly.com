@@ -1,15 +1,28 @@
 import { withPayload } from '@payloadcms/next/withPayload'
+
+import { readServerEnv } from './src/lib/env'
 import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
+function readResolve(config: unknown): { extensionAlias?: Record<string, string[]> | undefined } {
+  if (typeof config !== 'object' || config === null || !('resolve' in config)) {
+    throw new Error('next webpack config is missing resolve')
+  }
+  const resolve = config.resolve
+  if (typeof resolve !== 'object' || resolve === null) {
+    throw new Error('next webpack config is missing resolve')
+  }
+  return resolve
+}
+
 // When BUILD_STATIC=true we produce the fully static production site
 // (`output: export` -> out/). scripts/build-static.mjs stashes the (payload)
 // admin/API group and snapshots published content from the accp API first, so
 // the export needs no Payload runtime.
-const isStatic = process.env.BUILD_STATIC === 'true'
+const isStatic = readServerEnv().BUILD_STATIC === 'true'
 
 const nextConfig: NextConfig = {
   // The engine ships as TypeScript/JSX source; Next must transpile it.
@@ -34,11 +47,14 @@ const nextConfig: NextConfig = {
   // (which serves the accp content API it snapshots) stays up.
   ...(isStatic ? { output: 'export' as const, distDir: '.next-static' } : {}),
   webpack: (webpackConfig) => {
-    webpackConfig.resolve.extensionAlias = {
+    const resolve = readResolve(webpackConfig)
+    resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],
       '.js': ['.ts', '.tsx', '.js', '.jsx'],
       '.mjs': ['.mts', '.mjs'],
     }
+    // NextJsWebpackConfig types this callback's config as `any`.
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return webpackConfig
   },
   turbopack: {
@@ -50,7 +66,7 @@ const nextConfig: NextConfig = {
 // so the static site handles `/` via out/_redirects (written by build-static.mjs,
 // which also mirrors the locale-prefixed /check redirects below).
 if (!isStatic) {
-  nextConfig.redirects = async () => [
+  nextConfig.redirects = () => [
     { source: '/', destination: '/nl', permanent: false },
     // /check is deliberately locale-less (short URL in the LeadLens mail, Dutch
     // only) — catch intuitive locale-prefixed variants instead of 404ing.
@@ -76,7 +92,7 @@ if (!isStatic) {
     const entries = payloadHeaders ? await payloadHeaders() : []
     return [
       ...entries.map((entry) =>
-        entry.source === '/:path*' && entry.headers?.some((h) => h.key === 'Critical-CH')
+        entry.source === '/:path*' && entry.headers.some((h) => h.key === 'Critical-CH')
           ? { ...entry, source: '/((?!check).*)' }
           : entry,
       ),

@@ -23,7 +23,7 @@ const ICON: Record<string, string> = {
 
 function hrefFor(item: Item): string | undefined {
   if (item.kind === 'email') return `mailto:${item.value}`
-  if (item.kind === 'phone') return `tel:${item.value?.replace(/\s+/g, '')}`
+  if (item.kind === 'phone') return `tel:${item.value.replace(/\s+/g, '')}`
   return undefined
 }
 
@@ -40,7 +40,7 @@ export function Contact({ header, items, buttons, locale }: Props) {
                 const body = (
                   <span className="flex items-start gap-3">
                     <span className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
-                      <Icon name={ICON[item.kind ?? 'text']} fallback="IconPoint" size={18} stroke={1.75} />
+                      <Icon name={ICON[item.kind ?? 'text'] ?? 'IconPoint'} fallback="IconPoint" size={18} stroke={1.75} />
                     </span>
                     <span className="flex flex-col">
                       {item.label && (
@@ -72,6 +72,7 @@ export function Contact({ header, items, buttons, locale }: Props) {
               // blocks, so its link fields no longer match the engine's
               // structurally identical `LinkFields` (which reference the engine's
               // core-only `Page`). Same data, divergent types.
+              // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion -- engine LinkFields reference its own Page, not this site's generated one
               buttons={buttons as unknown as LinkFields[]}
               locale={locale}
               className="mt-2 flex flex-wrap items-center gap-5"

@@ -1,4 +1,7 @@
+import { z } from 'zod'
+
 import type { Scorecard } from './leadlens'
+import { logCaught } from './logCaught'
 
 /**
  * Self-service website check — the automated counterpart of LeadLens. A visitor
@@ -39,7 +42,7 @@ export function normalizeCheckUrl(value: string): URL | null {
 export type SiteProbe = {
   reachable: boolean
   /** Final URL after redirects (https). */
-  finalUrl?: string
+  finalUrl?: string | undefined
   /** Plain http:// serves content without upgrading to https. */
   httpNotUpgraded: boolean
   headers: {
@@ -50,17 +53,17 @@ export type SiteProbe = {
     referrerPolicy: boolean
   }
   html: {
-    title?: string
-    siteName?: string
+    title?: string | undefined
+    siteName?: string | undefined
     viewport: boolean
     metaDescription: boolean
     lang: boolean
-    generator?: string
+    generator?: string | undefined
     wordpress: boolean
-    copyrightYear?: number
+    copyrightYear?: number | undefined
   }
   /** Time to first byte of the https GET, in ms. */
-  ttfbMs?: number
+  ttfbMs?: number | undefined
 }
 
 const FETCH_UA =
@@ -68,7 +71,7 @@ const FETCH_UA =
 
 async function fetchWithTimeout(url: string, ms: number, redirect: 'follow' | 'manual') {
   const ctl = new AbortController()
-  const timer = setTimeout(() => ctl.abort(), ms)
+  const timer = setTimeout(() => { ctl.abort(); }, ms)
   try {
     return await fetch(url, {
       redirect,
@@ -130,7 +133,8 @@ export async function probeSite(url: URL): Promise<SiteProbe> {
     const started = Date.now()
     res = await fetchWithTimeout(url.href, 20_000, 'follow')
     probe.ttfbMs = Date.now() - started
-  } catch {
+  } catch (err) {
+    logCaught('[site-check] https probe failed', err)
     return probe
   }
   if (!res.ok) return probe
@@ -147,8 +151,9 @@ export async function probeSite(url: URL): Promise<SiteProbe> {
   }
   try {
     probe.html = parseHtmlSignals(await res.text())
-  } catch {
-    // keep defaults — reachability and headers still grade
+  } catch (err) {
+    // Reachability and headers still grade when the body cannot be read.
+    logCaught('[site-check] homepage body unreadable', err)
   }
 
   // Does plain http:// upgrade to https? Follow redirects and look at the
@@ -156,8 +161,9 @@ export async function probeSite(url: URL): Promise<SiteProbe> {
   try {
     const httpRes = await fetchWithTimeout(`http://${url.hostname}/`, 15_000, 'follow')
     probe.httpNotUpgraded = httpRes.ok && new URL(httpRes.url).protocol === 'http:'
-  } catch {
+  } catch (err) {
     // http closed entirely → fine (not a downgrade risk)
+    logCaught('[site-check] http upgrade probe failed', err)
   }
 
   return probe
@@ -166,13 +172,22 @@ export async function probeSite(url: URL): Promise<SiteProbe> {
 // ---- PageSpeed Insights (optional enrichment) ------------------------------
 
 export type PsiResult = {
-  performance?: number
-  seo?: number
-  accessibility?: number
-  lcpMs?: number
-  fcpMs?: number
-  tbtMs?: number
+  performance?: number | undefined
+  seo?: number | undefined
+  accessibility?: number | undefined
+  lcpMs?: number | undefined
+  fcpMs?: number | undefined
+  tbtMs?: number | undefined
 }
+
+const psiSchema = z.object({
+  lighthouseResult: z
+    .object({
+      categories: z.record(z.string(), z.unknown()).optional(),
+      audits: z.record(z.string(), z.unknown()).optional(),
+    })
+    .optional(),
+})
 
 export async function fetchPsi(url: string, apiKey?: string): Promise<PsiResult | null> {
   const endpoint = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed')
@@ -182,23 +197,30 @@ export async function fetchPsi(url: string, apiKey?: string): Promise<PsiResult 
   if (apiKey) endpoint.searchParams.set('key', apiKey)
 
   const ctl = new AbortController()
-  const timer = setTimeout(() => ctl.abort(), 75_000)
+  const timer = setTimeout(() => { ctl.abort(); }, 75_000)
   try {
     const res = await fetch(endpoint, { signal: ctl.signal })
     if (!res.ok) return null
-    const data = (await res.json()) as {
-      lighthouseResult?: {
-        categories?: Record<string, { score?: number }>
-        audits?: Record<string, { numericValue?: number }>
-      }
+    const parsed = psiSchema.safeParse(await res.json())
+    if (!parsed.success) {
+      logCaught('[site-check] PageSpeed response did not match the schema', parsed.error)
+      return null
     }
-    const lhr = data.lighthouseResult
+    const lhr = parsed.data.lighthouseResult
     if (!lhr?.categories) return null
     const pct = (id: string) => {
-      const s = lhr.categories?.[id]?.score
-      return typeof s === 'number' ? Math.round(s * 100) : undefined
+      const category = lhr.categories?.[id]
+      const score =
+        typeof category === 'object' && category !== null && 'score' in category
+          ? category.score
+          : undefined
+      return typeof score === 'number' ? Math.round(score * 100) : undefined
     }
-    const ms = (id: string) => lhr.audits?.[id]?.numericValue
+    const ms = (id: string) => {
+      const audit = lhr.audits?.[id]
+      if (typeof audit !== 'object' || audit === null || !('numericValue' in audit)) return undefined
+      return typeof audit.numericValue === 'number' ? audit.numericValue : undefined
+    }
     return {
       performance: pct('performance'),
       seo: pct('seo'),
@@ -207,7 +229,8 @@ export async function fetchPsi(url: string, apiKey?: string): Promise<PsiResult 
       fcpMs: ms('first-contentful-paint'),
       tbtMs: ms('total-blocking-time'),
     }
-  } catch {
+  } catch (err) {
+    logCaught('[site-check] PageSpeed request failed', err)
     return null
   } finally {
     clearTimeout(timer)
@@ -305,6 +328,7 @@ export function composeFindings(probe: SiteProbe, psi: PsiResult | null, now = n
 
 export function composePitch(grades: Scorecard['grades'], probe: SiteProbe): string {
   const worst = Object.entries(grades).sort((a, b) => a[1] - b[1])[0]
+  if (worst === undefined) throw new Error('composePitch: grades are empty')
   const labels: Record<string, string> = {
     moderniteit: 'een verouderde uitstraling',
     snelheid: 'een trage laadtijd',
@@ -315,7 +339,8 @@ export function composePitch(grades: Scorecard['grades'], probe: SiteProbe): str
   if (!probe.reachable) return 'We konden de site niet bereiken. Juist dan is een gesprek zinvol.'
   if (worst[1] >= 65)
     return 'De site staat er technisch goed bij. In een korte kennismaking kijken we graag mee waar nog winst zit.'
-  return `Het grootste verbeterpunt is ${labels[worst[0]]}. In een gratis kennismaking laten we zien hoe wij dat oplossen.`
+  const label = labels[worst[0]] ?? worst[0]
+  return `Het grootste verbeterpunt is ${label}. In een gratis kennismaking laten we zien hoe wij dat oplossen.`
 }
 
 // ---- pipeline --------------------------------------------------------------
@@ -326,13 +351,27 @@ export type CheckRunStatus = {
   step: 'probe' | 'psi' | 'compose' | 'done'
   token: string
   startedAt: string
-  message?: string
+  message?: string | undefined
 }
+
+const runStatusSchema = z.object({
+  state: z.enum(['running', 'done', 'error']),
+  step: z.enum(['probe', 'psi', 'compose', 'done']),
+  token: z.string(),
+  startedAt: z.string(),
+  message: z.string().optional(),
+})
 
 export function generateToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(24))
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  return [...bytes].map((b) => alphabet[b % alphabet.length]).join('')
+  return [...bytes]
+    .map((b) => {
+      const ch = alphabet[b % alphabet.length]
+      if (ch === undefined) throw new Error('generateToken: alphabet index out of range')
+      return ch
+    })
+    .join('')
 }
 
 const STATUS_KEY = (token: string) => `${token}/status.json`
@@ -341,8 +380,14 @@ export async function readRunStatus(bucket: R2Bucket, token: string): Promise<Ch
   const obj = await bucket.get(STATUS_KEY(token))
   if (!obj) return null
   try {
-    return (await obj.json()) as CheckRunStatus
-  } catch {
+    const parsed = runStatusSchema.safeParse(await obj.json())
+    if (!parsed.success) {
+      logCaught('[site-check] status.json did not match the schema', parsed.error)
+      return null
+    }
+    return parsed.data
+  } catch (err) {
+    logCaught('[site-check] status.json was not JSON', err)
     return null
   }
 }
@@ -385,7 +430,7 @@ export async function runSiteCheck(opts: {
         probe.html.siteName ||
         // Split only on a separator with surrounding space, so hyphenated names
         // ("e-invoicing for everyone") survive.
-        probe.html.title?.split(/\s+[|–—-]\s+/)[0].trim() ||
+        probe.html.title?.split(/\s+[|–—-]\s+/)[0]?.trim() ||
         url.hostname.replace(/^www\./, ''),
       grades,
       findings: composeFindings(probe, psi, now()),
@@ -399,6 +444,8 @@ export async function runSiteCheck(opts: {
     // No screenshots in the self-service v1 — the page omits that section.
     await setStatus('done', 'done')
   } catch (err) {
-    await setStatus('error', 'compose', err instanceof Error ? err.message : String(err)).catch(() => {})
+    await setStatus('error', 'compose', err instanceof Error ? err.message : String(err)).catch((statusErr: unknown) => {
+      logCaught('[site-check] could not persist error status', statusErr)
+    })
   }
 }

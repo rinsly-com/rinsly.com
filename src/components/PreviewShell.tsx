@@ -9,7 +9,9 @@ import { RevenueCalculator } from '@/components/custom/RevenueCalculator'
 
 type BlockOf<T extends string> = Extract<NonNullable<Page['layout']>[number], { blockType: T }>
 
-const as = <T,>(block: unknown) => block as T
+// The type parameter is how each call site names its block. The assertion is the use.
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+const as = <T,>(block: unknown): T => block as T
 
 /**
  * This site's block renderers, on the client, for live preview.

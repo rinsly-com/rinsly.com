@@ -21,13 +21,19 @@ const valid = () => ({
   expiresAt: '2026-10-27T09:00:00Z',
 })
 
+function definedScorecard(raw: unknown) {
+  const sc = parseScorecard(raw)
+  expect(sc).not.toBeNull()
+  if (!sc) throw new Error('expected a scorecard')
+  return sc
+}
+
 describe('parseScorecard', () => {
   it('accepts the datacontract example', () => {
-    const sc = parseScorecard(valid())
-    expect(sc).not.toBeNull()
-    expect(sc!.domain).toBe('kapsalonjan.nl')
-    expect(sc!.grades.snelheid).toBe(83)
-    expect(sc!.findings).toHaveLength(1)
+    const sc = definedScorecard(valid())
+    expect(sc.domain).toBe('kapsalonjan.nl')
+    expect(sc.grades.snelheid).toBe(83)
+    expect(sc.findings).toHaveLength(1)
   })
 
   it('rejects non-objects and missing required fields', () => {
@@ -44,28 +50,27 @@ describe('parseScorecard', () => {
       parseScorecard({ ...valid(), grades: { ...valid().grades, mobiel: 'laag' } }),
     ).toBeNull()
 
-    const clamped = parseScorecard({
+    const clamped = definedScorecard({
       ...valid(),
       grades: { ...valid().grades, mobiel: -5, snelheid: 250 },
     })
-    expect(clamped!.grades.mobiel).toBe(0)
-    expect(clamped!.grades.snelheid).toBe(100)
+    expect(clamped.grades.mobiel).toBe(0)
+    expect(clamped.grades.snelheid).toBe(100)
   })
 
   it('caps findings at 5 and drops non-string entries', () => {
-    const sc = parseScorecard({
+    const sc = definedScorecard({
       ...valid(),
       findings: ['a', 'b', 42, '', 'c', 'd', 'e', 'f'],
     })
-    expect(sc!.findings).toEqual(['a', 'b', 'c', 'd', 'e'])
+    expect(sc.findings).toEqual(['a', 'b', 'c', 'd', 'e'])
   })
 
   it('tolerates absent optional fields', () => {
     const { niche: _n, city: _c, pitch: _p, expiresAt: _e, ...minimal } = valid()
-    const sc = parseScorecard(minimal)
-    expect(sc).not.toBeNull()
-    expect(sc!.niche).toBeUndefined()
-    expect(sc!.expiresAt).toBeUndefined()
+    const sc = definedScorecard(minimal)
+    expect(sc.niche).toBeUndefined()
+    expect(sc.expiresAt).toBeUndefined()
   })
 })
 
