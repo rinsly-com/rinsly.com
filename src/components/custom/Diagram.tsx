@@ -10,7 +10,7 @@ import { Section, SectionHeading } from '@rinsly-com/site-core/ui'
 type Kind = 'figmaToProduction' | 'oneEngineFleet' | 'invoicingRoutes'
 
 type Props = {
-  kind?: Kind | string | null
+  kind?: Kind | null
   eyebrow?: string | null
   title?: string | null
   caption?: string | null
