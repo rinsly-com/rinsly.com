@@ -24,9 +24,9 @@ export interface PartnerTokenPayload {
   /** Business name, for the greeting and the prefill. */
   n: string
   /** City. */
-  c?: string | undefined
+  c?: string
   /** ISO 3166-1 alpha-2, lowercase. */
-  l?: string | undefined
+  l?: string
   /** Expiry, seconds since the epoch. */
   exp: number
 }
@@ -46,11 +46,7 @@ function fromB64url(value: string): Uint8Array {
 function toB64url(bytes: ArrayBuffer): string {
   let binary = ''
   const view = new Uint8Array(bytes)
-  for (let i = 0; i < view.length; i++) {
-    const byte = view[i]
-    if (byte === undefined) throw new Error('partner token: truncated signature bytes')
-    binary += String.fromCharCode(byte)
-  }
+  for (let i = 0; i < view.length; i++) binary += String.fromCharCode(view[i])
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 

@@ -42,7 +42,7 @@ export function normalizeCheckUrl(value: string): URL | null {
 export type SiteProbe = {
   reachable: boolean
   /** Final URL after redirects (https). */
-  finalUrl?: string | undefined
+  finalUrl?: string
   /** Plain http:// serves content without upgrading to https. */
   httpNotUpgraded: boolean
   headers: {
@@ -53,17 +53,17 @@ export type SiteProbe = {
     referrerPolicy: boolean
   }
   html: {
-    title?: string | undefined
-    siteName?: string | undefined
+    title?: string
+    siteName?: string
     viewport: boolean
     metaDescription: boolean
     lang: boolean
-    generator?: string | undefined
+    generator?: string
     wordpress: boolean
-    copyrightYear?: number | undefined
+    copyrightYear?: number
   }
   /** Time to first byte of the https GET, in ms. */
-  ttfbMs?: number | undefined
+  ttfbMs?: number
 }
 
 const FETCH_UA =
@@ -172,12 +172,12 @@ export async function probeSite(url: URL): Promise<SiteProbe> {
 // ---- PageSpeed Insights (optional enrichment) ------------------------------
 
 export type PsiResult = {
-  performance?: number | undefined
-  seo?: number | undefined
-  accessibility?: number | undefined
-  lcpMs?: number | undefined
-  fcpMs?: number | undefined
-  tbtMs?: number | undefined
+  performance?: number
+  seo?: number
+  accessibility?: number
+  lcpMs?: number
+  fcpMs?: number
+  tbtMs?: number
 }
 
 const psiSchema = z.object({
@@ -329,7 +329,6 @@ export function composeFindings(probe: SiteProbe, psi: PsiResult | null, now = n
 
 export function composePitch(grades: Scorecard['grades'], probe: SiteProbe): string {
   const worst = Object.entries(grades).sort((a, b) => a[1] - b[1])[0]
-  if (worst === undefined) throw new Error('composePitch: grades are empty')
   const labels: Record<string, string> = {
     moderniteit: 'een verouderde uitstraling',
     snelheid: 'een trage laadtijd',
@@ -340,8 +339,7 @@ export function composePitch(grades: Scorecard['grades'], probe: SiteProbe): str
   if (!probe.reachable) return 'We konden de site niet bereiken. Juist dan is een gesprek zinvol.'
   if (worst[1] >= 65)
     return 'De site staat er technisch goed bij. In een korte kennismaking kijken we graag mee waar nog winst zit.'
-  const label = labels[worst[0]] ?? worst[0]
-  return `Het grootste verbeterpunt is ${label}. In een gratis kennismaking laten we zien hoe wij dat oplossen.`
+  return `Het grootste verbeterpunt is ${labels[worst[0]]}. In een gratis kennismaking laten we zien hoe wij dat oplossen.`
 }
 
 // ---- pipeline --------------------------------------------------------------
@@ -352,7 +350,7 @@ export type CheckRunStatus = {
   step: 'probe' | 'psi' | 'compose' | 'done'
   token: string
   startedAt: string
-  message?: string | undefined
+  message?: string
 }
 
 const runStatusSchema = z.object({
@@ -366,13 +364,7 @@ const runStatusSchema = z.object({
 export function generateToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(24))
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
-  return [...bytes]
-    .map((b) => {
-      const ch = alphabet[b % alphabet.length]
-      if (ch === undefined) throw new Error('generateToken: alphabet index out of range')
-      return ch
-    })
-    .join('')
+  return [...bytes].map((b) => alphabet[b % alphabet.length]).join('')
 }
 
 const STATUS_KEY = (token: string) => `${token}/status.json`
@@ -431,7 +423,7 @@ export async function runSiteCheck(opts: {
         probe.html.siteName ||
         // Split only on a separator with surrounding space, so hyphenated names
         // ("e-invoicing for everyone") survive.
-        probe.html.title?.split(/\s+[|–—-]\s+/)[0]?.trim() ||
+        probe.html.title?.split(/\s+[|–—-]\s+/)[0].trim() ||
         url.hostname.replace(/^www\./, ''),
       grades,
       findings: composeFindings(probe, psi, now()),

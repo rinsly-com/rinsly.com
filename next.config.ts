@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
-function readResolve(config: unknown): { extensionAlias?: Record<string, string[]> | undefined } {
+function readResolve(config: unknown): { extensionAlias?: Record<string, string[]> } {
   if (typeof config !== 'object' || config === null || !('resolve' in config)) {
     throw new Error('next webpack config is missing resolve')
   }

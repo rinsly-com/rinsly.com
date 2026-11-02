@@ -127,14 +127,15 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
 
   const perMonth = (portfolio * ratePct) / 100
   const atMax = ratePct >= PARTNER_MAX_PCT
-  const nextThreshold = VOLUME_THRESHOLDS_EUR[tier]
+  // tier 3 is past the last threshold, so the lookup is absent even though the tuple type is not.
+  const nextThreshold = VOLUME_THRESHOLDS_EUR[tier] as number | undefined
   const toNext = nextThreshold ? nextThreshold - portfolio + 1 : null
 
   const toggle = (key: Duty) => { setDuties((d) => ({ ...d, [key]: !d[key] })); }
 
   return (
     <Section className="py-14 sm:py-20">
-      <SectionHeading header={{ eyebrow: eyebrow ?? null, title: title ?? null, intro: intro ?? null }} />
+      <SectionHeading header={{ eyebrow, title, intro }} />
 
       <div className="shadow-card mt-8 grid gap-0 overflow-hidden rounded-2xl border border-hair bg-card lg:grid-cols-[3fr_2fr]">
         {/* ── Inputs ─────────────────────────────────────────────────── */}

@@ -1670,7 +1670,7 @@ async function run() {
 
   // Admin user
   const users = await payload.find({ collection: 'users', limit: 1, sort: 'createdAt' })
-  const existingUser = users.docs[0]
+  const existingUser = users.docs[0] as (typeof users.docs)[number] | undefined
   if (existingUser !== undefined && !userRowSchema.safeParse(existingUser).success) {
     throw new Error('seed: user row failed validation')
   }
@@ -1736,7 +1736,7 @@ async function run() {
       limit: 1,
       depth: 0,
     })
-    const found = existing.docs[0]
+    const found = existing.docs[0] as (typeof existing.docs)[number] | undefined
     const stored = found === undefined ? undefined : idRowSchema.safeParse(found)
     if (stored && !stored.success) throw new Error(`seed: page row ${page.slug} failed validation`)
     let pageId = stored?.success ? stored.data.id : undefined
@@ -1757,7 +1757,7 @@ async function run() {
   }
 
   const idFor = (slug: string): number => {
-    const id = ids[slug]
+    const id = ids[slug] as number | undefined
     if (id === undefined) throw new Error(`seed: no page id for ${slug}`)
     return id
   }

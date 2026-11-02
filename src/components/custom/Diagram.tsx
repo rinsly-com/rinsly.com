@@ -7,8 +7,10 @@ import { Section, SectionHeading } from '@rinsly-com/site-core/ui'
  * A new kind needs an option in `src/blocks/Diagram.ts` and a case here.
  */
 
+type Kind = 'figmaToProduction' | 'oneEngineFleet' | 'invoicingRoutes'
+
 type Props = {
-  kind?: string | null
+  kind?: Kind | string | null
   eyebrow?: string | null
   title?: string | null
   caption?: string | null
@@ -258,7 +260,7 @@ export function Diagram({ kind, eyebrow, title, caption, locale }: Props) {
 
   return (
     <Section className="py-12 sm:py-16">
-      <SectionHeading header={{ eyebrow: eyebrow ?? null, title: title ?? null }} />
+      <SectionHeading header={{ eyebrow, title }} />
       <figure className={eyebrow || title ? 'mt-7' : undefined} data-reveal>
         {/* The drawing scrolls inside its own box rather than widening the page. */}
         <div

@@ -36,13 +36,13 @@ export type Scorecard = {
   token: string
   domain: string
   businessName: string
-  niche?: string | undefined
-  city?: string | undefined
+  niche?: string
+  city?: string
   grades: Record<GradeKey, number>
   findings: string[]
-  pitch?: string | undefined
-  createdAt?: string | undefined
-  expiresAt?: string | undefined
+  pitch?: string
+  createdAt?: string
+  expiresAt?: string
 }
 
 export type ScorecardResult =

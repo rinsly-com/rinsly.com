@@ -23,7 +23,7 @@ const ICON: Record<string, string> = {
 
 function hrefFor(item: Item): string | undefined {
   if (item.kind === 'email') return `mailto:${item.value}`
-  if (item.kind === 'phone') return `tel:${item.value.replace(/\s+/g, '')}`
+  if (item.kind === 'phone') return `tel:${item.value?.replace(/\s+/g, '')}`
   return undefined
 }
 
@@ -32,7 +32,7 @@ export function Contact({ header, items, buttons, locale }: Props) {
     <Section className="py-16 sm:py-20">
       <div className="grid gap-10 lg:grid-cols-2">
         <div className="flex flex-col gap-6">
-          <SectionHeading {...(header ? { header } : {})} />
+          <SectionHeading header={header} />
           {items?.length ? (
             <ul data-reveal-group className="flex flex-col gap-4">
               {items.map((item, i) => {
@@ -40,7 +40,7 @@ export function Contact({ header, items, buttons, locale }: Props) {
                 const body = (
                   <span className="flex items-start gap-3">
                     <span className="mt-0.5 inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent-soft text-accent">
-                      <Icon name={ICON[item.kind ?? 'text'] ?? 'IconPoint'} fallback="IconPoint" size={18} stroke={1.75} />
+                      <Icon name={ICON[item.kind ?? 'text']} fallback="IconPoint" size={18} stroke={1.75} />
                     </span>
                     <span className="flex flex-col">
                       {item.label && (

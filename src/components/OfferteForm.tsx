@@ -151,9 +151,7 @@ const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
 
 // Base UI has no Textarea part; Field.Control renders one.
-const Textarea = (props: React.ComponentProps<'textarea'>) => (
-  <Field.Control render={<textarea {...props} />} />
-)
+const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props as object)} />
 
 /** Placeholder stays the visible label. The sr-only label keeps `for` wired to an explicit id. */
 function TextField({
@@ -675,6 +673,7 @@ function Check({
   onChange: (value: boolean) => void
   hint?: string
 }) {
+  const hintId = hint ? `${id}-hint` : undefined
   return (
     <Field.Root>
       <Field.Label
@@ -691,7 +690,7 @@ function Check({
           checked={checked}
           onCheckedChange={onChange}
           render={<button type="button" />}
-          {...(hint ? { 'aria-describedby': `${id}-hint` } : {})}
+          aria-describedby={hintId}
           className={[
             'mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border p-0 transition-all',
             checked ? 'border-accent bg-accent text-white' : 'border-hair bg-paper text-transparent',
@@ -712,7 +711,7 @@ function Check({
         <span className="flex flex-col gap-0.5">
           <span className="text-ink">{label}</span>
           {hint ? (
-            <Field.Description id={`${id}-hint`} className="m-0 text-xs text-muted">
+            <Field.Description id={hintId} className="m-0 text-xs text-muted">
               {hint}
             </Field.Description>
           ) : null}

@@ -23,9 +23,7 @@ const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
 
 // Base UI has no Textarea part; Field.Control renders one.
-const Textarea = (props: React.ComponentProps<'textarea'>) => (
-  <Field.Control render={<textarea {...props} />} />
-)
+const Textarea = (props: React.ComponentProps<'textarea'>) => <Field.Control render={<textarea />} {...(props as object)} />
 
 const isEmail = (v: string) => /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v.trim())
 
@@ -151,17 +149,13 @@ function TextInput({
   label: string
   hint?: string
 } & Omit<React.ComponentProps<'input'>, 'id'>) {
+  const hintId = hint ? `${id}-hint` : undefined
   return (
     <Field.Root className="block">
       <Field.Label className="mb-1.5 block text-sm font-medium text-ink">{label}</Field.Label>
-      <Input
-        {...props}
-        id={id}
-        className={inputClass}
-        {...(hint ? { 'aria-describedby': `${id}-hint` } : {})}
-      />
+      <Input {...props} id={id} className={inputClass} aria-describedby={hintId} />
       {hint ? (
-        <Field.Description id={`${id}-hint`} className="m-0 mt-1 block text-xs text-muted">
+        <Field.Description id={hintId} className="m-0 mt-1 block text-xs text-muted">
           {hint}
         </Field.Description>
       ) : null}

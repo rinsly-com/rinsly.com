@@ -22,14 +22,14 @@ export const DeployView: React.FC<AdminViewServerProps> = ({
   return (
     <DefaultTemplate
       i18n={req.i18n}
+      locale={initPageResult.locale}
+      params={params}
       payload={req.payload}
-      req={req}
-      visibleEntities={visibleEntities}
-      {...(initPageResult.locale !== undefined ? { locale: initPageResult.locale } : {})}
-      {...(params !== undefined ? { params } : {})}
       permissions={permissions}
-      {...(searchParams !== undefined ? { searchParams } : {})}
-      {...(req.user != null ? { user: req.user } : {})}
+      req={req}
+      searchParams={searchParams}
+      user={req.user ?? undefined}
+      visibleEntities={visibleEntities}
     >
       <Gutter>
         <DeployPanel />

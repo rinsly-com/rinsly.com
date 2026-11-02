@@ -15,14 +15,14 @@ type Runtime = { env: CloudflareEnv; waitUntil: (p: Promise<unknown>) => void }
 
 type LocalProxy = {
   env: unknown
-  ctx?: { waitUntil?: (promise: Promise<unknown>) => void } | undefined
+  ctx?: { waitUntil?: (promise: Promise<unknown>) => void }
 }
 
 let proxy: Promise<LocalProxy> | undefined
 let loggedProxyFallback = false
 
 type PlatformProxyModule = {
-  getPlatformProxy: (options: { environment?: string | undefined }) => Promise<LocalProxy>
+  getPlatformProxy: (options: { environment?: string }) => Promise<LocalProxy>
 }
 
 function readPlatformProxy(mod: unknown): PlatformProxyModule['getPlatformProxy'] {

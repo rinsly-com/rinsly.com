@@ -177,7 +177,7 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
       limit: 1,
       overrideAccess: true,
     })
-    const previous = existing.docs[0]
+    const previous = existing.docs[0] as (typeof existing.docs)[number] | undefined
     const row = previous === undefined ? undefined : partnerRowSchema.safeParse(previous)
     if (row && !row.success) {
       logCaught('[partner-aanvraag] stored application failed validation', row.error)
@@ -396,7 +396,7 @@ export const partnerInteresseHandler: PayloadHandler = async (req: PayloadReques
       limit: 1,
       overrideAccess: true,
     })
-    const previous = existing.docs[0]
+    const previous = existing.docs[0] as (typeof existing.docs)[number] | undefined
     const row = previous === undefined ? undefined : partnerRowSchema.safeParse(previous)
     if (row && !row.success) {
       logCaught('[partner-interesse] stored application failed validation', row.error)
