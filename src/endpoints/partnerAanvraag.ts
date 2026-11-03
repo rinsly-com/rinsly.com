@@ -34,6 +34,7 @@ const partnerBodySchema = z.object({
   exclusiviteit: flag,
   relatiebeheer: flag,
   marketing: flag,
+  // Kept for older clients, and no longer collected: accepted on purpose, never written.
   figmaSeat: flag,
   branches: text(400),
   talen: text(100),
@@ -48,6 +49,7 @@ const interesseSchema = z.object({
   domein: text(253),
   contactpersoon: text(),
   telefoon: text(40),
+  // Kept for older clients, and no longer collected: accepted on purpose, never written.
   figmaSeat: flag,
   bouwtZelf: flag,
   verkooptHosting: flag,
@@ -334,8 +336,9 @@ export const partnerMarkHandler: PayloadHandler = async (req: PayloadRequest) =>
  *   sites themselves, and whether they already sell hosting. They are asked
  *   here rather than on the first call, and both go into `opmerking` until
  *   the collection grows columns for them (see FACILITATOR-MIGRATION.md).
- *   `figmaSeat` keeps its column for older applications. This handler does
- *   not write it.
+ *   `figmaSeat` stays on the request schema so an older client is accepted,
+ *   not rejected. The value is never written. The column stays for older
+ *   applications.
  */
 export const partnerInteresseHandler: PayloadHandler = async (req: PayloadRequest) => {
   const raw = await readRequestJson(req)
