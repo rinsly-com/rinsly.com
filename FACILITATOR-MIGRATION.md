@@ -88,8 +88,8 @@ It deserves a real checkbox field, because it drives an **irreversible** build-t
 
 **b. The partner qualification answers have no columns.** `POST /api/partner-interesse` (new,
 in `src/endpoints/partnerAanvraag.ts`) writes a `partner-aanvragen` row for a studio that
-arrived on `/contact` with no invite token. `figmaSeat` has a column; *"do you build sites
-yourselves"* and *"do you already sell hosting"* do not, so they are written into `opmerking`
+arrived on `/contact` with no invite token. *"Do you build sites
+yourselves"* and *"do you already sell hosting"* have no columns, so they are written into `opmerking`
 as `Bouwt zelf websites: JA/nee`. Those two answers are the ones that decide whether there is
 a deal at all — they should be real, filterable booleans.
 

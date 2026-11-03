@@ -741,10 +741,6 @@ export interface PartnerAanvragen {
   relatiebeheer?: boolean | null;
   marketing?: boolean | null;
   /**
-   * Required of every partner, so a "no" is a conversation, not a rejection.
-   */
-  figmaSeat?: boolean | null;
-  /**
    * Comma-separated, e.g. kapper,restaurant. Empty means any branch.
    */
   branches?: string | null;
@@ -1248,7 +1244,6 @@ export interface PartnerAanvragenSelect<T extends boolean = true> {
   exclusiviteit?: T;
   relatiebeheer?: T;
   marketing?: T;
-  figmaSeat?: T;
   branches?: T;
   talen?: T;
   landen?: T;

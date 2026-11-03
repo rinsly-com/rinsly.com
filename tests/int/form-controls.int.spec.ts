@@ -91,7 +91,7 @@ describe('form control ids survive hydration', () => {
     expect(screen.getByRole('button', { name: 'Test mijn website nu' })).toBeTruthy()
   })
 
-  it('keeps offerte labels, and the figma checkbox description, attached', () => {
+  it('keeps offerte labels attached, without a Figma checkbox', () => {
     hydrate(createElement(OfferteForm, { locale: 'nl' }))
 
     fireEvent.click(screen.getByRole('button', { name: /Ik wil een website/ }))
@@ -112,12 +112,12 @@ describe('form control ids survive hydration', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Volgende' }))
 
-    const figma = screen.getByRole('checkbox', { name: /Figma-licentie/ })
-    expect(figma.tagName).toBe('BUTTON')
-    expect(figma.getAttribute('id')).toBe('offerte-figma')
-    expect(figma.getAttribute('aria-describedby')).toBe('offerte-figma-hint')
-    expect(document.querySelector('label[for="offerte-figma"]')).toBeTruthy()
-    expect(document.getElementById('offerte-figma-hint')?.textContent).toMatch(/Dev Mode/)
+    const builds = screen.getByRole('checkbox', { name: /bouwen onze websites zelf/ })
+    expect(builds.tagName).toBe('BUTTON')
+    expect(builds.getAttribute('id')).toBe('offerte-bouwt')
+    expect(document.querySelector('label[for="offerte-bouwt"]')).toBeTruthy()
+    expect(screen.getByRole('checkbox', { name: /verkopen zelf al hosting/ })).toBeTruthy()
+    expect(screen.queryByRole('checkbox', { name: /Figma/ })).toBeNull()
     labelPointsAtControl(document.body)
   })
 

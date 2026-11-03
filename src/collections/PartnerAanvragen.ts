@@ -72,13 +72,6 @@ export const PartnerAanvragen: CollectionConfig = {
       type: 'checkbox',
       defaultValue: false,
     },
-    {
-      name: 'figmaSeat',
-      label: { en: 'Has a Figma seat with Dev Mode', nl: 'Heeft Figma met Dev Mode' },
-      type: 'checkbox',
-      defaultValue: false,
-      admin: { description: 'Required of every partner, so a "no" is a conversation, not a rejection.' },
-    },
 
     // ── how they should be matched ────────────────────────────────────────
     {
