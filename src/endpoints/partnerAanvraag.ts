@@ -20,6 +20,8 @@ const bool = (v: unknown): boolean => v === true || v === 'true' || v === 'on' |
 const text = (max = 200) => z.unknown().optional().transform((value) => str(value, max))
 const flag = z.unknown().optional().transform((value) => bool(value))
 
+// z.object strips unknown keys. A cached client that still posts figmaSeat
+// is accepted, and the value is ignored.
 const partnerBodySchema = z.object({
   website: z.unknown().optional(),
   token: text(1024),
@@ -34,8 +36,6 @@ const partnerBodySchema = z.object({
   exclusiviteit: flag,
   relatiebeheer: flag,
   marketing: flag,
-  // Kept for older clients, and no longer collected: accepted on purpose, never written.
-  figmaSeat: flag,
   branches: text(400),
   talen: text(100),
   landen: text(100),
@@ -49,8 +49,6 @@ const interesseSchema = z.object({
   domein: text(253),
   contactpersoon: text(),
   telefoon: text(40),
-  // Kept for older clients, and no longer collected: accepted on purpose, never written.
-  figmaSeat: flag,
   bouwtZelf: flag,
   verkooptHosting: flag,
   opmerking: text(2000),
@@ -336,9 +334,6 @@ export const partnerMarkHandler: PayloadHandler = async (req: PayloadRequest) =>
  *   sites themselves, and whether they already sell hosting. They are asked
  *   here rather than on the first call, and both go into `opmerking` until
  *   the collection grows columns for them (see FACILITATOR-MIGRATION.md).
- *   `figmaSeat` stays on the request schema so an older client is accepted,
- *   not rejected. The value is never written. The column stays for older
- *   applications.
  */
 export const partnerInteresseHandler: PayloadHandler = async (req: PayloadRequest) => {
   const raw = await readRequestJson(req)
