@@ -201,8 +201,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
     ),
     t(
       locale,
-      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke mediaback-up. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
-      'Rinsly is the build-and-run department design studios don’t have. You deliver the design in Figma, we build it as a real application and run it from there: hosting, updates, continuous point-in-time restore of the database (Cloudflare D1 Time Travel) and a nightly media backup. Every time the client pays, a share of it comes to you.',
+      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het design system aan, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke mediaback-up. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
+      'Rinsly is the build-and-run department design studios don’t have. You deliver the design system, we build it as a real application and run it from there: hosting, updates, continuous point-in-time restore of the database (Cloudflare D1 Time Travel) and a nightly media backup. Every time the client pays, a share of it comes to you.',
     ),
     [
       pageLink(t(locale, 'Word partner', 'Become a partner'), ids, SLUG.partner, { variant: 'primary' }),
@@ -223,12 +223,12 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
     },
     cards: [
       {
-        icon: 'IconBrandFigma',
-        title: t(locale, 'Van Figma naar productie', 'From Figma to production'),
+        icon: 'IconBrush',
+        title: t(locale, 'Van design system naar productie', 'From design system to production'),
         description: t(
           locale,
-          'Wij bouwen uit Dev Mode. Type-scale, spacing, responsive gedrag en motion zitten in de engine, dus het ontwerp overleeft de bouw.',
-          'We build from Dev Mode. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.',
+          'Wij bouwen vanuit het design system. Type-scale, spacing, responsive gedrag en motion zitten in de engine, dus het ontwerp overleeft de bouw.',
+          'We build from the design system. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.',
         ),
         features: [
           feature(t(locale, 'Next.js met Rinsly CMS', 'Next.js with Rinsly CMS')),
@@ -387,12 +387,12 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         ],
       },
       {
-        icon: 'IconBrandFigma',
-        title: t(locale, 'Van Figma naar productie', 'From Figma to production'),
+        icon: 'IconBrush',
+        title: t(locale, 'Van design system naar productie', 'From design system to production'),
         description: t(
           locale,
-          'We bouwen uit Dev Mode: type-scale, spacing en motion zitten in de engine, dus het ontwerp overleeft de bouw.',
-          'We build from Dev Mode: type scale, spacing and motion live in the engine, so the design survives the build.',
+          'We bouwen vanuit het design system: type-scale, spacing en motion zitten in de engine, dus het ontwerp overleeft de bouw.',
+          'We build from the design system: type scale, spacing and motion live in the engine, so the design survives the build.',
         ),
         features: [
           feature(t(locale, 'Next.js met Rinsly CMS', 'Next.js with Rinsly CMS')),
@@ -436,14 +436,14 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
     },
     cards: [
       {
-        icon: 'IconBrandFigma',
+        icon: 'IconBrush',
         title: t(locale, '1. Jullie ontwerpen', '1. You design'),
         description: t(
           locale,
-          'Wat jullie al doen: het ontwerp, in Figma. Elke partner heeft een Figma-seat met Dev Mode en levert website-ontwerpen aan als Figma-bestanden. Dat is een voorwaarde, en het verandert het percentage niet.',
-          'What you already do: the design, in Figma. Every partner must hold a Figma seat with Dev Mode and deliver website designs as Figma files. That is a precondition, and it does not change the percentage.',
+          'Wat jullie al doen: het design system. Partners leveren een design system aan; de tool is aan jullie, en het verandert het percentage niet.',
+          'What you already do: the design system. Partners deliver a design system; the tool is up to you, and it does not change the percentage.',
         ),
-        features: [feature(t(locale, 'Aanlevering als Figma-bestand', 'Delivered as a Figma file'))],
+        features: [feature(t(locale, 'Jullie leveren het design system aan', 'You deliver the design system'))],
       },
       {
         icon: 'IconCode',
@@ -476,8 +476,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
     t(locale, 'Drie stappen, en maar één ervan is van jou', 'Three steps, and only one of them is yours'),
     t(
       locale,
-      'Jullie leveren het Figma-bestand met Dev Mode aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna edge-hosting, SSL, uptime-monitoring, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up, beveiliging en CMS-updates.',
-      'You hand over the Figma file with Dev Mode. Rinsly builds it as a real application on the shared engine and takes it live, then runs edge hosting, SSL, uptime monitoring, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup, security and CMS updates.',
+      'Jullie leveren het design system aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna edge-hosting, SSL, uptime-monitoring, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up, beveiliging en CMS-updates.',
+      'You deliver the design system. Rinsly builds it as a real application on the shared engine and takes it live, then runs edge hosting, SSL, uptime monitoring, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup, security and CMS updates.',
     ),
   ),
   {
@@ -623,8 +623,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         body: richBody(
           t(
             locale,
-            'De basis van het aandeel is 0%. Een Figma-seat met Dev Mode is een voorwaarde, en die verandert het percentage niet. Eenmalige bouwkosten en meerwerk worden niet gedeeld.',
-            'The base of the share is 0%. A Figma seat with Dev Mode is a precondition, and it does not change the percentage. One-off build fees and meerwerk are not shared.',
+            'De basis van het aandeel is 0%. Partners leveren een design system aan; de tool is aan jullie, en dat verandert het percentage niet. Eenmalige bouwkosten en meerwerk worden niet gedeeld.',
+            'The base of the share is 0%. Partners deliver a design system; the tool is up to you, and it does not change the percentage. One-off build fees and meerwerk are not shared.',
           ),
         ),
       },
@@ -666,12 +666,12 @@ const platformLayout = (locale: Locale, _ids: PageIds): Block[] => [
     },
     cards: [
       {
-        icon: 'IconBrandFigma',
-        title: t(locale, 'Van Figma naar productie', 'From Figma to production'),
+        icon: 'IconBrush',
+        title: t(locale, 'Van design system naar productie', 'From design system to production'),
         description: t(
           locale,
-          'Wij bouwen uit Dev Mode. Type-scale, spacing, responsive gedrag en motion zitten in de engine, dus het ontwerp overleeft de bouw.',
-          'We build from Dev Mode. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.',
+          'Wij bouwen vanuit het design system. Type-scale, spacing, responsive gedrag en motion zitten in de engine, dus het ontwerp overleeft de bouw.',
+          'We build from the design system. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.',
         ),
         features: [
           feature(t(locale, 'Next.js met Rinsly CMS', 'Next.js with Rinsly CMS')),
@@ -1155,8 +1155,8 @@ const overLayout = (locale: Locale, ids: PageIds): Block[] => [
     t(locale, 'Een technisch bedrijf, geen websitebouwer', 'A technical company, not a website maker'),
     t(
       locale,
-      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Wij verkopen geen ontwerp. Dat doen onze partners. Wij nemen hun Figma-bestand en maken er een applicatie van die we daarna blijven draaien.',
-      'Rinsly is the build-and-run department design studios don’t have. We don’t sell design: our partners do that. We take their Figma file and turn it into an application that we then keep running.',
+      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Wij verkopen geen ontwerp. Dat doen onze partners. Wij nemen hun design system en maken er een applicatie van die we daarna blijven draaien.',
+      'Rinsly is the build-and-run department design studios don’t have. We don’t sell design: our partners do that. We take their design system and turn it into an application that we then keep running.',
     ),
   ),
   {

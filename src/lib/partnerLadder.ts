@@ -158,8 +158,8 @@ export function partnerProgrammeCopy(locale: LadderLocale): PartnerProgrammeCopy
     : `The volume levels are cumulative, each +${VOLUME_STEP_PCT}%. The ladder tops out at ${PARTNER_MAX_PCT}% of the recurring subscription revenue excluding VAT, per settled invoice. One-off build fees and meerwerk are not shared.`
 
   const asideFigma = nl
-    ? 'Elke partner heeft een Figma-seat met Dev Mode en levert website-ontwerpen aan als Figma-bestanden. Dat is een voorwaarde, en het verandert het percentage niet.'
-    : 'Every partner must hold a Figma seat with Dev Mode and deliver website designs as Figma files. This is a precondition, not a rate modifier.'
+    ? 'Partners leveren een design system aan; de tool is aan jullie. Dat verandert het percentage niet.'
+    : 'Partners deliver a design system; the tool is up to you. It does not change the percentage.'
 
   const example = nl
     ? `Eén getal geldt voor beide. Een partner op ${EXAMPLE_PARTNER_PCT}% krijgt ${EXAMPLE_PARTNER_PCT}% terug of koopt met ${EXAMPLE_PARTNER_PCT}% korting. In beide gevallen houdt Rinsly €${EXAMPLE_RINSLY_KEEPS} over van een Growth-abonnement van €${GROWTH_MONTHLY_EUR}. Er is geen aparte groothandelsprijslijst.`

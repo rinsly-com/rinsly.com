@@ -58,9 +58,9 @@ const T = {
     languagesHint: 'Waarin je een klantgesprek voert.',
     countries: 'Landen',
     countriesHint: 'Waar je klanten zitten.',
-    figmaTitle: 'We hebben een Figma-seat met Dev Mode',
-    figmaBlurb:
-      'Elke partner levert website-ontwerpen aan als Figma-bestanden. Dat is een voorwaarde, en het verandert het percentage niet.',
+    designTitle: 'Jullie leveren het design system aan',
+    designBlurb:
+      'Partners leveren een design system aan; de tool is aan jullie, en het verandert het percentage niet.',
     note: 'Nog iets dat we moeten weten?',
     invalid: 'Vul in ieder geval je bedrijfsnaam en een geldig e-mailadres in.',
     failed: 'Er ging iets mis bij het versturen. Probeer het nog eens, of mail ons op',
@@ -98,9 +98,9 @@ const T = {
     languagesHint: 'The ones you can hold a client call in.',
     countries: 'Countries',
     countriesHint: 'Where your clients are.',
-    figmaTitle: 'We hold a Figma seat with Dev Mode',
-    figmaBlurb:
-      'Every partner delivers website designs as Figma files. This is a precondition, and it does not change the percentage.',
+    designTitle: 'You deliver the design system',
+    designBlurb:
+      'Partners deliver a design system; the tool is up to you, and it does not change the percentage.',
     note: 'Anything else we should know?',
     invalid: 'Please give at least your company name and a valid e-mail address.',
     failed: 'Something went wrong sending this. Try again, or mail us at',
@@ -134,7 +134,6 @@ type Fields = {
   exclusiviteit: boolean
   relatiebeheer: boolean
   marketing: boolean
-  figmaSeat: boolean
   /** Honeypot — hidden from people, irresistible to bots. */
   website: string
 }
@@ -224,7 +223,6 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
     exclusiviteit: false,
     relatiebeheer: false,
     marketing: false,
-    figmaSeat: false,
     website: '',
   })
   const [touched, setTouched] = useState(false)
@@ -429,28 +427,9 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
           onChange={set('landen')}
           placeholder="nl, be"
         />
-        <div className="sm:col-span-2">
-          <Button
-            type="button"
-            onClick={toggle('figmaSeat')}
-            aria-pressed={f.figmaSeat}
-            className={`flex w-full gap-3 rounded-xl border px-4 py-3 text-left transition-colors ${
-              f.figmaSeat ? 'border-accent bg-accent-soft' : 'border-hair bg-paper'
-            }`}
-          >
-            <span
-              aria-hidden
-              className={`mt-0.5 flex h-5 w-5 flex-none items-center justify-center rounded border text-xs font-bold ${
-                f.figmaSeat ? 'border-accent bg-accent text-white' : 'border-hair text-transparent'
-              }`}
-            >
-              ✓
-            </span>
-            <span>
-              <span className="font-semibold text-ink">{t.figmaTitle}</span>
-              <span className="mt-0.5 block text-sm text-muted">{t.figmaBlurb}</span>
-            </span>
-          </Button>
+        <div className="sm:col-span-2 rounded-xl border border-hair bg-paper px-4 py-3">
+          <p className="font-semibold text-ink">{t.designTitle}</p>
+          <p className="mt-0.5 text-sm text-muted">{t.designBlurb}</p>
         </div>
         <div className="sm:col-span-2">
           <NoteInput id="partner-note" label={t.note} rows={4} value={f.opmerking} onChange={set('opmerking')} />
