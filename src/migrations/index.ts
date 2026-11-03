@@ -5,6 +5,7 @@ import * as migration_20260803_201709_partner_aanvragen from './20260803_201709_
 import * as migration_20260805_203609 from './20260805_203609';
 import * as migration_20260805_211835 from './20260805_211835';
 import * as migration_20260815_154536 from './20260815_154536';
+import * as migration_20261013_162150_site_core_0_22 from './20261013_162150_site_core_0_22';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20260815_154536.up,
     down: migration_20260815_154536.down,
-    name: '20260815_154536'
+    name: '20260815_154536',
+  },
+  {
+    up: migration_20261013_162150_site_core_0_22.up,
+    down: migration_20261013_162150_site_core_0_22.down,
+    name: '20261013_162150_site_core_0_22'
   },
 ];

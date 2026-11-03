@@ -1,17 +1,9 @@
 import type { Block } from 'payload'
 
 /**
- * `revenueCalculator` — what a partner would actually earn, worked out live.
- *
- * The persuasive part of the partner pitch is a number the studio recognises as
- * theirs, not a table of examples. So this block holds only its framing copy;
- * the plans, the rate ladder and the arithmetic live in the renderer
- * (`src/components/custom/RevenueCalculator.tsx`) because they must match
- * `~/Rinsly/ledger/src/domain/tenantRate.ts` exactly — a CMS field that could
- * drift from what the administration pays out would be worse than no field.
- *
- * Site-specific on purpose: it encodes Rinsly's commercial model, so it does not
- * belong in the shared engine.
+ * `revenueCalculator` — framing copy only. Plans and arithmetic stay in
+ * RevenueCalculator.tsx so they cannot drift from Ledger's tenantRate.ts.
+ * Site-specific: this is Rinsly's commercial model, not an engine block.
  */
 export const revenueCalculatorBlock: Block = {
   slug: 'revenueCalculator',

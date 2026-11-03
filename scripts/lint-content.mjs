@@ -31,6 +31,7 @@ const ESCAPES = [/\\u2014/g, /&mdash;/g, /&#8212;/g, /&#x2014;/gi]
 /** Files whose strings are read by a visitor. Not a whole-repo sweep. */
 const TARGETS = [
   'scripts/seed.ts',
+  'src/lib/partnerLadder.ts',
   'src/site.config.ts',
   'src/components/OfferteForm.tsx',
   'src/components/custom',

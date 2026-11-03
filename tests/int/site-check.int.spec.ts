@@ -35,9 +35,9 @@ const baseProbe = (over: Partial<SiteProbe> = {}): SiteProbe => ({
 
 describe('normalizeCheckUrl', () => {
   it('accepts bare domains and full URLs', () => {
-    expect(normalizeCheckUrl('kapsalonjan.nl')!.href).toBe('https://kapsalonjan.nl/')
-    expect(normalizeCheckUrl('  www.uwbedrijf.nl  ')!.hostname).toBe('www.uwbedrijf.nl')
-    expect(normalizeCheckUrl('http://site.nl/pagina')!.href).toBe('http://site.nl/pagina')
+    expect(normalizeCheckUrl('kapsalonjan.nl')?.href).toBe('https://kapsalonjan.nl/')
+    expect(normalizeCheckUrl('  www.uwbedrijf.nl  ')?.hostname).toBe('www.uwbedrijf.nl')
+    expect(normalizeCheckUrl('http://site.nl/pagina')?.href).toBe('http://site.nl/pagina')
   })
 
   it('rejects local, private and non-public targets', () => {
@@ -193,6 +193,7 @@ describe('pipeline output shape', () => {
       expiresAt: new Date(NOW.getTime() + 90 * 24 * 3600 * 1000).toISOString(),
     })
     expect(sc).not.toBeNull()
-    expect(sc!.findings.length).toBeGreaterThan(0)
+    if (!sc) throw new Error('expected a scorecard')
+    expect(sc.findings.length).toBeGreaterThan(0)
   })
 })

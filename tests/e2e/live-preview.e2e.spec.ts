@@ -1,92 +1,66 @@
 import { expect, test, type Frame, type Page } from '@playwright/test'
 
+import { readServerEnv } from '../../src/lib/env'
+import { logCaught } from '../../src/lib/logCaught'
+
 /**
- * Visual editing, end to end.
- *
- * Every assertion here exists because the thing it checks broke once and could
- * not be caught any other way. `tsc` was green for all of them, and each cost an
- * afternoon:
- *
- *  - Payload validates the Origin header before it will authenticate by COOKIE,
- *    and a browser sends no Origin on a GET navigation — which an iframe load
- *    is. The preview carried a perfectly good session that Payload declined to
- *    read, and silently served the published page instead.
- *  - The Lexical field renders no `id`, only `data-field-path`. Every other
- *    field type has both, so a lookup by id worked everywhere except the one
- *    field it was written for.
- *  - A collapsed block row keeps its fields mounted inside a zero-height
- *    wrapper, so testing that the field EXISTS says nothing about whether it can
- *    be seen or used.
- *  - The panel had no handler for the message the page was sending, so every
- *    keystroke went nowhere.
- *
- * Three of the four are Payload internals rather than public API. If this file
- * starts failing after a Payload upgrade, that is the test doing its job: read
- * `packages/site-core/src/preview/bridge.ts`, which names them in one place.
+ * Live preview, end to end. Each check failed once with `tsc` still green:
+ * cookie auth requires an Origin (an iframe GET sends none); Lexical fields
+ * expose `data-field-path` and no id; a collapsed block row stays mounted at
+ * 0×0; the panel must handle the page's message. Named in
+ * `packages/site-core/src/preview/bridge.ts`.
  */
 
-const EMAIL = process.env.SEED_ADMIN_EMAIL || 'dev@rinsly.local'
-const PASSWORD = process.env.SEED_ADMIN_PASSWORD || 'rinsly-dev'
+const env = readServerEnv()
+const EMAIL = env.SEED_ADMIN_EMAIL || 'dev@rinsly.local'
+const PASSWORD = env.SEED_ADMIN_PASSWORD || 'rinsly-dev'
 const RICH_TEXT_PAGE = '/admin/collections/pages/1'
-const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000'
+const BASE_URL = env.PLAYWRIGHT_BASE_URL || 'http://localhost:3000'
 
 async function clearStaleLocks(page: Page) {
   await page.evaluate(async () => {
+    const isRecord = (value: unknown): value is Record<string, unknown> =>
+      typeof value === 'object' && value !== null
+    const isUnknownArray = (value: unknown): value is unknown[] => Array.isArray(value)
     const res = await fetch('/api/payload-locked-documents?limit=100&depth=0', {
       credentials: 'include',
       headers: { origin: window.location.origin },
     })
     if (!res.ok) return
-    const { docs } = (await res.json()) as { docs?: { id: number | string }[] }
+    const body: unknown = await res.json()
+    const docs = isRecord(body) && isUnknownArray(body['docs']) ? body['docs'] : []
     await Promise.all(
-      (docs ?? []).map((doc) =>
-        fetch(`/api/payload-locked-documents/${doc.id}`, {
+      docs.map((doc) => {
+        const id = isRecord(doc) ? doc['id'] : undefined
+        if (typeof id !== 'string' && typeof id !== 'number') return Promise.resolve()
+        return fetch(`/api/payload-locked-documents/${id}`, {
           method: 'DELETE',
           credentials: 'include',
-        }).catch(() => undefined),
-      ),
+        }).catch((err: unknown) => {
+          const detail = err instanceof Error ? err.message : String(err)
+          console.error(`[e2e] could not delete a document lock: ${detail}`)
+        })
+      }),
     )
   })
 }
 
 /**
- * The preview frame, looked up fresh every time.
- *
- * Never hold a `Frame` across steps. Payload recomputes the preview URL as form
- * state changes and reloads the iframe, which detaches the old frame object —
- * every call against it then fails until the timeout, and the test reads as
- * "element not visible" when the element is perfectly fine in the frame that
- * actually exists. This was the cause of two intermittent failures.
+ * Look the preview frame up at the point of use. Payload reloads the iframe
+ * when form state changes, and a held `Frame` then times out as "not visible".
  */
 function previewFrame(page: Page): Frame | undefined {
   return page.frames().find((f) => f.url().includes('preview=1'))
 }
 
 /**
- * Sign in through the API, not the form.
- *
- * Clicking the login form is the single flakiest step in this file: the button
- * exists long before React has hydrated it, so an early click does nothing at
- * all and the wait for `/api/users/login` never resolves — a four-minute timeout
- * whose error names the login, not the hydration that caused it. It cost this
- * suite several wrong diagnoses (a preference race, a document lock, worker
- * parallelism) because the symptom appeared in whichever test happened to hit
- * the slow compile.
- *
- * `page.request` shares the browser context's cookie jar, so posting the
- * credentials leaves the browser signed in exactly as the form would, minus the
- * race. Testing that Payload's own login form works is not this file's job.
+ * Sign in through the API. The login button exists before hydration, so a
+ * click can no-op and the wait names the login instead of the race.
+ * `page.request` shares the browser cookie jar.
  */
 async function login(page: Page) {
-  /**
-   * Retry a server error, and only a server error.
-   *
-   * The first authenticated request against a cold `next dev` compiles the route
-   * as it serves it, and can come back 500 before anything is wrong with the
-   * credentials. A wrong password is a 401 and must fail immediately — retrying
-   * that would turn a real breakage into a slow one, and this suite guards
-   * access to unpublished content, so it has to stay loud about it.
-   */
+  // Retry 500s only. A cold `next dev` can 500 while compiling the route.
+  // A 401 is a bad password and must fail immediately.
   let res = await page.request.post('/api/users/login', {
     data: { email: EMAIL, password: PASSWORD },
     // Payload validates Origin before it will authenticate by cookie.
@@ -102,37 +76,28 @@ async function login(page: Page) {
   }
 
   // The body is what says WHY, and a status alone has cost this file hours.
-  expect(res.ok(), `login failed: ${res.status()} ${await res.text().catch(() => '')}`).toBeTruthy()
+  const loginBody = await res.text().catch((err: unknown) => {
+    logCaught('[e2e] login response body unreadable', err)
+    return ''
+  })
+  expect(res.ok(), `login failed: ${res.status()} ${loginBody}`).toBeTruthy()
 
   await page.goto('/admin', { waitUntil: 'domcontentloaded' })
   await clearStaleLocks(page)
   await resetEditViewPreference(page)
 }
 
-/**
- * Payload locks a document while it is open, per SESSION rather than per user.
- * Navigating away is what releases it; a run that ends on the edit view leaves
- * the next one with a read-only form and no preview iframe at all.
- */
+/** Navigating away releases Payload's per-session document lock. */
 async function releaseLock(page: Page) {
-  await page.goto('/admin', { waitUntil: 'domcontentloaded' }).catch(() => undefined)
+  await page.goto('/admin', { waitUntil: 'domcontentloaded' }).catch((err: unknown) => {
+    logCaught('[e2e] could not navigate away to release the lock', err)
+  })
 }
 
 /**
- * Put the edit view back to its default, so every test starts from a known
- * state.
- *
- * Payload remembers whether live preview was open, as a per-collection
- * preference (`collection-pages` → `editViewType`). Left alone, a test inherits
- * whatever the previous one did, and the toggler is a toggle — so the same click
- * opens the preview for one test and closes it for the next. Every attempt to
- * detect the current state instead of controlling it has raced something: the
- * `--active` class is applied at hydration, and the iframe is deliberately never
- * unmounted once rendered ("defer load and never unmount", Payload's own
- * comment), so its presence does not mean the preview is open.
- *
- * Deleting the preference removes the question: preview is off on arrival, and
- * one click opens it.
+ * Delete the `collection-pages` edit-view preference so preview starts closed.
+ * The toggler is a toggle, `--active` arrives at hydration, and the iframe is
+ * never unmounted, so detecting the current state races.
  */
 async function resetEditViewPreference(page: Page) {
   await page
@@ -140,31 +105,26 @@ async function resetEditViewPreference(page: Page) {
       await fetch('/api/payload-preferences/collection-pages', {
         method: 'DELETE',
         credentials: 'include',
-      }).catch(() => undefined)
+      }).catch((err: unknown) => {
+        const detail = err instanceof Error ? err.message : String(err)
+        console.error(`[e2e] could not delete the edit-view preference: ${detail}`)
+      })
     })
-    .catch(() => undefined)
+    .catch((err: unknown) => {
+      logCaught('[e2e] preference reset failed', err)
+    })
 }
 
-/** Clear locks left behind by an earlier run, so a test never inherits one. */
 async function openLivePreview(page: Page): Promise<void> {
   await page.goto(RICH_TEXT_PAGE, { waitUntil: 'networkidle' })
 
-  // The preference was cleared at login, so the preview is off and one click
-  // opens it. See `resetEditViewPreference` for why this is not detected.
+  // Preference was cleared at login, so one click opens the preview.
   const toggler = page.locator('.live-preview-toggler').first()
   await expect(toggler).toBeVisible({ timeout: 60_000 })
   await toggler.click()
 
-  /**
-   * Wait for a section to have a SIZE, not merely to exist.
-   *
-   * The annotations appear as soon as the shell renders, but the iframe's
-   * stylesheet and fonts land a beat later, and until they do every element
-   * measures 0x0 — a click on one reports "element is not visible" even with
-   * `force`, because there is no point to click. Existence was the wrong wait:
-   * the same mistake the panel bridge made when it polled for the field to
-   * exist rather than to be laid out.
-   */
+  // Wait for a laid-out height. Annotations exist before CSS lands, and a
+  // 0×0 target reports "not visible" even with `force`.
   await expect
     .poll(
       async () => {
@@ -175,7 +135,10 @@ async function openLivePreview(page: Page): Promise<void> {
           .first()
           .boundingBox()
           .then((b) => Math.round(b?.height ?? 0))
-          .catch(() => 0)
+          .catch((err: unknown) => {
+            logCaught('[e2e] preview box was not measurable yet', err)
+            return 0
+          })
       },
       { timeout: 120_000, intervals: [500] },
     )
@@ -186,25 +149,13 @@ async function openLivePreview(page: Page): Promise<void> {
 function frameOf(page: Page): Frame {
   const frame = previewFrame(page)
   expect(frame, 'preview frame').toBeTruthy()
-  return frame!
+  if (!frame) throw new Error('preview frame')
+  return frame
 }
 
 test.describe('live preview', () => {
-  /**
-   * One worker, one test at a time.
-   *
-   * Every test here signs in as the same admin and opens the same document, and
-   * both of those are single-occupancy: Payload locks a document per session, so
-   * a second browser gets it read-only, and the edit-view preference is stored
-   * per user, so two runs racing each other flip it under one another. Run in
-   * parallel — which is what `--repeat-each` does by default — they interfere,
-   * and the symptom is never the real cause: a login that never resolves, a
-   * preview that never opens, a different test failing each time.
-   *
-   * That erratic pattern sent this file through several wrong diagnoses. It is
-   * not flakiness in the app; it is shared state, and the fix is to stop sharing
-   * it concurrently.
-   */
+  // Same admin, same document: a lock and a per-user preference. Parallel
+  // (`--repeat-each`) makes those collide, and the failure looks like a flake.
   test.describe.configure({ mode: 'serial' })
   // Booting the admin, toggling the preview and waiting for the first live
   // merge is comfortably more than the 30s default.
@@ -238,13 +189,8 @@ test.describe('live preview', () => {
     const path = await region.getAttribute('data-rinsly-richtext')
     expect(path).toBeTruthy()
 
-    // The row has to be opened first: a collapsed block row renders none of its
-    // fields, so asserting against a shut one proves nothing. Clicking the
-    // region is what asks the panel to expand it, which is the real flow.
-    // No `force`: it skips the scroll-into-view a real click performs, and this
-    // block sits well below the fold, so a forced click lands on coordinates
-    // outside the viewport and hits nothing. The layout wait in
-    // `openLivePreview` is what makes an ordinary click safe here.
+    // Open the row first: a collapsed block renders no fields. No `force`:
+    // this block is below the fold, and a forced click misses the viewport.
     await region.locator('p').first().scrollIntoViewIfNeeded()
     await region.locator('p').first().click()
 

@@ -6,7 +6,7 @@ import { ArrowIcon, Eyebrow, Icon, Section, SectionHeading } from '@rinsly-com/s
 
 import { checkConfig } from '@/check.config'
 import { CheckCta } from '@/components/check/CheckCta'
-import { GRADE_LABELS, getScorecard, gradeTone, type GradeKey } from '@/lib/leadlens'
+import { GRADE_KEYS, GRADE_LABELS, getScorecard, gradeTone } from '@/lib/leadlens'
 
 /**
  * Personal scorecard page behind the CTA in LeadLens' scorecard e-mail:
@@ -145,7 +145,7 @@ export default async function CheckTokenPage({ params }: Params) {
           }}
         />
         <div data-reveal-group className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-          {(Object.keys(GRADE_LABELS) as GradeKey[]).map((key) => {
+          {GRADE_KEYS.map((key) => {
             const score = scorecard.grades[key]
             return (
               <div

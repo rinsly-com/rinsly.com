@@ -1,28 +1,22 @@
 /**
- * Verifier for the partner invite token behind /partner?token=…
+ * Verifier for /partner?token=…
  *
- * The token is minted by Rinsly Lens (apps/tenants) and carries the studio's own
- * details, signed with a shared secret. That is deliberate: Lens owns
- * `tenants.db`, Ledger owns `ledger.db` and this site owns its D1, each with
- * exactly one writer. A token that had to be *looked up* would need a fourth
- * sync path between them; a signed one needs none, so this file can prefill a
- * form for a studio the site has never heard of.
- *
- * ── FORMAT ────────────────────────────────────────────────────────────────
- *   <base64url(JSON payload)>.<base64url(HMAC-SHA256 of that same base64url)>
- *
- * The signature covers the encoded payload, not the JSON, so neither side has to
- * agree on key order or whitespace.
- *
- * ── KEEP IN SYNC ──────────────────────────────────────────────────────────
- * The minting half lives in Lens at apps/tenants/src/partnerToken.ts. Both files
- * carry the same test vector; if either encoding drifts, one of the two test
- * suites fails. Do not reconcile a failing vector by editing one side's expected
- * string.
- *
- * Web Crypto rather than node:crypto because this runs in a Worker, which is
- * also why verification is async.
+ * Lens mints `<base64url(JSON)>.<base64url(HMAC-SHA256 of that base64url)>`
+ * (apps/tenants/src/partnerToken.ts). The signature covers the encoded payload,
+ * so key order does not matter. Both sides share one test vector: if it fails,
+ * fix the encoding, do not update the expected string on one side only.
+ * Web Crypto (not node:crypto) because this runs in a Worker.
  */
+
+import { z } from 'zod'
+
+const partnerTokenSchema = z.object({
+  d: z.string(),
+  n: z.string(),
+  c: z.string().optional(),
+  l: z.string().optional(),
+  exp: z.number(),
+})
 
 export interface PartnerTokenPayload {
   /** Domain of the studio — the identifier shared across all three systems. */
@@ -52,7 +46,7 @@ function fromB64url(value: string): Uint8Array {
 function toB64url(bytes: ArrayBuffer): string {
   let binary = ''
   const view = new Uint8Array(bytes)
-  for (let i = 0; i < view.length; i++) binary += String.fromCharCode(view[i]!)
+  for (let i = 0; i < view.length; i++) binary += String.fromCharCode(view[i])
   return btoa(binary).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
 }
 
@@ -95,13 +89,10 @@ export async function verifyPartnerToken(
   }
   if (!safeEqual(provided, expected)) return { ok: false, reason: 'bad_signature' }
 
-  let payload: PartnerTokenPayload
+  let payload: z.infer<typeof partnerTokenSchema>
   try {
-    payload = JSON.parse(new TextDecoder().decode(fromB64url(encoded))) as PartnerTokenPayload
+    payload = partnerTokenSchema.parse(JSON.parse(new TextDecoder().decode(fromB64url(encoded))))
   } catch {
-    return { ok: false, reason: 'malformed' }
-  }
-  if (typeof payload.d !== 'string' || typeof payload.exp !== 'number') {
     return { ok: false, reason: 'malformed' }
   }
   if (payload.exp * 1000 < now.getTime()) return { ok: false, reason: 'expired' }

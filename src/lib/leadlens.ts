@@ -1,6 +1,8 @@
 import { cache } from 'react'
+import { z } from 'zod'
 
 import { getBindings } from './bindings'
+import { logCaught } from './logCaught'
 import { DEMO_TOKEN, demoEnabled, demoScorecard } from './leadlensDemo'
 
 /**
@@ -25,6 +27,9 @@ export const GRADE_LABELS = {
 } as const
 
 export type GradeKey = keyof typeof GRADE_LABELS
+
+/** Insertion order of GRADE_LABELS. Hoisted so parse and render share one array. */
+export const GRADE_KEYS = Object.keys(GRADE_LABELS) as GradeKey[]
 
 export type Scorecard = {
   version: number
@@ -59,19 +64,36 @@ export function isExpired(scorecard: Pick<Scorecard, 'expiresAt'>, now = Date.no
   return Number.isFinite(t) && t < now
 }
 
+const scorecardInput = z.object({
+  version: z.unknown().optional(),
+  token: z.unknown().optional(),
+  domain: z.unknown().optional(),
+  businessName: z.unknown().optional(),
+  niche: z.unknown().optional(),
+  city: z.unknown().optional(),
+  grades: z.unknown().optional(),
+  findings: z.unknown().optional(),
+  pitch: z.unknown().optional(),
+  createdAt: z.unknown().optional(),
+  expiresAt: z.unknown().optional(),
+})
+
+const gradeMap = z.record(z.string(), z.unknown())
+
 /** Validate the raw JSON against the contract; null for anything malformed. */
 export function parseScorecard(raw: unknown): Scorecard | null {
-  if (typeof raw !== 'object' || raw === null) return null
-  const data = raw as Record<string, unknown>
+  const parsed = scorecardInput.safeParse(raw)
+  if (!parsed.success) return null
+  const data = parsed.data
 
   if (typeof data.domain !== 'string' || !data.domain.trim()) return null
   if (typeof data.businessName !== 'string' || !data.businessName.trim()) return null
 
-  const grades = data.grades
-  if (typeof grades !== 'object' || grades === null) return null
+  const grades = gradeMap.safeParse(data.grades)
+  if (!grades.success) return null
   const parsedGrades = {} as Record<GradeKey, number>
-  for (const key of Object.keys(GRADE_LABELS) as GradeKey[]) {
-    const value = (grades as Record<string, unknown>)[key]
+  for (const key of GRADE_KEYS) {
+    const value = grades.data[key]
     if (typeof value !== 'number' || !Number.isFinite(value)) return null
     parsedGrades[key] = Math.max(0, Math.min(100, Math.round(value)))
   }
@@ -114,7 +136,8 @@ export const getScorecard = cache(async (token: string): Promise<ScorecardResult
   let scorecard: Scorecard | null = null
   try {
     scorecard = parseScorecard(await object.json())
-  } catch {
+  } catch (err) {
+    logCaught('[leadlens] scorecard.json was not JSON', err)
     scorecard = null
   }
   if (!scorecard) return { status: 'not_found' }

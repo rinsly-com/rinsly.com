@@ -168,6 +168,7 @@ export interface User {
   resetPasswordExpiration?: string | null;
   salt?: string | null;
   hash?: string | null;
+  resetPasswordRequestedAt?: string | null;
   loginAttempts?: number | null;
   lockUntil?: string | null;
   sessions?:
@@ -190,6 +191,7 @@ export interface Media {
    * Short description of the image for screen readers and when the image can’t load. Important for accessibility and SEO.
    */
   alt: string;
+  _objectKey?: string | null;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -284,7 +286,7 @@ export interface HeroBlock {
          */
         url?: string | null;
         /**
-         * Optional. Anchor ID of a section on the selected page (e.g. “prijzen”). Lowercase letters, numbers and dashes.
+         * Optional. Hash of a section on the selected page (e.g. “prijzen”): its Anchor ID, or the slug of its block name. Lowercase letters, numbers and dashes.
          */
         anchor?: string | null;
         newTab?: boolean | null;
@@ -296,7 +298,7 @@ export interface HeroBlock {
    */
   variant?: ('default' | 'spotlight' | 'offset' | 'centered' | 'quiet') | null;
   /**
-   * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
+   * Optional. Public hash for menu links (e.g. “over-ons”). Leave empty to use a slug of the block name. Lowercase letters, numbers and dashes. The document id is never used.
    */
   anchor?: string | null;
   id?: string | null;
@@ -337,7 +339,7 @@ export interface ServicesBlock {
       }[]
     | null;
   /**
-   * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
+   * Optional. Public hash for menu links (e.g. “over-ons”). Leave empty to use a slug of the block name. Lowercase letters, numbers and dashes. The document id is never used.
    */
   anchor?: string | null;
   id?: string | null;
@@ -389,7 +391,7 @@ export interface PricingBlock {
       }[]
     | null;
   /**
-   * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
+   * Optional. Public hash for menu links (e.g. “over-ons”). Leave empty to use a slug of the block name. Lowercase letters, numbers and dashes. The document id is never used.
    */
   anchor?: string | null;
   id?: string | null;
@@ -423,13 +425,13 @@ export interface CtaBlock {
      */
     url?: string | null;
     /**
-     * Optional. Anchor ID of a section on the selected page (e.g. “prijzen”). Lowercase letters, numbers and dashes.
+     * Optional. Hash of a section on the selected page (e.g. “prijzen”): its Anchor ID, or the slug of its block name. Lowercase letters, numbers and dashes.
      */
     anchor?: string | null;
     newTab?: boolean | null;
   };
   /**
-   * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
+   * Optional. Public hash for menu links (e.g. “over-ons”). Leave empty to use a slug of the block name. Lowercase letters, numbers and dashes. The document id is never used.
    */
   anchor?: string | null;
   id?: string | null;
@@ -480,7 +482,7 @@ export interface ContactBlock {
          */
         url?: string | null;
         /**
-         * Optional. Anchor ID of a section on the selected page (e.g. “prijzen”). Lowercase letters, numbers and dashes.
+         * Optional. Hash of a section on the selected page (e.g. “prijzen”): its Anchor ID, or the slug of its block name. Lowercase letters, numbers and dashes.
          */
         anchor?: string | null;
         newTab?: boolean | null;
@@ -488,7 +490,11 @@ export interface ContactBlock {
       }[]
     | null;
   /**
-   * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
+   * When on, the site can mount a form next to this section via contactForm on RenderBlocks. The engine does not ship a built-in form.
+   */
+  showForm?: boolean | null;
+  /**
+   * Optional. Public hash for menu links (e.g. “over-ons”). Leave empty to use a slug of the block name. Lowercase letters, numbers and dashes. The document id is never used.
    */
   anchor?: string | null;
   id?: string | null;
@@ -534,7 +540,7 @@ export interface AccordionBlock {
       }[]
     | null;
   /**
-   * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
+   * Optional. Public hash for menu links (e.g. “over-ons”). Leave empty to use a slug of the block name. Lowercase letters, numbers and dashes. The document id is never used.
    */
   anchor?: string | null;
   id?: string | null;
@@ -566,7 +572,7 @@ export interface ButtonRowBlock {
          */
         url?: string | null;
         /**
-         * Optional. Anchor ID of a section on the selected page (e.g. “prijzen”). Lowercase letters, numbers and dashes.
+         * Optional. Hash of a section on the selected page (e.g. “prijzen”): its Anchor ID, or the slug of its block name. Lowercase letters, numbers and dashes.
          */
         anchor?: string | null;
         newTab?: boolean | null;
@@ -575,7 +581,7 @@ export interface ButtonRowBlock {
     | null;
   alignment?: ('left' | 'center' | 'right') | null;
   /**
-   * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
+   * Optional. Public hash for menu links (e.g. “over-ons”). Leave empty to use a slug of the block name. Lowercase letters, numbers and dashes. The document id is never used.
    */
   anchor?: string | null;
   id?: string | null;
@@ -615,7 +621,7 @@ export interface RichTextBlock {
   } | null;
   width?: ('narrow' | 'wide') | null;
   /**
-   * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
+   * Optional. Public hash for menu links (e.g. “over-ons”). Leave empty to use a slug of the block name. Lowercase letters, numbers and dashes. The document id is never used.
    */
   anchor?: string | null;
   id?: string | null;
@@ -629,7 +635,7 @@ export interface RichTextBlock {
 export interface NoteBlock {
   text: string;
   /**
-   * Optional. Gives this section an id so a menu item can scroll to it (e.g. “over-ons”). Use lowercase letters, numbers and dashes.
+   * Optional. Public hash for menu links (e.g. “over-ons”). Leave empty to use a slug of the block name. Lowercase letters, numbers and dashes. The document id is never used.
    */
   anchor?: string | null;
   id?: string | null;
@@ -869,6 +875,7 @@ export interface UsersSelect<T extends boolean = true> {
   resetPasswordExpiration?: T;
   salt?: T;
   hash?: T;
+  resetPasswordRequestedAt?: T;
   loginAttempts?: T;
   lockUntil?: T;
   sessions?:
@@ -885,6 +892,7 @@ export interface UsersSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  _objectKey?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1081,6 +1089,7 @@ export interface ContactBlockSelect<T extends boolean = true> {
         newTab?: T;
         id?: T;
       };
+  showForm?: T;
   anchor?: T;
   id?: T;
   blockName?: T;
@@ -1317,7 +1326,7 @@ export interface Header {
          */
         url?: string | null;
         /**
-         * Optional. Anchor ID of a section on the selected page (e.g. “prijzen”). Lowercase letters, numbers and dashes.
+         * Optional. Hash of a section on the selected page (e.g. “prijzen”): its Anchor ID, or the slug of its block name. Lowercase letters, numbers and dashes.
          */
         anchor?: string | null;
         newTab?: boolean | null;
@@ -1342,7 +1351,7 @@ export interface Header {
      */
     url?: string | null;
     /**
-     * Optional. Anchor ID of a section on the selected page (e.g. “prijzen”). Lowercase letters, numbers and dashes.
+     * Optional. Hash of a section on the selected page (e.g. “prijzen”): its Anchor ID, or the slug of its block name. Lowercase letters, numbers and dashes.
      */
     anchor?: string | null;
     newTab?: boolean | null;

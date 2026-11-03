@@ -1,28 +1,30 @@
-import { createCloudflareEmailSendingAdapter } from '@rinsly-com/site-core/email/cloudflareEmailSending'
+import {
+  createCloudflareEmailSendingAdapter,
+  type EmailSendBinding,
+} from '@rinsly-com/site-core/email/cloudflareEmailSending'
 
 import { getBindings } from '../lib/bindings'
 
 /**
- * Payload e-mail adapter on Cloudflare Email Sending (the EMAIL send_email
- * binding in wrangler.jsonc). Sender domain rinsly.com is onboarded (DKIM on
- * the cf-bounce selector), so DMARC aligns for noreply@rinsly.com.
+ * Payload mail via the EMAIL binding (noreply@rinsly.com). Auth mail and the
+ * form notifications use payload.sendEmail. With no binding (local `next dev`)
+ * the message is logged instead of sent.
  *
- * Powers Payload's own auth mails (forgot password, verification) and the
- * submission notifications in the offerte/check endpoints via
- * payload.sendEmail. When the binding is absent (local `next dev` without the
- * Workers runtime mock, or an older deploy) the mail is logged instead of
- * sent, mirroring Payload's no-adapter behaviour without breaking the caller.
+ * Wrangler's SendEmail.send() does not overlap EmailSendBinding, so narrow
+ * from unknown instead of intersecting CloudflareEnv (that cast is TS2352).
  */
+function isSendEmail(value: unknown): value is EmailSendBinding {
+  if (typeof value !== 'object' || value === null) return false
+  return typeof Reflect.get(value, 'send') === 'function'
+}
+
+function readSendBinding(env: CloudflareEnv): EmailSendBinding | null {
+  const candidate: unknown = env.EMAIL
+  return isSendEmail(candidate) ? candidate : null
+}
+
 export const cloudflareEmailAdapter = createCloudflareEmailSendingAdapter({
   defaultFromAddress: 'noreply@rinsly.com',
   defaultFromName: 'Rinsly',
-  getSendBinding: async () => {
-    const env = (await getBindings()) as CloudflareEnv & {
-      EMAIL?: { send: (msg: Record<string, unknown>) => Promise<unknown> }
-    }
-    return typeof env.EMAIL?.send === 'function' ? env.EMAIL : null
-  },
+  getSendBinding: async () => readSendBinding(await getBindings()),
 })
-
-/** @deprecated Prefer importing from site-core; kept for local tests. */
-export { toAddressList } from '@rinsly-com/site-core/email/cloudflareEmailSending'

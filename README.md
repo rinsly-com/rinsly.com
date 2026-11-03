@@ -20,7 +20,7 @@ Then open:
 
 - `http://localhost:3000/` → redirects to `/nl`
 - `http://localhost:3000/nl` and `/en` — the site
-- `/nl/diensten`, `/nl/over`, `/nl/contact` (+ `/en/…`)
+- `/nl/platform`, `/nl/partnerprogramma`, `/nl/prijzen`, `/nl/website`, `/nl/over`, `/nl/contact` (+ `/en/…`)
 - `http://localhost:3000/admin` — the CMS (`dev@rinsly.local` / `rinsly-dev`)
 
 ## Deployment
@@ -35,10 +35,10 @@ pnpm run deploy       # migrate remote D1 + build & deploy the worker
 
 ## Structure
 
-- `src/payload.config.ts` — collections (Users, Media, Pages), globals
-  (Header, Footer), localization, D1 + R2 + SEO.
-- `src/blocks/` + `src/components/frontend/blocks/` — the page-builder blocks
-  (hero, services, pricing, cta, contact, accordion, buttonRow, richText).
+- `src/payload.config.ts` — site config on top of `@rinsly-com/site-core`
+  (extra collections, blocks, endpoints, D1 + R2).
+- `src/blocks/` — site-specific blocks (diagram, revenue calculator). Shared
+  blocks (hero, services, pricing, …) live in the engine.
 - `src/app/(frontend)/[locale]/` — the localized frontend routes.
 - `src/app/(payload)/` — the Payload admin panel + REST/GraphQL API.
-- `scripts/seed.ts` — seeds the four pages, globals and a dev admin.
+- `scripts/seed.ts` — seeds the pages, globals and a dev admin.

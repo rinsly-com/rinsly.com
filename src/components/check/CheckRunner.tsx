@@ -2,13 +2,21 @@
 
 import { useEffect, useRef, useState } from 'react'
 
-import { Turnstile, turnstileHeaders } from '@rinsly-com/site-core/ui'
+import { Turnstile } from '@rinsly-com/site-core/ui'
+
+import { publicString } from '@/lib/env'
+import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
+import { checkPollSchema, checkStartSchema, readJsonResponse } from '@/lib/json'
+import { logCaught } from '@/lib/logCaught'
+import { Button } from '@rinsly-com/ui/button'
+import { Field } from '@rinsly-com/ui/field'
+import { Input } from '@rinsly-com/ui/input'
 
 // Empty on accp (same origin); the static rinsly.com build inlines the accp API
 // origin — same wiring as the other public forms. The final scorecard link uses
 // the same base so it works before the rinsly.com/check/* zone route exists.
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
-const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)
+const API_BASE = publicString(process.env.NEXT_PUBLIC_API_URL).replace(/\/+$/, '')
+const TURNSTILE_REQUIRED = Boolean(publicString(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY))
 
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
@@ -44,7 +52,7 @@ export function CheckRunner() {
     if (pollRef.current) clearInterval(pollRef.current)
   }, [])
 
-  async function start(e: React.FormEvent) {
+  async function start(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     if (phase.kind === 'running' || !looksLikeSite(url)) return
     // Capture then clear before unmount: running phase tears down Turnstile, so
@@ -57,11 +65,13 @@ export function CheckRunner() {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...turnstileHeaders(tokenToSend),
+          ...turnstileHeaderRecord(tokenToSend),
         },
         body: JSON.stringify({ url, bedrijfsnaam: honeypot }),
       })
-      const body = (await res.json().catch(() => ({}))) as { ok?: boolean; token?: string; error?: string }
+      const parsed = checkStartSchema.safeParse(await readJsonResponse(res, '[check-run] start response was not JSON'))
+      if (!parsed.success) logCaught('[check-run] start response failed validation', parsed.error)
+      const body = parsed.success ? parsed.data : {}
       if (!res.ok || !body.ok || !body.token) {
         setPhase({
           kind: 'error',
@@ -78,7 +88,8 @@ export function CheckRunner() {
       setPhase({ kind: 'running', token, step: 'probe' })
 
       const startedAt = Date.now()
-      pollRef.current = setInterval(async () => {
+      pollRef.current = setInterval(() => {
+        void (async () => {
         if (Date.now() - startedAt > 150_000) {
           if (pollRef.current) clearInterval(pollRef.current)
           setPhase({ kind: 'error', message: 'De check duurt langer dan verwacht. Laat uw gegevens achter via het formulier hieronder, dan kijken wij er persoonlijk naar.' })
@@ -87,26 +98,31 @@ export function CheckRunner() {
         try {
           const s = await fetch(`${API_BASE}/api/check-run/status?token=${token}`)
           if (s.status === 404) return // status.json not written yet — keep waiting
-          const data = (await s.json().catch(() => ({}))) as {
-            ok?: boolean
-            status?: { state: string; step: string }
+          const polled = checkPollSchema.safeParse(await readJsonResponse(s, '[check-run] status response was not JSON'))
+          if (!polled.success) {
+            logCaught('[check-run] status response failed validation', polled.error)
+            return
           }
+          const data = polled.data
           if (!data.ok || !data.status) return
           if (data.status.state === 'done') {
             if (pollRef.current) clearInterval(pollRef.current)
             setPhase({ kind: 'done', token })
-            window.location.href = `${API_BASE}/check/${token}`
+            window.location.assign(`${API_BASE}/check/${token}`)
           } else if (data.status.state === 'error') {
             if (pollRef.current) clearInterval(pollRef.current)
             setPhase({ kind: 'error', message: 'We konden de site niet volledig beoordelen. Laat uw gegevens achter via het formulier hieronder, dan kijken wij er persoonlijk naar.' })
           } else {
             setPhase({ kind: 'running', token, step: data.status.step })
           }
-        } catch {
+        } catch (err) {
           // transient network hiccup — the next poll retries
+          logCaught('[check-run] status poll failed', err)
         }
+        })()
       }, 2500)
-    } catch {
+    } catch (err) {
+      logCaught('[check-run] start failed', err)
       setPhase({ kind: 'error', message: 'De check kon niet worden gestart. Probeer het nog eens, of gebruik het formulier hieronder.' })
     }
   }
@@ -153,43 +169,44 @@ export function CheckRunner() {
 
   return (
     <div className="shadow-card rounded-2xl border border-hair bg-card p-6 sm:p-8">
-      <form onSubmit={start} noValidate className="flex flex-col gap-4">
+      <form onSubmit={(event) => { void start(event) }} noValidate className="flex flex-col gap-4">
         <input
           type="text"
           name="bedrijfsnaam"
           value={honeypot}
-          onChange={(e) => setHoneypot(e.target.value)}
+          onChange={(e) => { setHoneypot(e.target.value); }}
           tabIndex={-1}
           autoComplete="off"
           aria-hidden
           className="hidden"
         />
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-          Uw websiteadres
-          <input
+        <Field.Root className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
+          <Field.Label>Uw websiteadres</Field.Label>
+          <Input
+            id="check-run-url"
             type="url"
             name="url"
             required
             placeholder="bijv. www.uwbedrijf.nl"
             value={url}
-            onChange={(e) => setUrl(e.target.value)}
+            onChange={(e) => { setUrl(e.target.value); }}
             className={inputClass}
           />
-        </label>
+        </Field.Root>
         {phase.kind === 'error' && (
           <p className="rounded-xl border border-bad/30 bg-bad/10 px-4 py-3 text-sm text-ink" role="alert">
             {phase.message}
           </p>
         )}
         <Turnstile action="check-run" onToken={setTurnstileToken} />
-        <button
+        <Button
           type="submit"
           disabled={!looksLikeSite(url) || (TURNSTILE_REQUIRED && !turnstileToken)}
           data-magnetic=""
           className="inline-flex items-center justify-center gap-2 self-start rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           Test mijn website nu
-        </button>
+        </Button>
         <p className="text-xs text-muted">
           Direct resultaat, geen gegevens nodig. We bewaren alleen het domein en het rapport.
         </p>

@@ -15,20 +15,37 @@
  */
 
 import { execFileSync } from 'node:child_process'
+import { z } from 'zod'
+
+const env = z
+  .object({
+    DEPLOY_VERSION_MESSAGE: z.string().optional(),
+    DEPLOY_VERSION_TAG: z.string().optional(),
+    DISPATCH_NAMESPACE: z.string().optional(),
+    GITHUB_RUN_ID: z.string().optional(),
+    GITHUB_SHA: z.string().optional(),
+  })
+  .parse({
+    DEPLOY_VERSION_MESSAGE: process.env.DEPLOY_VERSION_MESSAGE,
+    DEPLOY_VERSION_TAG: process.env.DEPLOY_VERSION_TAG,
+    DISPATCH_NAMESPACE: process.env.DISPATCH_NAMESPACE,
+    GITHUB_RUN_ID: process.env.GITHUB_RUN_ID,
+    GITHUB_SHA: process.env.GITHUB_SHA,
+  })
 
 const CONFIG = 'wrangler.static.jsonc'
 
-const dispatchNs = process.env.DISPATCH_NAMESPACE?.trim() || ''
+const dispatchNs = env.DISPATCH_NAMESPACE?.trim() || ''
 
 const tag =
-  process.env.DEPLOY_VERSION_TAG?.trim() ||
-  (process.env.GITHUB_SHA
-    ? `ci-${process.env.GITHUB_SHA.slice(0, 12)}${process.env.GITHUB_RUN_ID ? `-${process.env.GITHUB_RUN_ID}` : ''}`
+  env.DEPLOY_VERSION_TAG?.trim() ||
+  (env.GITHUB_SHA
+    ? `ci-${env.GITHUB_SHA.slice(0, 12)}${env.GITHUB_RUN_ID ? `-${env.GITHUB_RUN_ID}` : ''}`
     : `local-${Date.now()}`)
 
 const message =
-  process.env.DEPLOY_VERSION_MESSAGE?.trim() ||
-  (process.env.GITHUB_SHA ? `ci ${process.env.GITHUB_SHA.slice(0, 12)}` : `deploy ${tag}`)
+  env.DEPLOY_VERSION_MESSAGE?.trim() ||
+  (env.GITHUB_SHA ? `ci ${env.GITHUB_SHA.slice(0, 12)}` : `deploy ${tag}`)
 
 const run = (args) =>
   execFileSync('pnpm', ['exec', 'wrangler', ...args], {

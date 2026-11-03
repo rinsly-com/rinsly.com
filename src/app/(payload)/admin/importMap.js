@@ -35,14 +35,15 @@ import { AdminLogo as AdminLogo_f080d585fcf30ba912897804a22f2f48 } from '../../.
 import { TotpNavLink as TotpNavLink_f080d585fcf30ba912897804a22f2f48 } from '../../../components/RinslyAdmin'
 import { DeployNavLink as DeployNavLink_49051cef4f4f73eec296efbbf5e2838c } from '../../../components/DeployNavLink'
 import { TotpGate as TotpGate_f080d585fcf30ba912897804a22f2f48 } from '../../../components/RinslyAdmin'
-import { R2ClientUploadHandler as R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d } from '@payloadcms/storage-r2/client'
 import { TotpLoginView as TotpLoginView_f080d585fcf30ba912897804a22f2f48 } from '../../../components/RinslyAdmin'
 import { TotpSetupView as TotpSetupView_f080d585fcf30ba912897804a22f2f48 } from '../../../components/RinslyAdmin'
+import { ResetPasswordView as ResetPasswordView_f080d585fcf30ba912897804a22f2f48 } from '../../../components/RinslyAdmin'
 import { DeployView as DeployView_703d11826258ff65bac24c5c38c83090 } from '../../../components/DeployView'
 import { BackupsPanel as BackupsPanel_f080d585fcf30ba912897804a22f2f48 } from '../../../components/RinslyAdmin'
 import { UptimePanel as UptimePanel_f080d585fcf30ba912897804a22f2f48 } from '../../../components/RinslyAdmin'
 import { AnalyticsPanel as AnalyticsPanel_f080d585fcf30ba912897804a22f2f48 } from '../../../components/RinslyAdmin'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
+import { R2ClientUploadHandler as R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d } from '@payloadcms/storage-r2/client'
 
 /** @type import('payload').ImportMap */
 export const importMap = {
@@ -83,12 +84,13 @@ export const importMap = {
   "/components/RinslyAdmin#TotpNavLink": TotpNavLink_f080d585fcf30ba912897804a22f2f48,
   "/components/DeployNavLink#DeployNavLink": DeployNavLink_49051cef4f4f73eec296efbbf5e2838c,
   "/components/RinslyAdmin#TotpGate": TotpGate_f080d585fcf30ba912897804a22f2f48,
-  "@payloadcms/storage-r2/client#R2ClientUploadHandler": R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d,
   "/components/RinslyAdmin#TotpLoginView": TotpLoginView_f080d585fcf30ba912897804a22f2f48,
   "/components/RinslyAdmin#TotpSetupView": TotpSetupView_f080d585fcf30ba912897804a22f2f48,
+  "/components/RinslyAdmin#ResetPasswordView": ResetPasswordView_f080d585fcf30ba912897804a22f2f48,
   "/components/DeployView#DeployView": DeployView_703d11826258ff65bac24c5c38c83090,
   "/components/RinslyAdmin#BackupsPanel": BackupsPanel_f080d585fcf30ba912897804a22f2f48,
   "/components/RinslyAdmin#UptimePanel": UptimePanel_f080d585fcf30ba912897804a22f2f48,
   "/components/RinslyAdmin#AnalyticsPanel": AnalyticsPanel_f080d585fcf30ba912897804a22f2f48,
-  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
+  "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1,
+  "@payloadcms/storage-r2/client#R2ClientUploadHandler": R2ClientUploadHandler_85cc02ed84006fcc91d3aff39dda669d
 }

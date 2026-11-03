@@ -10,12 +10,26 @@
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs'
 import path from 'node:path'
+import { z } from 'zod'
+
 import { staticContentSecurityPolicy } from './staticCsp.mjs'
+
+const env = z
+  .object({
+    NODE_OPTIONS: z.string().optional(),
+    NEXT_PUBLIC_API_URL: z.string().optional(),
+    PAYLOAD_API_URL: z.string().optional(),
+  })
+  .parse({
+    NODE_OPTIONS: process.env.NODE_OPTIONS,
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    PAYLOAD_API_URL: process.env.PAYLOAD_API_URL,
+  })
 
 const root = process.cwd()
 const backupDir = path.join(root, '.static-build-backup')
 const snapshotDir = path.join(root, '.static-content')
-const API_URL = (process.env.PAYLOAD_API_URL || 'http://localhost:3000').replace(/\/+$/, '')
+const API_URL = (env.PAYLOAD_API_URL || 'http://localhost:3000').replace(/\/+$/, '')
 
 // Content locales — must match the engine's LOCALES (Dutch is the default).
 const LOCALES = ['nl', 'en']
@@ -161,10 +175,10 @@ try {
       CONTENT_SNAPSHOT: snapshotDir,
       // Inlined into the client offerte form so it posts to the accp API
       // (cross-origin from rinsly.com; accp allows it via CORS).
-      NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || API_URL,
+      NEXT_PUBLIC_API_URL: env.NEXT_PUBLIC_API_URL || API_URL,
       // Same heap headroom as package.json's `build` script: page-data
       // collection for the full page set can exceed node's default heap.
-      NODE_OPTIONS: `${process.env.NODE_OPTIONS ?? ''} --no-deprecation --max-old-space-size=8000`.trim(),
+      NODE_OPTIONS: `${env.NODE_OPTIONS ?? ''} --no-deprecation --max-old-space-size=8000`.trim(),
     },
   })
 } finally {
@@ -212,7 +226,7 @@ writeFileSync(
 // do and it can be cached forever. /images and /fonts are stable author-chosen
 // paths, so they are deliberately NOT immutable: a replaced file has to be able
 // to reach people. Rename it if it must change immediately.
-const apiOrigin = process.env.NEXT_PUBLIC_API_URL || API_URL
+const apiOrigin = env.NEXT_PUBLIC_API_URL || API_URL
 writeFileSync(
   path.join(root, 'out', '_headers'),
   [

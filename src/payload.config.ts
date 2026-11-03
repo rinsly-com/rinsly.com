@@ -23,6 +23,7 @@ import {
 } from './endpoints/partnerAanvraag'
 import { deployHandler } from './endpoints/deploy'
 import { triggerDeploy } from './hooks/triggerStaticDeploy'
+import { readServerEnv } from './lib/env'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
 
@@ -36,7 +37,7 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
 export default buildSiteConfig({
   siteConfig,
   // Accp origin for auth mails (forgot-password links). Not the static public URL.
-  serverURL: process.env.PAYLOAD_SERVER_URL || 'https://accp.rinsly.com',
+  serverURL: readServerEnv().PAYLOAD_SERVER_URL || 'https://accp.rinsly.com',
   // Transactional mail (auth mails + submission notifications) as
   // noreply@rinsly.com via Cloudflare Email Sending; logs when no binding.
   email: cloudflareEmailAdapter,
@@ -83,24 +84,16 @@ export default buildSiteConfig({
   },
   importMapBaseDir: path.resolve(dirname),
   typesOutputFile: path.resolve(dirname, 'payload-types.ts'),
-  // Cloudflare traffic strip on the dashboard (unique visitors / page views).
-  // Needs the src/components/RinslyAdmin.tsx barrel plus
-  // CLOUDFLARE_ZONE_ID + CLOUDFLARE_ANALYTICS_TOKEN; without those it renders
-  // nothing on a live site.
+  // Widgets resolve through src/components/RinslyAdmin.tsx and render nothing
+  // until their Worker secrets exist.
+  // Analytics: CLOUDFLARE_ZONE_ID + CLOUDFLARE_ANALYTICS_TOKEN.
   dashboardAnalytics: true,
-  // Rinsly's own uptime monitor on the dashboard (online/offline, 30/90-day
-  // percentages, 90-day strip). Needs the src/components/RinslyAdmin.tsx
-  // barrel plus RINSLY_UPTIME_TOKEN on the accp worker; without the token
-  // it renders nothing on a live site.
+  // Uptime (online/offline, 30/90-day): RINSLY_UPTIME_TOKEN.
   dashboardUptime: true,
-  // Last media-backup widget: last successful `rinsly-backups` run for this
-  // site, plus the fixed D1 Time Travel line. Needs the RinslyAdmin barrel's
-  // BackupsPanel re-export plus RINSLY_BACKUPS_TOKEN + RINSLY_BACKUPS_SITE on
-  // the accp worker. Without them the panel renders nothing.
+  // Last rinsly-backups run plus the D1 Time Travel line:
+  // RINSLY_BACKUPS_TOKEN + RINSLY_BACKUPS_SITE.
   dashboardBackups: true,
-  // TOTP two-factor authentication: login code field, /admin/two-factor
-  // enrolment screen, and admins are steered into enrolling (never locked
-  // out). Needs the src/components/RinslyAdmin.tsx barrel. This is what makes
-  // the DPA's "tweefactorauthenticatie voor beheertoegang" sentence true.
+  // TOTP enrolment for admins (steered in, never locked out). This is what
+  // makes the DPA's "tweefactorauthenticatie voor beheertoegang" true.
   totp: { require: 'admin' },
 })

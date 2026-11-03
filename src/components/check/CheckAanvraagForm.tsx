@@ -3,13 +3,21 @@
 import { useSearchParams } from 'next/navigation'
 import { Suspense, useRef, useState } from 'react'
 
-import { Turnstile, turnstileHeaders, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
+
+import { publicString } from '@/lib/env'
+import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
+import { formAckSchema, readJsonResponse } from '@/lib/json'
+import { logCaught } from '@/lib/logCaught'
+import { Button } from '@rinsly-com/ui/button'
+import { Field } from '@rinsly-com/ui/field'
+import { Input } from '@rinsly-com/ui/input'
 
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and the form posts cross-origin (CORS-allowed) —
 // the same wiring as the OfferteForm quote wizard.
-const API_BASE = (process.env.NEXT_PUBLIC_API_URL || '').replace(/\/+$/, '')
-const TURNSTILE_REQUIRED = Boolean(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)
+const API_BASE = publicString(process.env.NEXT_PUBLIC_API_URL).replace(/\/+$/, '')
+const TURNSTILE_REQUIRED = Boolean(publicString(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY))
 
 const inputClass =
   'w-full rounded-lg border border-hair bg-paper px-3.5 py-2.5 text-sm text-ink outline-none transition-colors placeholder:text-muted focus:border-accent'
@@ -49,10 +57,9 @@ export function CheckAanvraagForm() {
 
   const valid = looksLikeSite(data.url) && data.naam.trim() !== '' && isPhone(data.telefoon)
 
-  const set = (key: keyof typeof data) => (e: React.ChangeEvent<HTMLInputElement>) =>
-    setData((d) => ({ ...d, [key]: e.target.value }))
+  const set = (key: keyof typeof data) => (e: React.ChangeEvent<HTMLInputElement>) => { setData((d) => ({ ...d, [key]: e.target.value })); }
 
-  async function submit(e: React.FormEvent) {
+  async function submit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault()
     setTouched(true)
     if (!valid || status === 'submitting') return
@@ -64,13 +71,15 @@ export function CheckAanvraagForm() {
         method: 'POST',
         headers: {
           'content-type': 'application/json',
-          ...turnstileHeaders(tokenToSend),
+          ...turnstileHeaderRecord(tokenToSend),
         },
         body: JSON.stringify(data),
       })
-      const body = (await res.json().catch(() => ({}))) as { ok?: boolean }
-      setStatus(res.ok && body.ok ? 'success' : 'error')
-    } catch {
+      const parsed = formAckSchema.safeParse(await readJsonResponse(res, '[check-aanvraag] response was not JSON'))
+      if (!parsed.success) logCaught('[check-aanvraag] response failed validation', parsed.error)
+      setStatus(res.ok && parsed.success && parsed.data.ok ? 'success' : 'error')
+    } catch (err) {
+      logCaught('[check-aanvraag] submit failed', err)
       setStatus('error')
     } finally {
       turnstileRef.current?.reset()
@@ -105,7 +114,7 @@ export function CheckAanvraagForm() {
       <Suspense fallback={null}>
         <ExpiredNotice />
       </Suspense>
-      <form onSubmit={submit} noValidate className="flex flex-col gap-4">
+      <form onSubmit={(event) => { void submit(event) }} noValidate className="flex flex-col gap-4">
         {/* Honeypot — hidden from real visitors; bots that fill it are ignored. */}
         <input
           type="text"
@@ -117,9 +126,10 @@ export function CheckAanvraagForm() {
           aria-hidden
           className="hidden"
         />
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-          Uw website
-          <input
+        <Field.Root className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
+          <Field.Label>Uw website</Field.Label>
+          <Input
+            id="check-url"
             type="url"
             name="url"
             required
@@ -128,10 +138,11 @@ export function CheckAanvraagForm() {
             onChange={set('url')}
             className={inputClass}
           />
-        </label>
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-          Uw naam
-          <input
+        </Field.Root>
+        <Field.Root className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
+          <Field.Label>Uw naam</Field.Label>
+          <Input
+            id="check-naam"
             type="text"
             name="naam"
             required
@@ -141,10 +152,11 @@ export function CheckAanvraagForm() {
             onChange={set('naam')}
             className={inputClass}
           />
-        </label>
-        <label className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
-          Telefoonnummer
-          <input
+        </Field.Root>
+        <Field.Root className="flex flex-col gap-1.5 text-sm font-semibold text-ink">
+          <Field.Label>Telefoonnummer</Field.Label>
+          <Input
+            id="check-telefoon"
             type="tel"
             name="telefoon"
             required
@@ -154,7 +166,7 @@ export function CheckAanvraagForm() {
             onChange={set('telefoon')}
             className={inputClass}
           />
-        </label>
+        </Field.Root>
         {touched && !valid && status !== 'submitting' && (
           <p className="text-sm text-muted" role="alert">
             Vul uw websiteadres, naam en telefoonnummer in, dan kunnen we u bereiken.
@@ -176,14 +188,14 @@ export function CheckAanvraagForm() {
             turnstileRef.current = h
           }}
         />
-        <button
+        <Button
           type="submit"
           disabled={status === 'submitting' || (TURNSTILE_REQUIRED && !turnstileToken)}
           data-magnetic=""
           className="inline-flex items-center justify-center gap-2 self-start rounded-pill bg-accent px-6 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"
         >
           {status === 'submitting' ? 'Versturen…' : 'Vraag de gratis check aan'}
-        </button>
+        </Button>
         <p className="text-xs text-muted">
           We gebruiken uw gegevens alleen om contact op te nemen over uw websitecheck.
         </p>

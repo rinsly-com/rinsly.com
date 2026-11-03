@@ -1,4 +1,7 @@
+import { z } from 'zod'
+
 import type { Scorecard } from './leadlens'
+import { logCaught } from './logCaught'
 
 /**
  * Self-service website check — the automated counterpart of LeadLens. A visitor
@@ -68,7 +71,7 @@ const FETCH_UA =
 
 async function fetchWithTimeout(url: string, ms: number, redirect: 'follow' | 'manual') {
   const ctl = new AbortController()
-  const timer = setTimeout(() => ctl.abort(), ms)
+  const timer = setTimeout(() => { ctl.abort(); }, ms)
   try {
     return await fetch(url, {
       redirect,
@@ -130,7 +133,8 @@ export async function probeSite(url: URL): Promise<SiteProbe> {
     const started = Date.now()
     res = await fetchWithTimeout(url.href, 20_000, 'follow')
     probe.ttfbMs = Date.now() - started
-  } catch {
+  } catch (err) {
+    logCaught('[site-check] https probe failed', err)
     return probe
   }
   if (!res.ok) return probe
@@ -147,8 +151,9 @@ export async function probeSite(url: URL): Promise<SiteProbe> {
   }
   try {
     probe.html = parseHtmlSignals(await res.text())
-  } catch {
-    // keep defaults — reachability and headers still grade
+  } catch (err) {
+    // Reachability and headers still grade when the body cannot be read.
+    logCaught('[site-check] homepage body unreadable', err)
   }
 
   // Does plain http:// upgrade to https? Follow redirects and look at the
@@ -156,8 +161,9 @@ export async function probeSite(url: URL): Promise<SiteProbe> {
   try {
     const httpRes = await fetchWithTimeout(`http://${url.hostname}/`, 15_000, 'follow')
     probe.httpNotUpgraded = httpRes.ok && new URL(httpRes.url).protocol === 'http:'
-  } catch {
+  } catch (err) {
     // http closed entirely → fine (not a downgrade risk)
+    logCaught('[site-check] http upgrade probe failed', err)
   }
 
   return probe
@@ -174,6 +180,15 @@ export type PsiResult = {
   tbtMs?: number
 }
 
+const psiSchema = z.object({
+  lighthouseResult: z
+    .object({
+      categories: z.record(z.string(), z.unknown()).optional(),
+      audits: z.record(z.string(), z.unknown()).optional(),
+    })
+    .optional(),
+})
+
 export async function fetchPsi(url: string, apiKey?: string): Promise<PsiResult | null> {
   const endpoint = new URL('https://www.googleapis.com/pagespeedonline/v5/runPagespeed')
   endpoint.searchParams.set('url', url)
@@ -182,23 +197,30 @@ export async function fetchPsi(url: string, apiKey?: string): Promise<PsiResult 
   if (apiKey) endpoint.searchParams.set('key', apiKey)
 
   const ctl = new AbortController()
-  const timer = setTimeout(() => ctl.abort(), 75_000)
+  const timer = setTimeout(() => { ctl.abort(); }, 75_000)
   try {
     const res = await fetch(endpoint, { signal: ctl.signal })
     if (!res.ok) return null
-    const data = (await res.json()) as {
-      lighthouseResult?: {
-        categories?: Record<string, { score?: number }>
-        audits?: Record<string, { numericValue?: number }>
-      }
+    const parsed = psiSchema.safeParse(await res.json())
+    if (!parsed.success) {
+      logCaught('[site-check] PageSpeed response did not match the schema', parsed.error)
+      return null
     }
-    const lhr = data.lighthouseResult
+    const lhr = parsed.data.lighthouseResult
     if (!lhr?.categories) return null
     const pct = (id: string) => {
-      const s = lhr.categories?.[id]?.score
-      return typeof s === 'number' ? Math.round(s * 100) : undefined
+      const category = lhr.categories?.[id]
+      const score =
+        typeof category === 'object' && category !== null && 'score' in category
+          ? category.score
+          : undefined
+      return typeof score === 'number' ? Math.round(score * 100) : undefined
     }
-    const ms = (id: string) => lhr.audits?.[id]?.numericValue
+    const ms = (id: string) => {
+      const audit = lhr.audits?.[id]
+      if (typeof audit !== 'object' || audit === null || !('numericValue' in audit)) return undefined
+      return typeof audit.numericValue === 'number' ? audit.numericValue : undefined
+    }
     return {
       performance: pct('performance'),
       seo: pct('seo'),
@@ -208,6 +230,8 @@ export async function fetchPsi(url: string, apiKey?: string): Promise<PsiResult 
       tbtMs: ms('total-blocking-time'),
     }
   } catch {
+    // The thrown message includes the request URL, which carries the PSI key.
+    console.error('[site-check] psi_fetch_failed')
     return null
   } finally {
     clearTimeout(timer)
@@ -329,6 +353,14 @@ export type CheckRunStatus = {
   message?: string
 }
 
+const runStatusSchema = z.object({
+  state: z.enum(['running', 'done', 'error']),
+  step: z.enum(['probe', 'psi', 'compose', 'done']),
+  token: z.string(),
+  startedAt: z.string(),
+  message: z.string().optional(),
+})
+
 export function generateToken(): string {
   const bytes = crypto.getRandomValues(new Uint8Array(24))
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
@@ -341,8 +373,14 @@ export async function readRunStatus(bucket: R2Bucket, token: string): Promise<Ch
   const obj = await bucket.get(STATUS_KEY(token))
   if (!obj) return null
   try {
-    return (await obj.json()) as CheckRunStatus
-  } catch {
+    const parsed = runStatusSchema.safeParse(await obj.json())
+    if (!parsed.success) {
+      logCaught('[site-check] status.json did not match the schema', parsed.error)
+      return null
+    }
+    return parsed.data
+  } catch (err) {
+    logCaught('[site-check] status.json was not JSON', err)
     return null
   }
 }
@@ -399,6 +437,8 @@ export async function runSiteCheck(opts: {
     // No screenshots in the self-service v1 — the page omits that section.
     await setStatus('done', 'done')
   } catch (err) {
-    await setStatus('error', 'compose', err instanceof Error ? err.message : String(err)).catch(() => {})
+    await setStatus('error', 'compose', err instanceof Error ? err.message : String(err)).catch((statusErr: unknown) => {
+      logCaught('[site-check] could not persist error status', statusErr)
+    })
   }
 }

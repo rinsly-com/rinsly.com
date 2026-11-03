@@ -36,7 +36,7 @@ export async function GET(
   const object = await env.LEADLENS_CHECKS.get(`${token}/${file}`)
   if (!object) return new Response('Not found', { status: 404 })
 
-  return new Response(object.body as ReadableStream, {
+  return new Response(object.body, {
     headers: {
       'content-type': object.httpMetadata?.contentType ?? 'image/png',
       // Private: the URL embeds the per-lead token — keep it out of shared caches.

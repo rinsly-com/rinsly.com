@@ -4,6 +4,7 @@ import { Suspense } from 'react'
 import { Eyebrow, Section } from '@rinsly-com/site-core/ui'
 
 import { PartnerTokenGate } from '@/components/partner/PartnerTokenGate'
+import { partnerProgrammeCopy } from '@/lib/partnerLadder'
 
 /**
  * /nl/partner and /en/partner — where a recruited studio configures itself.
@@ -40,20 +41,6 @@ const COPY = {
     lede: 'Jij levert het ontwerp in Figma, wij bouwen het als applicatie op ons platform en draaien het daarna. Van de doorlopende hostingomzet gaat een deel naar jou, zolang die klant blijft: hoeveel bepaal je zelf, door te kiezen wat je op je neemt. Je kiest ook hoe het gefactureerd wordt. Wij factureren de klant en betalen jou uit zodra die betaald heeft, op zijn eigen factuurritme, of je zet de hosting op je eigen factuur en koopt bij ons in tegen de prijs min jouw percentage.',
     checking: 'Even je link controleren…',
     asideTitle: 'Hoe het tarief werkt',
-    asideBase:
-      'De basis is 0%. Dat is geen truc: de vergoeding betaalt niet voor een introductie die je één keer doet, maar voor werk dat je elke maand blijft doen.',
-    asideCumulative:
-      'De omzetniveaus tellen bij elkaar op, dus boven €25.000 per maand is dat +15%, niet +5%. Maximaal 35% van de doorlopende abonnementsomzet, ex btw. Eenmalige bouwkosten vallen erbuiten.',
-    asideFigma:
-      'Eén harde eis: een eigen Figma-licentie met Dev Mode. Ontwerpen leveren we in Figma aan.',
-    ladder: [
-      { pct: '+10%', label: 'Exclusiviteit', kind: 'keuze' },
-      { pct: '+5%', label: 'Relatiebeheer & eerstelijnssupport', kind: 'keuze' },
-      { pct: '+5%', label: 'Marketing & naamsvermelding', kind: 'keuze' },
-      { pct: '+5%', label: 'Meer dan €1.000 per maand', kind: 'omzet' },
-      { pct: '+5%', label: 'Meer dan €5.000 per maand', kind: 'omzet' },
-      { pct: '+5%', label: 'Meer dan €25.000 per maand', kind: 'omzet' },
-    ],
   },
   en: {
     title: 'Become a Rinsly partner',
@@ -64,20 +51,6 @@ const COPY = {
     lede: 'You deliver the design in Figma, we build it as an application on our platform and run it from there. A share of the recurring hosting revenue comes to you for as long as the client stays: how much is up to you, and follows from what you take on. You also choose how it is invoiced: we bill the client and pay you once they have paid, on their own billing rhythm, or you put the hosting on your own invoice and buy from us at list minus your percentage.',
     checking: 'Just checking your link…',
     asideTitle: 'How the rate works',
-    asideBase:
-      'The base is 0%. That is not a trick: the fee does not pay for an introduction you make once, it pays for work you keep doing every month.',
-    asideCumulative:
-      'The revenue levels stack, so above €25.000 a month that is +15%, not +5%. At most 35% of the recurring subscription revenue, excl. VAT. One-off build fees are not shared.',
-    asideFigma:
-      'One hard requirement: your own Figma licence with Dev Mode. Designs are delivered in Figma.',
-    ladder: [
-      { pct: '+10%', label: 'Exclusivity', kind: 'choice' },
-      { pct: '+5%', label: 'Relation & first-line support', kind: 'choice' },
-      { pct: '+5%', label: 'Marketing & attribution', kind: 'choice' },
-      { pct: '+5%', label: 'More than €1.000 per month', kind: 'revenue' },
-      { pct: '+5%', label: 'More than €5.000 per month', kind: 'revenue' },
-      { pct: '+5%', label: 'More than €25.000 per month', kind: 'revenue' },
-    ],
   },
 } as const
 
@@ -103,6 +76,7 @@ export async function generateMetadata({
 export default async function PartnerPage({ params }: { params: Promise<Params> }) {
   const { locale } = await params
   const t = copyFor(locale)
+  const commercial = partnerProgrammeCopy(locale === 'en' ? 'en' : 'nl')
 
   return (
     <>
@@ -148,22 +122,22 @@ export default async function PartnerPage({ params }: { params: Promise<Params> 
               wholesale so nothing on a conversion page waits for GSAP. */}
           <aside className="order-1 flex flex-col gap-4 lg:order-2">
             <h2 className="text-lg font-bold tracking-[-0.01em] text-ink">{t.asideTitle}</h2>
-            <p className="text-sm leading-relaxed text-muted">{t.asideBase}</p>
+            <p className="text-sm leading-relaxed text-muted">{commercial.asideBase}</p>
             <ul className="flex flex-col divide-y divide-hair rounded-xl border border-hair bg-card">
-              {t.ladder.map((row) => (
-                <li key={row.label} className="flex items-baseline gap-3 px-4 py-2.5 text-sm">
+              {commercial.ladder.rungs.map((row) => (
+                <li key={row.id} className="flex items-baseline gap-3 px-4 py-2.5 text-sm">
                   <span className="w-12 flex-none font-bold tabular-nums text-accent">
-                    {row.pct}
+                    +{row.pct}%
                   </span>
-                  <span className="min-w-0 flex-1 text-ink">{row.label}</span>
+                  <span className="min-w-0 flex-1 text-ink">{row.title}</span>
                   <span className="flex-none text-[10.5px] font-bold uppercase tracking-wider text-muted">
-                    {row.kind}
+                    {commercial.ladder.kindLabel[row.kind]}
                   </span>
                 </li>
               ))}
             </ul>
-            <p className="text-sm leading-relaxed text-muted">{t.asideCumulative}</p>
-            <p className="text-sm leading-relaxed text-muted">{t.asideFigma}</p>
+            <p className="text-sm leading-relaxed text-muted">{commercial.asideCumulative}</p>
+            <p className="text-sm leading-relaxed text-muted">{commercial.asideFigma}</p>
           </aside>
         </div>
       </Section>

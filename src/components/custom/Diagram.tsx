@@ -2,27 +2,15 @@ import type { Locale } from '@rinsly-com/site-core'
 import { Section, SectionHeading } from '@rinsly-com/site-core/ui'
 
 /**
- * The `diagram` block's renderer: schematics drawn as inline SVG.
- *
- * Why SVG in code rather than uploaded images:
- *  - **Theme-aware.** Everything is painted with `currentColor` or the token
- *    classes (`text-ink`, `text-muted`, `text-accent`, `text-hair`), so the same
- *    drawing works in light and dark without exporting twice.
- *  - **Accessible.** Each figure is a `<figure>` with a real `<figcaption>`, and
- *    the SVG carries `role="img"` + `aria-label`, so the caption is the
- *    description rather than decoration.
- *  - **Responsive.** A `viewBox` with no fixed width scales down; the wrapper
- *    scrolls horizontally below the point where labels would collide, so the page
- *    body never scrolls sideways.
- *
- * Adding a diagram: a new `kind` option in `src/blocks/Diagram.ts` and a case
- * here. Keep them mechanism drawings — what actually happens — not decoration.
+ * `diagram` renderer: inline SVG so the drawing follows the theme tokens,
+ * stays a reviewed commit, and scrolls inside its figure instead of the page.
+ * A new kind needs an option in `src/blocks/Diagram.ts` and a case here.
  */
 
 type Kind = 'figmaToProduction' | 'oneEngineFleet' | 'invoicingRoutes'
 
 type Props = {
-  kind?: Kind | string | null
+  kind?: Kind | null
   eyebrow?: string | null
   title?: string | null
   caption?: string | null
@@ -46,7 +34,7 @@ type RouteLabels = {
 
 const T: Record<'nl' | 'en', { figma: FigmaLabels; fleet: FleetLabels; routes: RouteLabels }> = {
   nl: {
-    figma: { a: 'Figma-bestand', aSub: 'Dev Mode', b: 'Rinsly bouwt', bSub: 'getypeerde app op de engine', c: 'Live site', cSub: 'edge · CMS · databaseherstel' },
+    figma: { a: 'Figma-bestand', aSub: 'Dev Mode', b: 'Rinsly bouwt', bSub: 'getypeerde app op de engine', c: 'Live site', cSub: 'edge · CMS · puntherstel' },
     fleet: { engine: '@rinsly-com/site-core', fix: 'één fix', sites: 'elke klantsite', release: 'één release' },
     routes: {
       a: 'Rinsly factureert',
@@ -62,7 +50,7 @@ const T: Record<'nl' | 'en', { figma: FigmaLabels; fleet: FleetLabels; routes: R
     },
   },
   en: {
-    figma: { a: 'Figma file', aSub: 'Dev Mode', b: 'Rinsly builds', bSub: 'typed app on the engine', c: 'Live site', cSub: 'edge · CMS · database recovery' },
+    figma: { a: 'Figma file', aSub: 'Dev Mode', b: 'Rinsly builds', bSub: 'typed app on the engine', c: 'Live site', cSub: 'edge · CMS · point-in-time restore' },
     fleet: { engine: '@rinsly-com/site-core', fix: 'one fix', sites: 'every client site', release: 'one release' },
     routes: {
       a: 'Rinsly invoices',
@@ -291,5 +279,3 @@ export function Diagram({ kind, eyebrow, title, caption, locale }: Props) {
     </Section>
   )
 }
-
-export default Diagram

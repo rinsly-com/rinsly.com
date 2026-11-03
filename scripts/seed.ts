@@ -25,7 +25,10 @@ import { getPayload } from 'payload'
 import { sql } from '@payloadcms/db-d1-sqlite'
 
 import config from '../src/payload.config'
-import type { User } from '../src/payload-types'
+import { readServerEnv } from '../src/lib/env'
+import { logCaught } from '../src/lib/logCaught'
+import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
+import { idRowSchema, userRowSchema } from '../src/lib/rows'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 type Block = Record<string, unknown>
@@ -124,8 +127,8 @@ const checkCta = (locale: Locale): Block => ({
   title: t(locale, 'Vijf rapportcijfers in een halve minuut', 'Five grades in half a minute'),
   text: t(
     locale,
-    'Wij meten websites voor het echte werk: crawlen, scoren en Lighthouse op schaal. Probeer het op elke URL, gratis en zonder account.',
-    'We measure websites for real: crawling, scoring and Lighthouse at scale. Try it on any URL, free and without an account.',
+    'Vijf rapportcijfers voor elke site in een halve minuut. Probeer het op elke URL, gratis en zonder account.',
+    'Five grades for any site in half a minute. Try it on any URL, free and without an account.',
   ),
   button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
 })
@@ -198,8 +201,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
     ),
     t(
       locale,
-      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates, databaseherstel en dagelijkse mediaback-up. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
-      'Rinsly is the build-and-run department design studios don’t have. You deliver the design in Figma, we build it as a real application and run it from there: hosting, updates, database recovery and daily media backup. Every time the client pays, a share of it comes to you.',
+      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke mediaback-up. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
+      'Rinsly is the build-and-run department design studios don’t have. You deliver the design in Figma, we build it as a real application and run it from there: hosting, updates, continuous point-in-time restore of the database (Cloudflare D1 Time Travel) and a nightly media backup. Every time the client pays, a share of it comes to you.',
     ),
     [
       pageLink(t(locale, 'Word partner', 'Become a partner'), ids, SLUG.partner, { variant: 'primary' }),
@@ -211,7 +214,7 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
     anchor: 'platform',
     header: {
       eyebrow: t(locale, 'Het platform', 'The platform'),
-      title: t(locale, 'Eén engine, de hele fleet', 'One engine, the whole fleet'),
+      title: t(locale, 'Eén engine, al onze sites', 'One engine, every site'),
       intro: t(
         locale,
         'Geen thema en geen pagebuilder. Elke site is een applicatie op één gedeelde, geversioneerde engine. Daarom kan een beveiligingsfix één keer gemaakt worden en over alle sites tegelijk uitgerold.',
@@ -228,8 +231,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
           'We build from Dev Mode. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.',
         ),
         features: [
-          feature('Payload CMS, Next.js & React'),
-          feature(t(locale, 'Meertalig, toegankelijk, getypeerd', 'Multilingual, accessible, typed')),
+          feature(t(locale, 'Next.js met Rinsly CMS', 'Next.js with Rinsly CMS')),
+          feature(t(locale, 'Meertalig, toegankelijk, gecontroleerd voordat het live gaat', 'Multilingual, accessible, checked before it goes live')),
         ],
       },
       {
@@ -237,8 +240,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Eén geversioneerde engine', 'One versioned engine'),
         description: t(
           locale,
-          'Een beveiligingsfix maken we één keer en rollen we uit over de hele fleet. Geen plugin-sprawl, geen WordPress.',
-          'A security fix is made once and rolled out across the whole fleet. No plugin sprawl, no WordPress.',
+          'Een beveiligingsfix maken we één keer en rollen we uit over al onze sites. Geen plugin-sprawl, geen WordPress.',
+          'A security fix is made once and rolled out to every site. No plugin sprawl, no WordPress.',
         ),
         features: [
           feature(t(locale, 'Fix in één release', 'Fixed in one release')),
@@ -255,7 +258,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
         ),
         features: [
           feature(t(locale, 'Edge-hosting & SSL', 'Edge hosting & SSL')),
-          feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
+          feature(t(locale, 'Doorlopend puntherstel (Cloudflare D1 Time Travel)', 'Continuous point-in-time restore (Cloudflare D1 Time Travel)')),
+          feature(t(locale, 'Nachtelijke mediaback-up', 'Nightly media backup')),
         ],
       },
     ],
@@ -264,7 +268,7 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
   {
     blockType: 'cta',
     eyebrow: t(locale, 'De techniek', 'The technical part'),
-    title: t(locale, 'Eén fix, de hele fleet', 'One fix, the whole fleet'),
+    title: t(locale, 'Eén fix, al onze sites', 'One fix, every site'),
     text: t(
       locale,
       'Hoe die engine werkt, wat er in een release gebeurt en waar de data staat. Dat leggen we liever uit dan dat we het samenvatten.',
@@ -308,18 +312,54 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
 /* The pitch, broken into small blocks. It used to be one enormous richText   */
 /* on the home page, which nobody reads.                                     */
 
-const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
+const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
+  const partner = partnerProgrammeCopy(locale)
+  // Presentation only. The rung text and the percentages come from
+  // src/lib/partnerLadder.ts, which is the published copy of the ladder.
+  const ladderIcons = [
+    'IconTargetArrow',
+    'IconRefresh',
+    'IconBolt',
+    'IconPackages',
+    'IconRocket',
+    'IconSeeding',
+  ]
+  return [
   pageHero(
     'offset',
-    t(locale, 'Partnerprogramma', 'Partner programme'),
-    t(locale, 'Eén ontwerp, elke maand inkomsten', 'One design, revenue every month'),
-    t(
-      locale,
-      'Nu betaalt een ontwerpopdracht één keer. Je levert het bestand, je factureert, en die website verdient daarna niets meer voor je, terwijl iemand anders er maandelijks aan verdient met hosting. Breng het bij ons onder en dat maandbedrag loopt deels naar jou terug, zolang de site leeft.',
-      'Right now a design job pays once. You deliver the file, you invoice, and that website never earns you anything again, while somebody else takes a monthly fee to host it. Bring it to us and part of that monthly fee comes back to you, for as long as the site is live.',
-    ),
-    [pageLink(t(locale, 'Vraag een partnergesprek aan', 'Request a partner call'), ids, SLUG.contact, { variant: 'primary' })],
+    partner.hero.eyebrow,
+    partner.hero.title,
+    partner.hero.intro,
+    [
+      pageLink(t(locale, 'Vraag een partnergesprek aan', 'Request a partner call'), ids, SLUG.contact, { variant: 'primary' }),
+      pageLink(t(locale, 'Bekijk de ladder', 'See the ladder'), ids, SLUG.partner, { anchor: 'ladder', variant: 'secondary' }),
+    ],
   ),
+  {
+    blockType: 'services',
+    anchor: 'ladder',
+    header: {
+      eyebrow: partner.ladder.eyebrow,
+      title: partner.ladder.title,
+      intro: partner.ladder.intro,
+    },
+    cards: partner.ladder.rungs.map((rung, index) => ({
+      icon: ladderIcons[index],
+      title: `+${rung.pct}% ${rung.title}`,
+      description: rung.detail,
+      features: [feature(partner.ladder.kindLabel[rung.kind])],
+    })),
+  },
+  {
+    blockType: 'richText',
+    anchor: 'basis',
+    width: 'wide',
+    header: {
+      eyebrow: partner.rules.eyebrow,
+      title: partner.rules.title,
+    },
+    content: proseRich(partner.rules.paragraphs.map((paragraph) => ({ p: paragraph }))),
+  },
   {
     blockType: 'services',
     anchor: 'waarom',
@@ -328,18 +368,18 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
       title: t(locale, 'Niet nog een websitebouwer', 'Not another website builder'),
       intro: t(
         locale,
-        'Geen thema, geen pagebuilder, geen tien losse WordPress-installaties. Eén geversioneerde engine, een hele fleet, en cijfers in plaats van bijvoeglijke naamwoorden.',
-        'No theme, no page builder, no ten separate WordPress installs. One versioned engine, a whole fleet, and numbers instead of adjectives.',
+        'Geen thema, geen pagebuilder, geen tien losse WordPress-installaties. Eén geversioneerde engine voor al onze sites, en cijfers in plaats van bijvoeglijke naamwoorden.',
+        'No theme, no page builder, no ten separate WordPress installs. One versioned engine for every site, and numbers instead of adjectives.',
       ),
     },
     cards: [
       {
         icon: 'IconPackages',
-        title: t(locale, 'Eén engine, hele fleet', 'One engine, whole fleet'),
+        title: t(locale, 'Eén engine, al onze sites', 'One engine, every site'),
         description: t(
           locale,
-          'Elke site is een dunne app op dezelfde geversioneerde engine. Een beveiligingsfix maken we één keer en rollen uit over alle klanten tegelijk.',
-          'Every site is a thin app on the same versioned engine. A security fix is made once and rolled out to every client at once.',
+          'Elke site deelt één engine en houdt zijn eigen ontwerp. Een beveiligingsfix maken we één keer en rollen uit over alle klanten tegelijk.',
+          'Every site shares one engine and keeps its own design. A security fix is made once and rolled out to every client at once.',
         ),
         features: [
           feature(t(locale, 'Geen plugin-sprawl', 'No plugin sprawl')),
@@ -355,8 +395,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
           'We build from Dev Mode: type scale, spacing and motion live in the engine, so the design survives the build.',
         ),
         features: [
-          feature('Payload CMS, Next.js & React'),
-          feature(t(locale, 'Getypeerd, met tests', 'Typed, with tests')),
+          feature(t(locale, 'Next.js met Rinsly CMS', 'Next.js with Rinsly CMS')),
+          feature(t(locale, 'Gecontroleerd voordat het live gaat', 'Checked before it goes live')),
         ],
       },
       {
@@ -377,8 +417,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Operatie met harde cijfers', 'Operations in hard numbers'),
         description: t(
           locale,
-          'Limieten in gigabytes en requests, doorlopend databaseherstel, dagelijkse mediaback-up. Geen "ruime opslag", geen kleine letters.',
-          'Limits in gigabytes and requests, continuous database recovery, daily media backup. No "generous storage", no fine print.',
+          'Limieten in gigabytes en requests, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up. Geen "ruime opslag", geen kleine letters.',
+          'Limits in gigabytes and requests, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup. No "generous storage", no fine print.',
         ),
         features: [
           feature(t(locale, 'Staging bij elke site', 'Staging on every site')),
@@ -400,8 +440,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, '1. Jullie ontwerpen', '1. You design'),
         description: t(
           locale,
-          'Wat jullie al doen: het ontwerp, in Figma. Eén harde eis is een eigen licentie met Dev Mode: daaruit bouwen we.',
-          'What you already do: the design, in Figma. One hard requirement is your own licence with Dev Mode, that’s what we build from.',
+          'Wat jullie al doen: het ontwerp, in Figma. Elke partner heeft een Figma-seat met Dev Mode en levert website-ontwerpen aan als Figma-bestanden. Dat is een voorwaarde, en het verandert het percentage niet.',
+          'What you already do: the design, in Figma. Every partner must hold a Figma seat with Dev Mode and deliver website designs as Figma files. That is a precondition, and it does not change the percentage.',
         ),
         features: [feature(t(locale, 'Aanlevering als Figma-bestand', 'Delivered as a Figma file'))],
       },
@@ -410,22 +450,22 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, '2. Wij bouwen en zetten live', '2. We build and launch'),
         description: t(
           locale,
-          'Wij maken er een getypeerde applicatie van op onze engine en zetten die live. De klant sluit de overeenkomst bij Rinsly.',
-          'We turn it into a typed application on our engine and take it live. The client’s agreement is with Rinsly.',
+          'Wij maken er een echte applicatie van op onze engine en zetten die live. De klant sluit de overeenkomst bij Rinsly.',
+          'We turn it into a real application on our engine and take it live. The client’s agreement is with Rinsly.',
         ),
-        features: [feature(t(locale, 'Gratis bouw voor uw klant bij 3 jaar', 'Free client build on 3 years'))],
+        features: [feature(t(locale, 'Gratis bouw voor de klant bij 36 maanden hosting', 'Free client build on 36 months of hosting'))],
       },
       {
         icon: 'IconRefresh',
         title: t(locale, '3. Wij draaien het', '3. We run it'),
         description: t(
           locale,
-          'Updates, databaseherstel, dagelijkse mediaback-up, support. Jij hoeft nooit meer een CMS te patchen of op zondag een storing op te lossen. Na onboarding krijg je toegang tot het partnerportaal.',
-          'Updates, database recovery, daily media backup, support. You never patch a CMS or fix a Sunday outage again. After onboarding you get access to the partner portal.',
+          'Edge-hosting, SSL, uptime-monitoring, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up, beveiliging en CMS-updates, en uitrol over alle sites.',
+          'Edge hosting, SSL, uptime monitoring, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup, security and CMS updates, and rollout across every site.',
         ),
         features: [
-          feature(t(locale, 'Jij krijgt je deel van de omzet', 'You get your share of the revenue')),
-          feature(t(locale, 'Portaal: klanten, leads en tarief', 'Portal: clients, leads and rate')),
+          feature(t(locale, 'Aandeel van de doorlopende abonnementsomzet', 'A share of the recurring subscription revenue')),
+          feature(t(locale, 'Bouwkosten en meerwerk worden niet gedeeld', 'Build fees and meerwerk are not shared')),
         ],
       },
     ],
@@ -436,62 +476,10 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
     t(locale, 'Drie stappen, en maar één ervan is van jou', 'Three steps, and only one of them is yours'),
     t(
       locale,
-      'Jullie leveren het Figma-bestand met Dev Mode aan. Rinsly bouwt het als getypeerde applicatie op de gedeelde engine en zet het live, en draait daarna de hosting, het CMS, databaseherstel en dagelijkse mediaback-up.',
-      'You hand over the Figma file with Dev Mode. Rinsly builds it as a typed application on the shared engine and takes it live, then runs the hosting, the CMS, database recovery and daily media backup.',
+      'Jullie leveren het Figma-bestand met Dev Mode aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna edge-hosting, SSL, uptime-monitoring, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up, beveiliging en CMS-updates.',
+      'You hand over the Figma file with Dev Mode. Rinsly builds it as a real application on the shared engine and takes it live, then runs edge hosting, SSL, uptime monitoring, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup, security and CMS updates.',
     ),
   ),
-  {
-    blockType: 'richText',
-    anchor: 'tarief',
-    width: 'wide',
-    header: {
-      eyebrow: t(locale, 'Wat je verdient', 'What you earn'),
-      title: t(locale, 'Je tarief bepaal je zelf', 'You set your own rate'),
-    },
-    content: proseRich(
-      locale === 'nl'
-        ? [
-            { p: 'De basis is **0%**, en dat is geen onderhandeltruc: de vergoeding betaalt niet voor een introductie die je één keer doet, maar voor werk dat elke maand doorgaat. Elk procentpunt koop je met een verantwoordelijkheid, of met omzet.' },
-            { p: 'De omzetniveaus tellen bij elkaar op, dus het maximum is **35%** van de doorlopende abonnementsomzet, exclusief btw. Eenmalige bouwkosten en meerwerk vallen erbuiten.' },
-            { p: 'Tien klanten op **Managed** met exclusiviteit en relatiebeheer is 15% van €990: ongeveer €149 per maand, voor ontwerpen die je al gemaakt had. Bij de elfde klant gaat je portfolio over de €1.000 en komt er een omzetniveau bij, dus 20%. Reken het hieronder zelf na.' },
-          ]
-        : [
-            { p: 'The base is **0%**, and that is not a bargaining trick: the fee does not pay for an introduction you make once, it pays for work that continues every month. Every percentage point is bought with a responsibility, or with volume.' },
-            { p: 'The volume levels stack, so the maximum is **35%** of the recurring subscription revenue, excluding VAT. One-off build fees and additional work are not shared.' },
-            { p: 'Ten clients on **Managed** with exclusivity and relationship management is 15% of €990: about €149 a month, for designs you had already made. Add an eleventh and your portfolio passes €1.000, which adds a volume level, so 20%. Work it out yourself below.' },
-          ],
-    ),
-  },
-  {
-    blockType: 'richText',
-    anchor: 'verantwoordelijkheden',
-    width: 'wide',
-    header: {
-      eyebrow: t(locale, 'Hoe je percentage stijgt', 'How your percentage rises'),
-      title: t(locale, 'Verantwoordelijkheden en omzet', 'Responsibilities and volume'),
-    },
-    content: proseRich(
-      locale === 'nl'
-        ? [
-            { p: 'Bovenop de **0%** basis koop je elk procentpunt met een keuze die je maandelijks blijft doen, of met groeiende omzet. De drie keuzes:' },
-            { ul: [
-              '**Exclusiviteit (+10%):** nieuw klantwerk breng je bij ons onder. Klanten die al ergens anders draaien mogen blijven tot een grote update, of tot hun hostingcontract daar afloopt; dan bied je ons opnieuw aan.',
-              '**Relatiebeheer (+5%):** jij bent het aanspreekpunt van je klant en reageert inhoudelijk binnen een week. Wat technisch werk vraagt, meld je per e-mail aan ons; wij nemen geen direct contact op met jouw klanten.',
-              '**Marketing (+5%):** een vaste vermelding op je eigen site, en Rinsly genoemd in elk voorstel waar hosting in voorkomt.',
-            ] },
-            { p: 'Daarbovenop tellen **omzetniveaus** cumulatief mee: portfolio boven €1.000 per maand +5%, boven €5.000 +10%, boven €25.000 +15%. Samen met alle drie de keuzes is het maximum **35%** van de doorlopende abonnementsomzet, exclusief btw.' },
-          ]
-        : [
-            { p: 'On top of the **0%** base, every point is bought with a choice you keep making every month, or with growing volume. The three choices:' },
-            { ul: [
-              '**Exclusivity (+10%):** new client work comes to us. Clients already hosted elsewhere may stay until a big update, or until their hosting contract elsewhere comes up for renewal; at that point you offer us again.',
-              '**Relation & first-line support (+5%):** you are your client’s point of contact and reply to them within a week. Whatever needs our technical work, you email us; we do not contact your clients directly.',
-              '**Marketing (+5%):** a standing mention on your own site, and Rinsly named in every proposal that includes hosting.',
-            ] },
-            { p: 'On top of that, **volume levels** stack: portfolio above €1.000 a month +5%, above €5.000 +10%, above €25.000 +15%. With all three choices taken, the maximum is **35%** of recurring subscription revenue, excluding VAT.' },
-          ],
-    ),
-  },
   {
     blockType: 'revenueCalculator',
     anchor: 'rekenen',
@@ -502,39 +490,17 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
       'Kies een pakket, schuif het aantal klanten en vink aan wat je zou oppakken. Het tarief en je aandeel rekenen mee.',
       'Pick a plan, drag the number of clients and tick what you would take on. The rate and your share follow along.',
     ),
-    footnote: t(
-      locale,
-      'De omzetniveaus tellen bij elkaar op, dus het maximum is 35% van de doorlopende abonnementsomzet, exclusief btw. Eenmalige bouwkosten en meerwerk vallen erbuiten. Uitbetaling volgt het geld van de klant: wij betalen niet voordat wij betaald zijn, en op het factuurritme van die klant. Dit is een indicatie, geen aanbod.',
-      'The volume levels stack, so the maximum is 35% of the recurring subscription revenue, excluding VAT. One-off build fees and additional work are not shared. Payment follows the client’s money: we do not pay before we have been paid, and we pay on that client’s billing rhythm. This is an indication, not an offer.',
-    ),
+    footnote: partner.calculatorFootnote,
   },
   {
     blockType: 'richText',
     anchor: 'facturatie',
     width: 'wide',
     header: {
-      eyebrow: t(locale, 'Facturatie', 'Invoicing'),
-      title: t(locale, 'Jij kiest wie de klant factureert', 'You choose who invoices the client'),
+      eyebrow: partner.invoicing.eyebrow,
+      title: partner.invoicing.title,
     },
-    content: proseRich(
-      locale === 'nl'
-        ? [
-            { p: 'Wil je niets met facturatie te maken hebben, of wil je juist alles op je eigen factuur? Beide kan, en het maakt voor ons niets uit.' },
-            { ul: [
-              '**Wij factureren de klant.** Jij hoeft niets in te kopen. Zodra de klant betaald heeft, betalen wij jouw deel uit, op het factuurritme van die klant: betaalt hij per maand, dan word jij per maand betaald.',
-              '**Jij factureert je eigen klant.** Je koopt bij ons in tegen de prijs min jouw percentage en zet hosting op je eigen factuur, naast je ontwerpwerk. Je bepaalt dan zelf je prijs en desgewenst je eigen abonnementsvorm, en je mag ons noemen zoals je elke infrastructuurpartij zou noemen.',
-            ] },
-            { p: 'Wat in beide gevallen hetzelfde blijft: de overeenkomst over de website loopt tussen Rinsly en de eindklant. Dat is er niet om jou buiten te sluiten, maar om jou vrij te laten: **wil je een klant niet langer onder je houden, dan gaat die zonder onderbreking verder als klant van Rinsly**: zelfde site, zelfde voorwaarden, zelfde prijs. Je kunt dus weglopen zonder dat jouw klant iets kwijtraakt.' },
-          ]
-        : [
-            { p: 'Want nothing to do with invoicing, or want everything on your own invoice? Both work, and it makes no difference to us.' },
-            { ul: [
-              '**We invoice the client.** You buy nothing. As soon as the client has paid, we pay out your share, on that client’s billing rhythm: if they pay monthly, you are paid monthly.',
-              '**You invoice your own client.** You buy from us at the price minus your percentage and put hosting on your own invoice, next to your design work. You then set your own price, and your own tiers if you want, and you may name us the way you would credit any infrastructure provider.',
-            ] },
-            { p: 'What stays the same either way: the agreement about the website runs between Rinsly and the end client. That is not there to cut you out but to leave you free: **if you no longer want to carry a client, they simply carry on as a Rinsly client**: same site, same terms, same price. So you can walk away without your client losing anything.' },
-          ],
-    ),
+    content: proseRich(partner.invoicing.blocks),
   },
   diagram(
     'invoicingRoutes',
@@ -542,8 +508,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
     t(locale, 'Wie stuurt welke factuur', 'Who sends which invoice'),
     t(
       locale,
-      'Route A: Rinsly factureert de eindklant de lijstprijs en betaalt jou je aandeel uit. Route B: jij factureert je eigen klant en koopt bij ons in tegen de lijstprijs min jouw percentage. De overeenkomst over de website loopt in beide gevallen tussen Rinsly en de eindklant.',
-      'Route A: Rinsly invoices the end client at list and pays out your share. Route B: you invoice your own client and buy from us at list minus your percentage. Either way, the agreement about the website runs between Rinsly and the end client.',
+      'Opzet A: Rinsly factureert de eindklant de lijstprijs en betaalt de commissie uit zodra die factuur betaald is. Opzet B: de partner factureert de eigen klant en koopt in tegen de lijstprijs min het ladderpercentage. De overeenkomst loopt in beide gevallen tussen Rinsly en de eindklant.',
+      'Setup A: Rinsly invoices the end client at list and pays the commission once that invoice is settled. Setup B: the partner invoices their own client and buys at list minus their ladder percentage. Either way the agreement runs between Rinsly and the end client.',
     ),
   ),
   partnerCheckCta(locale),
@@ -637,8 +603,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'De klant is eigenaar van de site en de data. Dat staat in de overeenkomst, het is geen belofte. De engine is een geversioneerd pakket en de site is een normale Next.js-applicatie; die is over te dragen. En je zit nergens aan vast tenzij je zelf voor exclusiviteit kiest.',
-            'The client owns the site and the data. That is in the agreement, not a promise. The engine is a versioned package and the site is a normal Next.js application; it can be handed over. And you are not tied to anything unless you choose exclusivity yourself.',
+            'De klant is eigenaar van de site en de data. Dat is contractueel, geen belofte.',
+            'The client owns the site and the data. That is contractual, not a promise.',
           ),
         ),
       },
@@ -647,8 +613,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Ja. Factureer je zelf, dan koop je bij ons in en bepaal je je eigen prijs en abonnementsvorm, en je mag ons noemen zoals je elke infrastructuurpartij zou noemen. Wat niet meebeweegt is de overeenkomst: die blijft tussen Rinsly en de eindklant.',
-            'Yes. If you invoice, you buy from us and set your own price and tiers, and you may name us the way you would credit any infrastructure provider. What does not move is the agreement. That stays between Rinsly and the end client.',
+            'Ja. Doorverkoop en eigen branding zijn toegestaan. Factureer je zelf, dan bepaal je je eigen prijs en desgewenst je eigen abonnementsvorm, en je mag Rinsly noemen zoals je Cloudflare noemt: hosting bij Rinsly. De overeenkomst blijft tussen Rinsly en de eindklant.',
+            'Yes. Reselling and your own branding are allowed. If you invoice, you set your own price and your own tiers if you want, and you may name Rinsly the way anyone names Cloudflare: hosting at Rinsly. The agreement stays between Rinsly and the end client.',
           ),
         ),
       },
@@ -657,8 +623,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Niets. Je hebt een eigen Figma-licentie met Dev Mode nodig: die heb je, en dat is de enige eis.',
-            'Nothing. You need your own Figma licence with Dev Mode, which you have, and that is the only requirement.',
+            'De basis van het aandeel is 0%. Een Figma-seat met Dev Mode is een voorwaarde, en die verandert het percentage niet. Eenmalige bouwkosten en meerwerk worden niet gedeeld.',
+            'The base of the share is 0%. A Figma seat with Dev Mode is a precondition, and it does not change the percentage. One-off build fees and meerwerk are not shared.',
           ),
         ),
       },
@@ -675,15 +641,16 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => [
       'Tell us what you make and how you deliver it today. If it doesn’t fit, we’ll say so.',
     ),
   ),
-]
+  ]
+}
 
 /* -------------------------------- /platform ------------------------------- */
 
-const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
+const platformLayout = (locale: Locale, _ids: PageIds): Block[] => [
   pageHero(
     'default',
     t(locale, 'Het platform', 'The platform'),
-    t(locale, 'Eén engine, één fleet, één maandbedrag', 'One engine, one fleet, one monthly fee'),
+    t(locale, 'Eén engine, al onze sites, één maandbedrag', 'One engine, every site, one monthly fee'),
     t(
       locale,
       'Elke site die wij bouwen is een applicatie op dezelfde geversioneerde engine. Dat is geen technische voorkeur maar de reden dat we veel sites tegelijk kunnen onderhouden zonder dat het onderhoud ontspoort.',
@@ -707,9 +674,9 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
           'We build from Dev Mode. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.',
         ),
         features: [
-          feature('Payload CMS, Next.js & React'),
+          feature(t(locale, 'Next.js met Rinsly CMS', 'Next.js with Rinsly CMS')),
           feature(t(locale, 'Meertalig en toegankelijk', 'Multilingual and accessible')),
-          feature(t(locale, 'Getypeerd, met tests', 'Typed, with tests')),
+          feature(t(locale, 'Gecontroleerd voordat het live gaat', 'Checked before it goes live')),
         ],
       },
       {
@@ -717,11 +684,11 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Eén geversioneerde engine', 'One versioned engine'),
         description: t(
           locale,
-          'Elke site is een dunne app op @rinsly-com/site-core en bevat alleen wat die site eigen maakt. Een lek fixen we één keer.',
-          'Every site is a thin app on @rinsly-com/site-core and holds only what makes that site its own. A vulnerability is fixed once.',
+          'Elke site deelt één engine en houdt zijn eigen ontwerp. Een lek fixen we één keer.',
+          'Every site shares one engine and keeps its own design. A vulnerability is fixed once.',
         ),
         features: [
-          feature(t(locale, 'Fix in één release, uitrol over de fleet', 'Fixed in one release, rolled out fleet-wide')),
+          feature(t(locale, 'Fix in één release, uitrol over al onze sites', 'Fixed in one release, rolled out to every site')),
           feature(t(locale, 'Geen plugin-sprawl, geen WordPress', 'No plugin sprawl, no WordPress')),
           feature(t(locale, 'Elke site houdt zijn eigen ontwerp', 'Every site keeps its own design')),
         ],
@@ -736,7 +703,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         ),
         features: [
           feature(t(locale, 'SSL, aan de edge', 'SSL, at the edge')),
-          feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
+          feature(t(locale, 'Doorlopend puntherstel (Cloudflare D1 Time Travel)', 'Continuous point-in-time restore (Cloudflare D1 Time Travel)')),
+          feature(t(locale, 'Nachtelijke mediaback-up', 'Nightly media backup')),
           feature(t(locale, 'Vaste opslag- en verkeerslimieten', 'Stated storage and traffic limits')),
         ],
       },
@@ -744,12 +712,12 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
   },
   diagram(
     'oneEngineFleet',
-    t(locale, 'De fleet', 'The fleet'),
+    t(locale, 'Al onze sites', 'Every site'),
     t(locale, 'Eén release raakt elke site', 'One release reaches every site'),
     t(
       locale,
-      'Elke klantsite is een dunne applicatie op dezelfde geversioneerde engine. Een beveiligingsfix maken we één keer en rollen we uit over de hele fleet, zonder dat een site zijn eigen ontwerp verliest.',
-      'Every client site is a thin application on the same versioned engine. A security fix is made once and rolled out across the whole fleet, without a site losing its own design.',
+      'Elke site deelt één engine en houdt zijn eigen ontwerp. Een beveiligingsfix maken we één keer en rollen we uit over al onze sites.',
+      'Every site shares one engine and keeps its own design. A security fix is made once and rolled out to every site.',
     ),
   ),
   {
@@ -765,8 +733,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Elke site heeft een volwaardig CMS (Payload, Rinsly CMS): u beheert teksten, pagina’s en media zelf. Daarnaast krijgt elke site een staging-omgeving op een apart subdomein, zodat u wijzigingen kunt bekijken vóór ze live gaan. De live site draait aan de edge; publicatie is een bewuste stap, geen automatische sync.',
-            'Every site has a full CMS (Payload, Rinsly CMS): you manage words, pages and media yourself. Each site also gets a staging environment on a separate subdomain, so you can review changes before they go live. The live site runs at the edge; publishing is a deliberate step, not an automatic sync.',
+            'Elke site heeft een volwaardig CMS (Rinsly CMS): u beheert teksten, pagina’s en media zelf. Daarnaast krijgt elke site een staging-omgeving op een apart subdomein, zodat u wijzigingen kunt bekijken vóór ze live gaan. De live site draait aan de edge; publicatie is een bewuste stap, geen automatische sync.',
+            'Every site has a full CMS (Rinsly CMS): you manage words, pages and media yourself. Each site also gets a staging environment on a separate subdomain, so you can review changes before they go live. The live site runs at the edge; publishing is a deliberate step, not an automatic sync.',
           ),
         ),
       },
@@ -775,8 +743,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Omdat elke site bij ons op dezelfde geversioneerde engine draait. Een lek fixen we één keer en rollen we uit over de hele fleet. Tien losse WordPress-installaties met elk hun eigen plugins kun je zo niet onderhouden. Daarom is onderhoud daarop óf duur, óf gebeurt het niet.',
-            'Because every site here runs on the same versioned engine. A vulnerability is fixed once and rolled out across the whole fleet. Ten separate WordPress installs, each with its own plugins, cannot be maintained that way, which is why maintenance on them is either expensive or simply not happening.',
+            'Omdat elke site bij ons op dezelfde geversioneerde engine draait. Een lek fixen we één keer en rollen we uit over al onze sites. Tien losse WordPress-installaties met elk hun eigen plugins kun je zo niet onderhouden. Daarom is onderhoud daarop óf duur, óf gebeurt het niet.',
+            'Because every site here runs on the same versioned engine. A vulnerability is fixed once and rolled out to every site. Ten separate WordPress installs, each with its own plugins, cannot be maintained that way, which is why maintenance on them is either expensive or simply not happening.',
           ),
         ),
       },
@@ -785,8 +753,8 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Voor de database geldt dit voor elk pakket, zonder onderscheid: Cloudflare Time Travel geeft doorlopend puntherstel naar elk moment binnen de laatste dertig dagen. Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid, maar voeren zelf geen actieve uptime-monitoring uit; een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
-            'For the database this is the same for every plan, no distinction: Cloudflare Time Travel gives continuous point-in-time recovery to any moment within the last thirty days. Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability, but do not run our own active uptime monitoring; a guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
+            'Voor de database geldt dit voor elk pakket, zonder onderscheid: de database heeft doorlopend puntherstel (Cloudflare D1 Time Travel). Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid. Externe uptime-monitoring controleert uw site dag en nacht en waarschuwt ons als die onbereikbaar is. Dat is geen belofte van een reactie- of hersteltijd. Een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
+            'For the database this is the same for every plan, no distinction: the database has continuous point-in-time restore (Cloudflare D1 Time Travel). Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability. External uptime monitoring checks your site around the clock and alerts us when it goes down. That is not a promised response or fix time. A guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
           ),
         ),
       },
@@ -802,6 +770,16 @@ const platformLayout = (locale: Locale, ids: PageIds): Block[] => [
             locale,
             'Heeft een ontwerpstudio de site ontworpen of gefactureerd, dan verandert dat niets: de studio wordt daarmee geen eigenaar van de site of van de data van haar klant. Bij beëindiging helpen we de klant met de overdracht van site, data en domein.',
             'If a design studio designed or invoiced the site, that changes nothing: it does not make the studio the owner of the site or of their client’s data. On termination we help the client transfer the site, data and domain.',
+          ),
+        ),
+      },
+      {
+        title: t(locale, 'Hoe wordt afwezigheid aangekondigd?', 'How are absences announced?'),
+        body: richBody(
+          t(
+            locale,
+            'Afwezigheid van Yaron wordt vooraf aangekondigd, zoals bij vakantie, enkele dagen van tevoren. Waar nodig wordt een geschikte vervanger aangesteld.',
+            'Yaron’s absences are announced in advance, like a holiday, a few days ahead. Where needed, a suitable replacement is appointed.',
           ),
         ),
       },
@@ -836,13 +814,40 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
   pageHero(
     'centered',
     t(locale, 'Prijzen', 'Pricing'),
-    t(locale, 'Hosting en beheer, met limieten die vaststaan', 'Hosting and management, with limits that are stated'),
+    t(locale, 'Gratis bouw', 'Free build'),
     t(
       locale,
-      'Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
-      'The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
+      'De bouw is €0 bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
+      'The build is €0 for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
     ),
   ),
+  // Free build stays in the hero, the loudest block. The paid route is a
+  // `note`, the quieter block this page already uses under the plans.
+  // Not a second `pricing` block: the four tiers below are the one table D1
+  // can seed (see FACILITATOR-MIGRATION.md). `services` cards have no
+  // emphasis field, so two cards would read as peers.
+  {
+    blockType: 'richText',
+    anchor: 'bouw',
+    width: 'wide',
+    header: {
+      eyebrow: t(locale, 'De bouw', 'The build'),
+      title: t(locale, 'Twee routes', 'Two routes'),
+      intro: t(
+        locale,
+        'Gratis bouw. €0 bij een normale bedrijfs- of brochurewebsite. 36 maanden minimum, daarna maandelijks opzegbaar.',
+        'Free build. €0 for a typical business or brochure site. 36 months minimum, then monthly cancellable.',
+      ),
+    },
+  },
+  {
+    blockType: 'note',
+    text: t(
+      locale,
+      'Of betaal de bouw: vanaf €2.500, daarna doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar. Alle prijzen exclusief 21% btw. Een betaalde bouw schaalt met de complexiteit.',
+      'Or pay for the build: from €2,500, then ongoing and cancellable monthly with one month’s notice. A paid build can, by arrangement, be spread over the first year. All prices exclude 21% VAT. A paid build scales with complexity.',
+    ),
+  },
   {
     blockType: 'pricing',
     anchor: 'pakketten',
@@ -869,9 +874,9 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           feature(t(locale, 'Tot 1 miljoen requests per maand', 'Up to 1 million requests a month')),
           feature(t(locale, 'Edge-hosting & SSL', 'Edge hosting & SSL')),
           feature(t(locale, 'Beveiligings- & CMS-updates', 'Security & CMS updates')),
-          feature(t(locale, 'Doorlopend databaseherstel', 'Continuous database recovery')),
-          feature(t(locale, 'Dagelijkse mediaback-up', 'Daily media backup')),
-          feature(t(locale, 'E-mailsupport, reactie binnen 1 week', 'Email support, reply within a week')),
+          feature(t(locale, 'Doorlopend puntherstel (Cloudflare D1 Time Travel)', 'Continuous point-in-time restore (Cloudflare D1 Time Travel)')),
+          feature(t(locale, 'Nachtelijke mediaback-up', 'Nightly media backup')),
+          feature(t(locale, 'E-mailantwoord op vragen binnen een week', 'Email reply to questions within a week')),
           feature(t(locale, 'Staging-omgeving', 'Staging environment')),
           feature(t(locale, 'Wijzigingen inbegrepen', 'Changes included'), false),
         ],
@@ -947,18 +952,18 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Twee routes. **Betaalde bouw:** een maatwerksite vanaf €2.500 (excl. btw); de exacte prijs hangt af van omvang en complexiteit. U krijgt vooraf een heldere offerte, en het hostingabonnement is daarna maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar.',
-            'Two routes. **Paid build:** a custom site from €2,500 (excl. VAT); the exact price depends on size and complexity. You receive a clear quote up front, and the hosting subscription is cancellable monthly afterwards with one month’s notice. A paid build can, by arrangement, be spread over the first year.',
+            '**Gratis bouw:** €0 bouwkosten bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar.',
+            '**Free build:** a €0 build fee for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable.',
           ),
           t(
             locale,
-            '**Gratis bouw:** legt u zich voor **drie jaar (36 maanden)** vast op het hostingabonnement, dan bouwen wij zonder bouwkosten bij een normale bedrijfs- of brochurewebsite.',
-            '**Free build:** if you commit to **three years (36 months)** of the hosting subscription, we build at no build fee for a typical business or brochure site.',
+            '**Betaal de bouw:** vanaf €2.500 (excl. btw). De prijs schaalt met de complexiteit. Het hostingabonnement is doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar.',
+            '**Pay the build:** from €2,500 (excl. VAT). The price scales with complexity. The hosting subscription is ongoing and cancellable monthly with one month’s notice. A paid build can, by arrangement, be spread over the first year.',
           ),
           t(
             locale,
-            'Beide routes bestaan echt. De minimumlooptijd van drie jaar is wat de gratis bouw betaalt; daarna loopt het abonnement door en is het net zo goed maandelijks opzegbaar.',
-            'Both routes are real. The three-year minimum term is what pays for the free build; after that the subscription continues and is just as monthly-cancellable.',
+            'Beide routes bestaan echt. De minimumlooptijd van drie jaar is wat de gratis bouw betaalt. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website. Daarna loopt het abonnement door en is het net zo goed maandelijks opzegbaar.',
+            'Both routes are real. The three-year minimum term is what pays for the free build. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website. After that the subscription continues and is just as monthly-cancellable.',
           ),
         ),
       },
@@ -967,8 +972,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Dat hangt af van welke route u kiest. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Kiest u de gratis bouw, dan geldt een minimumlooptijd van 36 maanden op het abonnement; daarna is het net zo goed maandelijks opzegbaar.',
-            'That depends on the route you choose. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice. If you choose the free build, a minimum term of 36 months applies to the subscription; after that it is just as monthly-cancellable.',
+            'Dat hangt af van welke route u kiest. Kiest u de gratis bouw, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website; daarna is het maandelijks opzegbaar. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
+            'That depends on the route you choose. If you choose the free build, a minimum term of 36 months applies to the subscription. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website; after that it is monthly cancellable. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
           ),
         ),
       },
@@ -999,6 +1004,16 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
             locale,
             'Alles buiten de inbegrepen uren, en al het werk op **Care**, is **meerwerk** tegen **€95 per uur** (excl. btw), vooraf afgestemd. Grote uitbreidingen of nieuwe functionaliteit offreren we apart, met een heldere scope.',
             'Anything beyond the included hours, and all work on **Care**, is **additional work** at **€95 an hour** (excl. VAT), agreed up front. Larger extensions or new functionality we quote separately, with a clear scope.',
+          ),
+        ),
+      },
+      {
+        title: t(locale, 'Gaat de week ook over storingen?', 'Does the week cover outages too?'),
+        body: richBody(
+          t(
+            locale,
+            'Op Care is de week de reactietijd voor gewone vragen. Storingen lopen niet op die termijn.',
+            'On Care, the week is the reply time for normal questions. Outages are not handled on that timeline.',
           ),
         ),
       },
@@ -1059,8 +1074,8 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Hosting en onderhoud inbegrepen', 'Hosting and maintenance included'),
         description: t(
           locale,
-          'Eén maandbedrag voor hosting, SSL, databaseherstel en updates. Geen losse rekeningen voor een plugin-update.',
-          'One monthly fee for hosting, SSL, database recovery and updates. No separate bills for a plugin update.',
+          'Eén maandbedrag voor hosting, SSL, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up en updates. Geen losse rekeningen voor een plugin-update.',
+          'One monthly fee for hosting, SSL, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup and updates. No separate bills for a plugin update.',
         ),
         features: [
           feature(t(locale, 'Vaste limieten, vooraf bekend', 'Stated limits, known up front')),
@@ -1164,8 +1179,8 @@ const overLayout = (locale: Locale, ids: PageIds): Block[] => [
       ),
       t(
         locale,
-        'We meten websites ook echt: crawlen, scoren en Lighthouse op grote schaal. Vandaar de gratis websitecheck op deze site: vijf rapportcijfers in een halve minuut.',
-        'We genuinely measure websites: crawling, scoring and Lighthouse at scale. Hence the free website check on this site: five grades in half a minute.',
+        'Vijf rapportcijfers voor elke site in een halve minuut: probeer de gratis websitecheck op deze site.',
+        'Five grades for any site in half a minute: try the free website check on this site.',
       ),
     ),
   },
@@ -1346,7 +1361,7 @@ const legalLayout = (eyebrow: string, title: string, nodes: ProseNode[]): Block[
 
 const privacyNodes: Record<Locale, ProseNode[]> = {
   nl: [
-    { p: 'Laatst bijgewerkt: 15 augustus 2026.' },
+    { p: 'Laatst bijgewerkt: 29 oktober 2026.' },
     { p: 'Rinsly hecht veel waarde aan de bescherming van uw persoonsgegevens. In deze privacyverklaring leggen we uit welke gegevens we verwerken wanneer u onze website bezoekt of contact met ons opneemt, en ook wanneer wij de website van uw bedrijf hebben gemeten zonder dat u zich bij ons had gemeld (zie artikel 7), met welk doel en op welke grondslag, en welke rechten u heeft.' },
     { h: '1. Verwerkingsverantwoordelijke' },
     { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden. KvK 85578835. E-mail: contact@rinsly.com. Rinsly is de verwerkingsverantwoordelijke voor de verwerking van persoonsgegevens via deze website.' },
@@ -1385,12 +1400,12 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '9. Uw rechten' },
     { p: 'U heeft het recht op inzage, rectificatie, verwijdering, beperking van de verwerking, bezwaar tegen de verwerking en gegevensoverdraagbaarheid. Stuur uw verzoek naar contact@rinsly.com; we reageren binnen de wettelijke termijn. Bent u het niet eens met hoe we met uw gegevens omgaan, dan kunt u een klacht indienen bij de Autoriteit Persoonsgegevens.' },
     { h: '10. Beveiliging' },
-    { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer, doorlopend puntherstel van de database via Cloudflare Time Travel en een dagelijkse back-up van mediabestanden naar aparte opslag.' },
+    { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke back-up van mediabestanden naar aparte opslag.' },
     { h: '11. Wijzigingen' },
     { p: 'We kunnen deze privacyverklaring van tijd tot tijd aanpassen. De actuele versie staat altijd op deze pagina, met de datum van de laatste wijziging bovenaan.' },
   ],
   en: [
-    { p: 'Last updated: 15 August 2026.' },
+    { p: 'Last updated: 29 October 2026.' },
     { p: 'Rinsly takes the protection of your personal data seriously. This privacy policy explains which data we process when you visit our website or contact us, and also when we have measured your company’s website without you having contacted us (see section 7), for what purpose and on what legal basis, and what rights you have.' },
     { h: '1. Controller' },
     { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, the Netherlands. Chamber of Commerce (KvK) 85578835. Email: contact@rinsly.com. Rinsly is the controller for the processing of personal data through this website.' },
@@ -1429,7 +1444,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '9. Your rights' },
     { p: 'You have the right to access, rectification, erasure, restriction of processing, objection to processing and data portability. Send your request to contact@rinsly.com; we will respond within the statutory period. If you disagree with how we handle your data, you may lodge a complaint with the Dutch Data Protection Authority (Autoriteit Persoonsgegevens).' },
     { h: '10. Security' },
-    { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control, continuous point-in-time database recovery via Cloudflare Time Travel and a daily backup of media files to separate storage.' },
+    { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control, continuous point-in-time restore of the database (Cloudflare D1 Time Travel) and a nightly backup of media files to separate storage.' },
     { h: '11. Changes' },
     { p: 'We may update this privacy policy from time to time. The current version is always available on this page, with the date of the last change shown at the top.' },
   ],
@@ -1437,7 +1452,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
 
 const voorwaardenNodes: Record<Locale, ProseNode[]> = {
   nl: [
-    { p: 'Laatst bijgewerkt: 17 juli 2026.' },
+    { p: 'Laatst bijgewerkt: 29 oktober 2026.' },
     { h: 'Artikel 1: Definities' },
     { ul: [
       '**Rinsly:** de eenmanszaak Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, KvK 85578835, gebruiker van deze algemene voorwaarden.',
@@ -1478,9 +1493,10 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
     { h: 'Artikel 7: Beschikbaarheid en onderhoud' },
     { ol: [
-      'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly voert daarbij zelf geen actieve uptime-monitoring uit. Een specifieke of ononderbroken beschikbaarheid wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
-      'De database van de website is doorlopend herstelbaar naar elk moment binnen de laatste dertig dagen via Cloudflare Time Travel. Mediabestanden worden dagelijks naar aparte opslag geback-upt.',
+      'Rinsly spant zich in voor een goede beschikbaarheid van de website en voert het onderhoud met zorg uit. Rinsly controleert de beschikbaarheid van de website doorlopend met externe uptime-monitoring en krijgt een melding als de website onbereikbaar is. Een specifieke of ononderbroken beschikbaarheid, of een reactie- of hersteltijd, wordt niet gegarandeerd, tenzij daarover in een afzonderlijke service level agreement (SLA) uitdrukkelijk anders is overeengekomen.',
+      'De database van de website heeft doorlopend puntherstel (Cloudflare D1 Time Travel). Mediabestanden worden elke nacht naar aparte opslag geback-upt.',
       'Storingen kunnen per e-mail worden gemeld; Rinsly reageert binnen de in de overeenkomst of SLA genoemde termijn.',
+      'Afwezigheid van Yaron Schaeffer wordt vooraf aangekondigd, zoals bij vakantie, enkele dagen van tevoren. Waar nodig wordt een geschikte vervanger aangesteld.',
     ] },
     { h: 'Artikel 8: Meerwerk' },
     { ol: [
@@ -1489,7 +1505,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Artikel 9: Looptijd en opzegging' },
     { ol: [
       'Onderhouds- en hostingovereenkomsten worden aangegaan voor onbepaalde tijd en zijn maandelijks opzegbaar met een opzegtermijn van één maand.',
-      'Is de website zonder eenmalige bouwkosten opgeleverd omdat opdrachtgever zich voor een minimumlooptijd heeft verbonden, dan geldt die minimumlooptijd: in beginsel 36 maanden, en is tussentijdse opzegging pas mogelijk na afloop daarvan. De minimumlooptijd wordt in het voorstel vastgelegd. Na afloop loopt de overeenkomst door voor onbepaalde tijd en geldt lid 1.',
+      'Is de website zonder eenmalige bouwkosten opgeleverd omdat opdrachtgever zich voor een minimumlooptijd heeft verbonden, dan geldt die minimumlooptijd: in beginsel 36 maanden. Tussentijdse opzegging is mogelijk via een afkoop, of opdrachtgever betaalt de resterende maanden van de minimumlooptijd van 36 maanden en behoudt de website. De minimumlooptijd wordt in het voorstel vastgelegd. Na afloop loopt de overeenkomst door voor onbepaalde tijd en geldt lid 1.',
       'Vooruitbetaalde vergoedingen over de periode na de opzegdatum worden naar rato terugbetaald.',
       'Elke partij kan de overeenkomst met onmiddellijke ingang ontbinden bij een wezenlijke, niet-herstelde tekortkoming van de andere partij of bij diens faillissement of surseance van betaling.',
     ] },
@@ -1497,7 +1513,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { ol: [
       'De website, de inhoud en de bijbehorende data blijven eigendom van opdrachtgever. Na volledige betaling verkrijgt opdrachtgever het recht op vrije overdracht van de website en de broncode.',
       'Door Rinsly gebruikte generieke onderdelen, hulpmiddelen en kennis blijven aan Rinsly voorbehouden.',
-      'Bij beëindiging verleent Rinsly redelijke medewerking aan de overdracht van de website, data en het domein en houdt de omgeving hiervoor nog dertig dagen beschikbaar.',
+      'Bij beëindiging ontvangt opdrachtgever alle data, de website, de broncode daarvan en een momentopname van de versie van de site-core-engine die de site gebruikte, zodat de broncode bruikbaar blijft. Vanaf beëindiging levert Rinsly geen engine-updates, geen beveiligingsupdates en geen ondersteuning meer. Rinsly verleent redelijke medewerking aan de overdracht van de website, data en het domein en houdt de omgeving hiervoor nog dertig dagen beschikbaar.',
     ] },
     { h: 'Artikel 11: Verwerking van persoonsgegevens' },
     { ol: [
@@ -1506,7 +1522,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Artikel 12: Aansprakelijkheid' },
     { ol: [
       'De aansprakelijkheid van Rinsly is beperkt tot directe schade en tot ten hoogste het bedrag dat opdrachtgever in de twaalf maanden voorafgaand aan de schadeveroorzakende gebeurtenis uit hoofde van de overeenkomst heeft betaald.',
-      'Rinsly is niet aansprakelijk voor indirecte schade, waaronder gevolgschade, gederfde omzet en dataverlies dat niet kan worden hersteld via Cloudflare Time Travel of de dagelijkse mediaback-up binnen de bewaartermijn van die back-up.',
+      'Rinsly is niet aansprakelijk voor indirecte schade, waaronder gevolgschade, gederfde omzet en dataverlies dat niet kan worden hersteld via Cloudflare D1 Time Travel of de nachtelijke mediaback-up.',
       'Deze beperkingen gelden niet bij opzet of bewuste roekeloosheid van Rinsly.',
     ] },
     { h: 'Artikel 13: Overmacht' },
@@ -1532,7 +1548,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
   ],
   en: [
-    { p: 'Last updated: 17 July 2026.' },
+    { p: 'Last updated: 29 October 2026.' },
     { h: 'Article 1: Definitions' },
     { ul: [
       '**Rinsly:** the sole proprietorship Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, the Netherlands, KvK 85578835, user of these terms.',
@@ -1573,9 +1589,10 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     ] },
     { h: 'Article 7: Availability and maintenance' },
     { ol: [
-      'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly does not run its own active uptime monitoring. No specific or uninterrupted availability is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
-      "The website's database is continuously recoverable to any point within the last thirty days via Cloudflare Time Travel. Media files are backed up daily to separate storage.",
+      'Rinsly makes reasonable efforts to keep the website available and performs maintenance with care. Rinsly continuously checks the availability of the website with external uptime monitoring and is alerted when the website is unreachable. No specific or uninterrupted availability, and no response or fix time, is guaranteed unless expressly agreed otherwise in a separate service level agreement (SLA).',
+      "The website's database has continuous point-in-time restore (Cloudflare D1 Time Travel). Media files are backed up nightly to separate storage.",
       'Incidents may be reported by email; Rinsly responds within the period stated in the agreement or SLA.',
+      'Absences of Yaron Schaeffer are announced in advance, as with a holiday, a few days ahead. Where needed, a suitable replacement is appointed.',
     ] },
     { h: 'Article 8: Additional work' },
     { ol: [
@@ -1584,7 +1601,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Article 9: Term and termination' },
     { ol: [
       "Maintenance and hosting agreements are entered into for an indefinite term and are cancellable monthly with one month's notice.",
-      'Where the website was delivered without a one-off build fee because the client committed to a minimum term, that minimum term applies: in principle 36 months, and early termination is only possible once it has expired. The minimum term is recorded in the proposal. After it expires the agreement continues for an indefinite term and paragraph 1 applies.',
+      'Where the website was delivered without a one-off build fee because the client committed to a minimum term, that minimum term applies: in principle 36 months. Early termination is possible through a buy-out, or the client pays the remaining months of the 36-month term and keeps the website. The minimum term is recorded in the proposal. After it expires the agreement continues for an indefinite term and paragraph 1 applies.',
       'Fees prepaid for the period after the termination date are refunded pro rata.',
       'Either party may terminate the agreement with immediate effect in the event of a material, uncured breach by the other party or its bankruptcy or suspension of payment.',
     ] },
@@ -1592,7 +1609,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { ol: [
       "The website, its content and associated data remain the client's property. After full payment the client obtains the right to freely transfer the website and source code.",
       'Generic components, tools and know-how used by Rinsly remain reserved to Rinsly.',
-      'On termination Rinsly gives reasonable assistance with the transfer of the website, data and domain and keeps the environment available for a further thirty days.',
+      'On termination the client receives all data, the website, its source code and a snapshot of the site-core engine version the site used, so the source stays usable. From termination Rinsly provides no further engine updates, security updates or support. Rinsly gives reasonable assistance with the transfer of the website, data and domain and keeps the environment available for a further thirty days.',
     ] },
     { h: 'Article 11: Processing of personal data' },
     { ol: [
@@ -1601,7 +1618,7 @@ const voorwaardenNodes: Record<Locale, ProseNode[]> = {
     { h: 'Article 12: Liability' },
     { ol: [
       "Rinsly's liability is limited to direct damage and to at most the amount the client paid under the agreement in the twelve months preceding the event causing the damage.",
-      'Rinsly is not liable for indirect damage, including consequential loss, lost revenue and data loss that cannot be recovered via Cloudflare Time Travel or the daily media backup within that backup’s retention period.',
+      'Rinsly is not liable for indirect damage, including consequential loss, lost revenue and data loss that cannot be recovered via Cloudflare D1 Time Travel or the nightly media backup.',
       "These limitations do not apply in the event of intent or deliberate recklessness on Rinsly's part.",
     ] },
     { h: 'Article 13: Force majeure' },
@@ -1642,8 +1659,8 @@ async function repairOrphanedVersions(payload: PayloadInstance) {
           WHERE parent_id IS NULL AND EXISTS (SELECT 1 FROM pages p WHERE p.slug = _pages_v.version_slug)`,
     )
     await drizzle.run(sql`DELETE FROM _pages_v WHERE parent_id IS NULL`)
-  } catch {
-    /* healthy database — nothing to repair */
+  } catch (err) {
+    logCaught('[seed] orphaned-version repair skipped', err)
   }
 }
 
@@ -1653,21 +1670,26 @@ async function run() {
 
   // Admin user
   const users = await payload.find({ collection: 'users', limit: 1, sort: 'createdAt' })
-  let user = users.docs[0] as User | undefined
+  const existingUser = users.docs[0] as (typeof users.docs)[number] | undefined
+  if (existingUser !== undefined && !userRowSchema.safeParse(existingUser).success) {
+    throw new Error('seed: user row failed validation')
+  }
+  let user = existingUser
   if (!user) {
-    const email = process.env.SEED_ADMIN_EMAIL || 'dev@rinsly.local'
-    const password = process.env.SEED_ADMIN_PASSWORD || 'rinsly-dev'
-    user = (await payload.create({
+    const env = readServerEnv()
+    const email = env.SEED_ADMIN_EMAIL || 'dev@rinsly.local'
+    const password = env.SEED_ADMIN_PASSWORD || 'rinsly-dev'
+    user = await payload.create({
       collection: 'users',
       data: { email, password, roles: ['admin'] },
-    })) as User
+    })
     console.log(`Created admin ${email}`)
-  } else if (!user.roles?.includes('admin')) {
-    user = (await payload.update({
+  } else if (!user.roles.includes('admin')) {
+    user = await payload.update({
       collection: 'users',
       id: user.id,
-      data: { roles: [...(user.roles ?? []), 'admin'] },
-    })) as User
+      data: { roles: [...user.roles, 'admin'] },
+    })
   }
   console.log(`Seeding as ${user.email}`)
 
@@ -1714,17 +1736,30 @@ async function run() {
       limit: 1,
       depth: 0,
     })
-    let doc = existing.docs.find((d) => d?.id != null) as { id: number } | undefined
-    if (!doc) {
-      doc = (await payload.create({
-        collection: 'pages',
-        draft: true,
-        locale: 'nl',
-        data: { slug: page.slug, title: page.title('nl') } as never,
-        user,
-      })) as { id: number }
+    const found = existing.docs[0] as (typeof existing.docs)[number] | undefined
+    const stored = found === undefined ? undefined : idRowSchema.safeParse(found)
+    if (stored && !stored.success) throw new Error(`seed: page row ${page.slug} failed validation`)
+    let pageId = stored?.success ? stored.data.id : undefined
+    if (pageId === undefined) {
+      const created = idRowSchema.safeParse(
+        await payload.create({
+          collection: 'pages',
+          draft: true,
+          locale: 'nl',
+          data: { slug: page.slug, title: page.title('nl') },
+          user,
+        }),
+      )
+      if (!created.success) throw new Error(`seed: created page ${page.slug} failed validation`)
+      pageId = created.data.id
     }
-    ids[page.slug] = doc.id
+    ids[page.slug] = pageId
+  }
+
+  const idFor = (slug: string): number => {
+    const id = ids[slug] as number | undefined
+    if (id === undefined) throw new Error(`seed: no page id for ${slug}`)
+    return id
   }
 
   // Pass 2 — write both locales' layouts, then publish.
@@ -1732,16 +1767,16 @@ async function run() {
     for (const locale of ['nl', 'en'] as Locale[]) {
       await payload.update({
         collection: 'pages',
-        id: ids[page.slug],
+        id: idFor(page.slug),
         draft: true,
         locale,
-        data: { title: page.title(locale), layout: page.layout(locale, ids) } as never,
+        data: { title: page.title(locale), layout: page.layout(locale, ids) },
         user,
       })
     }
     await payload.update({
       collection: 'pages',
-      id: ids[page.slug],
+      id: idFor(page.slug),
       data: { _status: 'published' } as never,
       user,
     })
@@ -1749,15 +1784,15 @@ async function run() {
   }
 
   // Globals
-  await payload.updateGlobal({ slug: 'header', locale: 'nl', data: headerData('nl', ids) as never, user })
-  await payload.updateGlobal({ slug: 'header', locale: 'en', data: headerData('en', ids) as never, user })
+  await payload.updateGlobal({ slug: 'header', locale: 'nl', data: headerData('nl', ids), user })
+  await payload.updateGlobal({ slug: 'header', locale: 'en', data: headerData('en', ids), user })
   await payload.updateGlobal({
     slug: 'footer',
     locale: 'nl',
-    data: { ...footerShared, ...footerLocalized('nl') } as never,
+    data: { ...footerShared, ...footerLocalized('nl') },
     user,
   })
-  await payload.updateGlobal({ slug: 'footer', locale: 'en', data: footerLocalized('en') as never, user })
+  await payload.updateGlobal({ slug: 'footer', locale: 'en', data: footerLocalized('en'), user })
   console.log('Globals seeded (header, footer)')
 
   console.log('Seed complete.')
