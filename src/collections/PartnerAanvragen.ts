@@ -78,7 +78,7 @@ export const PartnerAanvragen: CollectionConfig = {
       type: 'checkbox',
       defaultValue: false,
       access: {
-        // admin.readOnly is UI-only. This also rejects a REST or GraphQL update.
+        // admin.readOnly is UI-only. Payload ignores a REST or GraphQL update of this field.
         update: () => false,
       },
       admin: {
