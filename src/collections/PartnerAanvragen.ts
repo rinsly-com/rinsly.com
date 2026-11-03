@@ -77,6 +77,10 @@ export const PartnerAanvragen: CollectionConfig = {
       label: { en: 'Has a Figma seat with Dev Mode', nl: 'Heeft Figma met Dev Mode' },
       type: 'checkbox',
       defaultValue: false,
+      access: {
+        // admin.readOnly is UI-only. This also rejects a REST or GraphQL update.
+        update: () => false,
+      },
       admin: {
         readOnly: true,
         description: 'No longer asked. Older applications may still have an answer here.',
