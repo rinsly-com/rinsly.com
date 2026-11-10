@@ -201,8 +201,8 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
     ),
     t(
       locale,
-      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het design system aan, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke mediaback-up. Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
-      'Rinsly is the build-and-run department design studios don’t have. You deliver the design system, we build it as a real application and run it from there: hosting, updates, continuous point-in-time restore of the database (Cloudflare D1 Time Travel) and a nightly media backup. Every time the client pays, a share of it comes to you.',
+      'Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het design system aan, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates en dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up). Elke keer dat de klant betaalt, gaat er een deel naar jullie.',
+      'Rinsly is the build-and-run department design studios don’t have. You deliver the design system, we build it as a real application and run it from there: hosting, updates and daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup). Every time the client pays, a share of it comes to you.',
     ),
     [
       pageLink(t(locale, 'Word partner', 'Become a partner'), ids, SLUG.partner, { variant: 'primary' }),
@@ -258,8 +258,7 @@ const homeLayout = (locale: Locale, ids: PageIds): Block[] => [
         ),
         features: [
           feature(t(locale, 'Edge-hosting & SSL', 'Edge hosting & SSL')),
-          feature(t(locale, 'Doorlopend puntherstel (Cloudflare D1 Time Travel)', 'Continuous point-in-time restore (Cloudflare D1 Time Travel)')),
-          feature(t(locale, 'Nachtelijke mediaback-up', 'Nightly media backup')),
+          feature(t(locale, 'Dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up)', 'Daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup)')),
         ],
       },
     ],
@@ -417,8 +416,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         title: t(locale, 'Operatie met harde cijfers', 'Operations in hard numbers'),
         description: t(
           locale,
-          'Limieten in gigabytes en requests, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up. Geen "ruime opslag", geen kleine letters.',
-          'Limits in gigabytes and requests, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup. No "generous storage", no fine print.',
+          'Limieten in gigabytes en requests, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up). Geen "ruime opslag", geen kleine letters.',
+          'Limits in gigabytes and requests, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup). No "generous storage", no fine print.',
         ),
         features: [
           feature(t(locale, 'Staging bij elke site', 'Staging on every site')),
@@ -460,8 +459,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         title: t(locale, '3. Wij draaien het', '3. We run it'),
         description: t(
           locale,
-          'Edge-hosting, SSL, uptime-monitoring, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up, beveiliging en CMS-updates, en uitrol over alle sites.',
-          'Edge hosting, SSL, uptime monitoring, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup, security and CMS updates, and rollout across every site.',
+          'Edge-hosting, SSL, uptime-monitoring, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up), beveiliging en CMS-updates, en uitrol over alle sites.',
+          'Edge hosting, SSL, uptime monitoring, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup), security and CMS updates, and rollout across every site.',
         ),
         features: [
           feature(t(locale, 'Aandeel van de doorlopende abonnementsomzet', 'A share of the recurring subscription revenue')),
@@ -476,8 +475,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
     t(locale, 'Drie stappen, en maar één ervan is van jou', 'Three steps, and only one of them is yours'),
     t(
       locale,
-      'Jullie leveren het design system aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna edge-hosting, SSL, uptime-monitoring, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up, beveiliging en CMS-updates.',
-      'You deliver the design system. Rinsly builds it as a real application on the shared engine and takes it live, then runs edge hosting, SSL, uptime monitoring, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup, security and CMS updates.',
+      'Jullie leveren het design system aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna edge-hosting, SSL, uptime-monitoring, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up), beveiliging en CMS-updates.',
+      'You deliver the design system. Rinsly builds it as a real application on the shared engine and takes it live, then runs edge hosting, SSL, uptime monitoring, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup), security and CMS updates.',
     ),
   ),
   {
@@ -703,8 +702,7 @@ const platformLayout = (locale: Locale, _ids: PageIds): Block[] => [
         ),
         features: [
           feature(t(locale, 'SSL, aan de edge', 'SSL, at the edge')),
-          feature(t(locale, 'Doorlopend puntherstel (Cloudflare D1 Time Travel)', 'Continuous point-in-time restore (Cloudflare D1 Time Travel)')),
-          feature(t(locale, 'Nachtelijke mediaback-up', 'Nightly media backup')),
+          feature(t(locale, 'Dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up)', 'Daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup)')),
           feature(t(locale, 'Vaste opslag- en verkeerslimieten', 'Stated storage and traffic limits')),
         ],
       },
@@ -749,12 +747,12 @@ const platformLayout = (locale: Locale, _ids: PageIds): Block[] => [
         ),
       },
       {
-        title: t(locale, 'Hoe zit het met databaseherstel en storingen?', 'What about database recovery and outages?'),
+        title: t(locale, 'Hoe zit het met dagelijkse back-ups en storingen?', 'What about daily backups and outages?'),
         body: richBody(
           t(
             locale,
-            'Voor de database geldt dit voor elk pakket, zonder onderscheid: de database heeft doorlopend puntherstel (Cloudflare D1 Time Travel). Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid. Externe uptime-monitoring controleert uw site dag en nacht en waarschuwt ons als die onbereikbaar is. Dat is geen belofte van een reactie- of hersteltijd. Een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
-            'For the database this is the same for every plan, no distinction: the database has continuous point-in-time restore (Cloudflare D1 Time Travel). Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability. External uptime monitoring checks your site around the clock and alerts us when it goes down. That is not a promised response or fix time. A guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
+            'Dagelijkse back-ups horen bij elk pakket, vanaf Care, zonder onderscheid: doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke mediaback-up. Mediabestanden (afbeeldingen, uploads) worden elke nacht naar aparte opslag geback-upt; verwijderde en overschreven bestanden blijven herstelbaar. We draaien op een wereldwijd edge-netwerk en spannen ons in voor goede beschikbaarheid. Externe uptime-monitoring controleert uw site dag en nacht en waarschuwt ons als die onbereikbaar is. Dat is geen belofte van een reactie- of hersteltijd. Een gegarandeerde ononderbroken beschikbaarheid bestaat sowieso niet, en wie dat belooft moet u niet vertrouwen. Wilt u wél harde reactietijden op papier, dan is dat een SLA bij Op maat.',
+            'Daily backups come with every plan, from Care up, with no distinction: continuous point-in-time database restore (Cloudflare D1 Time Travel) and a nightly media backup. Media files (images, uploads) are backed up nightly to separate storage; deleted and overwritten files remain recoverable. We run on a global edge network and work hard for good availability. External uptime monitoring checks your site around the clock and alerts us when it goes down. That is not a promised response or fix time. A guaranteed uninterrupted availability does not exist regardless, and anyone promising it should not be trusted. If you do want hard response times on paper, that is an SLA on the Custom plan.',
           ),
         ),
       },
@@ -874,8 +872,7 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           feature(t(locale, 'Tot 1 miljoen requests per maand', 'Up to 1 million requests a month')),
           feature(t(locale, 'Edge-hosting & SSL', 'Edge hosting & SSL')),
           feature(t(locale, 'Beveiligings- & CMS-updates', 'Security & CMS updates')),
-          feature(t(locale, 'Doorlopend puntherstel (Cloudflare D1 Time Travel)', 'Continuous point-in-time restore (Cloudflare D1 Time Travel)')),
-          feature(t(locale, 'Nachtelijke mediaback-up', 'Nightly media backup')),
+          feature(t(locale, 'Dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up)', 'Daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup)')),
           feature(t(locale, 'E-mailantwoord op vragen binnen een week', 'Email reply to questions within a week')),
           feature(t(locale, 'Staging-omgeving', 'Staging environment')),
           feature(t(locale, 'Wijzigingen inbegrepen', 'Changes included'), false),
@@ -1074,8 +1071,8 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Hosting en onderhoud inbegrepen', 'Hosting and maintenance included'),
         description: t(
           locale,
-          'Eén maandbedrag voor hosting, SSL, doorlopend puntherstel van de database (Cloudflare D1 Time Travel), nachtelijke mediaback-up en updates. Geen losse rekeningen voor een plugin-update.',
-          'One monthly fee for hosting, SSL, continuous point-in-time restore of the database (Cloudflare D1 Time Travel), nightly media backup and updates. No separate bills for a plugin update.',
+          'Eén maandbedrag voor hosting, SSL, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up) en updates. Geen losse rekeningen voor een plugin-update.',
+          'One monthly fee for hosting, SSL, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup) and updates. No separate bills for a plugin update.',
         ),
         features: [
           feature(t(locale, 'Vaste limieten, vooraf bekend', 'Stated limits, known up front')),
