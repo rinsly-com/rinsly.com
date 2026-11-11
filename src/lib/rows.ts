@@ -35,7 +35,6 @@ export const partnerRowSchema = z
     exclusiviteit: nullableBool,
     relatiebeheer: nullableBool,
     marketing: nullableBool,
-    figmaSeat: nullableBool,
     branches: nullableText,
     talen: nullableText,
     landen: nullableText,

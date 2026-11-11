@@ -34,7 +34,6 @@ type Data = {
   telefoon: string
   bouwtZelf: boolean
   verkooptHosting: boolean
-  figmaSeat: boolean
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -64,11 +63,9 @@ const COPY = {
     other: 'Anders, namelijk…',
     bericht: 'Aanvullende toelichting (optioneel)',
     partnerBericht: 'Waar werk je aan, en wat wil je weten? (optioneel)',
-    qualHint: 'Drie vragen die bepalen of dit voor jou werkt. Eerlijk antwoorden helpt jou het meest.',
+    qualHint: 'Twee vragen die bepalen of dit voor jou werkt. Eerlijk antwoorden helpt jou het meest.',
     bouwtZelf: 'We bouwen onze websites zelf',
     verkooptHosting: 'We verkopen zelf al hosting',
-    figmaSeat: 'We hebben een Figma-licentie met Dev Mode',
-    figmaNote: 'Dit is de enige harde eis. Wij bouwen uit Dev Mode.',
     buildWarn:
       'Dan is dit misschien niets voor je, en dat zeggen we liever nu. Dit werkt als bouwen het deel is dat je week opeet en niet betaalt zoals ontwerpen betaalt. Bouw je graag, blijf dan bouwen: je mag het gesprek natuurlijk nog steeds aangaan.',
     hostingWarn:
@@ -104,11 +101,9 @@ const COPY = {
     other: 'Other, namely…',
     bericht: 'Additional notes (optional)',
     partnerBericht: 'What are you working on, and what would you like to know? (optional)',
-    qualHint: 'Three questions that decide whether this works for you. Answering honestly helps you most.',
+    qualHint: 'Two questions that decide whether this works for you. Answering honestly helps you most.',
     bouwtZelf: 'We build our websites ourselves',
     verkooptHosting: 'We already sell hosting',
-    figmaSeat: 'We have a Figma licence with Dev Mode',
-    figmaNote: 'This is the only hard requirement: we build from Dev Mode.',
     buildWarn:
       'Then this may not be for you, and we’d rather say so now. It works when building is the part that eats your week and doesn’t pay like design does. If you like building, keep building: you’re still welcome to talk, of course.',
     hostingWarn:
@@ -220,7 +215,6 @@ const EMPTY: Data = {
   telefoon: '',
   bouwtZelf: false,
   verkooptHosting: false,
-  figmaSeat: false,
 }
 
 /**
@@ -305,7 +299,6 @@ export function OfferteForm({ locale }: { locale: Locale }) {
           domein: data.domein,
           bouwtZelf: data.bouwtZelf,
           verkooptHosting: data.verkooptHosting,
-          figmaSeat: data.figmaSeat,
           opmerking: data.bericht,
         }
       : {
@@ -441,13 +434,6 @@ export function OfferteForm({ locale }: { locale: Locale }) {
         <div className="flex flex-col gap-2.5">
           <p className="text-sm text-muted">{c.qualHint}</p>
           <Check
-            id="offerte-figma"
-            label={c.figmaSeat}
-            checked={data.figmaSeat}
-            onChange={(v) => { set('figmaSeat', v); }}
-            hint={c.figmaNote}
-          />
-          <Check
             id="offerte-bouwt"
             label={c.bouwtZelf}
             checked={data.bouwtZelf}
@@ -471,7 +457,6 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             <Row label={c.studio} value={data.bedrijf} />
             <Row label={c.domein} value={data.domein} />
             <Row label={c.email} value={data.email} />
-            <Row label={c.figmaSeat} value={yn(data.figmaSeat)} />
             <Row label={c.bouwtZelf} value={yn(data.bouwtZelf)} />
             <Row label={c.verkooptHosting} value={yn(data.verkooptHosting)} />
           </dl>

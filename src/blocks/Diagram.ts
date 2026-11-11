@@ -21,7 +21,7 @@ export const diagramBlock: Block = {
       defaultValue: 'figmaToProduction',
       options: [
         {
-          label: { en: 'Figma → production', nl: 'Figma → productie' },
+          label: { en: 'From design system to production', nl: 'Van design system naar productie' },
           value: 'figmaToProduction',
         },
         {

@@ -20,6 +20,8 @@ const bool = (v: unknown): boolean => v === true || v === 'true' || v === 'on' |
 const text = (max = 200) => z.unknown().optional().transform((value) => str(value, max))
 const flag = z.unknown().optional().transform((value) => bool(value))
 
+// z.object strips unknown keys. A cached client that still posts figmaSeat
+// is accepted, and the value is ignored.
 const partnerBodySchema = z.object({
   website: z.unknown().optional(),
   token: text(1024),
@@ -34,7 +36,6 @@ const partnerBodySchema = z.object({
   exclusiviteit: flag,
   relatiebeheer: flag,
   marketing: flag,
-  figmaSeat: flag,
   branches: text(400),
   talen: text(100),
   landen: text(100),
@@ -48,7 +49,6 @@ const interesseSchema = z.object({
   domein: text(253),
   contactpersoon: text(),
   telefoon: text(40),
-  figmaSeat: flag,
   bouwtZelf: flag,
   verkooptHosting: flag,
   opmerking: text(2000),
@@ -160,7 +160,6 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
     exclusiviteit: body.exclusiviteit,
     relatiebeheer: body.relatiebeheer,
     marketing: body.marketing,
-    figmaSeat: body.figmaSeat,
     branches: slugList(body.branches),
     talen: slugList(body.talen, 8) || (verified.payload.l ?? 'nl'),
     landen: slugList(body.landen, 8) || (verified.payload.l ?? 'nl'),
@@ -225,7 +224,6 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
           `Plaats:       ${data.plaats || ','}\n` +
           `KvK:          ${data.kvk || ','}\n\n` +
           `Wil oppakken: ${chosen}\n` +
-          `Figma:        ${data.figmaSeat ? 'ja' : 'nee: nog bespreken'}\n` +
           `Branches:     ${data.branches || 'alle'}\n` +
           `Talen:        ${data.talen}\n` +
           `Landen:       ${data.landen}\n\n` +
@@ -332,12 +330,10 @@ export const partnerMarkHandler: PayloadHandler = async (req: PayloadRequest) =>
  *
  * - `domein` comes from the body (their own website), so it is NOT evidence of
  *   anything. Treat these rows as leads to qualify, not as verified studios.
- * - The three qualifying answers — do they build sites themselves, do they
- *   already sell hosting, do they hold a Figma Dev Mode seat — are what decide
- *   whether there is a deal at all, so they are asked here rather than on the
- *   first call. Only `figmaSeat` has a column; the other two go into
- *   `opmerking` until the collection grows fields for them (see
- *   FACILITATOR-MIGRATION.md).
+ * - Two answers decide whether there is a deal at all: whether they build
+ *   sites themselves, and whether they already sell hosting. They are asked
+ *   here rather than on the first call, and both go into `opmerking` until
+ *   the collection grows columns for them (see FACILITATOR-MIGRATION.md).
  */
 export const partnerInteresseHandler: PayloadHandler = async (req: PayloadRequest) => {
   const raw = await readRequestJson(req)
@@ -382,7 +378,6 @@ export const partnerInteresseHandler: PayloadHandler = async (req: PayloadReques
     contactpersoon: body.contactpersoon,
     email,
     telefoon: body.telefoon,
-    figmaSeat: body.figmaSeat,
     opmerking,
     status: 'new' as const,
   }

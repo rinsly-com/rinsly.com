@@ -20,8 +20,8 @@ export const siteConfig = {
     // positioning the company moved away from.
     defaultTitle: 'Rinsly · bouw & hosting voor ontwerpstudio’s',
     description: {
-      nl: 'Rinsly bouwt en host websites voor ontwerpstudio’s. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en houden het draaiend.',
-      en: 'Rinsly builds and hosts websites for design studios. You deliver the design in Figma, we build it as a real application and keep it running.',
+      nl: 'Rinsly bouwt en host websites voor ontwerpstudio’s. Jullie leveren het design system aan, wij bouwen het als een echte applicatie en houden het draaiend.',
+      en: 'Rinsly builds and hosts websites for design studios. You deliver the design system, we build it as a real application and keep it running.',
     },
   },
   // `url` (rinsly.com) is the public static site — allow it so the accp CMS
