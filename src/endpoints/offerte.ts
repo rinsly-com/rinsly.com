@@ -2,6 +2,7 @@ import type { PayloadHandler, PayloadRequest } from 'payload'
 import { z } from 'zod'
 
 import { getRuntime } from '../lib/bindings'
+import { consentNotice, emailConsentFromSubmission } from '../lib/emailConsent'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -44,8 +45,9 @@ function json(body: unknown, status = 200): Response {
 export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
   const raw = await readRequestJson(req)
   if (!raw.ok) return json({ ok: false, error: 'invalid_body' }, 400)
-  if (asJsonObject(raw.value) === null) return json({ ok: false, error: 'invalid_body' }, 400)
-  const parsed = offerteSchema.safeParse(raw.value)
+  const rawObject = asJsonObject(raw.value)
+  if (rawObject === null) return json({ ok: false, error: 'invalid_body' }, 400)
+  const parsed = offerteSchema.safeParse(rawObject)
   if (!parsed.success) return json({ ok: false, error: 'invalid_body' }, 400)
   const body = parsed.data
 
@@ -59,6 +61,8 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
     return json({ ok: false, error: 'validation' }, 422)
   }
 
+  // Server clock and the locale constant. Client consentAt / consentText are ignored.
+  const consent = emailConsentFromSubmission(rawObject)
   try {
     await req.payload.create({
       collection: 'offertes',
@@ -70,6 +74,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
         additions,
         ...(additions.includes('other') && additionsOther ? { additionsOther } : {}),
         ...(bericht ? { bericht } : {}),
+        ...consent,
       },
       overrideAccess: true,
     })
@@ -88,7 +93,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
       .sendEmail({
         to: 'contact@rinsly.com',
         subject: `Nieuwe offerteaanvraag: ${bedrijf}`,
-        text: `Er is een nieuwe offerteaanvraag binnengekomen via de contactwizard.\n\nBedrijf: ${bedrijf}\nNaam: ${naam}\nE-mail: ${email}\nAbonnement: ${chosen.data}\n${bericht ? `\nBericht:\n${bericht}\n` : ''}\nDe aanvraag staat ook in het admin-panel onder Offerteaanvragen.`,
+        text: `Er is een nieuwe offerteaanvraag binnengekomen via de contactwizard.\n\nBedrijf: ${bedrijf}\nNaam: ${naam}\nE-mail: ${email}\nAbonnement: ${chosen.data}\n${bericht ? `\nBericht:\n${bericht}\n` : ''}\n${consentNotice(consent)}\nDe aanvraag staat ook in het admin-panel onder Offerteaanvragen.`,
       })
       .catch((err: unknown) => {
         req.payload.logger.error({

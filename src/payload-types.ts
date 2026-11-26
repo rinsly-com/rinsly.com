@@ -692,6 +692,9 @@ export interface Offerte {
   additions?: ('localization' | 'email' | 'design' | 'seo' | 'content' | 'other')[] | null;
   additionsOther?: string | null;
   bericht?: string | null;
+  consentGiven?: boolean | null;
+  consentAt?: string | null;
+  consentText?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -704,6 +707,9 @@ export interface CheckAanvragen {
   url: string;
   naam: string;
   telefoon: string;
+  consentGiven?: boolean | null;
+  consentAt?: string | null;
+  consentText?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1202,6 +1208,9 @@ export interface OffertesSelect<T extends boolean = true> {
   additions?: T;
   additionsOther?: T;
   bericht?: T;
+  consentGiven?: T;
+  consentAt?: T;
+  consentText?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1213,6 +1222,9 @@ export interface CheckAanvragenSelect<T extends boolean = true> {
   url?: T;
   naam?: T;
   telefoon?: T;
+  consentGiven?: T;
+  consentAt?: T;
+  consentText?: T;
   updatedAt?: T;
   createdAt?: T;
 }
