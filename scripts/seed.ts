@@ -1018,8 +1018,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           ),
           t(
             locale,
-            'Beide routes bestaan echt. Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte. Daarna loopt het abonnement door en is het net zo goed maandelijks opzegbaar.',
-            'Both routes are real. If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote. After that the subscription continues and is just as monthly-cancellable.',
+            'Beide routes bestaan echt. Na de minimumlooptijd van 36 maanden loopt het abonnement door en is het net zo goed maandelijks opzegbaar. Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte.',
+            'Both routes are real. After the 36-month minimum term the subscription continues and is just as monthly-cancellable. If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote.',
           ),
         ),
       },
@@ -1028,8 +1028,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Dat hangt af van welke route u kiest. Kiest u de route zonder bouwkosten bij 36 maanden hosting, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte. Daarna is het maandelijks opzegbaar. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
-            'That depends on the route you choose. If you choose the route with no build fee on 36 months of hosting, a minimum term of 36 months applies to the subscription. If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote. After that it is monthly cancellable. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
+            'Dat hangt af van welke route u kiest. Kiest u de route zonder bouwkosten bij 36 maanden hosting, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Na die 36 maanden is het maandelijks opzegbaar. Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
+            'That depends on the route you choose. If you choose the route with no build fee on 36 months of hosting, a minimum term of 36 months applies to the subscription. After those 36 months it is monthly cancellable. If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
           ),
         ),
       },
