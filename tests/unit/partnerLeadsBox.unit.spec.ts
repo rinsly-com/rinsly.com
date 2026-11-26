@@ -42,4 +42,17 @@ describe('partner page without the Leads box', () => {
     expect(seed).not.toMatch(/anchor:\s*'leads'/)
     expect(seed).not.toMatch(/partner#leads|#leads/)
   })
+
+  it('partner check CTA has the final copy (CC-01..CC-04) and no lead-supply claim', () => {
+    const start = seed.indexOf('const partnerCheckCta')
+    const end = seed.indexOf('\nconst feature', start)
+    const cta = seed.slice(start, end)
+    // CC-01 (text), CC-02 (eyebrow), CC-03 (title), CC-04 (button label)
+    expect(cta).toContain("'Probeer de meting zelf op elke URL. Vijf rapportcijfers, gratis en zonder account.'")
+    expect(cta).toContain("'Try the measurement yourself on any URL. Five grades, free and without an account.'")
+    expect(cta).toContain("'Proef onze meting', 'Try our measurement'")
+    expect(cta).toContain("'Meet een site in een halve minuut', 'Measure a site in half a minute'")
+    expect(cta).toContain("'Gratis websitecheck', 'Free website check'")
+    expect(cta).not.toMatch(/lead|aanlever|we supply|screenshot/i)
+  })
 })
