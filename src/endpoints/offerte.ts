@@ -1,6 +1,7 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
 import { z } from 'zod'
 
+import { b2bFromSubmission } from '../lib/b2bConfirmation'
 import { getRuntime } from '../lib/bindings'
 import { emailConsentFromSubmission } from '../lib/emailConsent'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
@@ -61,7 +62,8 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
     return json({ ok: false, error: 'validation' }, 422)
   }
   const chosen = subscription.safeParse(body.subscription)
-  if (!bedrijf || !naam || !EMAIL_RE.test(email) || !chosen.success) {
+  const b2b = b2bFromSubmission(rawObject)
+  if (!bedrijf || !naam || !EMAIL_RE.test(email) || !chosen.success || b2b === null) {
     return json({ ok: false, error: 'validation' }, 422)
   }
 
@@ -79,6 +81,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
         ...(additions.includes('other') && additionsOther ? { additionsOther } : {}),
         ...(bericht ? { bericht } : {}),
         ...consent,
+        ...b2b,
       },
       overrideAccess: true,
     })
@@ -104,6 +107,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
           subscription: chosen.data,
           bericht,
           consent,
+          kvkNummer: b2b.kvkNummer,
         }),
       })
       .catch((err: unknown) => {

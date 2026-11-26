@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '@rinsly-com/site-core/access'
 
+import { b2bConfirmationFields } from '@/lib/b2bConfirmation'
 import { emailConsentFields } from '@/lib/emailConsent'
 
 /**
@@ -59,6 +60,7 @@ export const Offertes: CollectionConfig = {
     { name: 'additionsOther', label: { en: 'Other addition', nl: 'Andere toevoeging' }, type: 'text' },
     { name: 'bericht', label: { en: 'Message', nl: 'Bericht' }, type: 'textarea' },
     ...emailConsentFields(),
+    ...b2bConfirmationFields(),
   ],
   timestamps: true,
 }
