@@ -2,6 +2,8 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '@rinsly-com/site-core/access'
 
+import { emailConsentFields } from '@/lib/emailConsent'
+
 /**
  * Offertes — quote requests submitted through the multi-step contact wizard.
  * Rows are created only via the public `/api/offerte` endpoint (overrideAccess);
@@ -15,7 +17,7 @@ export const Offertes: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'bedrijf',
-    defaultColumns: ['bedrijf', 'naam', 'email', 'subscription', 'createdAt'],
+    defaultColumns: ['bedrijf', 'naam', 'email', 'subscription', 'consentGiven', 'createdAt'],
   },
   access: {
     read: authenticated,
@@ -56,6 +58,7 @@ export const Offertes: CollectionConfig = {
     },
     { name: 'additionsOther', label: { en: 'Other addition', nl: 'Andere toevoeging' }, type: 'text' },
     { name: 'bericht', label: { en: 'Message', nl: 'Bericht' }, type: 'textarea' },
+    ...emailConsentFields(),
   ],
   timestamps: true,
 }
