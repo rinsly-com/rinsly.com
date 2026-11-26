@@ -120,9 +120,11 @@ describe('email consent checkbox', () => {
       '/nl/privacy',
     )
     const submit = screen.getByRole('button', { name: 'Aanvraag versturen' })
-    expect(submit.hasAttribute('disabled')).toBe(true)
-    setValue('offerte-kvk', '1234 5678')
+    expect(submit.hasAttribute('disabled')).toBe(false)
+    expect(screen.getByText(/Vink de verklaring aan/)).toBeTruthy()
+    setValue('offerte-kvk', '1234-5678')
     fireEvent.click(screen.getByRole('checkbox', { name: /beroep of bedrijf/ }))
+    expect(screen.queryByText(/Vink de verklaring aan/)).toBeNull()
     expect(submit.hasAttribute('disabled')).toBe(false)
   })
 
@@ -142,9 +144,11 @@ describe('email consent checkbox', () => {
       '/en/privacy',
     )
     const submit = screen.getByRole('button', { name: 'Send request' })
-    expect(submit.hasAttribute('disabled')).toBe(true)
+    expect(submit.hasAttribute('disabled')).toBe(false)
+    expect(screen.getByText(/Tick the declaration/)).toBeTruthy()
     setValue('offerte-kvk', '12345678')
-    fireEvent.click(screen.getByRole('checkbox', { name: /trade or business/ }))
+    fireEvent.click(screen.getByRole('checkbox', { name: /business or profession/ }))
+    expect(screen.queryByText(/Tick the declaration/)).toBeNull()
     expect(submit.hasAttribute('disabled')).toBe(false)
   })
 })
