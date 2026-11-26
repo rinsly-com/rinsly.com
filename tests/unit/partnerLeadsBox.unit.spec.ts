@@ -23,6 +23,9 @@ describe('partner page without the Leads box', () => {
     expect(layout).not.toContain('Leads for partners')
     expect(layout).not.toContain('Elke maand inbegrepen')
     expect(layout).not.toContain('Included every month')
+    // partnerCheckCta lives outside the layout slice; a reseed must not reinstate the lead-supply claim.
+    expect(seed).not.toContain('Elke lead die wij aanleveren')
+    expect(seed).not.toContain('Every lead we supply')
   })
 
   it('keeps the neighbouring blocks: check CTA before the FAQ, ladder, how it works', () => {

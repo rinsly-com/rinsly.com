@@ -139,8 +139,8 @@ const partnerCheckCta = (locale: Locale): Block => ({
   title: t(locale, 'Meet een site in een halve minuut', 'Measure a site in half a minute'),
   text: t(
     locale,
-    'Elke lead die wij aanleveren komt met vijf rapportcijfers en een screenshot. Probeer de meting zelf op elke URL.',
-    'Every lead we supply comes with five grades and a screenshot. Try the measurement yourself on any URL.',
+    'Probeer de meting zelf op elke URL.',
+    'Try the measurement yourself on any URL.',
   ),
   button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
 })
