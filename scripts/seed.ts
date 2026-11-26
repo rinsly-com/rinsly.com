@@ -30,10 +30,16 @@ import { logCaught } from '../src/lib/logCaught'
 import { LOCAL_PAGE_SLUG } from '../src/lib/localPageJsonLd'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
 import { idRowSchema, userRowSchema } from '../src/lib/rows'
+import { PLACEHOLDER_NOINDEX_SLUGS } from '../src/lib/sitemapSlugs'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 type Block = Record<string, unknown>
 type Locale = 'nl' | 'en'
+
+/** meta.noindex for placeholder pages. Driven by PLACEHOLDER_NOINDEX_SLUGS; remove a slug there when final copy lands. */
+const placeholderNoindexMeta = (slug: string): { meta: { noindex: true } } | Record<string, never> =>
+  PLACEHOLDER_NOINDEX_SLUGS.has(slug) ? { meta: { noindex: true } } : {}
+
 
 const t = <T,>(locale: Locale, nl: T, en: T): T => (locale === 'nl' ? nl : en)
 
@@ -1261,8 +1267,6 @@ const localWoerdenMeta = (locale: Locale) => ({
     '[Concept] Rinsly bouwt en host websites voor ontwerpstudio’s in de provincie Utrecht, op afstand vanuit Woerden.',
     '[Draft] Rinsly builds and hosts websites for design studios in the province of Utrecht, remotely from Woerden.',
   ),
-  // Remove noindex (and this slug from PLACEHOLDER_NOINDEX_SLUGS) when Marketeer's final copy lands.
-  noindex: true,
 })
 
 const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
@@ -1842,7 +1846,7 @@ async function run() {
     slug: string
     title: (l: Locale) => string
     layout: (l: Locale, ids: PageIds) => Block[]
-    meta?: (l: Locale) => { title: string; description: string; noindex?: boolean }
+    meta?: (l: Locale) => { title: string; description: string }
   }[] = [
     { slug: SLUG.home, title: () => 'Rinsly', layout: homeLayout },
     {
@@ -1899,7 +1903,7 @@ async function run() {
           collection: 'pages',
           draft: true,
           locale: 'nl',
-          data: { slug: page.slug, title: page.title('nl') },
+          data: { slug: page.slug, title: page.title('nl'), ...placeholderNoindexMeta(page.slug) },
           user,
         }),
       )
@@ -1926,7 +1930,9 @@ async function run() {
         data: {
           title: page.title(locale),
           layout: page.layout(locale, ids),
-          ...(page.meta ? { meta: page.meta(locale) } : {}),
+          ...(page.meta
+            ? { meta: { ...page.meta(locale), ...placeholderNoindexMeta(page.slug).meta } }
+            : placeholderNoindexMeta(page.slug)),
         },
         user,
       })

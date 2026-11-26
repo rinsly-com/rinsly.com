@@ -43,12 +43,18 @@ describe('local page Woerden/Utrecht: structure', () => {
     expect(LOCAL_PAGE_SLUG).toBe('website-laten-maken-woerden')
     expect(seed).toMatch(/LOCAL_PAGE_SLUG/)
     expect(seed).toMatch(/slug:\s*SLUG\.woerden/)
-    // Drop this slug from PLACEHOLDER_NOINDEX_SLUGS and noindex from localWoerdenMeta when final copy lands.
+    // Drop this slug from PLACEHOLDER_NOINDEX_SLUGS when Marketeer's final copy lands.
     expect(PLACEHOLDER_NOINDEX_SLUGS.has(LOCAL_PAGE_SLUG)).toBe(true)
     expect(SITEMAP_EXCLUDED_SLUGS.has(LOCAL_PAGE_SLUG)).toBe(true)
     expect(slugsForSitemap(['over', LOCAL_PAGE_SLUG])).not.toContain(LOCAL_PAGE_SLUG)
     expect(slugsForSitemap(['over', LOCAL_PAGE_SLUG])).toContain('over')
+    expect(seed).toMatch(/PLACEHOLDER_NOINDEX_SLUGS/)
+    expect(seed).toMatch(/placeholderNoindexMeta/)
     expect(seed).toMatch(/noindex:\s*true/)
+    const metaStart = seed.indexOf('const localWoerdenMeta')
+    const metaEnd = seed.indexOf('const localWoerdenLayout')
+    expect(metaStart).toBeGreaterThan(-1)
+    expect(seed.slice(metaStart, metaEnd)).not.toMatch(/noindex/)
   })
 
   it('has hero, how-we-work cards, region prose, FAQ and a contact CTA', () => {
