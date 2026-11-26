@@ -19,14 +19,20 @@
  * Bootstrap only (DF1, 26 Nov 2026). accp D1 is the source of truth for the copy:
  * Marketeer edits it through the content endpoint and the editor. This seed
  * creates pages that do not exist yet, finishes an incomplete stub (a title-only
- * draft, a locale with no layout blocks, a header/footer locale that was never
- * saved), and never rewrites a locale that already has content (see
- * scripts/seedLock.ts). Changing copy below therefore does NOT change an
- * existing finished page. A seed-accp, SEED_TARGET=accp, or NODE_ENV=production
- * run is refused once RINSLY_HANDED_OVER is 1/true/yes. The flag is default-open
- * by design (unset/empty/0/false/no); any other value fails closed before any
- * database access. In production the seed also skips orphan-version repair and
- * oldest-user admin promotion.
+ * draft, a published locale with no layout blocks and no editor draft, a
+ * header/footer locale that was never saved), and never rewrites a locale that
+ * already has content (see scripts/seedLock.ts). A never-published draft that
+ * already has layout is treated as editor-owned: it is kept, not published or
+ * overwritten. Finishing a missing locale on an already-published page writes
+ * that locale onto the published version (locale + _status) and does not
+ * publish the document, so another locale's unpublished draft stays
+ * unpublished and onContentPublished does not fire for that draft. Changing
+ * copy below therefore does NOT change an existing finished page. A
+ * seed-accp, SEED_TARGET=accp, or NODE_ENV=production run is refused once
+ * RINSLY_HANDED_OVER is 1/true/yes. The flag is default-open by design
+ * (unset/empty/0/false/no); any other value fails closed before any database
+ * access, including on a local seed. In production the seed also skips
+ * orphan-version repair and oldest-user admin promotion.
  *
  * Known limit: a deleted page is recreated with a new id; kept pages' header
  * and in-page links to it are not relinked (see seedLock.ts).
@@ -43,7 +49,15 @@ import { readServerEnv } from '../src/lib/env'
 import { logCaught } from '../src/lib/logCaught'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
 import { idRowSchema, userRowSchema } from '../src/lib/rows'
-import { beginSeed, globalIsUnseeded, localesToWrite } from './seedLock'
+import {
+  beginSeed,
+  globalIsUnseeded,
+  pageSeedPlan,
+  recreateLinkWarning,
+  unrelinkedPaths,
+  type GlobalLinks,
+  type PageSeedAction,
+} from './seedLock'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 type Block = Record<string, unknown>
@@ -1759,18 +1773,18 @@ async function run() {
   // Pass 1 — make sure every page row exists, and collect slug → id.
   const ids: PageIds = {}
   const created = new Set<string>()
-  const finish = new Map<string, { nl: boolean; en: boolean }>()
-  const readPageLocale = async (pageId: number, locale: Locale) => {
+  const finish = new Map<string, PageSeedAction>()
+  const readPageLocale = async (pageId: number, locale: Locale, draft: boolean) => {
     const found = await payload.find({
       collection: 'pages',
       where: { id: { equals: pageId } },
       locale,
       fallbackLocale: false,
-      draft: false,
+      draft,
       limit: 1,
       depth: 0,
     })
-    return found.docs[0] as { layout?: unknown } | undefined
+    return found.docs[0] as { layout?: unknown; _status?: unknown; updatedAt?: unknown } | undefined
   }
   for (const page of sitePages) {
     const existing = await payload.find({
@@ -1799,11 +1813,16 @@ async function run() {
       created.add(page.slug)
     }
     ids[page.slug] = pageId
-    const needs = localesToWrite(created.has(page.slug), {
-      nl: await readPageLocale(pageId, 'nl'),
-      en: await readPageLocale(pageId, 'en'),
-    })
-    if (needs) finish.set(page.slug, needs)
+    const published = {
+      nl: await readPageLocale(pageId, 'nl', false),
+      en: await readPageLocale(pageId, 'en', false),
+    }
+    const drafts = {
+      nl: await readPageLocale(pageId, 'nl', true),
+      en: await readPageLocale(pageId, 'en', true),
+    }
+    const plan = pageSeedPlan(created.has(page.slug), published, drafts)
+    finish.set(page.slug, plan)
   }
 
   const idFor = (slug: string): number => {
@@ -1812,33 +1831,76 @@ async function run() {
     return id
   }
 
-  // Pass 2 — write only the locales that still have no layout, then publish.
-  // A locale that already has blocks is left alone (copy lives in D1).
+  // Pass 2 — write only the locales that still have no layout, publishing
+  // each one with locale + _status (publishSpecificLocale, publishAllLocales:
+  // false). Never publish the document without a locale: `_status` is
+  // document-level, and that would promote another locale's unpublished draft
+  // and fire onContentPublished for it. A locale that already has blocks, or
+  // an editor-owned draft, is left alone (copy lives in D1).
   for (const page of sitePages) {
-    const needs = finish.get(page.slug)
-    if (!needs) {
-      console.log(`Kept /${page.slug === SLUG.home ? '' : page.slug} (exists; copy lives in D1)`)
+    const plan = finish.get(page.slug)
+    const path = `/${page.slug === SLUG.home ? '' : page.slug}`
+    if (!plan || plan.action === 'keep') {
+      console.log(`Kept ${path} (${plan?.reason ?? 'exists; copy lives in D1'})`)
       continue
     }
-    const writeLocales = (['nl', 'en'] as const).filter((locale) => needs[locale])
+    const pageId = idFor(page.slug)
+    const writeLocales = (['nl', 'en'] as const).filter((locale) => plan.locales[locale])
     for (const locale of writeLocales) {
       await payload.update({
         collection: 'pages',
-        id: idFor(page.slug),
-        draft: true,
+        id: pageId,
         locale,
-        data: { title: page.title(locale), layout: page.layout(locale, ids) },
+        draft: false,
+        // Without this, Payload treats a published update as publish-all
+        // because `_status` is not localized on pages.
+        publishAllLocales: false,
+        publishSpecificLocale: locale,
+        data: {
+          title: page.title(locale),
+          layout: page.layout(locale, ids),
+          _status: 'published',
+        } as never,
         user,
       })
     }
-    await payload.update({
-      collection: 'pages',
-      id: idFor(page.slug),
-      data: { _status: 'published' } as never,
-      user,
-    })
     const which = writeLocales.join(', ')
-    console.log(`Published /${page.slug === SLUG.home ? '' : page.slug} (${which})`)
+    console.log(`Published ${path} (${which})`)
+  }
+
+  // Recreating a deleted page assigns a new id. Kept header/footer links to
+  // the old id are not rewritten; say which ones need a hand relink.
+  if (created.size) {
+    const pathsFor = async (slug: string, pageId: number) => {
+      const paths: string[] = []
+      for (const locale of ['nl', 'en'] as Locale[]) {
+        const header = (await payload.findGlobal({
+          slug: 'header',
+          locale,
+          fallbackLocale: false,
+          depth: 0,
+        })) as unknown as GlobalLinks
+        const footer = (await payload.findGlobal({
+          slug: 'footer',
+          locale,
+          fallbackLocale: false,
+          depth: 0,
+        })) as unknown as GlobalLinks
+        if (!globalIsUnseeded('header', header)) {
+          paths.push(...unrelinkedPaths(slug, pageId, headerData(locale, ids), header, 'header'))
+        }
+        if (!globalIsUnseeded('footer', footer)) {
+          const expectedFooter: GlobalLinks =
+            locale === 'nl' ? { ...footerShared, ...footerLocalized('nl') } : footerLocalized('en')
+          paths.push(...unrelinkedPaths(slug, pageId, expectedFooter, footer, 'footer'))
+        }
+      }
+      return [...new Set(paths)]
+    }
+    for (const slug of created) {
+      const warning = recreateLinkWarning(slug, idFor(slug), await pathsFor(slug, idFor(slug)))
+      if (warning) console.warn(warning)
+    }
   }
 
   // Globals: each locale is decided on its own, with fallbackLocale: false, so

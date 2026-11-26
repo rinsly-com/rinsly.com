@@ -1,12 +1,20 @@
 /**
  * DF1 seed lock. accp D1 is the source of truth for rinsly.com copy; this seed
  * only bootstraps. It creates pages that do not exist, and it finishes an
- * incomplete locale: no published document (draft-only, including a crash
- * between pass 1 and pass 2, or after layouts were written but before
- * publish), a published locale with no layout blocks, or a header/footer
- * locale with no copy text. A published locale that already has layout
- * blocks, or a header/footer locale that already has a label, is left alone,
- * so a content-endpoint or editor edit is not reverted by the next seed run.
+ * incomplete locale: no published document and no layout in the draft (a
+ * title-only stub, including a crash between pass 1 and pass 2), a published
+ * locale with no layout blocks and no editor draft on that locale, or a
+ * header/footer locale with no copy text. A published locale that already
+ * has layout blocks, a never-published draft that already has layout
+ * (editor-owned: Keep, do not publish or overwrite), a locale whose draft is
+ * newer than the published version, or a header/footer locale that already
+ * has a label, is left alone, so a content-endpoint or editor edit is not
+ * reverted or promoted by the next seed run.
+ *
+ * Finishing a missing locale on an already-published page writes that locale
+ * onto the published version (locale + _status, publishSpecificLocale) and
+ * does not publish the document, so another locale's unpublished draft stays
+ * unpublished and onContentPublished does not fire for that draft.
  *
  * Header and footer are decided per locale (fallbackLocale: false). All-blank
  * copy in a locale (no labels, tagline, or copyright) is treated as truly
@@ -20,8 +28,10 @@
  * value fails closed with InvalidHandoverFlagError and does not seed. A
  * handed-over run is blocked when SEED_COMMAND=seed-accp, SEED_TARGET=accp,
  * or NODE_ENV=production (a production seed against remote bindings is
- * treated as seed-accp). Local seeds (no those values) may still run after
- * handover, to build a fresh dev database.
+ * treated as seed-accp). Local seeds (none of those values) may still run
+ * after handover, to build a fresh dev database. An invalid
+ * RINSLY_HANDED_OVER value fails closed on local seeds too, before any
+ * database access.
  *
  * Known limit: deleting a page on accp and then seeding recreates it with a
  * new id. Internal links (header nav, in-page buttons) on pages that were
@@ -56,21 +66,23 @@ export function pageLocaleIsStub(doc: PageLocale): boolean {
 }
 
 /**
- * True when this locale still needs a bootstrap write. Pass the published
- * document (draft: false, fallbackLocale: false). Empty layout or no
- * published document (draft-only) is unseeded. A published locale with
- * layout blocks is finished and must not be overwritten, even if a draft
- * also exists.
+ * True when this locale still needs a bootstrap write. Pass the document
+ * from `draft: false` (fallbackLocale: false). Payload still returns a
+ * never-published draft on that query, so only `_status === 'published'`
+ * counts as published. Empty layout, no document, or a draft-only row is
+ * unseeded. A published locale with layout blocks is finished and must not
+ * be overwritten, even if a draft also exists.
  */
 export function pageLocaleNeedsSeed(published: PageLocale): boolean {
+  if (!published || published._status !== 'published') return true
   return pageLocaleIsStub(published)
 }
 
 /**
- * Which locales pass 2 should write. A row this run just created is written
- * in both locales. Otherwise each locale is decided on its published
- * document: missing or empty layout is filled; a published layout is kept.
- * Returns null when both published locales already have blocks.
+ * Which locales would be written if only the published document is considered.
+ * Pass 2 uses `pageSeedPlan`, which also inspects drafts (editor-owned and
+ * newer drafts are kept). Returns null when both published locales already
+ * have blocks.
  */
 export function localesToWrite(createdThisRun: boolean, published: LocaleDocs): LocalesToWrite | null {
   if (createdThisRun) return { nl: true, en: true }
@@ -80,6 +92,187 @@ export function localesToWrite(createdThisRun: boolean, published: LocaleDocs): 
   }
   if (!needs.nl && !needs.en) return null
   return needs
+}
+
+export type PageSeedAction =
+  | { action: 'keep'; reason: string }
+  | {
+      action: 'write'
+      locales: LocalesToWrite
+      /** Always per-locale: write with locale + _status, never a document-wide publish. */
+      publish: 'locale'
+    }
+
+function dateOf(value: unknown): number | undefined {
+  if (typeof value === 'string' || typeof value === 'number' || value instanceof Date) {
+    const ms = new Date(value).getTime()
+    return Number.isFinite(ms) ? ms : undefined
+  }
+  return undefined
+}
+
+/**
+ * Draft has layout and the published locale does not: the editor owns this
+ * locale. A title-only or empty-layout draft is a stub, not editor-owned.
+ * A crash after the seed wrote layouts and before publish cannot be told
+ * apart from this case, so it is also kept.
+ */
+export function localeIsEditorOwned(published: PageLocale, draft: PageLocale): boolean {
+  if (pageLocaleIsStub(draft)) return false
+  return pageLocaleNeedsSeed(published)
+}
+
+/** Compare copy only; row/block ids can differ between the published row and a version. */
+function copySignature(value: unknown): unknown {
+  if (Array.isArray(value)) {
+    const items = value.map(copySignature)
+    return items.length === 0 ? null : items
+  }
+  if (value && typeof value === 'object') {
+    const record = value as Record<string, unknown>
+    const out: Record<string, unknown> = {}
+    for (const key of Object.keys(record).sort()) {
+      if (key === 'id' || key === 'blockName') continue
+      const inner = copySignature(record[key])
+      if (inner === null || inner === undefined) continue
+      out[key] = inner
+    }
+    return Object.keys(out).length === 0 ? null : out
+  }
+  if (typeof value === 'string' && value.trim() === '') return null
+  return value
+}
+
+export function localeCopyDiffers(a: PageLocale, b: PageLocale): boolean {
+  const signature = (doc: PageLocale) =>
+    JSON.stringify(copySignature({ title: doc?.title, layout: doc?.layout, meta: doc?.meta }))
+  return signature(a) !== signature(b)
+}
+
+/**
+ * True when this locale already has a published layout and a pending draft
+ * whose copy differs from (or is timestamped after) the published version.
+ * A leftover draft snapshot with the same copy is not treated as editor work.
+ * The seed must not publish a real pending draft.
+ */
+export function localeDraftIsNewer(published: PageLocale, draft: PageLocale): boolean {
+  if (!draft || pageLocaleNeedsSeed(published)) return false
+  if (draft._status === 'published') return false
+  if (!localeCopyDiffers(published, draft)) return false
+  if (draft._status === 'draft') return true
+  const draftAt = dateOf(draft.updatedAt)
+  const publishedAt = dateOf(published?.updatedAt)
+  return draftAt !== undefined && publishedAt !== undefined && draftAt > publishedAt
+}
+
+/**
+ * What pass 2 should do with one page, given the published document and the
+ * latest draft per locale.
+ *
+ * - A row this run just created is written in both locales and published
+ *   per locale.
+ * - A title-only / empty-layout stub (crash between pass 1 and pass 2) is
+ *   finished and published per locale.
+ * - S7: a never-published draft that already has layout is editor-owned:
+ *   Keep and do not publish or overwrite.
+ * - S4: a published page with a missing locale is filled on the published
+ *   version only (`publish: 'locale'`). Another locale's unpublished draft
+ *   is not published.
+ * - A locale whose draft is newer than the published version is kept; if
+ *   that leaves nothing to write, the page is skipped.
+ */
+export function pageSeedPlan(
+  createdThisRun: boolean,
+  published: LocaleDocs,
+  drafts: LocaleDocs = { nl: undefined, en: undefined },
+): PageSeedAction {
+  if (createdThisRun) {
+    return { action: 'write', locales: { nl: true, en: true }, publish: 'locale' }
+  }
+
+  const editorNl = localeIsEditorOwned(published.nl, drafts.nl)
+  const editorEn = localeIsEditorOwned(published.en, drafts.en)
+  const neverPublished = pageLocaleNeedsSeed(published.nl) && pageLocaleNeedsSeed(published.en)
+
+  if (neverPublished && (editorNl || editorEn)) {
+    return { action: 'keep', reason: 'editor draft; not overwriting or publishing' }
+  }
+
+  const locales: LocalesToWrite = {
+    nl: pageLocaleNeedsSeed(published.nl) && !editorNl,
+    en: pageLocaleNeedsSeed(published.en) && !editorEn,
+  }
+  if (!locales.nl && !locales.en) {
+    const pending =
+      editorNl ||
+      editorEn ||
+      localeDraftIsNewer(published.nl, drafts.nl) ||
+      localeDraftIsNewer(published.en, drafts.en)
+    return {
+      action: 'keep',
+      reason: pending ? 'editor draft; not overwriting or publishing' : 'exists; copy lives in D1',
+    }
+  }
+
+  return { action: 'write', locales, publish: 'locale' }
+}
+
+type LinkFields = { page?: unknown; label?: unknown; url?: unknown }
+
+export type GlobalLinks = {
+  navItems?: LinkFields[] | null
+  cta?: LinkFields | null
+  menuItems?: LinkFields[] | null
+  infoLinks?: LinkFields[] | null
+}
+
+/**
+ * Paths in a live header/footer that should point at `pageId` (the slug the
+ * seed just recreated) but are null or still on another id. Used to warn
+ * that those links need relinking; the seed does not rewrite them.
+ */
+export function unrelinkedPaths(
+  slug: string,
+  pageId: number,
+  expected: GlobalLinks,
+  actual: GlobalLinks | null | undefined,
+  globalSlug: 'header' | 'footer',
+): string[] {
+  const paths: string[] = []
+  const push = (path: string, label: unknown) => {
+    const name = typeof label === 'string' && label.trim() ? label : slug
+    paths.push(`${globalSlug}.${path} ("${name}")`)
+  }
+  const items = (list: LinkFields[] | null | undefined) => list ?? []
+  const expectedNav = items(expected.navItems)
+  const actualNav = items(actual?.navItems)
+  for (let i = 0; i < expectedNav.length; i++) {
+    const want = expectedNav[i] as LinkFields | undefined
+    if (want === undefined || want.page !== pageId) continue
+    const got = actualNav[i] as LinkFields | undefined
+    if (got === undefined || got.page !== pageId) push(`navItems[${i}]`, want.label)
+  }
+  if (expected.cta?.page === pageId && actual?.cta?.page !== pageId) {
+    push('cta', expected.cta.label)
+  }
+  for (const field of ['menuItems', 'infoLinks'] as const) {
+    const wantList = items(expected[field])
+    const gotList = items(actual?.[field])
+    for (let i = 0; i < wantList.length; i++) {
+      const want = wantList[i] as LinkFields | undefined
+      if (want === undefined || want.page !== pageId) continue
+      const got = gotList[i] as LinkFields | undefined
+      if (got === undefined || got.page !== pageId) push(`${field}[${i}]`, want.label)
+    }
+  }
+  return paths
+}
+
+/** One warning line, or null when every expected link already points at the new id. */
+export function recreateLinkWarning(slug: string, pageId: number, paths: readonly string[]): string | null {
+  if (!paths.length) return null
+  const path = slug === 'home' ? '/' : `/${slug}`
+  return `Seed recreated ${path} with a new id (${pageId}). These header/footer links still point at the old page and need relinking: ${paths.join(', ')}`
 }
 
 /** Null, undefined, whitespace, an empty list, or an object whose values are all blank (ids ignored). */
@@ -165,7 +358,7 @@ export class InvalidHandoverFlagError extends Error {
 /**
  * Strict parse. Default-open by design: unset, empty, 0, false, or no means
  * not handed over. 1, true, or yes means handed over. Unknown values fail
- * closed; they do not run the seed.
+ * closed, including on local seeds; they do not run the seed.
  */
 export function parseHandoverFlag(value: string | undefined): 'off' | 'on' {
   if (value === undefined) return 'off'
