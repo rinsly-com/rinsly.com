@@ -428,6 +428,55 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
   },
   {
     blockType: 'services',
+    anchor: 'framer',
+    header: {
+      eyebrow: t(locale, 'Eerlijk vergelijken', 'An honest comparison'),
+      title: t(locale, 'Framer of Rinsly?', 'Framer or Rinsly?'),
+      intro: t(
+        locale,
+        'Het hangt af van wat je klant nodig heeft. Een goed gesprek begint met de vraag welke van de twee past.',
+        'It depends on what your client needs. A good conversation starts with which of the two fits.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconBrush',
+        title: t(locale, 'Framer past bij een portfolio of campagne', 'Framer fits a portfolio or a campaign'),
+        description: t(
+          locale,
+          'Bouw je het ontwerp zelf in Framer? Dan heb je een goed gereedschap voor een portfolio of een campagnepagina. Je bent dan zelf verantwoordelijk voor bouw, beheer en support.',
+          'Do you build the design yourself in Framer? Then you have a good tool for a portfolio or a campaign page. You are then responsible for build, management and support yourself.',
+        ),
+        features: [
+          feature(t(locale, 'Portfolio of showcase', 'Portfolio or showcase')),
+          feature(t(locale, 'Campagnepagina', 'Campaign page')),
+        ],
+      },
+      {
+        icon: 'IconPackages',
+        title: t(locale, 'Rinsly past bij een studio die niet zelf bouwt en beheert', 'Rinsly fits a studio that does not itself build and manage sites'),
+        description: t(
+          locale,
+          'Jij ontwerpt en levert het design system. Wij bouwen het als applicatie, hosten en onderhouden het, en jij verdient mee aan het abonnement, afhankelijk van wat je oppakt (zie de ladder).',
+          'You design and deliver the design system. We build it as an application, host and maintain it, and you earn a share of the subscription, depending on what you take on (see the ladder).',
+        ),
+        features: [
+          feature(t(locale, 'Bouw en hosting door Rinsly', 'Build and hosting by Rinsly')),
+          feature(t(locale, 'Beheer en updates door Rinsly', 'Management and updates by Rinsly')),
+        ],
+      },
+    ],
+  },
+  {
+    blockType: 'note',
+    text: t(
+      locale,
+      'Framer is een merk van de eigenaar. Rinsly is niet verbonden aan Framer. Informatie over Framer gecontroleerd op framer.com, 26 november 2026.',
+      'Framer is a brand of its owner. Rinsly is not affiliated with Framer. Information about Framer checked on framer.com, 26 November 2026.',
+    ),
+  },
+  {
+    blockType: 'services',
     anchor: 'hoe',
     header: {
       eyebrow: t(locale, 'Hoe het werkt', 'How it works'),
