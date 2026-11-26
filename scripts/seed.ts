@@ -16,19 +16,28 @@
  *
  * Run with:  pnpm seed        (= payload run scripts/seed.ts)
  *
- * Idempotent: re-running rebuilds the home page + globals, deletes any stray
- * non-home pages, and re-publishes. On a fresh DB an admin is created from
- * SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD, falling back to the dev credentials
- * dev@rinsly.local / rinsly-dev — set the env vars when seeding a remote DB.
+ * Bootstrap only (DF1, 26 Nov 2026). accp D1 is the source of truth for the copy:
+ * Marketeer edits it through the content endpoint and the editor. This seed
+ * creates pages that do not exist yet and fills header/footer when they were
+ * never saved; it never rewrites a page or global that already has content
+ * (see scripts/seedLock.ts). Changing copy below therefore does NOT change an
+ * existing database. A seed-accp run (SEED_COMMAND=seed-accp) is refused
+ * outright once RINSLY_HANDED_OVER is set.
+ *
+ * On a fresh DB an admin is created from SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD,
+ * falling back to the dev credentials dev@rinsly.local / rinsly-dev. To rebuild
+ * a LOCAL database from this file, delete it and seed again.
  */
 import { getPayload } from 'payload'
 import { sql } from '@payloadcms/db-d1-sqlite'
+import { assertSeedAllowed } from '@rinsly-com/site-core/content'
 
 import config from '../src/payload.config'
 import { readServerEnv } from '../src/lib/env'
 import { logCaught } from '../src/lib/logCaught'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
 import { idRowSchema, userRowSchema } from '../src/lib/rows'
+import { globalIsUnseeded, pagesToWrite } from './seedLock'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 type Block = Record<string, unknown>
@@ -1678,6 +1687,8 @@ async function repairOrphanedVersions(payload: PayloadInstance) {
 }
 
 async function run() {
+  // Throws SeedAccpBlockedError for SEED_COMMAND=seed-accp once RINSLY_HANDED_OVER is set.
+  assertSeedAllowed()
   const payload = await getPayload({ config })
   await repairOrphanedVersions(payload)
 
@@ -1741,6 +1752,7 @@ async function run() {
 
   // Pass 1 — make sure every page row exists, and collect slug → id.
   const ids: PageIds = {}
+  const created = new Set<string>()
   for (const page of sitePages) {
     const existing = await payload.find({
       collection: 'pages',
@@ -1754,7 +1766,7 @@ async function run() {
     if (stored && !stored.success) throw new Error(`seed: page row ${page.slug} failed validation`)
     let pageId = stored?.success ? stored.data.id : undefined
     if (pageId === undefined) {
-      const created = idRowSchema.safeParse(
+      const createdRow = idRowSchema.safeParse(
         await payload.create({
           collection: 'pages',
           draft: true,
@@ -1763,8 +1775,9 @@ async function run() {
           user,
         }),
       )
-      if (!created.success) throw new Error(`seed: created page ${page.slug} failed validation`)
-      pageId = created.data.id
+      if (!createdRow.success) throw new Error(`seed: created page ${page.slug} failed validation`)
+      pageId = createdRow.data.id
+      created.add(page.slug)
     }
     ids[page.slug] = pageId
   }
@@ -1775,8 +1788,9 @@ async function run() {
     return id
   }
 
-  // Pass 2 — write both locales' layouts, then publish.
-  for (const page of sitePages) {
+  // Pass 2 — write both locales' layouts, then publish. Only pages pass 1 just
+  // created: an existing page's copy lives in D1 and is not overwritten.
+  for (const page of pagesToWrite(sitePages, created)) {
     for (const locale of ['nl', 'en'] as Locale[]) {
       await payload.update({
         collection: 'pages',
@@ -1796,17 +1810,34 @@ async function run() {
     console.log(`Published /${page.slug === SLUG.home ? '' : page.slug}`)
   }
 
-  // Globals
-  await payload.updateGlobal({ slug: 'header', locale: 'nl', data: headerData('nl', ids), user })
-  await payload.updateGlobal({ slug: 'header', locale: 'en', data: headerData('en', ids), user })
-  await payload.updateGlobal({
-    slug: 'footer',
-    locale: 'nl',
-    data: { ...footerShared, ...footerLocalized('nl') },
-    user,
-  })
-  await payload.updateGlobal({ slug: 'footer', locale: 'en', data: footerLocalized('en'), user })
-  console.log('Globals seeded (header, footer)')
+  for (const page of sitePages) {
+    if (!created.has(page.slug)) console.log(`Kept /${page.slug === SLUG.home ? '' : page.slug} (exists; copy lives in D1)`)
+  }
+
+  // Globals: only when never saved. Decided once, before any write, because
+  // the nav/menu rows are shared across locales: writing nl first would make en
+  // look seeded. When a global is unseeded, both locales are written.
+  const readGlobal = async (slug: 'header' | 'footer') =>
+    (await payload.findGlobal({ slug, locale: 'nl', fallbackLocale: false, depth: 0 })) as unknown as Record<string, unknown>
+  if (globalIsUnseeded('header', await readGlobal('header'))) {
+    await payload.updateGlobal({ slug: 'header', locale: 'nl', data: headerData('nl', ids), user })
+    await payload.updateGlobal({ slug: 'header', locale: 'en', data: headerData('en', ids), user })
+    console.log('Header seeded (nl, en)')
+  } else {
+    console.log('Kept header (exists; copy lives in D1)')
+  }
+  if (globalIsUnseeded('footer', await readGlobal('footer'))) {
+    await payload.updateGlobal({
+      slug: 'footer',
+      locale: 'nl',
+      data: { ...footerShared, ...footerLocalized('nl') },
+      user,
+    })
+    await payload.updateGlobal({ slug: 'footer', locale: 'en', data: footerLocalized('en'), user })
+    console.log('Footer seeded (nl, en)')
+  } else {
+    console.log('Kept footer (exists; copy lives in D1)')
+  }
 
   console.log('Seed complete.')
 }

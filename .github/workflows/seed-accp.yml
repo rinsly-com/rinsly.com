@@ -1,9 +1,11 @@
 name: Seed ACCP (content)
 
-# Re-seeds the accp Payload CMS content (pages + globals) from scripts/seed.ts.
-# Idempotent — safe to re-run; it rebuilds the home page + globals, deletes any
-# stray non-home pages, and re-publishes (see the header comment in
-# scripts/seed.ts).
+# Bootstraps the accp Payload CMS content (pages + globals) from scripts/seed.ts.
+# Since DF1 (26 Nov 2026) accp D1 is the source of truth for the copy: the seed
+# only creates pages that do not exist and fills header/footer when they were
+# never saved. It does not rewrite existing pages, so it cannot revert content
+# endpoint or editor edits (see scripts/seedLock.ts). Setting the repository
+# variable RINSLY_HANDED_OVER=1 refuses this workflow outright.
 #
 # Manual only, on purpose: a content push is a human decision, never something
 # that should happen automatically on merge. This workflow only runs when
@@ -13,7 +15,7 @@ name: Seed ACCP (content)
 # NODE_ENV=production makes the Payload CLI resolve the real remote D1 + R2
 # bindings declared in wrangler.jsonc instead of the local dev mock — this
 # writes to the live accp database. There is no dry-run mode; review
-# scripts/seed.ts before dispatching if you're unsure what a run will change.
+# scripts/seed.ts before dispatching if you're unsure what a run will create.
 #
 # First run on a database with no admin yet creates one from
 # SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD. Set both as repository secrets
@@ -62,6 +64,8 @@ jobs:
       - name: Seed content
         run: NODE_ENV=production pnpm seed
         env:
+          SEED_COMMAND: seed-accp
+          RINSLY_HANDED_OVER: ${{ vars.RINSLY_HANDED_OVER }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
