@@ -96,7 +96,7 @@ describe('consent field access', () => {
       expect(field.access?.read).toBe(adminFieldOnly)
       const update = field.access?.update
       if (!update) throw new Error(`${field.name} is missing update access`)
-      expect(update({ req: { user: null } })).toBe(false)
+      expect(update({ req: { user: null } } as Parameters<typeof update>[0])).toBe(false)
     }
   })
 })
