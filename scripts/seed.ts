@@ -27,6 +27,7 @@ import { sql } from '@payloadcms/db-d1-sqlite'
 import config from '../src/payload.config'
 import { readServerEnv } from '../src/lib/env'
 import { logCaught } from '../src/lib/logCaught'
+import { LOCAL_PAGE_SLUG } from '../src/lib/localPageJsonLd'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
 import { idRowSchema, userRowSchema } from '../src/lib/rows'
 import { PLACEHOLDER_NOINDEX_SLUGS, SITEMAP_EXCLUDED_SLUGS } from '../src/lib/sitemapSlugs'
@@ -109,6 +110,7 @@ const SLUG = {
   website: 'website',
   over: 'over',
   contact: 'contact',
+  woerden: LOCAL_PAGE_SLUG,
 } as const
 
 /** Link to another page, optionally to an anchor inside it. */
@@ -1354,6 +1356,147 @@ const contactLayout = (locale: Locale): Block[] => [
   },
 ]
 
+/* ----------------- /website-laten-maken-woerden (local page) ---------------- */
+/* Yaron 26 Nov 15:59: remote only from Woerden, no in-person Utrecht service. */
+/* Structure by Builder. ALL COPY BELOW IS PLACEHOLDER: Marketeer writes the   */
+/* final text (then Lawyer). Slots: ~/Rinsly/marketing/copy-slots-local-woerden.md */
+
+const localWoerdenMeta = (locale: Locale) => ({
+  title: t(
+    locale,
+    '[Concept] Website laten maken, op afstand vanuit Woerden',
+    '[Draft] Website building, remotely from Woerden',
+  ),
+  description: t(
+    locale,
+    '[Concept] Rinsly bouwt en host websites voor ontwerpstudio’s in de provincie Utrecht, op afstand vanuit Woerden.',
+    '[Draft] Rinsly builds and hosts websites for design studios in the province of Utrecht, remotely from Woerden.',
+  ),
+})
+
+const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
+  pageHero(
+    'quiet',
+    t(locale, '[Concept] Vanuit Woerden', '[Draft] From Woerden'),
+    t(
+      locale,
+      'Websites bouwen en hosten, op afstand vanuit Woerden',
+      'Building and hosting websites, remotely from Woerden',
+    ),
+    t(
+      locale,
+      'Rinsly zit in Woerden. Voor ontwerpstudio’s in de provincie Utrecht werken we op afstand: kennismaken per telefoon of video, bouwen en beheren zonder dat iemand hoeft te reizen.',
+      'Rinsly is based in Woerden. For design studios in the province of Utrecht we work remotely: an intro by phone or video, building and managing without anyone having to travel.',
+    ),
+    [pageLink(t(locale, 'Neem contact op', 'Get in touch'), ids, SLUG.contact, { variant: 'primary' })],
+  ),
+  {
+    blockType: 'services',
+    anchor: 'werkwijze',
+    header: {
+      eyebrow: t(locale, '[Concept] Op afstand', '[Draft] Remote'),
+      title: t(locale, 'Zo werken we samen', 'How we work together'),
+      intro: t(
+        locale,
+        'We werken op afstand. Dat houdt het eenvoudig, ook als je studio in Utrecht zit.',
+        'We work remotely. That keeps it simple, also if your studio is in Utrecht.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconUsers',
+        title: t(locale, 'Kennismaken op afstand', 'An intro, remotely'),
+        description: t(
+          locale,
+          'We plannen een gesprek per telefoon of video om te horen wat je studio nodig heeft.',
+          'We schedule a call by phone or video to hear what your studio needs.',
+        ),
+      },
+      {
+        icon: 'IconCode',
+        title: t(locale, 'Bouwen op afstand', 'Building, remotely'),
+        description: t(
+          locale,
+          'Je levert het design aan, wij bouwen het als website en delen de voortgang online.',
+          'You deliver the design, we build it as a website and share progress online.',
+        ),
+      },
+      {
+        icon: 'IconRefresh',
+        title: t(locale, 'Hosting en beheer op afstand', 'Hosting and care, remotely'),
+        description: t(
+          locale,
+          'Na livegang houden we de website draaiend en passen we aan waar nodig, via e-mail of een kort gesprek.',
+          'After launch we keep the website running and adjust where needed, by email or a short call.',
+        ),
+      },
+    ],
+  },
+  {
+    blockType: 'richText',
+    anchor: 'regio',
+    width: 'narrow',
+    header: {
+      eyebrow: t(locale, '[Concept] Regio', '[Draft] Region'),
+      title: t(locale, 'Voor ontwerpstudio’s in de provincie Utrecht', 'For design studios in the province of Utrecht'),
+    },
+    content: richBody(
+      ...t(
+        locale,
+        [
+          'Rinsly is gevestigd in Woerden. We werken voor ontwerpstudio’s in de provincie Utrecht, op afstand.',
+          'Wil je liever eerst praten? Plan een telefoongesprek of een videogesprek via het contactformulier.',
+        ],
+        [
+          'Rinsly is based in Woerden. We work for design studios in the province of Utrecht, remotely.',
+          'Prefer to talk first? Schedule a phone call or a video call through the contact form.',
+        ],
+      ),
+    ),
+  },
+  {
+    blockType: 'accordion',
+    anchor: 'faq',
+    header: {
+      eyebrow: t(locale, '[Concept] Veelgestelde vragen', '[Draft] FAQ'),
+      title: t(locale, 'Praktisch', 'Practicalities'),
+    },
+    items: [
+      {
+        title: t(locale, 'Komen jullie langs in Utrecht?', 'Do you visit us in Utrecht?'),
+        body: richBody(
+          t(
+            locale,
+            'Nee. Wij werken op afstand vanuit Woerden: per telefoon, video en e-mail. Er is geen dienstverlening op locatie.',
+            'No. We work remotely from Woerden: by phone, video and email. There is no on-site service.',
+          ),
+        ),
+      },
+      {
+        title: t(locale, 'Voor wie werkt Rinsly?', 'Who does Rinsly work for?'),
+        body: richBody(
+          t(
+            locale,
+            'Voor ontwerpstudio’s die hun ontwerp als website willen laten bouwen en hosten.',
+            'For design studios that want their design built and hosted as a website.',
+          ),
+        ),
+      },
+    ],
+  },
+  cta(
+    locale,
+    ids,
+    t(locale, '[Concept] Contact', '[Draft] Contact'),
+    t(locale, 'Laten we praten', 'Let’s talk'),
+    t(
+      locale,
+      'Stuur een bericht, dan plannen we een gesprek op afstand.',
+      'Send a message and we schedule a remote call.',
+    ),
+  ),
+]
+
 /* ------------------------------ header / footer ---------------------------- */
 
 const headerData = (locale: Locale, ids: PageIds) => ({
@@ -1820,7 +1963,12 @@ async function run() {
   // Every page in the site, in one list. Layouts are written only after all of
   // them exist, because an internal link stores the TARGET PAGE'S id — a page
   // cannot link to a sibling that has not been created yet.
-  const sitePages: { slug: string; title: (l: Locale) => string; layout: (l: Locale, ids: PageIds) => Block[] }[] = [
+  const sitePages: {
+    slug: string
+    title: (l: Locale) => string
+    layout: (l: Locale, ids: PageIds) => Block[]
+    meta?: (l: Locale) => { title: string; description: string }
+  }[] = [
     { slug: SLUG.home, title: () => 'Rinsly', layout: homeLayout },
     {
       slug: SLUG.partner,
@@ -1837,6 +1985,12 @@ async function run() {
     { slug: SLUG.cases, title: (l) => t(l, 'Cases', 'Cases'), layout: casesLayout },
     { slug: SLUG.over, title: (l) => t(l, 'Over ons', 'About'), layout: overLayout },
     { slug: SLUG.contact, title: () => 'Contact', layout: (l) => contactLayout(l) },
+    {
+      slug: SLUG.woerden,
+      title: (l) => t(l, 'Website laten maken in Woerden', 'Website building from Woerden'),
+      layout: localWoerdenLayout,
+      meta: localWoerdenMeta,
+    },
     // The legal pages carry no internal links, but they ride along so that one
     // loop owns "which pages exist".
     {
@@ -1895,7 +2049,13 @@ async function run() {
         id: idFor(page.slug),
         draft: true,
         locale,
-        data: { title: page.title(locale), layout: page.layout(locale, ids), ...placeholderNoindexMeta(page.slug) },
+        data: {
+          title: page.title(locale),
+          layout: page.layout(locale, ids),
+          ...(page.meta
+            ? { meta: { ...page.meta(locale), ...placeholderNoindexMeta(page.slug).meta } }
+            : placeholderNoindexMeta(page.slug)),
+        },
         user,
       })
     }
