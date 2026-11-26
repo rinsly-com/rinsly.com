@@ -10,27 +10,12 @@ import {
   b2bConfirmationFields,
   b2bFromSubmission,
   b2bQuoteRequiredText,
-  isKvkCollectionEnabled,
   normalizeKvk,
 } from '../../src/lib/b2bConfirmation'
 
 const NOW = new Date('2026-11-26T15:59:00.000Z')
 const CLIENT_TIME = '1999-01-01T00:00:00.000Z'
 const COLLECT = { collectKvk: true } as const
-
-describe('isKvkCollectionEnabled', () => {
-  it('is off unless the value is 1, true, or yes', () => {
-    expect(isKvkCollectionEnabled('')).toBe(false)
-    expect(isKvkCollectionEnabled('0')).toBe(false)
-    expect(isKvkCollectionEnabled('false')).toBe(false)
-    expect(isKvkCollectionEnabled('off')).toBe(false)
-    expect(isKvkCollectionEnabled('no')).toBe(false)
-    expect(isKvkCollectionEnabled('1')).toBe(true)
-    expect(isKvkCollectionEnabled('true')).toBe(true)
-    expect(isKvkCollectionEnabled('YES')).toBe(true)
-    expect(isKvkCollectionEnabled(' True ')).toBe(true)
-  })
-})
 
 describe('normalizeKvk', () => {
   it('keeps eight digits and strips spaces, dots, and hyphens', () => {
@@ -46,12 +31,14 @@ describe('normalizeKvk', () => {
     expect(normalizeKvk('HRB 12345')).toBe('HRB 12345')
     expect(normalizeKvk('  HRB 12345  ')).toBe('HRB 12345')
     expect(normalizeKvk('BE0123.456.789')).toBe('BE0123.456.789')
-    expect(normalizeKvk('1234/5678')).toBe('1234/5678')
     expect(normalizeKvk('HRB12345')).toBe('HRB12345')
+    expect(normalizeKvk('DE-12345')).toBe('DE-12345')
   })
 
   it('rejects junk, no digit, too short or too long, non-strings, and oversized raw input', () => {
     expect(normalizeKvk('123')).toBeNull()
+    expect(normalizeKvk('1234567')).toBeNull()
+    expect(normalizeKvk('123456789')).toBeNull()
     expect(normalizeKvk('12#345678')).toBeNull()
     expect(normalizeKvk('ABCD')).toBeNull()
     expect(normalizeKvk('HRB')).toBeNull()
@@ -59,6 +46,22 @@ describe('normalizeKvk', () => {
     expect(normalizeKvk(12345678)).toBeNull()
     expect(normalizeKvk(`1234 5678${' '.repeat(20)}`)).toBeNull()
     expect(normalizeKvk('BE01234567890123456789')).toBeNull()
+  })
+
+  it('rejects a digits-only typo and a foreign number with no letter', () => {
+    expect(normalizeKvk('1234567')).toBeNull()
+    expect(normalizeKvk('1234 567')).toBeNull()
+    expect(normalizeKvk('123456789')).toBeNull()
+    expect(normalizeKvk('1234/5678')).toBeNull()
+  })
+
+  it('rejects leading, trailing, or consecutive separators', () => {
+    expect(normalizeKvk('../1')).toBeNull()
+    expect(normalizeKvk('//1/')).toBeNull()
+    expect(normalizeKvk('-BE1234')).toBeNull()
+    expect(normalizeKvk('BE1234-')).toBeNull()
+    expect(normalizeKvk('BE..1234')).toBeNull()
+    expect(normalizeKvk('HRB  12345')).toBeNull()
   })
 
   it('rejects unicode dashes, unicode digits, and NBSP in a registration number', () => {

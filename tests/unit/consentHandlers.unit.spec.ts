@@ -215,7 +215,7 @@ describe('offerteHandler business confirmation', () => {
 
   it('returns 422 for an invalid registration number when collection is on', async () => {
     collectKvk()
-    for (const kvkNummer of ['123', '12#345678', 'ABCD', 'BE01234567890123456789', 'HRB\u201312345', 'HRB\u00A012345', '1234567\uFF18']) {
+    for (const kvkNummer of ['123', '1234567', '123456789', '1234/5678', '../1', '//1/', '12#345678', 'ABCD', 'BE01234567890123456789', 'HRB\u201312345', 'HRB\u00A012345', '1234567\uFF18']) {
       await rejected({ ...quote, b2bConfirmed: true, kvkNummer })
     }
     await rejected({ ...quote, b2bConfirmed: true })

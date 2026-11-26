@@ -4,6 +4,7 @@ import type { Page } from '@/payload-types'
 import { Contact } from '@/components/custom/Contact'
 import { Diagram } from '@/components/custom/Diagram'
 import { RevenueCalculator } from '@/components/custom/RevenueCalculator'
+import { isKvkCollectionEnabled } from '@/lib/kvkCollectionFlag'
 
 type BlockOf<T extends string> = Extract<NonNullable<Page['layout']>[number], { blockType: T }>
 
@@ -25,7 +26,9 @@ const as = <T,>(block: unknown): T => block as T
  * payload.config.ts.
  */
 export const extraRenderers: Record<string, BlockRenderer> = {
-  contact: (block, locale) => <Contact {...as<BlockOf<'contact'>>(block)} locale={locale} />,
+  contact: (block, locale) => (
+    <Contact {...as<BlockOf<'contact'>>(block)} locale={locale} kvkCollectionEnabled={isKvkCollectionEnabled()} />
+  ),
   revenueCalculator: (block, locale) => (
     <RevenueCalculator {...as<BlockOf<'revenueCalculator'>>(block)} locale={locale} />
   ),

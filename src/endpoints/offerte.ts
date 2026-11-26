@@ -1,7 +1,8 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
 import { z } from 'zod'
 
-import { b2bFromSubmission, isKvkCollectionEnabled } from '../lib/b2bConfirmation'
+import { b2bFromSubmission } from '../lib/b2bConfirmation'
+import { isKvkCollectionEnabled } from '../lib/kvkCollectionFlag'
 import { getRuntime } from '../lib/bindings'
 import { emailConsentFromSubmission } from '../lib/emailConsent'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'

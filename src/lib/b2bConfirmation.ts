@@ -2,8 +2,6 @@ import type { CheckboxField, DateField, FieldAccess, TextField } from 'payload'
 
 import { adminFieldOnly } from '@rinsly-com/site-core/access'
 
-import { readServerEnv } from './env'
-
 /**
  * Exact checkbox label. Dutch is Yaron's wording (26 Nov 2026). English is the
  * lawyer's sentence from the same day.
@@ -42,20 +40,6 @@ export function b2bQuoteRequiredText(locale: B2bLocale, collectKvk: boolean): st
   return collectKvk ? B2B_QUOTE_REQUIRED_WITH_KVK[locale] : B2B_QUOTE_REQUIRED[locale]
 }
 
-/** Non-secret wrangler / process env flag. Default off. */
-export const KVK_COLLECTION_FLAG = 'RINSLY_KVK_COLLECTION_ENABLED'
-
-/**
- * Collection is on only for `1`, `true`, or `yes` (any case, surrounding
- * space ignored). Anything else, including unset, is off.
- */
-export function isKvkCollectionEnabled(raw?: string): boolean {
-  const source =
-    raw !== undefined ? raw : (readServerEnv().RINSLY_KVK_COLLECTION_ENABLED ?? '')
-  const value = source.trim().toLowerCase()
-  return value === '1' || value === 'true' || value === 'yes'
-}
-
 /** Raw registration-number cap, before separators or control characters are removed. */
 export const KVK_RAW_MAX = 20
 
@@ -76,10 +60,12 @@ const REGISTRATION_CONTROLS = /[\u0000-\u001F\u007F-\u009F\u2028\u2029]/gu
 /**
  * A Dutch KvK (exactly 8 digits after spaces, dots, and hyphens are stripped)
  * or a foreign business registration number: trimmed, 4–20 characters of
- * ASCII letters, digits, and space . - / only, with at least one digit.
- * Unicode dashes, digits, and NBSP are rejected. All C0 and C1 control
- * characters, plus U+2028/2029, are stripped after the raw length cap.
- * Only strings are accepted.
+ * ASCII letters, digits, and space . - / only, with at least one letter and
+ * one digit. Separators may not lead, trail, or repeat. A digits-only value
+ * after that Dutch normalisation must be exactly 8 digits; it is never
+ * accepted as foreign. Unicode dashes, digits, and NBSP are rejected. All
+ * C0 and C1 control characters, plus U+2028/2029, are stripped after the
+ * raw length cap. Only strings are accepted.
  */
 export function normalizeKvk(value: unknown): string | null {
   if (typeof value !== 'string') return null
@@ -87,12 +73,14 @@ export function normalizeKvk(value: unknown): string | null {
   const cleaned = value.replace(REGISTRATION_CONTROLS, '')
 
   const dutch = cleaned.replace(/[-. ]/g, '')
-  if (/^[0-9]{8}$/.test(dutch)) return dutch
+  if (/^[0-9]+$/.test(dutch)) {
+    return dutch.length === 8 ? dutch : null
+  }
 
   const foreign = cleaned.trim()
   if (foreign.length < 4 || foreign.length > KVK_RAW_MAX) return null
-  if (!/^[A-Za-z0-9 .\-\/]+$/.test(foreign)) return null
-  if (!/[0-9]/.test(foreign)) return null
+  if (!/^[A-Za-z0-9]+(?:[ .\-\/][A-Za-z0-9]+)*$/.test(foreign)) return null
+  if (!/[A-Za-z]/.test(foreign) || !/[0-9]/.test(foreign)) return null
   return foreign
 }
 
