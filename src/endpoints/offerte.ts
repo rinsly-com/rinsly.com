@@ -1,7 +1,7 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
 import { z } from 'zod'
 
-import { b2bFromSubmission, isKvkCollectionEnabled } from '../lib/b2bConfirmation'
+import { b2bFromSubmission, isKvkCollectionEnabled, KVK_COLLECTION_FLAG } from '../lib/b2bConfirmation'
 import { getRuntime } from '../lib/bindings'
 import { emailConsentFromSubmission } from '../lib/emailConsent'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
@@ -32,17 +32,35 @@ const offerteSchema = z.object({
   }),
 })
 
-function json(body: unknown, status = 200): Response {
+function json(body: unknown, status = 200, headers: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'content-type': 'application/json' },
+    headers: { 'content-type': 'application/json', ...headers },
   })
 }
 
 function kvkCollectionFlagFrom(env: unknown): string | undefined {
   if (typeof env !== 'object' || env === null) return undefined
-  const raw = (env as Record<string, unknown>).RINSLY_KVK_COLLECTION_ENABLED
+  const raw = (env as Record<string, unknown>)[KVK_COLLECTION_FLAG]
   return typeof raw === 'string' ? raw : undefined
+}
+
+/** The value POST /api/offerte will enforce. One read, shared with the public form. */
+function collectKvkFrom(env: unknown): boolean {
+  return isKvkCollectionEnabled(kvkCollectionFlagFrom(env))
+}
+
+/**
+ * GET /api/offerte-config — whether the quote form must collect a registration
+ * number. rinsly.com prerenders the form, so a wrangler var turned on later
+ * never reaches that HTML. The form asks here, and this uses the same worker
+ * binding as the POST.
+ */
+export const offerteConfigHandler: PayloadHandler = async () => {
+  const runtime = await getRuntime()
+  return json({ kvkCollectionEnabled: collectKvkFrom(runtime.env) }, 200, {
+    'cache-control': 'no-store',
+  })
 }
 
 /**
@@ -69,7 +87,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
   }
   const chosen = subscription.safeParse(body.subscription)
   const runtime = await getRuntime()
-  const collectKvk = isKvkCollectionEnabled(kvkCollectionFlagFrom(runtime.env))
+  const collectKvk = collectKvkFrom(runtime.env)
   const b2b = b2bFromSubmission(rawObject, new Date(), { collectKvk })
   if (!bedrijf || !naam || !EMAIL_RE.test(email) || !chosen.success) {
     return json({ ok: false, error: 'validation' }, 422)

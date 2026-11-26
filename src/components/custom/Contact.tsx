@@ -80,6 +80,7 @@ export function Contact({ header, items, buttons, locale }: Props) {
           ) : null}
         </div>
 
+        {/* Build-time first paint. The form replaces this with the worker flag. */}
         <OfferteForm locale={locale} kvkCollectionEnabled={isKvkCollectionEnabled()} />
       </div>
     </Section>

@@ -65,6 +65,12 @@ function postedBody(
   return JSON.parse(raw) as Record<string, unknown>
 }
 
+function requestUrl(input: RequestInfo | URL): string {
+  if (typeof input === 'string') return input
+  if (input instanceof URL) return input.href
+  return input.url
+}
+
 function okFetch() {
   return vi.fn((_input: RequestInfo | URL, _init?: RequestInit) =>
     Promise.resolve(
@@ -184,6 +190,98 @@ describe('email consent checkbox', () => {
     expect(screen.getByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeTruthy()
     setValue('offerte-kvk', 'BE0123456789')
     expect(screen.queryByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeNull()
+  })
+
+  it('shows the registration field when the worker flag is on and the baked form is off', async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL, _init?: RequestInit) => {
+      const url = requestUrl(input)
+      const body = url.endsWith('/api/offerte-config')
+        ? { kvkCollectionEnabled: true }
+        : { ok: true }
+      return Promise.resolve(
+        new Response(JSON.stringify(body), {
+          status: 200,
+          headers: { 'content-type': 'application/json' },
+        }),
+      )
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    hydrate(createElement(OfferteForm, { locale: 'en' }))
+    fireEvent.click(screen.getByRole('button', { name: /I want a website/ }))
+    setValue('offerte-bedrijf', 'Studio')
+    setValue('offerte-naam', 'Ada')
+    setValue('offerte-email', 'ada@example.com')
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    fireEvent.click(screen.getByRole('button', { name: /Care/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(KVK_FIELD_LABEL.en)).toBeTruthy()
+    })
+    expect(screen.getByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeTruthy()
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
+
+    fireEvent.click(screen.getByRole('checkbox', { name: B2B_CONFIRMATION_TEXT.en }))
+    setValue('offerte-kvk', 'BE0123456789')
+    fireEvent.click(screen.getByRole('button', { name: 'Send request' }))
+
+    await waitFor(() => {
+      const post = fetchMock.mock.calls.find((call) => requestUrl(call[0]).endsWith('/api/offerte'))
+      expect(post).toBeTruthy()
+    })
+    const post = fetchMock.mock.calls.find((call) => requestUrl(call[0]).endsWith('/api/offerte'))
+    const raw = post?.[1]?.body
+    if (typeof raw !== 'string') throw new Error('expected a JSON string body')
+    expect(JSON.parse(raw)).toMatchObject({ b2bConfirmed: true, kvkNummer: 'BE0123456789' })
+  })
+
+  it('shows the registration field when a ticked quote is rejected without one', async () => {
+    const fetchMock = vi.fn((input: RequestInfo | URL, _init?: RequestInit) => {
+      const url = requestUrl(input)
+      if (url.endsWith('/api/offerte-config')) {
+        return Promise.resolve(
+          new Response(JSON.stringify({ kvkCollectionEnabled: false }), {
+            status: 200,
+            headers: { 'content-type': 'application/json' },
+          }),
+        )
+      }
+      return Promise.resolve(
+        new Response(JSON.stringify({ ok: false, error: 'b2b' }), {
+          status: 422,
+          headers: { 'content-type': 'application/json' },
+        }),
+      )
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    hydrate(createElement(OfferteForm, { locale: 'en' }))
+    await waitFor(() => {
+      expect(
+        fetchMock.mock.calls.some((call) => requestUrl(call[0]).endsWith('/api/offerte-config')),
+      ).toBe(true)
+    })
+
+    fireEvent.click(screen.getByRole('button', { name: /I want a website/ }))
+    setValue('offerte-bedrijf', 'Studio')
+    setValue('offerte-naam', 'Ada')
+    setValue('offerte-email', 'ada@example.com')
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    fireEvent.click(screen.getByRole('button', { name: /Care/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+
+    expect(document.querySelector('#offerte-kvk')).toBeNull()
+    fireEvent.click(screen.getByRole('checkbox', { name: B2B_CONFIRMATION_TEXT.en }))
+    fireEvent.click(screen.getByRole('button', { name: 'Send request' }))
+
+    await waitFor(() => {
+      expect(screen.getByLabelText(KVK_FIELD_LABEL.en)).toBeTruthy()
+    })
+    expect(screen.getByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeTruthy()
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
   })
 
   it('does not show the business-client sentence on the design-studio path', () => {

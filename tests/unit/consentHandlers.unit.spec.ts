@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { PayloadRequest } from 'payload'
 
 import { checkAanvraagHandler } from '../../src/endpoints/checkAanvraag'
-import { offerteHandler } from '../../src/endpoints/offerte'
+import { offerteConfigHandler, offerteHandler } from '../../src/endpoints/offerte'
 import { EMAIL_CONSENT_TEXT } from '../../src/lib/emailConsent'
 
 const runtimeEnv: Record<string, unknown> = {}
@@ -251,5 +251,26 @@ describe('offerteHandler business confirmation', () => {
         expect(mailed.text).not.toContain(`KvK: ${input}`)
       }
     }
+  })
+})
+
+describe('offerteConfigHandler', () => {
+  it('reports the worker binding, and process.env only when that binding is absent', async () => {
+    runtimeEnv.RINSLY_KVK_COLLECTION_ENABLED = 'true'
+    vi.stubEnv('RINSLY_KVK_COLLECTION_ENABLED', '')
+    const on = await offerteConfigHandler(request({}).req)
+    expect(on.status).toBe(200)
+    expect(on.headers.get('cache-control')).toBe('no-store')
+    expect(await on.json()).toEqual({ kvkCollectionEnabled: true })
+
+    runtimeEnv.RINSLY_KVK_COLLECTION_ENABLED = 'false'
+    vi.stubEnv('RINSLY_KVK_COLLECTION_ENABLED', 'true')
+    const off = await offerteConfigHandler(request({}).req)
+    expect(await off.json()).toEqual({ kvkCollectionEnabled: false })
+
+    delete runtimeEnv.RINSLY_KVK_COLLECTION_ENABLED
+    vi.stubEnv('RINSLY_KVK_COLLECTION_ENABLED', 'yes')
+    const fallback = await offerteConfigHandler(request({}).req)
+    expect(await fallback.json()).toEqual({ kvkCollectionEnabled: true })
   })
 })

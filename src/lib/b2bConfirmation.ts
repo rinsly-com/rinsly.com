@@ -48,6 +48,10 @@ export const KVK_COLLECTION_FLAG = 'RINSLY_KVK_COLLECTION_ENABLED'
 /**
  * Collection is on only for `1`, `true`, or `yes` (any case, surrounding
  * space ignored). Anything else, including unset, is off.
+ *
+ * Pass the worker binding when you have request-time env. Omitting it reads
+ * process.env, which a static prerender bakes in and then cannot see a later
+ * wrangler change.
  */
 export function isKvkCollectionEnabled(raw?: string): boolean {
   const source =

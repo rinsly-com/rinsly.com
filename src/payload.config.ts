@@ -13,7 +13,7 @@ import { diagramBlock } from './blocks/Diagram'
 import { revenueCalculatorBlock } from './blocks/RevenueCalculator'
 import { checkAanvraagHandler } from './endpoints/checkAanvraag'
 import { checkRunStartHandler, checkRunStatusHandler } from './endpoints/checkRun'
-import { offerteHandler } from './endpoints/offerte'
+import { offerteConfigHandler, offerteHandler } from './endpoints/offerte'
 import {
   partnerAanvraagHandler,
   partnerInteresseHandler,
@@ -47,6 +47,9 @@ export default buildSiteConfig({
   extraBlocks: [revenueCalculatorBlock, diagramBlock],
   extraEndpoints: [
     { path: '/offerte', method: 'post', handler: offerteHandler },
+    // Runtime KvK flag for the prerendered public form. Not Turnstile-protected:
+    // a boolean, no submission. Same worker binding as POST /offerte.
+    { path: '/offerte-config', method: 'get', handler: offerteConfigHandler },
     // POST /api/check-aanvraag — lead form on the generic /check page.
     { path: '/check-aanvraag', method: 'post', handler: checkAanvraagHandler },
     // Self-service website check: start + progress polling (see lib/siteCheck).

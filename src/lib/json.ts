@@ -46,6 +46,11 @@ export const formAckSchema = z.object({
   error: z.string().optional(),
 })
 
+/** GET /api/offerte-config. The prerendered quote form reads the worker flag here. */
+export const offerteFlagSchema = z.object({
+  kvkCollectionEnabled: z.boolean(),
+})
+
 export const checkStartSchema = formAckSchema.extend({
   token: z.string().optional(),
 })

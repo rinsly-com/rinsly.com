@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import type { Locale } from '@rinsly-com/site-core'
 import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
@@ -10,7 +10,7 @@ import { EmailConsentCheckbox } from '@/components/EmailConsentCheckbox'
 import { b2bQuoteRequiredText, KVK_FIELD_LABEL, normalizeKvk } from '@/lib/b2bConfirmation'
 import { publicString } from '@/lib/env'
 import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
-import { formAckSchema, readJsonResponse } from '@/lib/json'
+import { formAckSchema, offerteFlagSchema, readJsonResponse } from '@/lib/json'
 import { logCaught } from '@/lib/logCaught'
 import { Button } from '@rinsly-com/ui/button'
 import { Checkbox } from '@rinsly-com/ui/checkbox'
@@ -247,6 +247,37 @@ export function OfferteForm({
   kvkCollectionEnabled?: boolean
 }) {
   const c = COPY[locale]
+  // The prop is whatever the page baked in. On rinsly.com that is build-time
+  // process.env; POST /api/offerte reads the worker binding instead. Replace
+  // the prop with that binding so a wrangler change does not reject quotes
+  // the form never asked for.
+  const [collectKvk, setCollectKvk] = useState(kvkCollectionEnabled)
+  useEffect(() => {
+    const controller = new AbortController()
+    let cancelled = false
+    void fetch(`${API_BASE}/api/offerte-config`, { cache: 'no-store', signal: controller.signal })
+      .then(async (res) =>
+        offerteFlagSchema.safeParse(
+          await readJsonResponse(res, '[offerte] flag response was not JSON'),
+        ),
+      )
+      .then((parsed) => {
+        if (cancelled) return
+        if (!parsed.success) {
+          logCaught('[offerte] flag response failed validation', parsed.error)
+          return
+        }
+        setCollectKvk(parsed.data.kvkCollectionEnabled)
+      })
+      .catch((err: unknown) => {
+        if (cancelled || (err instanceof Error && err.name === 'AbortError')) return
+        logCaught('[offerte] flag lookup failed', err)
+      })
+    return () => {
+      cancelled = true
+      controller.abort()
+    }
+  }, [])
   const [audience, setAudience] = useState<Audience>('')
   const [step, setStep] = useState(0)
   const [data, setData] = useState<Data>(EMPTY)
@@ -298,7 +329,7 @@ export function OfferteForm({
   }
   const yn = (v: boolean) => (v ? c.yes : c.no)
   const quoteReady =
-    isPartner || (data.b2bConfirmed && (!kvkCollectionEnabled || normalizeKvk(data.kvkNummer) !== null))
+    isPartner || (data.b2bConfirmed && (!collectKvk || normalizeKvk(data.kvkNummer) !== null))
   const showQuoteRequired =
     audience === 'client' && step === lastStep && (!quoteReady || quoteBlocked)
 
@@ -336,7 +367,7 @@ export function OfferteForm({
           bericht: data.bericht,
           emailConsent: data.emailConsent,
           b2bConfirmed: data.b2bConfirmed,
-          ...(kvkCollectionEnabled ? { kvkNummer: data.kvkNummer } : {}),
+          ...(collectKvk ? { kvkNummer: data.kvkNummer } : {}),
           locale,
         }
 
@@ -356,6 +387,9 @@ export function OfferteForm({
         setQuoteBlocked(false)
         setStatus('success')
       } else if (!isPartner && parsed.success && parsed.data.error === 'b2b') {
+        // Ticked, and this form did not send a number. The worker is requiring
+        // one the baked flag hid. Show the field and the with-KvK notice.
+        if (data.b2bConfirmed && !collectKvk) setCollectKvk(true)
         setQuoteBlocked(true)
         setStatus('error')
       } else {
@@ -608,7 +642,7 @@ export function OfferteForm({
             />
           </dl>
           <NoteField id="offerte-bericht" label={c.bericht} value={data.bericht} onValue={(v) => { set('bericht', v); }} />
-          {kvkCollectionEnabled ? (
+          {collectKvk ? (
             <TextField
               id="offerte-kvk"
               label={KVK_FIELD_LABEL[locale]}
@@ -652,7 +686,7 @@ export function OfferteForm({
 
       {showQuoteRequired && (
         <p className="mt-4 text-sm text-ink" role="status">
-          {b2bQuoteRequiredText(locale, kvkCollectionEnabled)}
+          {b2bQuoteRequiredText(locale, collectKvk)}
         </p>
       )}
 
