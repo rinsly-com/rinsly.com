@@ -166,7 +166,7 @@ describe('email consent checkbox', () => {
     expect(submit.hasAttribute('disabled')).toBe(false)
   })
 
-  it('requires a registration number on the English form when collection is on', () => {
+  it('requires a KvK number on the English form when collection is on', () => {
     hydrate(createElement(OfferteForm, { locale: 'en', kvkCollectionEnabled: true }))
     fireEvent.click(screen.getByRole('button', { name: /I want a website/ }))
     setValue('offerte-bedrijf', 'Studio')
@@ -183,6 +183,8 @@ describe('email consent checkbox', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: B2B_CONFIRMATION_TEXT.en }))
     expect(screen.getByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeTruthy()
     setValue('offerte-kvk', 'BE0123456789')
+    expect(screen.getByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeTruthy()
+    setValue('offerte-kvk', '1234-5678')
     expect(screen.queryByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeNull()
   })
 
