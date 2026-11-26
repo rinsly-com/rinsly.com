@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 import { LOCAL_PAGE_SLUG, buildLocalPageJsonLd } from '../../src/lib/localPageJsonLd'
-import { slugsForSitemap } from '../../src/lib/sitemapSlugs'
+import { PLACEHOLDER_NOINDEX_SLUGS, SITEMAP_EXCLUDED_SLUGS, slugsForSitemap } from '../../src/lib/sitemapSlugs'
 
 /**
  * Yaron (26 Nov 15:59, own card answer in Marketeer's chat): the Woerden/Utrecht
@@ -39,11 +39,16 @@ const BANNED = [
 describe('local page Woerden/Utrecht: structure', () => {
   const layout = localLayoutSource()
 
-  it('is registered under the shared slug and in the sitemap', () => {
+  it('is registered under the shared slug, noindex, and omitted from the sitemap until final copy', () => {
     expect(LOCAL_PAGE_SLUG).toBe('website-laten-maken-woerden')
     expect(seed).toMatch(/LOCAL_PAGE_SLUG/)
     expect(seed).toMatch(/slug:\s*SLUG\.woerden/)
-    expect(slugsForSitemap(['over', LOCAL_PAGE_SLUG])).toContain(LOCAL_PAGE_SLUG)
+    // Drop this slug from PLACEHOLDER_NOINDEX_SLUGS and noindex from localWoerdenMeta when final copy lands.
+    expect(PLACEHOLDER_NOINDEX_SLUGS.has(LOCAL_PAGE_SLUG)).toBe(true)
+    expect(SITEMAP_EXCLUDED_SLUGS.has(LOCAL_PAGE_SLUG)).toBe(true)
+    expect(slugsForSitemap(['over', LOCAL_PAGE_SLUG])).not.toContain(LOCAL_PAGE_SLUG)
+    expect(slugsForSitemap(['over', LOCAL_PAGE_SLUG])).toContain('over')
+    expect(seed).toMatch(/noindex:\s*true/)
   })
 
   it('has hero, how-we-work cards, region prose, FAQ and a contact CTA', () => {
