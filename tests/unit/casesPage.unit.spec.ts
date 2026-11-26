@@ -68,7 +68,7 @@ describe('cases page', () => {
     expect(layout).not.toMatch(/%|€|\bprocent\b|\bpercent\b|\bconversie|\bconversion/i)
     const withoutName = layout.replace(/Up2Brand/gi, '')
     // digits are fine in code (ids, 'IconX'); none in visible strings
-    const strings = [...withoutName.matchAll(/['`]((?:[^'`\\]|\\.)*)['`]/g)].map((m) => m[1] ?? '')
+    const strings = [...withoutName.matchAll(/['`]((?:[^'`\\]|\\.)*)['`]/g)].map((m) => m[1])
     const visible = strings.filter((s) => /\s/.test(s) && !/^https?:/.test(s))
     for (const s of visible) expect(s, s).not.toMatch(/\d/)
   })
