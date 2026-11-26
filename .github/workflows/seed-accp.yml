@@ -2,27 +2,31 @@ name: Seed ACCP (content)
 
 # Bootstraps the accp Payload CMS content (pages + globals) from scripts/seed.ts.
 # Since DF1 (26 Nov 2026) accp D1 is the source of truth for the copy: the seed
-# only creates pages that do not exist and fills header/footer when they were
-# never saved. It does not rewrite existing pages, so it cannot revert content
-# endpoint or editor edits (see scripts/seedLock.ts). Setting the repository
-# variable RINSLY_HANDED_OVER=1 refuses this workflow outright.
+# only creates pages that do not exist, finishes incomplete locales (draft-only
+# or empty layout, header/footer locales with no copy text), and never rewrites
+# a published locale that already has content (see scripts/seedLock.ts). Setting
+# the repository variable RINSLY_HANDED_OVER to 1, true, or yes refuses this
+# workflow outright (default-open: unset, empty, 0, false, or no still runs).
 #
 # Manual only, on purpose: a content push is a human decision, never something
 # that should happen automatically on merge. This workflow only runs when
 # someone explicitly dispatches it — from the Actions tab, or:
 #   gh workflow run seed-accp.yml
 #
-# NODE_ENV=production makes the Payload CLI resolve the real remote D1 + R2
-# bindings declared in wrangler.jsonc instead of the local dev mock — this
-# writes to the live accp database. There is no dry-run mode; review
+# NODE_ENV=production makes the Payload CLI use the remote D1 and R2 bindings
+# in wrangler.jsonc (the accp CMS database, not the static production site).
+# That is still a remote write. There is no dry-run mode; review
 # scripts/seed.ts before dispatching if you're unsure what a run will create.
+# In production the seed also skips orphan-version repair and will not promote
+# an existing user to admin.
 #
 # First run on a database with no admin yet creates one from
 # SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD. Set both as repository secrets
 # before the first dispatch against a fresh accp — without them the seed falls
 # back to the well-known dev@rinsly.local / rinsly-dev credentials, which must
 # never end up on a live, internet-reachable admin panel. Safe to leave unset
-# on every run after the first: an existing admin is never recreated.
+# on every run after the first: an existing admin is never recreated, and an
+# existing non-admin user is never promoted.
 #
 # Shares deploy-accp.yml's concurrency group so a seed and a deploy can never
 # race each other against the same worker/database.
