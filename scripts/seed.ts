@@ -1372,8 +1372,6 @@ const localWoerdenMeta = (locale: Locale) => ({
     '[Concept] Rinsly bouwt en host websites voor ontwerpstudio’s in de provincie Utrecht, op afstand vanuit Woerden.',
     '[Draft] Rinsly builds and hosts websites for design studios in the province of Utrecht, remotely from Woerden.',
   ),
-  // Remove noindex (and this slug from PLACEHOLDER_NOINDEX_SLUGS) when Marketeer's final copy lands.
-  noindex: true,
 })
 
 const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
@@ -1969,7 +1967,7 @@ async function run() {
     slug: string
     title: (l: Locale) => string
     layout: (l: Locale, ids: PageIds) => Block[]
-    meta?: (l: Locale) => { title: string; description: string; noindex?: boolean }
+    meta?: (l: Locale) => { title: string; description: string }
   }[] = [
     { slug: SLUG.home, title: () => 'Rinsly', layout: homeLayout },
     {
