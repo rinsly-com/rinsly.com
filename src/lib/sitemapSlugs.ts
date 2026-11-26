@@ -10,7 +10,7 @@
  * that replaces the placeholders. Seed then writes meta.noindex false; omitting
  * the field would leave the old true in place while the sitemap lists the page.
  */
-export const PLACEHOLDER_NOINDEX_SLUGS = new Set(['cases'])
+export const PLACEHOLDER_NOINDEX_SLUGS = new Set(['cases', 'website-laten-maken-woerden'])
 
 export const SITEMAP_EXCLUDED_SLUGS = new Set([
   'privacy',
