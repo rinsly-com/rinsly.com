@@ -5,6 +5,7 @@ import {
   consentNotice,
   emailConsentFields,
   emailConsentFromSubmission,
+  userCanReadConsent,
 } from '../../src/lib/emailConsent'
 
 const NOW = new Date('2026-11-26T13:50:00.000Z')
@@ -81,6 +82,29 @@ describe('email consent columns', () => {
     expect(given.required).toBeUndefined()
     expect(at.required).toBeUndefined()
     expect(text.required).toBeUndefined()
+  })
+})
+
+describe('consent field access', () => {
+  it('lets admins read the consent columns and hides them from editors', () => {
+    expect(userCanReadConsent(null)).toBe(false)
+    expect(userCanReadConsent(undefined)).toBe(false)
+    expect(userCanReadConsent({})).toBe(false)
+    expect(userCanReadConsent({ roles: ['editor'] })).toBe(false)
+    expect(userCanReadConsent({ roles: 'admin' })).toBe(false)
+    expect(userCanReadConsent({ roles: ['admin'] })).toBe(true)
+    expect(userCanReadConsent({ roles: ['editor', 'admin'] })).toBe(true)
+
+    for (const field of emailConsentFields()) {
+      const read = field.access?.read
+      const update = field.access?.update
+      if (!read || !update) throw new Error(`${field.name} is missing access`)
+      const editor = { req: { user: { roles: ['editor'] } } } as Parameters<typeof read>[0]
+      const admin = { req: { user: { roles: ['admin'] } } } as Parameters<typeof read>[0]
+      expect(read(editor)).toBe(false)
+      expect(read(admin)).toBe(true)
+      expect(update(admin)).toBe(false)
+    }
   })
 })
 
