@@ -95,8 +95,8 @@ describe('local page Woerden/Utrecht: JSON-LD', () => {
       expect(json).not.toContain('Kazernestraat')
       expect(json).not.toContain('postalCode')
       const provider = ld['provider'] as Record<string, unknown>
-      expect(provider['@id']).toBe(`${url}/#organization`)
-      expect(provider['@type']).toBe('LocalBusiness')
+      expect(provider).toEqual({ '@id': `${url}/#organization` })
+      expect(json).not.toContain('PostalAddress')
       const channel = ld['availableChannel'] as Record<string, unknown>
       expect(channel['@type']).toBe('ServiceChannel')
       expect(String(channel['name'])).toMatch(locale === 'nl' ? /op afstand/i : /remote/i)

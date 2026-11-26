@@ -3,11 +3,10 @@
  *
  * Yaron (26 Nov 15:59): Rinsly serves the province of Utrecht REMOTELY from
  * Woerden. There is no in-person service in Utrecht, so the data says so:
- * the service is delivered over a remote channel, the area served is the
- * province, and the provider carries a locality only. It deliberately has no
- * street address and no postal code: a street address on a "local" result
- * invites walk-in visits. (The site-wide LocalBusiness node from site-core is
- * unchanged and still carries the footer address that is already public.)
+ * the service is delivered over a remote channel and the area served is the
+ * province. The provider is only `@id` of the site-wide organization.
+ * JSON-LD merges every node with that `@id`, so a second PostalAddress here
+ * would sit on the same entity as the footer address from site-core.
  */
 
 /** Slug shared by both locales, like every other page of the site. */
@@ -47,18 +46,7 @@ export function buildLocalPageJsonLd(siteUrl: string, locale: LocalLocale): Reco
     description: text.description,
     url: pageUrl,
     inLanguage: locale,
-    provider: {
-      '@type': 'LocalBusiness',
-      '@id': `${base}/#organization`,
-      name: 'Rinsly',
-      url: base,
-      address: {
-        '@type': 'PostalAddress',
-        addressLocality: 'Woerden',
-        addressRegion: 'Utrecht',
-        addressCountry: 'NL',
-      },
-    },
+    provider: { '@id': `${base}/#organization` },
     areaServed: {
       '@type': 'AdministrativeArea',
       name: 'Utrecht',
