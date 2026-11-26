@@ -7,7 +7,7 @@ import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
 import { B2bConfirmCheckbox } from '@/components/B2bConfirmCheckbox'
 import { EmailConsentCheckbox } from '@/components/EmailConsentCheckbox'
-import { normalizeKvk } from '@/lib/b2bConfirmation'
+import { B2B_QUOTE_REQUIRED, normalizeKvk } from '@/lib/b2bConfirmation'
 import { publicString } from '@/lib/env'
 import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
 import { formAckSchema, readJsonResponse } from '@/lib/json'
@@ -247,6 +247,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
   const [status, setStatus] = useState<Status>('idle')
   const [trap, setTrap] = useState('')
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [quoteBlocked, setQuoteBlocked] = useState(false)
   const turnstileRef = useRef<TurnstileHandle | null>(null)
 
   const isPartner = audience === 'partner'
@@ -291,10 +292,15 @@ export function OfferteForm({ locale }: { locale: Locale }) {
   }
   const yn = (v: boolean) => (v ? c.yes : c.no)
   const quoteReady =
-    isPartner || (data.b2bConfirmed === true && normalizeKvk(data.kvkNummer) !== null)
+    isPartner || (data.b2bConfirmed && normalizeKvk(data.kvkNummer) !== null)
+  const showQuoteRequired = !isPartner && step === lastStep && (!quoteReady || quoteBlocked)
 
   async function submit() {
     if (status === 'submitting') return
+    if (!isPartner && !quoteReady) {
+      setQuoteBlocked(false)
+      return
+    }
     setStatus('submitting')
     const tokenToSend = turnstileToken
     setTurnstileToken(null)
@@ -338,9 +344,20 @@ export function OfferteForm({ locale }: { locale: Locale }) {
       })
       const parsed = formAckSchema.safeParse(await readJsonResponse(res, '[offerte] response was not JSON'))
       if (!parsed.success) logCaught('[offerte] response failed validation', parsed.error)
-      setStatus(res.ok && parsed.success && parsed.data.ok ? 'success' : 'error')
+      const accepted = res.ok && parsed.success && parsed.data.ok
+      if (accepted) {
+        setQuoteBlocked(false)
+        setStatus('success')
+      } else if (!isPartner && !res.ok) {
+        setQuoteBlocked(true)
+        setStatus('error')
+      } else {
+        setQuoteBlocked(false)
+        setStatus('error')
+      }
     } catch (err) {
       logCaught('[offerte] submit failed', err)
+      setQuoteBlocked(false)
       setStatus('error')
     } finally {
       turnstileRef.current?.reset()
@@ -602,7 +619,9 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             checked={data.emailConsent}
             onCheckedChange={(emailConsent) => { set('emailConsent', emailConsent); }}
           />
-          {status === 'error' && <p className="text-sm text-red-600">{c.error}</p>}
+          {status === 'error' && !showQuoteRequired && (
+            <p className="text-sm text-red-600">{c.error}</p>
+          )}
         </div>
       )}
 
@@ -620,6 +639,12 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             }}
           />
         </div>
+      )}
+
+      {showQuoteRequired && (
+        <p className="mt-4 text-sm text-ink" role="status">
+          {B2B_QUOTE_REQUIRED[locale]}
+        </p>
       )}
 
       {/* Navigation. Step 0 has no Next: choosing an audience advances it. */}
@@ -656,7 +681,6 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             }}
             disabled={
               status === 'submitting' ||
-              !quoteReady ||
               (Boolean(publicString(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)) && !turnstileToken)
             }
             className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"

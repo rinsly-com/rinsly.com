@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
+import { adminFieldOnly } from '@rinsly-com/site-core/access'
+
 import {
   B2B_CONFIRMATION_TEXT,
+  B2B_QUOTE_REQUIRED,
+  b2bConfirmationFields,
   b2bFromSubmission,
   normalizeKvk,
 } from '../../src/lib/b2bConfirmation'
@@ -10,18 +14,22 @@ const NOW = new Date('2026-11-26T15:59:00.000Z')
 const CLIENT_TIME = '1999-01-01T00:00:00.000Z'
 
 describe('normalizeKvk', () => {
-  it('keeps eight digits and strips spaces and dots', () => {
+  it('keeps eight digits and strips spaces, dots, and hyphens', () => {
     expect(normalizeKvk('12345678')).toBe('12345678')
     expect(normalizeKvk('1234 5678')).toBe('12345678')
     expect(normalizeKvk('1234.5678')).toBe('12345678')
-    expect(normalizeKvk('12 34.56 78')).toBe('12345678')
+    expect(normalizeKvk('1234-5678')).toBe('12345678')
+    expect(normalizeKvk('12 34.56-78')).toBe('12345678')
   })
 
-  it('rejects wrong length, letters, dashes, non-strings, and oversized raw input', () => {
+  it('rejects wrong length, letters, foreign numbers, non-strings, and oversized raw input', () => {
     expect(normalizeKvk('1234567')).toBeNull()
     expect(normalizeKvk('123456789')).toBeNull()
     expect(normalizeKvk('1234567a')).toBeNull()
-    expect(normalizeKvk('1234-5678')).toBeNull()
+    expect(normalizeKvk('HRB12345')).toBeNull()
+    expect(normalizeKvk('BE0123.456.789')).toBeNull()
+    expect(normalizeKvk('12#345678')).toBeNull()
+    expect(normalizeKvk('1234/5678')).toBeNull()
     expect(normalizeKvk('')).toBeNull()
     expect(normalizeKvk(12345678)).toBeNull()
     expect(normalizeKvk(`1234 5678${' '.repeat(20)}`)).toBeNull()
@@ -33,7 +41,7 @@ describe('b2bFromSubmission', () => {
     const stored = b2bFromSubmission(
       {
         b2bConfirmed: true,
-        kvkNummer: '1234.5678',
+        kvkNummer: '1234-5678',
         b2bConfirmedAt: CLIENT_TIME,
       },
       NOW,
@@ -47,6 +55,11 @@ describe('b2bFromSubmission', () => {
     expect(B2B_CONFIRMATION_TEXT.nl).toBe(
       'Ik handel in de uitoefening van een beroep of bedrijf. Rinsly contracteert alleen met zakelijke opdrachtgevers.',
     )
+    expect(B2B_CONFIRMATION_TEXT.en).toBe(
+      'I am acting in the course of a business or profession. Rinsly only contracts with business clients.',
+    )
+    expect(B2B_QUOTE_REQUIRED.nl).toContain('Vink de verklaring aan')
+    expect(B2B_QUOTE_REQUIRED.en).toContain('Tick the declaration')
   })
 
   it('rejects a missing checkbox and truthy values that are not boolean true', () => {
@@ -59,5 +72,17 @@ describe('b2bFromSubmission', () => {
   it('rejects a ticked box without a valid KvK number', () => {
     expect(b2bFromSubmission({ b2bConfirmed: true }, NOW)).toBeNull()
     expect(b2bFromSubmission({ b2bConfirmed: true, kvkNummer: '123' }, NOW)).toBeNull()
+  })
+})
+
+describe('b2b field access', () => {
+  it('uses adminFieldOnly for read and keeps updates closed', () => {
+    for (const field of b2bConfirmationFields()) {
+      expect(field.access?.read).toBe(adminFieldOnly)
+      expect(field.admin?.readOnly).toBe(true)
+      const update = field.access?.update
+      if (!update) throw new Error(`${field.name} is missing update access`)
+      expect(update({ req: { user: null } } as Parameters<typeof update>[0])).toBe(false)
+    }
   })
 })

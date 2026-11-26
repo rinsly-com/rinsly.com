@@ -3,17 +3,23 @@ import type { CheckboxField, DateField, FieldAccess, TextField } from 'payload'
 import { adminFieldOnly } from '@rinsly-com/site-core/access'
 
 /**
- * Exact checkbox label. The English sentence still needs Marketeer/Lawyer OK.
- * Dutch is the wording from Yaron's decision (26 Nov 2026).
+ * Exact checkbox label. Dutch is Yaron's wording (26 Nov 2026). English is the
+ * lawyer's sentence from the same day.
  */
 export const B2B_CONFIRMATION_TEXT = {
   nl: 'Ik handel in de uitoefening van een beroep of bedrijf. Rinsly contracteert alleen met zakelijke opdrachtgevers.',
-  en: 'I am acting in the course of a trade or business. Rinsly only contracts with business clients.',
+  en: 'I am acting in the course of a business or profession. Rinsly only contracts with business clients.',
+} as const
+
+/** Shown beside the quote submit button, and again when the server rejects the quote. */
+export const B2B_QUOTE_REQUIRED = {
+  nl: 'Rinsly contracteert alleen met zakelijke opdrachtgevers. Vink de verklaring aan en vul een geldig KvK-nummer (8 cijfers) in. Zonder die gegevens sturen we geen offerte.',
+  en: 'Rinsly only contracts with business clients. Tick the declaration and enter a valid Chamber of Commerce (KvK) number (8 digits). We cannot send a quote without that.',
 } as const
 
 export type B2bLocale = keyof typeof B2B_CONFIRMATION_TEXT
 
-/** Raw KvK input cap, before spaces and dots are removed. Eight digits with separators fit. */
+/** Raw KvK input cap, before spaces, dots, and hyphens are removed. Eight digits with separators fit. */
 export const KVK_RAW_MAX = 20
 
 export type StoredB2bConfirmation = {
@@ -25,14 +31,14 @@ export type StoredB2bConfirmation = {
 }
 
 /**
- * Eight digits after spaces and dots are removed. Anything else, including a
- * raw value longer than {@link KVK_RAW_MAX}, is rejected. Only strings are
- * accepted.
+ * Eight digits after spaces, dots, and hyphens are removed. Anything else,
+ * including a raw value longer than {@link KVK_RAW_MAX} and a foreign
+ * registration number, is rejected. Only strings are accepted.
  */
 export function normalizeKvk(value: unknown): string | null {
   if (typeof value !== 'string') return null
   if (value.length > KVK_RAW_MAX) return null
-  const digits = value.replace(/[ .]/g, '')
+  const digits = value.replace(/[-. ]/g, '')
   if (!/^\d{8}$/.test(digits)) return null
   return digits
 }
