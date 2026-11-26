@@ -39,11 +39,11 @@ const BANNED = [
 describe('local page Woerden/Utrecht: structure', () => {
   const layout = localLayoutSource()
 
-  it('is registered under the shared slug, noindex, and omitted from the sitemap until final copy', () => {
+  it('is registered under the shared slug, stays noindex, and is omitted from the sitemap until Yaron decides', () => {
     expect(LOCAL_PAGE_SLUG).toBe('website-laten-maken-woerden')
     expect(seed).toMatch(/LOCAL_PAGE_SLUG/)
     expect(seed).toMatch(/slug:\s*SLUG\.woerden/)
-    // Drop this slug from PLACEHOLDER_NOINDEX_SLUGS when Marketeer's final copy lands.
+    // noindex stays until Yaron decides; do not drop this slug from PLACEHOLDER_NOINDEX_SLUGS just because final copy has landed.
     expect(PLACEHOLDER_NOINDEX_SLUGS.has(LOCAL_PAGE_SLUG)).toBe(true)
     expect(SITEMAP_EXCLUDED_SLUGS.has(LOCAL_PAGE_SLUG)).toBe(true)
     expect(slugsForSitemap(['over', LOCAL_PAGE_SLUG])).not.toContain(LOCAL_PAGE_SLUG)

@@ -5,12 +5,12 @@
  * noindex,nofollow. The slug is shared across locales, so dropping these two
  * slugs removes exactly those four URLs.
  *
- * Placeholder slugs in PLACEHOLDER_NOINDEX_SLUGS are also omitted until
- * Marketeer's final copy lands. Remove a slug from that set in the same PR
- * that replaces the placeholders. The seed only writes meta.noindex for a page
- * row it creates; it never rewrites an existing page. For a page that already
- * exists, set meta.noindex to false through the content endpoint or in the
- * admin, or the page stays noindex while the sitemap lists it.
+ * Placeholder slugs in PLACEHOLDER_NOINDEX_SLUGS stay noindex and omitted
+ * from the sitemap until Yaron decides otherwise. The seed only writes
+ * meta.noindex for a page row it creates; it never rewrites an existing page.
+ * For a page that already exists, set meta.noindex to false through the
+ * content endpoint or in the admin, and remove the slug from this set, or
+ * the page stays noindex while the sitemap lists it.
  */
 export const PLACEHOLDER_NOINDEX_SLUGS = new Set(['cases', 'website-laten-maken-woerden'])
 
