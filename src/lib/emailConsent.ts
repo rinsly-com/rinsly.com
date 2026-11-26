@@ -1,4 +1,4 @@
-import type { CheckboxField, DateField, TextField } from 'payload'
+import type { CheckboxField, DateField, FieldAccess, TextField } from 'payload'
 
 /**
  * Exact checkbox label, per locale. The public forms render these strings and
@@ -34,6 +34,29 @@ export type StoredEmailConsent = {
  * anchor and must not treat `consentAt + 5 years` as the deletion date by
  * itself.
  */
+/**
+ * Admins may read the consent record. Editors do not. The columns stay
+ * read-only: update is closed, and the admin control is read-only.
+ * `authenticated` from site-core is true for every signed-in user, including
+ * editors, so it cannot hide these fields.
+ */
+export function userCanReadConsent(user: unknown): boolean {
+  if (typeof user !== 'object' || user === null || !('roles' in user)) return false
+  const { roles } = user
+  if (!Array.isArray(roles)) return false
+  for (const role of roles) {
+    if (role === 'admin') return true
+  }
+  return false
+}
+
+function consentAccess(): { read: FieldAccess; update: FieldAccess } {
+  return {
+    read: ({ req: { user } }) => userCanReadConsent(user),
+    update: () => false,
+  }
+}
+
 export function emailConsentFields(): [CheckboxField, DateField, TextField] {
   return [
     {
@@ -42,7 +65,7 @@ export function emailConsentFields(): [CheckboxField, DateField, TextField] {
       type: 'checkbox',
       defaultValue: false,
       admin: { readOnly: true },
-      access: { update: () => false },
+      access: consentAccess(),
     },
     {
       name: 'consentAt',
@@ -53,14 +76,14 @@ export function emailConsentFields(): [CheckboxField, DateField, TextField] {
         readOnly: true,
         date: { pickerAppearance: 'dayAndTime' },
       },
-      access: { update: () => false },
+      access: consentAccess(),
     },
     {
       name: 'consentText',
       label: { en: 'Consent text', nl: 'Toestemmingstekst' },
       type: 'text',
       admin: { readOnly: true },
-      access: { update: () => false },
+      access: consentAccess(),
     },
   ]
 }

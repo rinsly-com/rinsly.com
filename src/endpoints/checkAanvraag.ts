@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { getRuntime } from '../lib/bindings'
 import { consentNotice, emailConsentFromSubmission } from '../lib/emailConsent'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
+import { checkAanvraagFieldsTooLong } from '../lib/submissionLimits'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -57,9 +58,15 @@ export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) 
     return json({ ok: true })
   }
 
-  const url = normalizeUrl(body.url)
+  const urlInput = body.url
   const naam = body.naam
   const telefoon = body.telefoon
+
+  if (checkAanvraagFieldsTooLong({ url: urlInput, naam, telefoon })) {
+    return json({ ok: false, error: 'validation' }, 422)
+  }
+
+  const url = normalizeUrl(urlInput)
 
   if (!url || !naam || !isPhone(telefoon)) {
     return json({ ok: false, error: 'validation' }, 422)

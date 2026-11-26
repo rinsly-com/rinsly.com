@@ -34,8 +34,8 @@ export function EmailConsentCheckbox({
           name="emailConsent"
           nativeButton
           checked={checked}
-          onCheckedChange={(value) => {
-            onCheckedChange(value === true)
+          onCheckedChange={(value: boolean) => {
+            onCheckedChange(value)
           }}
           render={<button type="button" />}
           className={[
