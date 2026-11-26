@@ -27,7 +27,7 @@ describe('slugsForSitemap', () => {
     const slugs = slugsForSitemap(LIVE_SITEMAP_SLUGS)
     const paths = localePaths(slugs)
 
-    expect(SITEMAP_EXCLUDED_SLUGS).toEqual(new Set(['privacy', 'voorwaarden']))
+    expect(SITEMAP_EXCLUDED_SLUGS).toEqual(new Set(['privacy', 'voorwaarden', 'cases']))
     expect(paths).toEqual(
       expect.not.arrayContaining([
         '/nl/voorwaarden',
