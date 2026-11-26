@@ -89,6 +89,7 @@ const SLUG = {
   partner: 'partnerprogramma',
   platform: 'platform',
   prijzen: 'prijzen',
+  cases: 'cases',
   website: 'website',
   over: 'over',
   contact: 'contact',
@@ -1143,6 +1144,108 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
   ),
 ]
 
+/* ------------------------------- /cases ------------------------------------ */
+/* Yaron 26 Nov 15:59: a cases page is OK for burojazz.nl and Up2Brand. Before */
+/* this page existed /nl/cases answered 404. Structure by Builder. ALL COPY    */
+/* BELOW IS PLACEHOLDER: Marketeer writes the final text (then Lawyer). No     */
+/* quotes, numbers or results are attributed to a client. Slots:               */
+/* ~/Rinsly/marketing/copy-slots-cases.md                                      */
+/* IMAGE SLOT: no block in the CMS takes a picture yet (needs a new block +    */
+/* migration, so Yaron decides). Until then each case has a "Beeld" card with  */
+/* a placeholder line where the screenshot goes.                               */
+
+const caseBlocks = (
+  locale: Locale,
+  c: { anchor: string; client: string; url: string; host: string },
+): Block[] => [
+  {
+    blockType: 'services',
+    anchor: c.anchor,
+    header: {
+      eyebrow: t(locale, `[Concept] Case ${c.client}`, `[Draft] Case ${c.client}`),
+      title: t(
+        locale,
+        `${c.client}: titel volgt van Marketeer`,
+        `${c.client}: title to follow from Marketeer`,
+      ),
+      intro: t(
+        locale,
+        'Korte inleiding op deze case volgt van Marketeer.',
+        'A short introduction to this case follows from Marketeer.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconUsers',
+        title: t(locale, 'Klant', 'Client'),
+        description: t(
+          locale,
+          `${c.client}. Omschrijving van de klant volgt.`,
+          `${c.client}. Description of the client follows.`,
+        ),
+      },
+      {
+        icon: 'IconCode',
+        title: t(locale, 'Wat we bouwden', 'What we built'),
+        description: t(
+          locale,
+          'Omschrijving van wat Rinsly voor deze klant bouwde volgt van Marketeer.',
+          'A description of what Rinsly built for this client follows from Marketeer.',
+        ),
+      },
+      {
+        icon: 'IconBrush',
+        title: t(locale, 'Beeld', 'Image'),
+        description: t(
+          locale,
+          'IMAGE SLOT: hier komt een screenshot van de website.',
+          'IMAGE SLOT: a screenshot of the website goes here.',
+        ),
+      },
+    ],
+  },
+  {
+    blockType: 'cta',
+    eyebrow: t(locale, '[Concept] Bekijk de site', '[Draft] See the site'),
+    title: t(locale, `Bekijk ${c.host}`, `Visit ${c.host}`),
+    text: t(
+      locale,
+      'Tekst bij de link volgt van Marketeer.',
+      'Text for the link follows from Marketeer.',
+    ),
+    button: externalLink(t(locale, `Naar ${c.host}`, `Go to ${c.host}`), c.url, {
+      variant: 'secondary',
+      newTab: true,
+    }),
+  },
+]
+
+const casesLayout = (locale: Locale, ids: PageIds): Block[] => [
+  pageHero(
+    'quiet',
+    t(locale, '[Concept] Cases', '[Draft] Cases'),
+    t(locale, 'Websites die we bouwden en hosten', 'Websites we built and host'),
+    t(
+      locale,
+      'Twee voorbeelden van een ontwerp dat als website live ging. Introductie volgt van Marketeer.',
+      'Two examples of a design that went live as a website. Introduction follows from Marketeer.',
+    ),
+  ),
+  ...caseBlocks(locale, { anchor: 'burojazz', client: 'Burojazz', url: 'https://burojazz.nl', host: 'burojazz.nl' }),
+  ...caseBlocks(locale, { anchor: 'up2brand', client: 'Up2Brand', url: 'https://up2brand.com', host: 'up2brand.com' }),
+  cta(
+    locale,
+    ids,
+    t(locale, '[Concept] Contact', '[Draft] Contact'),
+    t(locale, 'Een ontwerp dat live moet?', 'A design that needs to go live?'),
+    t(
+      locale,
+      'Stuur een bericht en we kijken samen naar jouw ontwerp.',
+      'Send a message and we look at your design together.',
+    ),
+  ),
+]
+
 /* --------------------------------- /over ---------------------------------- */
 
 const overLayout = (locale: Locale, ids: PageIds): Block[] => [
@@ -1707,6 +1810,7 @@ async function run() {
       title: (l) => t(l, 'Website bij Rinsly', 'A website from Rinsly'),
       layout: websiteLayout,
     },
+    { slug: SLUG.cases, title: (l) => t(l, 'Cases', 'Cases'), layout: casesLayout },
     { slug: SLUG.over, title: (l) => t(l, 'Over ons', 'About'), layout: overLayout },
     { slug: SLUG.contact, title: () => 'Contact', layout: (l) => contactLayout(l) },
     // The legal pages carry no internal links, but they ride along so that one
