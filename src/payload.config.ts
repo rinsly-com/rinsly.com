@@ -36,6 +36,15 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
  */
 export default buildSiteConfig({
   siteConfig,
+  // POST /api/rinsly/content (site-core 0.26+). Adds the content-audit and
+  // content-replay collections (migration 20261127_content_endpoint). Only the
+  // accp Worker runs Payload; the prod static export has no runtime and no D1,
+  // so prod never serves the route. On accp it answers 404 until
+  // RINSLY_CONTENT_ENABLED is set on the rinsly-accp Worker (never set by
+  // `rinsly content setup`), and stays closed without Access
+  // (RINSLY_ACCESS_AUD / RINSLY_ACCESS_TEAM_DOMAIN secrets) and the
+  // RINSLY_CONTENT_RATE_LIMITER binding. The allowlist is empty (deny all).
+  contentEndpoint: true,
   // Accp origin for auth mails (forgot-password links). Not the static public URL.
   serverURL: readServerEnv().PAYLOAD_SERVER_URL || 'https://accp.rinsly.com',
   // Transactional mail (auth mails + submission notifications) as
