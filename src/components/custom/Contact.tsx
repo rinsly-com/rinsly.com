@@ -3,6 +3,7 @@ import type { Locale } from '@rinsly-com/site-core'
 import { Section, SectionHeading, Buttons, Icon, type LinkFields } from '@rinsly-com/site-core/ui'
 
 import { OfferteForm } from '@/components/OfferteForm'
+import { isKvkCollectionEnabled } from '@/lib/b2bConfirmation'
 
 /**
  * Rinsly's custom `contact` renderer — the engine's core contact block shows
@@ -79,7 +80,7 @@ export function Contact({ header, items, buttons, locale }: Props) {
           ) : null}
         </div>
 
-        <OfferteForm locale={locale} />
+        <OfferteForm locale={locale} kvkCollectionEnabled={isKvkCollectionEnabled()} />
       </div>
     </Section>
   )

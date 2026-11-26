@@ -2,6 +2,8 @@ import type { CheckboxField, DateField, FieldAccess, TextField } from 'payload'
 
 import { adminFieldOnly } from '@rinsly-com/site-core/access'
 
+import { readServerEnv } from './env'
+
 /**
  * Exact checkbox label. Dutch is Yaron's wording (26 Nov 2026). English is the
  * lawyer's sentence from the same day.
@@ -11,48 +13,107 @@ export const B2B_CONFIRMATION_TEXT = {
   en: 'I am acting in the course of a business or profession. Rinsly only contracts with business clients.',
 } as const
 
-/** Shown beside the quote submit button, and again when the server rejects the quote. */
+/**
+ * Shown beside the quote submit button, and again when the server rejects the
+ * quote, while KvK collection is off.
+ */
 export const B2B_QUOTE_REQUIRED = {
-  nl: 'Rinsly contracteert alleen met zakelijke opdrachtgevers. Vink de verklaring aan en vul een geldig KvK-nummer (8 cijfers) in. Zonder die gegevens sturen we geen offerte.',
-  en: 'Rinsly only contracts with business clients. Tick the declaration and enter a valid Chamber of Commerce (KvK) number (8 digits). We cannot send a quote without that.',
+  nl: 'Rinsly contracteert alleen met zakelijke opdrachtgevers. Vink de verklaring aan. Zonder die verklaring sturen we geen offerte.',
+  en: 'Rinsly only contracts with business clients. Tick the declaration. We cannot send a quote without it.',
+} as const
+
+/**
+ * Same notice when KvK collection is on. Lawyer's earlier line, with the
+ * 8-digit wording replaced by the registration-number phrase.
+ */
+export const B2B_QUOTE_REQUIRED_WITH_KVK = {
+  nl: 'Rinsly contracteert alleen met zakelijke opdrachtgevers. Vink de verklaring aan en vul een geldig KvK-nummer of buitenlands registratienummer in. Zonder die gegevens sturen we geen offerte.',
+  en: 'Rinsly only contracts with business clients. Tick the declaration and enter a valid Chamber of Commerce (KvK) or foreign registration number. We cannot send a quote without that.',
+} as const
+
+export const KVK_FIELD_LABEL = {
+  nl: 'KvK-nummer of buitenlands registratienummer',
+  en: 'Chamber of Commerce (KvK) or foreign registration number',
 } as const
 
 export type B2bLocale = keyof typeof B2B_CONFIRMATION_TEXT
 
-/** Raw KvK input cap, before spaces, dots, and hyphens are removed. Eight digits with separators fit. */
+export function b2bQuoteRequiredText(locale: B2bLocale, collectKvk: boolean): string {
+  return collectKvk ? B2B_QUOTE_REQUIRED_WITH_KVK[locale] : B2B_QUOTE_REQUIRED[locale]
+}
+
+/** Non-secret wrangler / process env flag. Default off. */
+export const KVK_COLLECTION_FLAG = 'RINSLY_KVK_COLLECTION_ENABLED'
+
+/**
+ * Collection is on only for `1`, `true`, or `yes` (any case, surrounding
+ * space ignored). Anything else, including unset, is off.
+ */
+export function isKvkCollectionEnabled(raw?: string): boolean {
+  const source =
+    raw !== undefined ? raw : (readServerEnv().RINSLY_KVK_COLLECTION_ENABLED ?? '')
+  const value = source.trim().toLowerCase()
+  return value === '1' || value === 'true' || value === 'yes'
+}
+
+/** Raw registration-number cap, before separators or control characters are removed. */
 export const KVK_RAW_MAX = 20
 
 export type StoredB2bConfirmation = {
   b2bConfirmed: true
   /** Server clock, ISO-8601. Never a client-supplied time. */
   b2bConfirmedAt: string
-  /** Eight digits, spaces and dots removed. */
-  kvkNummer: string
+  /** Dutch KvK: 8 digits after spaces, dots, and hyphens are stripped. Or a normalised foreign registration number. Omitted when collection is off. */
+  kvkNummer?: string
 }
 
 /**
- * Eight digits after spaces, dots, and hyphens are removed. Anything else,
- * including a raw value longer than {@link KVK_RAW_MAX} and a foreign
- * registration number, is rejected. Only strings are accepted.
+ * C0 (U+0000–001F), DEL and the rest of C1 (U+007F–009F), plus U+2028/2029.
+ * Broader than the mail-field strip, which leaves most C1 intact.
+ */
+const REGISTRATION_CONTROLS = /[\u0000-\u001F\u007F-\u009F\u2028\u2029]/gu
+
+/**
+ * A Dutch KvK (exactly 8 digits after spaces, dots, and hyphens are stripped)
+ * or a foreign business registration number: trimmed, 4–20 characters of
+ * ASCII letters, digits, and space . - / only, with at least one digit.
+ * Unicode dashes, digits, and NBSP are rejected. All C0 and C1 control
+ * characters, plus U+2028/2029, are stripped after the raw length cap.
+ * Only strings are accepted.
  */
 export function normalizeKvk(value: unknown): string | null {
   if (typeof value !== 'string') return null
   if (value.length > KVK_RAW_MAX) return null
-  const digits = value.replace(/[-. ]/g, '')
-  if (!/^\d{8}$/.test(digits)) return null
-  return digits
+  const cleaned = value.replace(REGISTRATION_CONTROLS, '')
+
+  const dutch = cleaned.replace(/[-. ]/g, '')
+  if (/^[0-9]{8}$/.test(dutch)) return dutch
+
+  const foreign = cleaned.trim()
+  if (foreign.length < 4 || foreign.length > KVK_RAW_MAX) return null
+  if (!/^[A-Za-z0-9 .\-\/]+$/.test(foreign)) return null
+  if (!/[0-9]/.test(foreign)) return null
+  return foreign
 }
 
 /**
- * A quote may be stored only when `b2bConfirmed` is boolean `true` and the KvK
- * number normalizes. `"true"`, `1`, and other truthy values are rejected.
- * `b2bConfirmedAt` on the body is ignored.
+ * A quote may be stored only when `b2bConfirmed` is boolean `true`. When
+ * `collectKvk` is on, the registration number must also normalize. `"true"`,
+ * `1`, and other truthy values are rejected. `b2bConfirmedAt` on the body is
+ * ignored. Submitted registration numbers are ignored when collection is off.
  */
 export function b2bFromSubmission(
   body: Record<string, unknown>,
   now: Date = new Date(),
+  options: { collectKvk?: boolean } = {},
 ): StoredB2bConfirmation | null {
   if (body.b2bConfirmed !== true) return null
+  if (!options.collectKvk) {
+    return {
+      b2bConfirmed: true,
+      b2bConfirmedAt: now.toISOString(),
+    }
+  }
   const kvkNummer = normalizeKvk(body.kvkNummer)
   if (kvkNummer === null) return null
   return {
@@ -91,7 +152,7 @@ export function b2bConfirmationFields(): [CheckboxField, DateField, TextField] {
     },
     {
       name: 'kvkNummer',
-      label: { en: 'KvK number', nl: 'KvK-nummer' },
+      label: { en: KVK_FIELD_LABEL.en, nl: KVK_FIELD_LABEL.nl },
       type: 'text',
       admin: { readOnly: true },
       access: b2bAccess(),
