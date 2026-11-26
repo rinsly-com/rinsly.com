@@ -3,14 +3,13 @@ import type { Locale } from '@rinsly-com/site-core'
 import { Section, SectionHeading, Buttons, Icon, type LinkFields } from '@rinsly-com/site-core/ui'
 
 import { OfferteForm } from '@/components/OfferteForm'
-
 /**
  * Rinsly's custom `contact` renderer — the engine's core contact block shows
  * details only; here we override it (via `extraRenderers`) to add the quote-
  * request wizard (OfferteForm) on the right, matching the original layout.
  */
 type ContactBlock = Extract<NonNullable<Page['layout']>[number], { blockType: 'contact' }>
-type Props = ContactBlock & { locale: Locale }
+type Props = ContactBlock & { locale: Locale; kvkCollectionEnabled?: boolean }
 
 type Item = NonNullable<Props['items']>[number]
 
@@ -27,7 +26,7 @@ function hrefFor(item: Item): string | undefined {
   return undefined
 }
 
-export function Contact({ header, items, buttons, locale }: Props) {
+export function Contact({ header, items, buttons, locale, kvkCollectionEnabled = false }: Props) {
   return (
     <Section className="py-16 sm:py-20">
       <div className="grid gap-10 lg:grid-cols-2">
@@ -79,7 +78,7 @@ export function Contact({ header, items, buttons, locale }: Props) {
           ) : null}
         </div>
 
-        <OfferteForm locale={locale} />
+        <OfferteForm locale={locale} kvkCollectionEnabled={kvkCollectionEnabled} />
       </div>
     </Section>
   )

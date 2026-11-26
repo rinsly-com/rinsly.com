@@ -20,6 +20,7 @@ declare namespace NodeJS {
     PAYLOAD_SERVER_URL?: string
     PLAYWRIGHT_BASE_URL?: string
     PSI_API_KEY?: string
+    RINSLY_KVK_COLLECTION_ENABLED?: string
     RESET_EMAIL?: string
     RESET_PASSWORD?: string
     SEED_ADMIN_EMAIL?: string

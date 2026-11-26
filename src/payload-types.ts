@@ -692,6 +692,12 @@ export interface Offerte {
   additions?: ('localization' | 'email' | 'design' | 'seo' | 'content' | 'other')[] | null;
   additionsOther?: string | null;
   bericht?: string | null;
+  consentGiven?: boolean | null;
+  consentAt?: string | null;
+  consentText?: string | null;
+  b2bConfirmed?: boolean | null;
+  b2bConfirmedAt?: string | null;
+  kvkNummer?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1202,6 +1208,12 @@ export interface OffertesSelect<T extends boolean = true> {
   additions?: T;
   additionsOther?: T;
   bericht?: T;
+  consentGiven?: T;
+  consentAt?: T;
+  consentText?: T;
+  b2bConfirmed?: T;
+  b2bConfirmedAt?: T;
+  kvkNummer?: T;
   updatedAt?: T;
   createdAt?: T;
 }
