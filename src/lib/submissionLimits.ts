@@ -7,10 +7,10 @@ export const SHORT_TEXT_MAX = 200
 export const FREE_TEXT_MAX = 4000
 
 /**
- * C0 controls, DEL, and the Unicode line/paragraph separators. Stripping these
- * keeps a value on one mail-header line.
+ * C0 controls, DEL, NEL (U+0085), and the Unicode line/paragraph separators.
+ * Stripping these keeps a value on one mail-header line.
  */
-const CONTROL_CHARS = /[\u0000-\u001F\u007F\u2028\u2029]/gu
+const CONTROL_CHARS = /[\u0000-\u001F\u007F\u0085\u2028\u2029]/gu
 
 export function stripControlChars(value: string): string {
   return value.replace(CONTROL_CHARS, '')
@@ -19,6 +19,11 @@ export function stripControlChars(value: string): string {
 /** Subject for the internal offerte mail. Control characters never reach the header. */
 export function offerteMailSubject(bedrijf: string): string {
   return `Nieuwe offerteaanvraag: ${stripControlChars(bedrijf)}`
+}
+
+/** Subject for the internal website-check mail. The URL is stripped the same way. */
+export function checkMailSubject(url: string): string {
+  return `Nieuwe websitecheck-aanvraag: ${stripControlChars(url)}`
 }
 
 export function exceedsMax(value: string, max: number): boolean {

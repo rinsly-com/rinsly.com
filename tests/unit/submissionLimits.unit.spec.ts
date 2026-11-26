@@ -4,6 +4,7 @@ import {
   FREE_TEXT_MAX,
   SHORT_TEXT_MAX,
   checkAanvraagFieldsTooLong,
+  checkMailSubject,
   offerteFieldsTooLong,
   offerteMailSubject,
   offerteNotificationText,
@@ -27,13 +28,22 @@ const check = {
   telefoon: '0612345678',
 }
 
-describe('offerteMailSubject', () => {
-  it('strips CR, LF, and other control characters before they reach the subject', () => {
-    const subject = offerteMailSubject('Acme\r\nBcc: evil@example.com\u0000\u0007\u007f\u2028')
-
-    expect(subject).toBe('Nieuwe offerteaanvraag: AcmeBcc: evil@example.com')
-    expect(subject).not.toMatch(/[\u0000-\u001F\u007F\u2028\u2029]/)
+describe('stripControlChars', () => {
+  it('removes CR, LF, NEL, and the Unicode line separators', () => {
+    expect(stripControlChars('a\r\nb\u2028c\u2029d\u0085e')).toBe('abcde')
     expect(stripControlChars('ok')).toBe('ok')
+  })
+})
+
+describe('mail subjects', () => {
+  it('strips control characters, including NEL, before they reach a subject', () => {
+    const quoteSubject = offerteMailSubject('Acme\r\nBcc: evil@example.com\u0000\u0007\u007f\u2028\u0085')
+    const checkSubject = checkMailSubject('https://example.nl/\r\nBcc: evil@example.com\u0085\u2029')
+
+    expect(quoteSubject).toBe('Nieuwe offerteaanvraag: AcmeBcc: evil@example.com')
+    expect(checkSubject).toBe('Nieuwe websitecheck-aanvraag: https://example.nl/Bcc: evil@example.com')
+    expect(quoteSubject).not.toMatch(/[\u0000-\u001F\u007F\u0085\u2028\u2029]/)
+    expect(checkSubject).not.toMatch(/[\u0000-\u001F\u007F\u0085\u2028\u2029]/)
   })
 })
 

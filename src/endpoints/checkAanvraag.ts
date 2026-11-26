@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { getRuntime } from '../lib/bindings'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
-import { checkAanvraagFieldsTooLong, checkNotificationText } from '../lib/submissionLimits'
+import { checkAanvraagFieldsTooLong, checkMailSubject, checkNotificationText } from '../lib/submissionLimits'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -91,7 +91,7 @@ export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) 
     req.payload
       .sendEmail({
         to: 'contact@rinsly.com',
-        subject: `Nieuwe websitecheck-aanvraag: ${url}`,
+        subject: checkMailSubject(url),
         text: checkNotificationText({ url, naam, telefoon }),
       })
       .catch((err: unknown) => {
