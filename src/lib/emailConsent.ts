@@ -1,19 +1,38 @@
 import type { CheckboxField, DateField, FieldAccess, TextField } from 'payload'
 
+import { adminFieldOnly } from '@rinsly-com/site-core/access'
+
 /**
  * Exact checkbox label, per locale. The public forms render these strings and
  * the server stores the same constant. Do not accept a consent sentence from
  * the client.
  *
- * The English sentence still needs Marketeer/Legal OK. Dutch is the approved
- * label from the board item (26 Nov 2026).
+ * The English sentences are the lawyer's wording from the 26 Nov 2026 review.
  */
 export const EMAIL_CONSENT_TEXT = {
-  nl: 'Ja, Rinsly mag mij hierover e-mailen',
-  en: 'Yes, Rinsly may email me about this',
+  nl: 'Ja, ik wil ook e-mails van Rinsly ontvangen over jullie diensten en het partnerprogramma. Dit is niet nodig om de offerte te ontvangen.',
+  en: 'Yes, I would also like Rinsly to e-mail me about your services and partner programme. This is not needed to receive the quote.',
 } as const
 
 export type EmailConsentLocale = keyof typeof EMAIL_CONSENT_TEXT
+
+/** Shown under the checkbox. Not stored. The link word is the privacy policy. */
+export const EMAIL_CONSENT_WITHDRAWAL = {
+  nl: {
+    before:
+      'U kunt deze toestemming te allen tijde intrekken via contact@rinsly.com of via de afmeldlink in de e-mail. Meer informatie staat in onze ',
+    link: 'privacyverklaring',
+    href: '/nl/privacy',
+    after: '.',
+  },
+  en: {
+    before:
+      'You can withdraw this consent at any time by e-mailing contact@rinsly.com or using the unsubscribe link in the e-mail. More information is in our ',
+    link: 'privacy policy',
+    href: '/en/privacy',
+    after: '.',
+  },
+} as const
 
 export type StoredEmailConsent = {
   consentGiven: boolean
@@ -24,7 +43,8 @@ export type StoredEmailConsent = {
 }
 
 /**
- * Consent columns for `check-aanvragen` and `offertes`.
+ * Consent columns for `offertes` only. The website-check form has no email
+ * address, so it does not ask for or store this consent.
  *
  * Retention: keep `consentGiven`, `consentAt` and `consentText` for 5 years
  * after the last email sent about that submission, then a later cleanup job
@@ -35,24 +55,12 @@ export type StoredEmailConsent = {
  * itself.
  */
 /**
- * Admins may read the consent record. Editors do not. The columns stay
- * read-only: update is closed, and the admin control is read-only.
- * `authenticated` from site-core is true for every signed-in user, including
- * editors, so it cannot hide these fields.
+ * Admins may read the consent record (`adminFieldOnly`). Editors do not.
+ * Update stays closed, and the admin control is read-only.
  */
-export function userCanReadConsent(user: unknown): boolean {
-  if (typeof user !== 'object' || user === null || !('roles' in user)) return false
-  const { roles } = user
-  if (!Array.isArray(roles)) return false
-  for (const role of roles) {
-    if (role === 'admin') return true
-  }
-  return false
-}
-
 function consentAccess(): { read: FieldAccess; update: FieldAccess } {
   return {
-    read: ({ req: { user } }) => userCanReadConsent(user),
+    read: adminFieldOnly,
     update: () => false,
   }
 }

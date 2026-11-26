@@ -2,9 +2,9 @@ import type { PayloadHandler, PayloadRequest } from 'payload'
 import { z } from 'zod'
 
 import { getRuntime } from '../lib/bindings'
-import { consentNotice, emailConsentFromSubmission } from '../lib/emailConsent'
+import { emailConsentFromSubmission } from '../lib/emailConsent'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
-import { offerteFieldsTooLong, offerteMailSubject } from '../lib/submissionLimits'
+import { offerteFieldsTooLong, offerteMailSubject, offerteNotificationText } from '../lib/submissionLimits'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const SUBSCRIPTIONS = ['care', 'beheerd', 'partner', 'opmaat'] as const
@@ -97,7 +97,14 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
       .sendEmail({
         to: 'contact@rinsly.com',
         subject: offerteMailSubject(bedrijf),
-        text: `Er is een nieuwe offerteaanvraag binnengekomen via de contactwizard.\n\nBedrijf: ${bedrijf}\nNaam: ${naam}\nE-mail: ${email}\nAbonnement: ${chosen.data}\n${bericht ? `\nBericht:\n${bericht}\n` : ''}\n${consentNotice(consent)}\nDe aanvraag staat ook in het admin-panel onder Offerteaanvragen.`,
+        text: offerteNotificationText({
+          bedrijf,
+          naam,
+          email,
+          subscription: chosen.data,
+          bericht,
+          consent,
+        }),
       })
       .catch((err: unknown) => {
         req.payload.logger.error({
