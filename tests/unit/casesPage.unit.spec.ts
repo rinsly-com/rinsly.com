@@ -47,7 +47,7 @@ describe('cases page', () => {
     expect(slugsForSitemap(['over', 'cases'])).toContain('over')
     expect(seed).toMatch(/PLACEHOLDER_NOINDEX_SLUGS/)
     expect(seed).toMatch(/noindex:\s*true/)
-    // A later seed must write false. Omitting the field leaves the stored true.
+    // The helper writes false for indexable slugs, but only when the seed creates the page row.
     expect(seed).toMatch(/noindex:\s*false/)
   })
 

@@ -51,7 +51,7 @@ describe('local page Woerden/Utrecht: structure', () => {
     expect(seed).toMatch(/PLACEHOLDER_NOINDEX_SLUGS/)
     expect(seed).toMatch(/placeholderNoindexMeta/)
     expect(seed).toMatch(/noindex:\s*true/)
-    // A later seed must write false. Omitting the field leaves the stored true.
+    // The helper writes false for indexable slugs, but only when the seed creates the page row.
     expect(seed).toMatch(/noindex:\s*false/)
     expect(seed).toMatch(/SITEMAP_EXCLUDED_SLUGS\.has\(slug\)/)
     const metaStart = seed.indexOf('const localWoerdenMeta')

@@ -16,10 +16,35 @@
  *
  * Run with:  pnpm seed        (= payload run scripts/seed.ts)
  *
- * Idempotent: re-running rebuilds the home page + globals, deletes any stray
- * non-home pages, and re-publishes. On a fresh DB an admin is created from
- * SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD, falling back to the dev credentials
- * dev@rinsly.local / rinsly-dev — set the env vars when seeding a remote DB.
+ * Bootstrap only (DF1, 26 Nov 2026). accp D1 is the source of truth for the copy:
+ * Marketeer edits it through the content endpoint and the editor. This seed
+ * creates pages that do not exist yet, finishes an incomplete stub (a title-only
+ * draft, a published locale with no layout blocks and no editor draft, a
+ * header/footer locale that was never saved), and never rewrites a locale that
+ * already has content (see scripts/seedLock.ts). A never-published draft that
+ * already has layout is treated as editor-owned: it is kept, not published or
+ * overwritten. Finishing a missing locale on an already-published page writes
+ * that locale onto the published version (locale + _status) and does not
+ * publish the document, so another locale's unpublished draft stays
+ * unpublished and onContentPublished does not fire for that draft. Changing
+ * copy below therefore does NOT change an existing finished page. A
+ * seed-accp, SEED_TARGET=accp, or NODE_ENV=production run is refused once
+ * RINSLY_HANDED_OVER is 1/true/yes. The flag is default-open by design
+ * (unset/empty/0/false/no); any other value fails closed before any database
+ * access, including on a local seed. In production the seed also skips
+ * orphan-version repair and oldest-user admin promotion.
+ *
+ * noindex: the placeholder-noindex helper is applied only to a page row created
+ * by this run. A seed rerun never flips meta.noindex on an existing page; for
+ * /cases and the Woerden page, dropping noindex goes through the content
+ * endpoint or the admin.
+ *
+ * Known limit: a deleted page is recreated with a new id; kept pages' header
+ * and in-page links to it are not relinked (see seedLock.ts).
+ *
+ * On a fresh DB an admin is created from SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD,
+ * falling back to the dev credentials dev@rinsly.local / rinsly-dev. To rebuild
+ * a LOCAL database from this file, delete it and seed again.
  */
 import { getPayload } from 'payload'
 import { sql } from '@payloadcms/db-d1-sqlite'
@@ -30,6 +55,15 @@ import { logCaught } from '../src/lib/logCaught'
 import { LOCAL_PAGE_SLUG } from '../src/lib/localPageJsonLd'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
 import { idRowSchema, userRowSchema } from '../src/lib/rows'
+import {
+  beginSeed,
+  globalIsUnseeded,
+  pageSeedPlan,
+  recreateLinkWarning,
+  unrelinkedPaths,
+  type GlobalLinks,
+  type PageSeedAction,
+} from './seedLock'
 import { PLACEHOLDER_NOINDEX_SLUGS, SITEMAP_EXCLUDED_SLUGS } from '../src/lib/sitemapSlugs'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
@@ -1931,9 +1965,11 @@ async function repairOrphanedVersions(payload: PayloadInstance) {
   }
 }
 
+// beginSeed() is the first statement in run(): no getPayload, repair, or writes before it.
 async function run() {
+  const { production } = beginSeed()
   const payload = await getPayload({ config })
-  await repairOrphanedVersions(payload)
+  if (!production) await repairOrphanedVersions(payload)
 
   // Admin user
   const users = await payload.find({ collection: 'users', limit: 1, sort: 'createdAt' })
@@ -1951,7 +1987,7 @@ async function run() {
       data: { email, password, roles: ['admin'] },
     })
     console.log(`Created admin ${email}`)
-  } else if (!user.roles.includes('admin')) {
+  } else if (!production && !user.roles.includes('admin')) {
     user = await payload.update({
       collection: 'users',
       id: user.id,
@@ -2007,6 +2043,20 @@ async function run() {
 
   // Pass 1 — make sure every page row exists, and collect slug → id.
   const ids: PageIds = {}
+  const created = new Set<string>()
+  const finish = new Map<string, PageSeedAction>()
+  const readPageLocale = async (pageId: number, locale: Locale, draft: boolean) => {
+    const found = await payload.find({
+      collection: 'pages',
+      where: { id: { equals: pageId } },
+      locale,
+      fallbackLocale: false,
+      draft,
+      limit: 1,
+      depth: 0,
+    })
+    return found.docs[0] as { layout?: unknown; _status?: unknown; updatedAt?: unknown } | undefined
+  }
   for (const page of sitePages) {
     const existing = await payload.find({
       collection: 'pages',
@@ -2020,7 +2070,7 @@ async function run() {
     if (stored && !stored.success) throw new Error(`seed: page row ${page.slug} failed validation`)
     let pageId = stored?.success ? stored.data.id : undefined
     if (pageId === undefined) {
-      const created = idRowSchema.safeParse(
+      const createdRow = idRowSchema.safeParse(
         await payload.create({
           collection: 'pages',
           draft: true,
@@ -2029,10 +2079,21 @@ async function run() {
           user,
         }),
       )
-      if (!created.success) throw new Error(`seed: created page ${page.slug} failed validation`)
-      pageId = created.data.id
+      if (!createdRow.success) throw new Error(`seed: created page ${page.slug} failed validation`)
+      pageId = createdRow.data.id
+      created.add(page.slug)
     }
     ids[page.slug] = pageId
+    const published = {
+      nl: await readPageLocale(pageId, 'nl', false),
+      en: await readPageLocale(pageId, 'en', false),
+    }
+    const drafts = {
+      nl: await readPageLocale(pageId, 'nl', true),
+      en: await readPageLocale(pageId, 'en', true),
+    }
+    const plan = pageSeedPlan(created.has(page.slug), published, drafts)
+    finish.set(page.slug, plan)
   }
 
   const idFor = (slug: string): number => {
@@ -2041,44 +2102,114 @@ async function run() {
     return id
   }
 
-  // Pass 2 — write both locales' layouts, then publish.
+  // Pass 2 — write only the locales that still have no layout, publishing
+  // each one with locale + _status (publishSpecificLocale, publishAllLocales:
+  // false). Never publish the document without a locale: `_status` is
+  // document-level, and that would promote another locale's unpublished draft
+  // and fire onContentPublished for it. A locale that already has blocks, or
+  // an editor-owned draft, is left alone (copy lives in D1).
   for (const page of sitePages) {
-    for (const locale of ['nl', 'en'] as Locale[]) {
+    const plan = finish.get(page.slug)
+    const path = `/${page.slug === SLUG.home ? '' : page.slug}`
+    if (!plan || plan.action === 'keep') {
+      console.log(`Kept ${path} (${plan?.reason ?? 'exists; copy lives in D1'})`)
+      continue
+    }
+    const pageId = idFor(page.slug)
+    const writeLocales = (['nl', 'en'] as const).filter((locale) => plan.locales[locale])
+    for (const locale of writeLocales) {
       await payload.update({
         collection: 'pages',
-        id: idFor(page.slug),
-        draft: true,
+        id: pageId,
         locale,
+        draft: false,
+        // Without this, Payload treats a published update as publish-all
+        // because `_status` is not localized on pages.
+        publishAllLocales: false,
+        publishSpecificLocale: locale,
         data: {
           title: page.title(locale),
           layout: page.layout(locale, ids),
-          ...(page.meta
-            ? { meta: { ...page.meta(locale), ...placeholderNoindexMeta(page.slug).meta } }
-            : placeholderNoindexMeta(page.slug)),
-        },
+          // Localized meta (title/description) is written with the locale it
+          // completes. `noindex` is document-level, so it is only seeded for a
+          // page row created in this run; completing a locale on an existing
+          // page must not touch an editor's noindex choice.
+          ...(page.meta || created.has(page.slug)
+            ? {
+                meta: {
+                  ...(page.meta ? page.meta(locale) : {}),
+                  ...(created.has(page.slug) ? placeholderNoindexMeta(page.slug).meta : {}),
+                },
+              }
+            : {}),
+          _status: 'published',
+        } as never,
         user,
       })
     }
-    await payload.update({
-      collection: 'pages',
-      id: idFor(page.slug),
-      data: { _status: 'published' } as never,
-      user,
-    })
-    console.log(`Published /${page.slug === SLUG.home ? '' : page.slug}`)
+    const which = writeLocales.join(', ')
+    console.log(`Published ${path} (${which})`)
   }
 
-  // Globals
-  await payload.updateGlobal({ slug: 'header', locale: 'nl', data: headerData('nl', ids), user })
-  await payload.updateGlobal({ slug: 'header', locale: 'en', data: headerData('en', ids), user })
-  await payload.updateGlobal({
-    slug: 'footer',
-    locale: 'nl',
-    data: { ...footerShared, ...footerLocalized('nl') },
-    user,
-  })
-  await payload.updateGlobal({ slug: 'footer', locale: 'en', data: footerLocalized('en'), user })
-  console.log('Globals seeded (header, footer)')
+  // Recreating a deleted page assigns a new id. Kept header/footer links to
+  // the old id are not rewritten; say which ones need a hand relink.
+  if (created.size) {
+    const pathsFor = async (slug: string, pageId: number) => {
+      const paths: string[] = []
+      for (const locale of ['nl', 'en'] as Locale[]) {
+        const header = (await payload.findGlobal({
+          slug: 'header',
+          locale,
+          fallbackLocale: false,
+          depth: 0,
+        })) as unknown as GlobalLinks
+        const footer = (await payload.findGlobal({
+          slug: 'footer',
+          locale,
+          fallbackLocale: false,
+          depth: 0,
+        })) as unknown as GlobalLinks
+        if (!globalIsUnseeded('header', header)) {
+          paths.push(...unrelinkedPaths(slug, pageId, headerData(locale, ids), header, 'header'))
+        }
+        if (!globalIsUnseeded('footer', footer)) {
+          const expectedFooter: GlobalLinks =
+            locale === 'nl' ? { ...footerShared, ...footerLocalized('nl') } : footerLocalized('en')
+          paths.push(...unrelinkedPaths(slug, pageId, expectedFooter, footer, 'footer'))
+        }
+      }
+      return [...new Set(paths)]
+    }
+    for (const slug of created) {
+      const warning = recreateLinkWarning(slug, idFor(slug), await pathsFor(slug, idFor(slug)))
+      if (warning) console.warn(warning)
+    }
+  }
+
+  // Globals: each locale is decided on its own, with fallbackLocale: false, so
+  // a written NL cannot hide a missing EN. A locale that already has copy is
+  // left alone.
+  const seedGlobal = async (slug: 'header' | 'footer', dataFor: (locale: Locale) => Record<string, unknown>) => {
+    const written: Locale[] = []
+    for (const locale of ['nl', 'en'] as Locale[]) {
+      const current = (await payload.findGlobal({
+        slug,
+        locale,
+        fallbackLocale: false,
+        depth: 0,
+      })) as unknown as Record<string, unknown>
+      if (!globalIsUnseeded(slug, current)) continue
+      await payload.updateGlobal({ slug, locale, data: dataFor(locale), user })
+      written.push(locale)
+    }
+    const title = slug === 'header' ? 'Header' : 'Footer'
+    if (written.length) console.log(`${title} seeded (${written.join(', ')})`)
+    else console.log(`Kept ${slug} (exists; copy lives in D1)`)
+  }
+  await seedGlobal('header', (locale) => headerData(locale, ids))
+  await seedGlobal('footer', (locale) =>
+    locale === 'nl' ? { ...footerShared, ...footerLocalized('nl') } : footerLocalized('en'),
+  )
 
   console.log('Seed complete.')
 }

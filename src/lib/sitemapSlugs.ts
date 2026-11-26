@@ -7,8 +7,10 @@
  *
  * Placeholder slugs in PLACEHOLDER_NOINDEX_SLUGS are also omitted until
  * Marketeer's final copy lands. Remove a slug from that set in the same PR
- * that replaces the placeholders. Seed then writes meta.noindex false; omitting
- * the field would leave the old true in place while the sitemap lists the page.
+ * that replaces the placeholders. The seed only writes meta.noindex for a page
+ * row it creates; it never rewrites an existing page. For a page that already
+ * exists, set meta.noindex to false through the content endpoint or in the
+ * admin, or the page stays noindex while the sitemap lists it.
  */
 export const PLACEHOLDER_NOINDEX_SLUGS = new Set(['cases', 'website-laten-maken-woerden'])
 
