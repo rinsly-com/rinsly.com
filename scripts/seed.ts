@@ -1214,7 +1214,7 @@ const caseBlocks = (
       'Text for the link follows from Marketeer.',
     ),
     button: externalLink(t(locale, `Naar ${c.host}`, `Go to ${c.host}`), c.url, {
-      variant: 'secondary',
+      variant: 'primary',
       newTab: true,
     }),
   },
