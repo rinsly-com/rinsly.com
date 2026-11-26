@@ -180,7 +180,7 @@ describe('offerteHandler business confirmation', () => {
     expect(sendEmail).not.toHaveBeenCalled()
   })
 
-  it('ignores a submitted registration number when collection is off', async () => {
+  it('ignores a submitted KvK number when collection is off', async () => {
     const { req, create, sendEmail } = request({
       ...quote,
       b2bConfirmed: true,
@@ -200,7 +200,7 @@ describe('offerteHandler business confirmation', () => {
     expect(mailed.text).not.toContain('KvK:')
   })
 
-  it('accepts a ticked box without a registration number when collection is off', async () => {
+  it('accepts a ticked box without a KvK number when collection is off', async () => {
     const { req, create, sendEmail } = request({ ...quote, b2bConfirmed: true })
     const res = await offerteHandler(req)
     expect(res.status).toBe(200)
@@ -213,21 +213,21 @@ describe('offerteHandler business confirmation', () => {
     expect(mailed.text).not.toContain('KvK:')
   })
 
-  it('returns 422 for an invalid registration number when collection is on', async () => {
+  it('returns 422 for an invalid KvK number or a foreign registration number when collection is on', async () => {
     collectKvk()
-    for (const kvkNummer of ['123', '1234567', '123456789', '1234/5678', '../1', '//1/', '12#345678', 'ABCD', 'BE01234567890123456789', 'HRB\u201312345', 'HRB\u00A012345', '1234567\uFF18']) {
+    for (const kvkNummer of ['123', '1234567', '123456789', '1234/5678', '../1', '//1/', '12#345678', 'ABCD', 'BE0123456789', 'HRB 12345', 'DE-12345', 'BE01234567890123456789', '1234\u20135678', '1234\u00A05678', '1234567\uFF18']) {
       await rejected({ ...quote, b2bConfirmed: true, kvkNummer })
     }
     await rejected({ ...quote, b2bConfirmed: true })
   })
 
-  it('stores a Dutch or foreign number when collection is on, and puts it on the sales mail', async () => {
+  it('stores a normalised Dutch KvK number when collection is on, and puts it on the sales mail', async () => {
     collectKvk()
     const cases: Array<[string, string]> = [
       ['1234-5678', '12345678'],
       ['12345678', '12345678'],
-      ['BE0123456789', 'BE0123456789'],
-      ['HRB 12345', 'HRB 12345'],
+      ['1234 5678', '12345678'],
+      ['1234.5678', '12345678'],
     ]
     for (const [input, storedValue] of cases) {
       const { req, create, sendEmail } = request({

@@ -72,7 +72,7 @@ function goToQuoteConfirm() {
 }
 
 describe('preview KvK collection flag', () => {
-  it('shows the registration field when the server-provided flag is on, even if process env is off', () => {
+  it('shows the KvK field when the server-provided flag is on, even if process env is off', () => {
     vi.stubEnv('RINSLY_KVK_COLLECTION_ENABLED', '')
     hydrate(previewContact(true))
     goToQuoteConfirm()
