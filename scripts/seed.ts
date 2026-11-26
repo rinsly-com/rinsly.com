@@ -426,9 +426,6 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
       },
     ],
   },
-  // DRAFT COPY for Marketeer (Marketing owns the wording). Structure by Builder:
-  // block, anchor, cards and features are final; every t(locale, nl, en) string
-  // in this block is a placeholder taken from ONE-PAGER.md and may be replaced.
   {
     blockType: 'services',
     anchor: 'framer',
@@ -447,8 +444,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         title: t(locale, 'Framer past bij een portfolio of campagne', 'Framer fits a portfolio or a campaign'),
         description: t(
           locale,
-          'Een site die vooral mooi moet zijn, door een of twee mensen wordt bijgehouden en een beperkte looptijd heeft. Daar is Framer een prima keuze.',
-          'A site that mainly has to look good, is kept up by one or two people and has a limited lifespan. Framer is a fine choice there.',
+          'Bouw je het ontwerp zelf in Framer? Dan heb je een goed gereedschap voor een portfolio of een campagnepagina. Je bent dan zelf verantwoordelijk voor bouw, beheer en support.',
+          'Do you build the design yourself in Framer? Then you have a good tool for a portfolio or a campaign page. You are then responsible for build, management and support yourself.',
         ),
         features: [
           feature(t(locale, 'Portfolio of showcase', 'Portfolio or showcase')),
@@ -457,19 +454,26 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
       },
       {
         icon: 'IconPackages',
-        title: t(locale, 'Rinsly past bij een bedrijfssite die jaren moet draaien', 'Rinsly fits a business site that has to run for years'),
+        title: t(locale, 'Rinsly past bij een studio die niet zelf bouwt en beheert', 'Rinsly fits a studio that does not itself build and manage sites'),
         description: t(
           locale,
-          'Een site met redacteuren, data en meerdere talen, waar iemand de techniek, hosting en updates moet doen. Jij ontwerpt, wij bouwen en draaien het, en jij verdient mee aan het abonnement.',
-          'A site with editors, data and more than one language, where someone has to take care of the technology, hosting and updates. You design, we build and run it, and you earn a share of the subscription.',
+          'Jij ontwerpt en levert het design system. Wij bouwen het als applicatie, hosten en onderhouden het, en jij verdient mee aan het abonnement, afhankelijk van wat je oppakt (zie de ladder).',
+          'You design and deliver the design system. We build it as an application, host and maintain it, and you earn a share of the subscription, depending on what you take on (see the ladder).',
         ),
         features: [
-          feature(t(locale, 'Redacteuren werken zelf in het CMS', 'Editors work in the CMS themselves')),
-          feature(t(locale, 'Nederlands en Engels naast elkaar', 'Dutch and English side by side')),
-          feature(t(locale, 'Hosting en updates inbegrepen', 'Hosting and updates included')),
+          feature(t(locale, 'Bouw en hosting door Rinsly', 'Build and hosting by Rinsly')),
+          feature(t(locale, 'Beheer en updates door Rinsly', 'Management and updates by Rinsly')),
         ],
       },
     ],
+  },
+  {
+    blockType: 'note',
+    text: t(
+      locale,
+      'Framer is een merk van de eigenaar. Rinsly is niet verbonden aan Framer. Informatie over Framer gecontroleerd op framer.com, 26 november 2026.',
+      'Framer is a brand of its owner. Rinsly is not affiliated with Framer. Information about Framer checked on framer.com, 26 November 2026.',
+    ),
   },
   {
     blockType: 'services',
