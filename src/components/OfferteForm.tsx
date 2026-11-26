@@ -7,7 +7,7 @@ import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
 import { B2bConfirmCheckbox } from '@/components/B2bConfirmCheckbox'
 import { EmailConsentCheckbox } from '@/components/EmailConsentCheckbox'
-import { B2B_QUOTE_REQUIRED, normalizeKvk } from '@/lib/b2bConfirmation'
+import { b2bQuoteRequiredText, KVK_FIELD_LABEL, normalizeKvk } from '@/lib/b2bConfirmation'
 import { publicString } from '@/lib/env'
 import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
 import { formAckSchema, readJsonResponse } from '@/lib/json'
@@ -239,7 +239,13 @@ const EMPTY: Data = {
  * signed invite link. A studio arriving here has no token, hence the separate
  * public endpoint.
  */
-export function OfferteForm({ locale }: { locale: Locale }) {
+export function OfferteForm({
+  locale,
+  kvkCollectionEnabled = false,
+}: {
+  locale: Locale
+  kvkCollectionEnabled?: boolean
+}) {
   const c = COPY[locale]
   const [audience, setAudience] = useState<Audience>('')
   const [step, setStep] = useState(0)
@@ -292,7 +298,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
   }
   const yn = (v: boolean) => (v ? c.yes : c.no)
   const quoteReady =
-    isPartner || (data.b2bConfirmed && normalizeKvk(data.kvkNummer) !== null)
+    isPartner || (data.b2bConfirmed && (!kvkCollectionEnabled || normalizeKvk(data.kvkNummer) !== null))
   const showQuoteRequired =
     audience === 'client' && step === lastStep && (!quoteReady || quoteBlocked)
 
@@ -330,7 +336,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
           bericht: data.bericht,
           emailConsent: data.emailConsent,
           b2bConfirmed: data.b2bConfirmed,
-          kvkNummer: data.kvkNummer,
+          ...(kvkCollectionEnabled ? { kvkNummer: data.kvkNummer } : {}),
           locale,
         }
 
@@ -602,12 +608,14 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             />
           </dl>
           <NoteField id="offerte-bericht" label={c.bericht} value={data.bericht} onValue={(v) => { set('bericht', v); }} />
-          <TextField
-            id="offerte-kvk"
-            label={locale === 'nl' ? 'KvK-nummer' : 'KvK number'}
-            value={data.kvkNummer}
-            onValue={(v) => { set('kvkNummer', v); }}
-          />
+          {kvkCollectionEnabled ? (
+            <TextField
+              id="offerte-kvk"
+              label={KVK_FIELD_LABEL[locale]}
+              value={data.kvkNummer}
+              onValue={(v) => { set('kvkNummer', v); }}
+            />
+          ) : null}
           <B2bConfirmCheckbox
             id="offerte-b2b"
             locale={locale}
@@ -644,7 +652,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
 
       {showQuoteRequired && (
         <p className="mt-4 text-sm text-ink" role="status">
-          {B2B_QUOTE_REQUIRED[locale]}
+          {b2bQuoteRequiredText(locale, kvkCollectionEnabled)}
         </p>
       )}
 
