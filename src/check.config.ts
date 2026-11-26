@@ -33,7 +33,7 @@ export const checkConfig: CheckConfig = {
   pricing: {
     title: 'Transparant over de kosten',
     lines: [
-      'Kiest u een hostingabonnement met een minimumlooptijd van 36 maanden? Dan rekenen we geen bouwkosten voor een bedrijfs- of brochuresite binnen de pakketgrenzen. Alleen voor zakelijke opdrachtgevers.',
+      'Kiest u een hostingabonnement met een minimumlooptijd van 36 maanden? Dan rekenen we geen bouwkosten voor een bedrijfs- of brochuresite binnen de pakketgrenzen. Stopt u binnen die 36 maanden, dan betaalt u een uitstapbedrag; het staat in uw offerte (zie ook de voetnoot bij de prijs op rinsly.com/prijzen). Alleen voor zakelijke opdrachtgevers.',
       'Liever niet vastzitten? Dan bouwen we vanaf €2.500 eenmalig (desgewenst in overleg gespreid over het eerste jaar) en kunt u maandelijks opzeggen.',
       'Het beheer is vanaf €49 per maand, alles inbegrepen: hosting, beveiliging, updates en dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up).',
     ],

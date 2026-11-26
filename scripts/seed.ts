@@ -557,8 +557,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         features: [feature(
             t(
               locale,
-              'Geen bouwkosten voor de klant bij 36 maanden hosting (zie voorwaarden en uitstapkosten op /prijzen)',
-              'No build fee for the client on 36 months of hosting (see the terms and exit costs on the pricing page)',
+              'Geen bouwkosten voor de klant bij 36 maanden hosting (zie voorwaarden en het uitstapbedrag op /prijzen)',
+              'No build fee for the client on 36 months of hosting (see the terms and the exit amount on the pricing page)',
             ),
           ),],
       },
@@ -808,12 +808,12 @@ const platformLayout = (locale: Locale, _ids: PageIds): Block[] => [
         ),
       },
       {
-        title: t(locale, 'Van wie is de website?', 'Who owns the website?'),
+        title: t(locale, 'Wat krijgt de klant mee bij beëindiging?', 'What does the client get on termination?'),
         body: richBody(
           t(
             locale,
-            'Van de eindklant: het bedrijf waarvan de website is. De klant houdt zijn gegevens en krijgt bij beëindiging de website en de broncode mee (art. 10 algemene voorwaarden).',
-            'The end client’s: the business whose website it is. The client keeps their data and, on termination, receives the website and the source code (article 10 of the general terms).',
+            'De klant houdt zijn gegevens en krijgt bij beëindiging de website en de broncode mee (art. 10 algemene voorwaarden).',
+            'The client keeps their data and, on termination, receives the website and the source code (article 10 of the general terms).',
           ),
           t(
             locale,
@@ -866,8 +866,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
     t(locale, 'Geen bouwkosten bij 36 maanden hosting', 'No build fee on 36 months of hosting'),
     t(
       locale,
-      'Kies je een hostingabonnement met een minimumlooptijd van 36 maanden (bijvoorbeeld Care: 36 × €49 = €1.764 excl. btw), dan rekenen we geen bouwkosten voor een bedrijfs- of brochuresite binnen de pakketgrenzen.¹ Daarna is het abonnement maandelijks opzegbaar, met een opzegtermijn van één maand. Alleen voor zakelijke opdrachtgevers. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
-      'Choose a hosting plan with a minimum term of 36 months (for example Care: 36 × €49 = €1,764 excl. VAT) and we charge no build fee for a business or brochure site within the plan limits.¹ After that the subscription can be cancelled monthly, with one month’s notice. For business clients only. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
+      'Kiest u een hostingabonnement met een minimumlooptijd van 36 maanden (bijvoorbeeld Care: 36 × €49 = €1.764 aan hostingkosten, excl. btw, bij het huidige tarief), dan rekenen we geen bouwkosten voor een bedrijfs- of brochuresite binnen de pakketgrenzen.¹ Daarna is het abonnement maandelijks opzegbaar, met een opzegtermijn van één maand. Alleen voor zakelijke opdrachtgevers. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
+      'If you choose a hosting plan with a minimum term of 36 months (for example Care: 36 × €49 = €1,764 in hosting fees, excl. VAT, at the current rate), we charge no build fee for a business or brochure site within the plan limits.¹ After that the subscription can be cancelled monthly, with one month’s notice. For business clients only. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
     ),
   ),
   // The 36-month route stays in the hero, the loudest block. The paid route is a
@@ -901,8 +901,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
     blockType: 'note',
     text: t(
       locale,
-      '¹ Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte.',
-      '¹ If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote.',
+      '¹ Stopt u binnen de 36 maanden (gerekend vanaf de startdatum in uw offerte), dan betaalt u een uitstapbedrag: de bouwwaarde uit uw offerte × het aantal resterende maanden ÷ 36, ten hoogste de hostingkosten voor de resterende maanden. Het bedrag staat in uw offerte. Uw gegevens krijgt u altijd mee; de website en de broncode zodra het uitstapbedrag en openstaande facturen zijn betaald. Zie de algemene voorwaarden en uw offerte.',
+      '¹ If you stop within the 36 months (counted from the start date in your quote), you pay an exit amount: the build value in your quote × the number of remaining months ÷ 36, at most the hosting fees for the remaining months. The amount is in your quote. You always receive your data; the website and source code once the exit amount and any open invoices are paid. See the general terms and your quote.',
     ),
   },
   {
@@ -1018,8 +1018,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           ),
           t(
             locale,
-            'Beide routes bestaan echt. Na de minimumlooptijd van 36 maanden loopt het abonnement door en is het net zo goed maandelijks opzegbaar. Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte.',
-            'Both routes are real. After the 36-month minimum term the subscription continues and is just as monthly-cancellable. If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote.',
+            'Beide routes bestaan echt. Na de minimumlooptijd van 36 maanden loopt het abonnement door en is het net zo goed maandelijks opzegbaar, met een opzegtermijn van één maand. Stopt u binnen de 36 maanden (gerekend vanaf de startdatum in uw offerte), dan betaalt u een uitstapbedrag: de bouwwaarde uit uw offerte × het aantal resterende maanden ÷ 36, ten hoogste de hostingkosten voor de resterende maanden. Het bedrag staat in uw offerte. Uw gegevens krijgt u altijd mee; de website en de broncode zodra het uitstapbedrag en openstaande facturen zijn betaald. Zie de algemene voorwaarden en uw offerte.',
+            'Both routes are real. After the 36-month minimum term the subscription continues and is just as monthly-cancellable, with one month’s notice. If you stop within the 36 months (counted from the start date in your quote), you pay an exit amount: the build value in your quote × the number of remaining months ÷ 36, at most the hosting fees for the remaining months. The amount is in your quote. You always receive your data; the website and source code once the exit amount and any open invoices are paid. See the general terms and your quote.',
           ),
         ),
       },
@@ -1028,8 +1028,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Dat hangt af van welke route u kiest. Kiest u de route zonder bouwkosten bij 36 maanden hosting, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Na die 36 maanden is het maandelijks opzegbaar. Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
-            'That depends on the route you choose. If you choose the route with no build fee on 36 months of hosting, a minimum term of 36 months applies to the subscription. After those 36 months it is monthly cancellable. If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
+            'Dat hangt af van welke route u kiest. Kiest u de route zonder bouwkosten bij 36 maanden hosting, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Na die 36 maanden is het maandelijks opzegbaar, met een opzegtermijn van één maand. Stopt u binnen de 36 maanden (gerekend vanaf de startdatum in uw offerte), dan betaalt u een uitstapbedrag: de bouwwaarde uit uw offerte × het aantal resterende maanden ÷ 36, ten hoogste de hostingkosten voor de resterende maanden. Het bedrag staat in uw offerte. Uw gegevens krijgt u altijd mee; de website en de broncode zodra het uitstapbedrag en openstaande facturen zijn betaald. Zie de algemene voorwaarden en uw offerte. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
+            'That depends on the route you choose. If you choose the route with no build fee on 36 months of hosting, a minimum term of 36 months applies to the subscription. After those 36 months it is monthly cancellable, with one month’s notice. If you stop within the 36 months (counted from the start date in your quote), you pay an exit amount: the build value in your quote × the number of remaining months ÷ 36, at most the hosting fees for the remaining months. The amount is in your quote. You always receive your data; the website and source code once the exit amount and any open invoices are paid. See the general terms and your quote. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
           ),
         ),
       },
@@ -1165,7 +1165,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
       locale === 'nl'
         ? [
             { ol: [
-              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: vanaf €2.500 (excl. btw) voor de bouw, met maandelijks opzegbaar hosting, of zonder bouwkosten bij 36 maanden hosting.',
+              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: de bouw vanaf €2.500 (excl. btw) met maandelijks opzegbare hosting (opzegtermijn van één maand), of geen bouwkosten bij 36 maanden hosting (bijvoorbeeld Care, €49 per maand excl. btw). Zie Prijzen voor de voorwaarden en het uitstapbedrag.',
               'Er komt een ontwerp: van uw eigen ontwerper, van een partner van ons, of op basis van wat u aanlevert.',
               'Wij bouwen het en zetten het live, inclusief domein en e-mailrouting.',
               'Daarna draaien wij het. U beheert de teksten en foto’s zelf in het CMS; het technische deel hoeft u nooit aan te raken.',
@@ -1173,7 +1173,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
           ]
         : [
             { ol: [
-              'You tell us what you need. We tell you what it costs: from €2,500 (excl. VAT) for the build with monthly-cancellable hosting, or with no build fee on 36 months of hosting.',
+              'You tell us what you need. We tell you what it costs: the build from €2,500 (excl. VAT) with monthly-cancellable hosting (one month’s notice), or no build fee with 36 months of hosting (for example Care, €49 per month excl. VAT). See Pricing for the terms and the exit amount.',
               'A design appears: from your own designer, from one of our partners, or based on what you supply.',
               'We build it and take it live, domain and email routing included.',
               'After that we run it. You manage the words and pictures yourself in the CMS; you never have to touch the technical part.',

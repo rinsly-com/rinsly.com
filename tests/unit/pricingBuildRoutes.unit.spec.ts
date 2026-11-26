@@ -28,7 +28,7 @@ describe('pricing page build routes', () => {
     expect(free).toBeGreaterThan(-1)
     expect(paid).toBeGreaterThan(free)
     expect(paid).toBeLessThan(tiers)
-    expect(layout.indexOf('Kies je een hostingabonnement')).toBeLessThan(paid)
+    expect(layout.indexOf('Kiest u een hostingabonnement')).toBeLessThan(paid)
     expect(layout).not.toContain('buildRoutes')
   })
 
@@ -55,11 +55,11 @@ describe('pricing page build routes', () => {
     expect(layout).toContain('spread over the first year')
 
     const lock = layout.indexOf('Zit ik ergens aan vast?')
-    const lockIn = layout.slice(lock, lock + 1500)
-    expect(lockIn.indexOf('Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten')).toBeLessThan(
+    const lockIn = layout.slice(lock, lock + 3500)
+    expect(lockIn.indexOf('dan betaalt u een uitstapbedrag')).toBeLessThan(
       lockIn.indexOf('Betaalt u de bouw'),
     )
-    expect(lockIn.indexOf('If you stop within the 36 months, you pay the exit costs')).toBeLessThan(
+    expect(lockIn.indexOf('you pay an exit amount')).toBeLessThan(
       lockIn.indexOf('If you pay for the build'),
     )
   })
