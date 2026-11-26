@@ -426,6 +426,9 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
       },
     ],
   },
+  // DRAFT COPY for Marketeer (Marketing owns the wording). Structure by Builder:
+  // block, anchor, cards and features are final; every t(locale, nl, en) string
+  // in this block is a placeholder taken from ONE-PAGER.md and may be replaced.
   {
     blockType: 'services',
     anchor: 'framer',
