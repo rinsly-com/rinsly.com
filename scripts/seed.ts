@@ -29,10 +29,16 @@ import { readServerEnv } from '../src/lib/env'
 import { logCaught } from '../src/lib/logCaught'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
 import { idRowSchema, userRowSchema } from '../src/lib/rows'
+import { PLACEHOLDER_NOINDEX_SLUGS } from '../src/lib/sitemapSlugs'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 type Block = Record<string, unknown>
 type Locale = 'nl' | 'en'
+
+/** meta.noindex for placeholder pages. Driven by PLACEHOLDER_NOINDEX_SLUGS; remove a slug there when final copy lands. */
+const placeholderNoindexMeta = (slug: string): { meta: { noindex: true } } | Record<string, never> =>
+  PLACEHOLDER_NOINDEX_SLUGS.has(slug) ? { meta: { noindex: true } } : {}
+
 
 const t = <T,>(locale: Locale, nl: T, en: T): T => (locale === 'nl' ? nl : en)
 
@@ -1855,7 +1861,7 @@ async function run() {
           collection: 'pages',
           draft: true,
           locale: 'nl',
-          data: { slug: page.slug, title: page.title('nl') },
+          data: { slug: page.slug, title: page.title('nl'), ...placeholderNoindexMeta(page.slug) },
           user,
         }),
       )
@@ -1879,7 +1885,7 @@ async function run() {
         id: idFor(page.slug),
         draft: true,
         locale,
-        data: { title: page.title(locale), layout: page.layout(locale, ids) },
+        data: { title: page.title(locale), layout: page.layout(locale, ids), ...placeholderNoindexMeta(page.slug) },
         user,
       })
     }

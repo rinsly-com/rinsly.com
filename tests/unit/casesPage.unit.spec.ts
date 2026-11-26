@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
-import { slugsForSitemap } from '../../src/lib/sitemapSlugs'
+import { PLACEHOLDER_NOINDEX_SLUGS, SITEMAP_EXCLUDED_SLUGS, slugsForSitemap } from '../../src/lib/sitemapSlugs'
 
 /**
  * Yaron (26 Nov 15:59): a cases page is OK for burojazz.nl and Up2Brand. The
@@ -37,10 +37,16 @@ const BANNED = [
 describe('cases page', () => {
   const layout = casesLayoutSource()
 
-  it('is registered at /cases (fixes the /nl/cases 404) and in the sitemap', () => {
+  it('is registered at /cases (fixes the /nl/cases 404), noindex, and omitted from the sitemap until final copy', () => {
     expect(seed).toMatch(/cases:\s*'cases'/)
     expect(seed).toMatch(/slug:\s*SLUG\.cases/)
-    expect(slugsForSitemap(['over', 'cases'])).toContain('cases')
+    // Drop 'cases' from PLACEHOLDER_NOINDEX_SLUGS when Marketeer's final copy lands.
+    expect(PLACEHOLDER_NOINDEX_SLUGS.has('cases')).toBe(true)
+    expect(SITEMAP_EXCLUDED_SLUGS.has('cases')).toBe(true)
+    expect(slugsForSitemap(['over', 'cases'])).not.toContain('cases')
+    expect(slugsForSitemap(['over', 'cases'])).toContain('over')
+    expect(seed).toMatch(/PLACEHOLDER_NOINDEX_SLUGS/)
+    expect(seed).toMatch(/noindex:\s*true/)
   })
 
   it('has one block per case, for exactly burojazz.nl and Up2Brand, each with an external link', () => {
