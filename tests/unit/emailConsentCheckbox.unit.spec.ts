@@ -10,6 +10,12 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { CheckAanvraagForm } from '@/components/check/CheckAanvraagForm'
 import { OfferteForm } from '@/components/OfferteForm'
+import {
+  B2B_CONFIRMATION_TEXT,
+  B2B_QUOTE_REQUIRED,
+  B2B_QUOTE_REQUIRED_WITH_KVK,
+  KVK_FIELD_LABEL,
+} from '@/lib/b2bConfirmation'
 import { EMAIL_CONSENT_TEXT } from '@/lib/emailConsent'
 
 vi.mock('next/navigation', () => ({
@@ -106,7 +112,9 @@ describe('email consent checkbox', () => {
 
   it('starts unticked on the Dutch contact quote form and does not block submit', () => {
     hydrate(createElement(OfferteForm, { locale: 'nl' }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.nl)).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /Ik wil een website/ }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.nl)).toBeNull()
     setValue('offerte-bedrijf', 'Studio')
     setValue('offerte-naam', 'Ada')
     setValue('offerte-email', 'ada@example.nl')
@@ -119,14 +127,22 @@ describe('email consent checkbox', () => {
     expect(screen.getByRole('link', { name: 'privacyverklaring' }).getAttribute('href')).toBe(
       '/nl/privacy',
     )
-    expect(
-      screen.getByRole('button', { name: 'Aanvraag versturen' }).hasAttribute('disabled'),
-    ).toBe(false)
+    const submit = screen.getByRole('button', { name: 'Aanvraag versturen' })
+    expect(submit.hasAttribute('disabled')).toBe(false)
+    expect(screen.queryByLabelText(KVK_FIELD_LABEL.nl)).toBeNull()
+    expect(document.querySelector('#offerte-kvk')).toBeNull()
+    expect(screen.getByText(B2B_QUOTE_REQUIRED.nl)).toBeTruthy()
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED_WITH_KVK.nl)).toBeNull()
+    fireEvent.click(screen.getByRole('checkbox', { name: B2B_CONFIRMATION_TEXT.nl }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.nl)).toBeNull()
+    expect(submit.hasAttribute('disabled')).toBe(false)
   })
 
   it('starts unticked on the English contact quote form', () => {
     hydrate(createElement(OfferteForm, { locale: 'en' }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /I want a website/ }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
     setValue('offerte-bedrijf', 'Studio')
     setValue('offerte-naam', 'Ada')
     setValue('offerte-email', 'ada@example.com')
@@ -139,8 +155,42 @@ describe('email consent checkbox', () => {
     expect(screen.getByRole('link', { name: 'privacy policy' }).getAttribute('href')).toBe(
       '/en/privacy',
     )
-    expect(screen.getByRole('button', { name: 'Send request' }).hasAttribute('disabled')).toBe(
-      false,
-    )
+    const submit = screen.getByRole('button', { name: 'Send request' })
+    expect(submit.hasAttribute('disabled')).toBe(false)
+    expect(screen.queryByLabelText(KVK_FIELD_LABEL.en)).toBeNull()
+    expect(document.querySelector('#offerte-kvk')).toBeNull()
+    expect(screen.getByText(B2B_QUOTE_REQUIRED.en)).toBeTruthy()
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeNull()
+    fireEvent.click(screen.getByRole('checkbox', { name: B2B_CONFIRMATION_TEXT.en }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
+    expect(submit.hasAttribute('disabled')).toBe(false)
+  })
+
+  it('requires a registration number on the English form when collection is on', () => {
+    hydrate(createElement(OfferteForm, { locale: 'en', kvkCollectionEnabled: true }))
+    fireEvent.click(screen.getByRole('button', { name: /I want a website/ }))
+    setValue('offerte-bedrijf', 'Studio')
+    setValue('offerte-naam', 'Ada')
+    setValue('offerte-email', 'ada@example.com')
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    fireEvent.click(screen.getByRole('button', { name: /Care/ }))
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Next' }))
+
+    expect(screen.getByLabelText(KVK_FIELD_LABEL.en)).toBeTruthy()
+    expect(screen.getByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeTruthy()
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
+    fireEvent.click(screen.getByRole('checkbox', { name: B2B_CONFIRMATION_TEXT.en }))
+    expect(screen.getByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeTruthy()
+    setValue('offerte-kvk', 'BE0123456789')
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeNull()
+  })
+
+  it('does not show the business-client sentence on the design-studio path', () => {
+    hydrate(createElement(OfferteForm, { locale: 'en', kvkCollectionEnabled: true }))
+    fireEvent.click(screen.getByRole('button', { name: /design studio/ }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED_WITH_KVK.en)).toBeNull()
+    expect(screen.queryByLabelText(KVK_FIELD_LABEL.en)).toBeNull()
   })
 })

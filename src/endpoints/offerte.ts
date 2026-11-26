@@ -1,6 +1,7 @@
 import type { PayloadHandler, PayloadRequest } from 'payload'
 import { z } from 'zod'
 
+import { b2bFromSubmission, isKvkCollectionEnabled } from '../lib/b2bConfirmation'
 import { getRuntime } from '../lib/bindings'
 import { emailConsentFromSubmission } from '../lib/emailConsent'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
@@ -38,6 +39,12 @@ function json(body: unknown, status = 200): Response {
   })
 }
 
+function kvkCollectionFlagFrom(env: unknown): string | undefined {
+  if (typeof env !== 'object' || env === null) return undefined
+  const raw = (env as Record<string, unknown>).RINSLY_KVK_COLLECTION_ENABLED
+  return typeof raw === 'string' ? raw : undefined
+}
+
 /**
  * Public quote-request submission from the contact wizard. Stores a row in
  * `offertes` (overrideAccess, since the collection's create is closed). Includes
@@ -61,8 +68,14 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
     return json({ ok: false, error: 'validation' }, 422)
   }
   const chosen = subscription.safeParse(body.subscription)
+  const runtime = await getRuntime()
+  const collectKvk = isKvkCollectionEnabled(kvkCollectionFlagFrom(runtime.env))
+  const b2b = b2bFromSubmission(rawObject, new Date(), { collectKvk })
   if (!bedrijf || !naam || !EMAIL_RE.test(email) || !chosen.success) {
     return json({ ok: false, error: 'validation' }, 422)
+  }
+  if (b2b === null) {
+    return json({ ok: false, error: 'b2b' }, 422)
   }
 
   // Server clock and the locale constant. Client consentAt / consentText are ignored.
@@ -79,6 +92,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
         ...(additions.includes('other') && additionsOther ? { additionsOther } : {}),
         ...(bericht ? { bericht } : {}),
         ...consent,
+        ...b2b,
       },
       overrideAccess: true,
     })
@@ -91,7 +105,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
   }
 
   // Notify sales in the background; a mail failure never breaks the submission.
-  const { waitUntil } = await getRuntime()
+  const { waitUntil } = runtime
   waitUntil(
     req.payload
       .sendEmail({
@@ -104,6 +118,7 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
           subscription: chosen.data,
           bericht,
           consent,
+          ...(b2b.kvkNummer !== undefined ? { kvkNummer: b2b.kvkNummer } : {}),
         }),
       })
       .catch((err: unknown) => {

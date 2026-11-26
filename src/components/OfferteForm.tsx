@@ -5,7 +5,9 @@ import { useRef, useState } from 'react'
 import type { Locale } from '@rinsly-com/site-core'
 import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
+import { B2bConfirmCheckbox } from '@/components/B2bConfirmCheckbox'
 import { EmailConsentCheckbox } from '@/components/EmailConsentCheckbox'
+import { b2bQuoteRequiredText, KVK_FIELD_LABEL, normalizeKvk } from '@/lib/b2bConfirmation'
 import { publicString } from '@/lib/env'
 import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
 import { formAckSchema, readJsonResponse } from '@/lib/json'
@@ -36,6 +38,8 @@ type Data = {
   bouwtZelf: boolean
   verkooptHosting: boolean
   emailConsent: boolean
+  b2bConfirmed: boolean
+  kvkNummer: string
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -218,6 +222,8 @@ const EMPTY: Data = {
   bouwtZelf: false,
   verkooptHosting: false,
   emailConsent: false,
+  b2bConfirmed: false,
+  kvkNummer: '',
 }
 
 /**
@@ -233,7 +239,13 @@ const EMPTY: Data = {
  * signed invite link. A studio arriving here has no token, hence the separate
  * public endpoint.
  */
-export function OfferteForm({ locale }: { locale: Locale }) {
+export function OfferteForm({
+  locale,
+  kvkCollectionEnabled = false,
+}: {
+  locale: Locale
+  kvkCollectionEnabled?: boolean
+}) {
   const c = COPY[locale]
   const [audience, setAudience] = useState<Audience>('')
   const [step, setStep] = useState(0)
@@ -241,6 +253,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
   const [status, setStatus] = useState<Status>('idle')
   const [trap, setTrap] = useState('')
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const [quoteBlocked, setQuoteBlocked] = useState(false)
   const turnstileRef = useRef<TurnstileHandle | null>(null)
 
   const isPartner = audience === 'partner'
@@ -284,9 +297,17 @@ export function OfferteForm({ locale }: { locale: Locale }) {
     return add ? (locale === 'nl' ? add.nl : add.en) : value
   }
   const yn = (v: boolean) => (v ? c.yes : c.no)
+  const quoteReady =
+    isPartner || (data.b2bConfirmed && (!kvkCollectionEnabled || normalizeKvk(data.kvkNummer) !== null))
+  const showQuoteRequired =
+    audience === 'client' && step === lastStep && (!quoteReady || quoteBlocked)
 
   async function submit() {
     if (status === 'submitting') return
+    if (!isPartner && !quoteReady) {
+      setQuoteBlocked(false)
+      return
+    }
     setStatus('submitting')
     const tokenToSend = turnstileToken
     setTurnstileToken(null)
@@ -314,6 +335,8 @@ export function OfferteForm({ locale }: { locale: Locale }) {
           additionsOther: data.additionsOther,
           bericht: data.bericht,
           emailConsent: data.emailConsent,
+          b2bConfirmed: data.b2bConfirmed,
+          ...(kvkCollectionEnabled ? { kvkNummer: data.kvkNummer } : {}),
           locale,
         }
 
@@ -328,9 +351,20 @@ export function OfferteForm({ locale }: { locale: Locale }) {
       })
       const parsed = formAckSchema.safeParse(await readJsonResponse(res, '[offerte] response was not JSON'))
       if (!parsed.success) logCaught('[offerte] response failed validation', parsed.error)
-      setStatus(res.ok && parsed.success && parsed.data.ok ? 'success' : 'error')
+      const accepted = res.ok && parsed.success && parsed.data.ok
+      if (accepted) {
+        setQuoteBlocked(false)
+        setStatus('success')
+      } else if (!isPartner && parsed.success && parsed.data.error === 'b2b') {
+        setQuoteBlocked(true)
+        setStatus('error')
+      } else {
+        setQuoteBlocked(false)
+        setStatus('error')
+      }
     } catch (err) {
       logCaught('[offerte] submit failed', err)
+      setQuoteBlocked(false)
       setStatus('error')
     } finally {
       turnstileRef.current?.reset()
@@ -574,13 +608,29 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             />
           </dl>
           <NoteField id="offerte-bericht" label={c.bericht} value={data.bericht} onValue={(v) => { set('bericht', v); }} />
+          {kvkCollectionEnabled ? (
+            <TextField
+              id="offerte-kvk"
+              label={KVK_FIELD_LABEL[locale]}
+              value={data.kvkNummer}
+              onValue={(v) => { set('kvkNummer', v); }}
+            />
+          ) : null}
+          <B2bConfirmCheckbox
+            id="offerte-b2b"
+            locale={locale}
+            checked={data.b2bConfirmed}
+            onCheckedChange={(b2bConfirmed) => { set('b2bConfirmed', b2bConfirmed); }}
+          />
           <EmailConsentCheckbox
             id="offerte-email-consent"
             locale={locale}
             checked={data.emailConsent}
             onCheckedChange={(emailConsent) => { set('emailConsent', emailConsent); }}
           />
-          {status === 'error' && <p className="text-sm text-red-600">{c.error}</p>}
+          {status === 'error' && !showQuoteRequired && (
+            <p className="text-sm text-red-600">{c.error}</p>
+          )}
         </div>
       )}
 
@@ -598,6 +648,12 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             }}
           />
         </div>
+      )}
+
+      {showQuoteRequired && (
+        <p className="mt-4 text-sm text-ink" role="status">
+          {b2bQuoteRequiredText(locale, kvkCollectionEnabled)}
+        </p>
       )}
 
       {/* Navigation. Step 0 has no Next: choosing an audience advances it. */}

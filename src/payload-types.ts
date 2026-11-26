@@ -695,6 +695,9 @@ export interface Offerte {
   consentGiven?: boolean | null;
   consentAt?: string | null;
   consentText?: string | null;
+  b2bConfirmed?: boolean | null;
+  b2bConfirmedAt?: string | null;
+  kvkNummer?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1208,6 +1211,9 @@ export interface OffertesSelect<T extends boolean = true> {
   consentGiven?: T;
   consentAt?: T;
   consentText?: T;
+  b2bConfirmed?: T;
+  b2bConfirmedAt?: T;
+  kvkNummer?: T;
   updatedAt?: T;
   createdAt?: T;
 }
