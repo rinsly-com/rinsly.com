@@ -58,8 +58,12 @@ describe('b2bFromSubmission', () => {
     expect(B2B_CONFIRMATION_TEXT.en).toBe(
       'I am acting in the course of a business or profession. Rinsly only contracts with business clients.',
     )
-    expect(B2B_QUOTE_REQUIRED.nl).toContain('Vink de verklaring aan')
-    expect(B2B_QUOTE_REQUIRED.en).toContain('Tick the declaration')
+    expect(B2B_QUOTE_REQUIRED.nl).toBe(
+      'Rinsly contracteert alleen met zakelijke opdrachtgevers. Vink de verklaring aan en vul een geldig KvK-nummer (8 cijfers) in. Zonder die gegevens sturen we geen offerte.',
+    )
+    expect(B2B_QUOTE_REQUIRED.en).toBe(
+      'Rinsly only contracts with business clients. Tick the declaration and enter a valid Chamber of Commerce (KvK) number (8 digits). We cannot send a quote without that.',
+    )
   })
 
   it('rejects a missing checkbox and truthy values that are not boolean true', () => {

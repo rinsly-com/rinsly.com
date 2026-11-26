@@ -10,6 +10,7 @@ import { fireEvent, screen, waitFor } from '@testing-library/react'
 
 import { CheckAanvraagForm } from '@/components/check/CheckAanvraagForm'
 import { OfferteForm } from '@/components/OfferteForm'
+import { B2B_CONFIRMATION_TEXT, B2B_QUOTE_REQUIRED } from '@/lib/b2bConfirmation'
 import { EMAIL_CONSENT_TEXT } from '@/lib/emailConsent'
 
 vi.mock('next/navigation', () => ({
@@ -121,10 +122,10 @@ describe('email consent checkbox', () => {
     )
     const submit = screen.getByRole('button', { name: 'Aanvraag versturen' })
     expect(submit.hasAttribute('disabled')).toBe(false)
-    expect(screen.getByText(/Vink de verklaring aan/)).toBeTruthy()
+    expect(screen.getByText(B2B_QUOTE_REQUIRED.nl)).toBeTruthy()
     setValue('offerte-kvk', '1234-5678')
-    fireEvent.click(screen.getByRole('checkbox', { name: /beroep of bedrijf/ }))
-    expect(screen.queryByText(/Vink de verklaring aan/)).toBeNull()
+    fireEvent.click(screen.getByRole('checkbox', { name: B2B_CONFIRMATION_TEXT.nl }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.nl)).toBeNull()
     expect(submit.hasAttribute('disabled')).toBe(false)
   })
 
@@ -145,10 +146,10 @@ describe('email consent checkbox', () => {
     )
     const submit = screen.getByRole('button', { name: 'Send request' })
     expect(submit.hasAttribute('disabled')).toBe(false)
-    expect(screen.getByText(/Tick the declaration/)).toBeTruthy()
+    expect(screen.getByText(B2B_QUOTE_REQUIRED.en)).toBeTruthy()
     setValue('offerte-kvk', '12345678')
-    fireEvent.click(screen.getByRole('checkbox', { name: /business or profession/ }))
-    expect(screen.queryByText(/Tick the declaration/)).toBeNull()
+    fireEvent.click(screen.getByRole('checkbox', { name: B2B_CONFIRMATION_TEXT.en }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
     expect(submit.hasAttribute('disabled')).toBe(false)
   })
 })

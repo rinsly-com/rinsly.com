@@ -22,15 +22,16 @@ type CreateArg = { collection: string; data: Record<string, unknown> }
 
 function request(body: unknown) {
   const create = vi.fn((_input: CreateArg) => Promise.resolve({ id: 1 }))
+  const sendEmail = vi.fn(() => Promise.resolve(undefined))
   const req = {
     json: () => Promise.resolve(body),
     payload: {
       create,
-      sendEmail: vi.fn(() => Promise.resolve(undefined)),
+      sendEmail,
       logger: { error: vi.fn() },
     },
   } as unknown as PayloadRequest
-  return { req, create }
+  return { req, create, sendEmail }
 }
 
 function stored(create: ReturnType<typeof request>['create']): Record<string, unknown> {
@@ -123,5 +124,56 @@ describe('offerteHandler consent', () => {
         consentText: null,
       })
     }
+  })
+})
+
+describe('offerteHandler business confirmation', () => {
+  const quote = {
+    bedrijf: 'Studio',
+    naam: 'Ada',
+    email: 'ada@example.nl',
+    subscription: 'care',
+  }
+
+  async function rejected(body: Record<string, unknown>) {
+    const { req, create, sendEmail } = request(body)
+    const res = await offerteHandler(req)
+    expect(res.status).toBe(422)
+    expect(await res.json()).toEqual({ ok: false, error: 'validation' })
+    expect(create).not.toHaveBeenCalled()
+    expect(sendEmail).not.toHaveBeenCalled()
+  }
+
+  it('returns 422 and stores nothing when the confirmation is missing, unticked, or null', async () => {
+    await rejected({ ...quote, kvkNummer: '12345678' })
+    await rejected({ ...quote, b2bConfirmed: false, kvkNummer: '12345678' })
+    await rejected({ ...quote, b2bConfirmed: null, kvkNummer: '12345678' })
+  })
+
+  it('returns 422 for an invalid KvK number', async () => {
+    for (const kvkNummer of ['123', '1234567', '123456789', '1234567a', '12#345678']) {
+      await rejected({ ...quote, b2bConfirmed: true, kvkNummer })
+    }
+  })
+
+  it('stores the normalised KvK and server time, and puts that number on the sales mail', async () => {
+    const { req, create, sendEmail } = request({
+      ...quote,
+      b2bConfirmed: true,
+      kvkNummer: '1234-5678',
+      b2bConfirmedAt: CLIENT_TIME,
+    })
+
+    const res = await offerteHandler(req)
+    expect(res.status).toBe(200)
+    expect(stored(create)).toMatchObject({
+      b2bConfirmed: true,
+      b2bConfirmedAt: NOW.toISOString(),
+      kvkNummer: '12345678',
+    })
+    expect(stored(create).b2bConfirmedAt).not.toBe(CLIENT_TIME)
+    const mailed = sendEmail.mock.calls[0]?.[0] as { text: string } | undefined
+    expect(mailed?.text).toContain('KvK: 12345678')
+    expect(mailed?.text).not.toContain('KvK: 1234-5678')
   })
 })
