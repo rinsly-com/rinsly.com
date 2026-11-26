@@ -139,8 +139,8 @@ const partnerCheckCta = (locale: Locale): Block => ({
   title: t(locale, 'Meet een site in een halve minuut', 'Measure a site in half a minute'),
   text: t(
     locale,
-    'Elke lead die wij aanleveren komt met vijf rapportcijfers en een screenshot. Probeer de meting zelf op elke URL.',
-    'Every lead we supply comes with five grades and a screenshot. Try the measurement yourself on any URL.',
+    'Probeer de meting zelf op elke URL.',
+    'Try the measurement yourself on any URL.',
   ),
   button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
 })
@@ -561,63 +561,6 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
     ),
   ),
   partnerCheckCta(locale),
-  {
-    blockType: 'services',
-    anchor: 'leads',
-    header: {
-      eyebrow: t(locale, 'Leads voor partners', 'Leads for partners'),
-      title: t(locale, 'Sneller groeien dan je eigen boek toelaat', 'Grow faster than your own book allows'),
-      intro: t(
-        locale,
-        'Wij meten websites op grote schaal: we sporen bedrijven op, scoren hun site op moderniteit, snelheid, mobiel, vindbaarheid en veiligheid, en selecteren de beste kandidaten. Als partner krijg je daar elke maand een deel van, zonder dat het je iets kost; heb je er meer nodig, dan maken we ze op aanvraag aan.',
-        'We measure websites at scale: we find businesses, score their site on modernity, speed, mobile, findability and security, and pick the best candidates. As a partner you get a share of that every month at no cost; if you need more, we generate them on request.',
-      ),
-    },
-    cards: [
-      {
-        icon: 'IconSeeding',
-        title: t(locale, 'Elke maand inbegrepen', 'Included every month'),
-        description: t(
-          locale,
-          'Bij je partnerschap hoort een maandelijkse portie leads. Kost je niets, hoef je niet af te nemen, en je zit er niet aan vast.',
-          'A monthly allocation of leads comes with your partnership. Costs you nothing, nothing to sign up for, nothing to cancel.',
-        ),
-        features: [
-          feature(t(locale, 'Vijf rapportcijfers per site', 'Five grades per site')),
-          feature(t(locale, 'Bevindingen, screenshot & contactgegevens', 'Findings, screenshot & contact details')),
-          feature(t(locale, '30 dagen exclusief voor jou', 'Exclusive to you for 30 days')),
-        ],
-      },
-      {
-        icon: 'IconTargetArrow',
-        title: t(locale, 'Meer op aanvraag', 'More on request'),
-        description: t(
-          locale,
-          'Wil je een specifieke regio of branche uitkammen, of een campagne draaien? Dan maken we ze op aanvraag aan: per stuk, per tien of per honderd.',
-          'Want to comb through a specific region or branch, or run a campaign? We generate them on request: one, ten or a hundred at a time.',
-        ),
-        features: [
-          feature(t(locale, 'Filteren op branche en regio', 'Filter by branch and region')),
-          feature(t(locale, 'Geen abonnement, geen verplichting', 'No subscription, no commitment')),
-          feature(t(locale, 'Prijs op aanvraag', 'Price on request')),
-        ],
-      },
-      {
-        icon: 'IconRocket',
-        title: t(locale, 'Wordt het een klant?', 'Does one become a client?'),
-        description: t(
-          locale,
-          'Dan telt die klant mee in je portfolio, en tilt dus je tarief op de ladder mee omhoog. Een lead die niets blijkt te zijn vervangen we.',
-          'Then that client counts toward your portfolio, and lifts your rate on the ladder with it. A lead that turns out to be nothing gets replaced.',
-        ),
-        features: [
-          feature(t(locale, 'Telt mee voor je omzetniveau', 'Counts toward your revenue level')),
-          feature(t(locale, 'Waardeloze leads worden vervangen', 'Worthless leads are replaced')),
-          feature(t(locale, 'Jij bepaalt wie je belt', 'You decide who you call')),
-        ],
-      },
-    ],
-  },
   {
     blockType: 'accordion',
     anchor: 'faq',
