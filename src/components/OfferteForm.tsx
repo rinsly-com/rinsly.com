@@ -293,7 +293,8 @@ export function OfferteForm({ locale }: { locale: Locale }) {
   const yn = (v: boolean) => (v ? c.yes : c.no)
   const quoteReady =
     isPartner || (data.b2bConfirmed && normalizeKvk(data.kvkNummer) !== null)
-  const showQuoteRequired = !isPartner && step === lastStep && (!quoteReady || quoteBlocked)
+  const showQuoteRequired =
+    audience === 'client' && step === lastStep && (!quoteReady || quoteBlocked)
 
   async function submit() {
     if (status === 'submitting') return
@@ -348,7 +349,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
       if (accepted) {
         setQuoteBlocked(false)
         setStatus('success')
-      } else if (!isPartner && !res.ok) {
+      } else if (!isPartner && parsed.success && parsed.data.error === 'b2b') {
         setQuoteBlocked(true)
         setStatus('error')
       } else {

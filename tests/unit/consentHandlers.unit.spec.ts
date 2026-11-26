@@ -139,7 +139,7 @@ describe('offerteHandler business confirmation', () => {
     const { req, create, sendEmail } = request(body)
     const res = await offerteHandler(req)
     expect(res.status).toBe(422)
-    expect(await res.json()).toEqual({ ok: false, error: 'validation' })
+    expect(await res.json()).toEqual({ ok: false, error: 'b2b' })
     expect(create).not.toHaveBeenCalled()
     expect(sendEmail).not.toHaveBeenCalled()
   }
@@ -148,6 +148,20 @@ describe('offerteHandler business confirmation', () => {
     await rejected({ ...quote, kvkNummer: '12345678' })
     await rejected({ ...quote, b2bConfirmed: false, kvkNummer: '12345678' })
     await rejected({ ...quote, b2bConfirmed: null, kvkNummer: '12345678' })
+  })
+
+  it('keeps a missing company on the generic validation error', async () => {
+    const { req, create, sendEmail } = request({
+      ...quote,
+      bedrijf: '',
+      b2bConfirmed: true,
+      kvkNummer: '12345678',
+    })
+    const res = await offerteHandler(req)
+    expect(res.status).toBe(422)
+    expect(await res.json()).toEqual({ ok: false, error: 'validation' })
+    expect(create).not.toHaveBeenCalled()
+    expect(sendEmail).not.toHaveBeenCalled()
   })
 
   it('returns 422 for an invalid KvK number', async () => {

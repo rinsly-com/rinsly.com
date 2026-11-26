@@ -107,7 +107,9 @@ describe('email consent checkbox', () => {
 
   it('starts unticked on the Dutch contact quote form and does not block submit', () => {
     hydrate(createElement(OfferteForm, { locale: 'nl' }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.nl)).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /Ik wil een website/ }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.nl)).toBeNull()
     setValue('offerte-bedrijf', 'Studio')
     setValue('offerte-naam', 'Ada')
     setValue('offerte-email', 'ada@example.nl')
@@ -131,7 +133,9 @@ describe('email consent checkbox', () => {
 
   it('starts unticked on the English contact quote form', () => {
     hydrate(createElement(OfferteForm, { locale: 'en' }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: /I want a website/ }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
     setValue('offerte-bedrijf', 'Studio')
     setValue('offerte-naam', 'Ada')
     setValue('offerte-email', 'ada@example.com')
@@ -151,5 +155,11 @@ describe('email consent checkbox', () => {
     fireEvent.click(screen.getByRole('checkbox', { name: B2B_CONFIRMATION_TEXT.en }))
     expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
     expect(submit.hasAttribute('disabled')).toBe(false)
+  })
+
+  it('does not show the business-client sentence on the design-studio path', () => {
+    hydrate(createElement(OfferteForm, { locale: 'en' }))
+    fireEvent.click(screen.getByRole('button', { name: /design studio/ }))
+    expect(screen.queryByText(B2B_QUOTE_REQUIRED.en)).toBeNull()
   })
 })
