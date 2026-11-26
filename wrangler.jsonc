@@ -80,6 +80,24 @@
       "secret_name": "FLEET_BACKUPS_READ_TOKEN",
     },
   ],
+  // POST /api/rinsly/content rate limit (site-core README). Keyed by IPv4,
+  // IPv6 /64 and key id. The WAF http_ratelimit rule on accp.rinsly.com sits in
+  // front of this. accp only: the prod static Worker (wrangler.static.jsonc) has
+  // no such binding and no runtime. namespace_id is our own number, unique per
+  // site (burojazz uses 2101) so counters are never shared between sites.
+  "ratelimits": [
+    {
+      "name": "RINSLY_CONTENT_RATE_LIMITER",
+      "namespace_id": "2102",
+      "simple": { "limit": 20, "period": 60 },
+    },
+  ],
+  // Content endpoint config lives in Worker SECRETS, set by
+  // `rinsly content setup rinsly --apply` (never in vars, a var and a secret
+  // cannot share a name): RINSLY_ACCESS_TEAM_DOMAIN, RINSLY_ACCESS_AUD,
+  // RINSLY_CONTENT_SITE (=rinsly), RINSLY_CONTENT_PUBLIC_KEYS,
+  // RINSLY_CONTENT_IP_SALT. RINSLY_CONTENT_ENABLED is set separately and last,
+  // on Yaron's OK; until then the route answers 404. Never set it in this file.
   // Self-service /check runs enrich with Google PageSpeed Insights when the
   // PSI_API_KEY Worker SECRET is set (free key via Google Cloud console;
   // keyless calls are 429'd). Without it the check degrades to probe-based
