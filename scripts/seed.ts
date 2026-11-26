@@ -428,6 +428,48 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
   },
   {
     blockType: 'services',
+    anchor: 'framer',
+    header: {
+      eyebrow: t(locale, 'Eerlijk vergelijken', 'An honest comparison'),
+      title: t(locale, 'Framer of Rinsly?', 'Framer or Rinsly?'),
+      intro: t(
+        locale,
+        'Het hangt af van wat je klant nodig heeft. Een goed gesprek begint met de vraag welke van de twee past.',
+        'It depends on what your client needs. A good conversation starts with which of the two fits.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconBrush',
+        title: t(locale, 'Framer past bij een portfolio of campagne', 'Framer fits a portfolio or a campaign'),
+        description: t(
+          locale,
+          'Een site die vooral mooi moet zijn, door een of twee mensen wordt bijgehouden en een beperkte looptijd heeft. Daar is Framer een prima keuze.',
+          'A site that mainly has to look good, is kept up by one or two people and has a limited lifespan. Framer is a fine choice there.',
+        ),
+        features: [
+          feature(t(locale, 'Portfolio of showcase', 'Portfolio or showcase')),
+          feature(t(locale, 'Campagnepagina', 'Campaign page')),
+        ],
+      },
+      {
+        icon: 'IconPackages',
+        title: t(locale, 'Rinsly past bij een bedrijfssite die jaren moet draaien', 'Rinsly fits a business site that has to run for years'),
+        description: t(
+          locale,
+          'Een site met redacteuren, data en meerdere talen, waar iemand de techniek, hosting en updates moet doen. Jij ontwerpt, wij bouwen en draaien het, en jij verdient mee aan het abonnement.',
+          'A site with editors, data and more than one language, where someone has to take care of the technology, hosting and updates. You design, we build and run it, and you earn a share of the subscription.',
+        ),
+        features: [
+          feature(t(locale, 'Redacteuren werken zelf in het CMS', 'Editors work in the CMS themselves')),
+          feature(t(locale, 'Nederlands en Engels naast elkaar', 'Dutch and English side by side')),
+          feature(t(locale, 'Hosting en updates inbegrepen', 'Hosting and updates included')),
+        ],
+      },
+    ],
+  },
+  {
+    blockType: 'services',
     anchor: 'hoe',
     header: {
       eyebrow: t(locale, 'Hoe het werkt', 'How it works'),
