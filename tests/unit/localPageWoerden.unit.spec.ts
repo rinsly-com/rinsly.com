@@ -51,10 +51,45 @@ describe('local page Woerden/Utrecht: structure', () => {
     expect(seed).toMatch(/PLACEHOLDER_NOINDEX_SLUGS/)
     expect(seed).toMatch(/placeholderNoindexMeta/)
     expect(seed).toMatch(/noindex:\s*true/)
+    // A later seed must write false. Omitting the field leaves the stored true.
+    expect(seed).toMatch(/noindex:\s*false/)
+    expect(seed).toMatch(/SITEMAP_EXCLUDED_SLUGS\.has\(slug\)/)
     const metaStart = seed.indexOf('const localWoerdenMeta')
     const metaEnd = seed.indexOf('const localWoerdenLayout')
     expect(metaStart).toBeGreaterThan(-1)
     expect(seed.slice(metaStart, metaEnd)).not.toMatch(/noindex/)
+  })
+
+  it('a slug not in the placeholder list gets noindex false and keeps its title/description', () => {
+    // Same helper as scripts/seed.ts (pass 2 merges page.meta with this).
+    const placeholderNoindexMeta = (
+      slug: string,
+    ): { meta: { noindex: boolean } } | Record<string, never> => {
+      if (PLACEHOLDER_NOINDEX_SLUGS.has(slug)) return { meta: { noindex: true } }
+      if (SITEMAP_EXCLUDED_SLUGS.has(slug)) return {}
+      return { meta: { noindex: false } }
+    }
+    const merge = (slug: string, pageMeta: { title: string; description: string }) => ({
+      ...pageMeta,
+      ...placeholderNoindexMeta(slug).meta,
+    })
+
+    const about = { title: 'Over ons', description: 'About the studio' }
+    expect(merge('over', about)).toEqual({
+      title: 'Over ons',
+      description: 'About the studio',
+      noindex: false,
+    })
+
+    const woerden = { title: '[Concept] Woerden', description: '[Draft] From Woerden' }
+    expect(merge(LOCAL_PAGE_SLUG, woerden)).toEqual({
+      title: '[Concept] Woerden',
+      description: '[Draft] From Woerden',
+      noindex: true,
+    })
+
+    expect(placeholderNoindexMeta('privacy')).toEqual({})
+    expect(placeholderNoindexMeta('voorwaarden')).toEqual({})
   })
 
   it('has hero, how-we-work cards, region prose, FAQ and a contact CTA', () => {
