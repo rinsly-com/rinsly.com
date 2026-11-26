@@ -215,7 +215,7 @@ export function partnerProgrammeCopy(locale: LadderLocale): PartnerProgrammeCopy
       blocks: nl
         ? [
             {
-              p: 'De partner kiest wie factureert. Niet afleiden uit de grootte van de studio. De eindklant sluit de overeenkomst met Rinsly. Dat is de standaard, en daarop staan de voorwaarden, de SLA, de verwerkersovereenkomst en het eigendom van site en data.',
+              p: 'De partner kiest wie factureert. Niet afleiden uit de grootte van de studio. De eindklant sluit de overeenkomst met Rinsly. Dat is de standaard, en daarop staan de voorwaarden, de SLA, de verwerkersovereenkomst en wat er met site en data gebeurt bij beëindiging.',
             },
             {
               ul: [
@@ -243,7 +243,7 @@ export function partnerProgrammeCopy(locale: LadderLocale): PartnerProgrammeCopy
           ]
         : [
             {
-              p: 'The partner chooses who invoices. Do not infer it from the size of the studio. The end client’s agreement is with Rinsly. That is the default, and it carries the terms, the SLA, the processor agreement and the client’s ownership of the site and the data.',
+              p: 'The partner chooses who invoices. Do not infer it from the size of the studio. The end client’s agreement is with Rinsly. That is the default, and it carries the terms, the SLA, the processor agreement and what happens to the site and the data on termination.',
             },
             {
               ul: [

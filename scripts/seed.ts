@@ -474,7 +474,7 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         ),
         features: [
           feature(t(locale, 'Staging bij elke site', 'Staging on every site')),
-          feature(t(locale, 'Klant is eigenaar van site en data', 'Client owns site and data')),
+          feature(t(locale, 'Klant krijgt site, gegevens en broncode mee bij beëindiging', 'Client receives the site, data and source code on termination')),
         ],
       },
     ],
@@ -554,7 +554,13 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
           'Wij maken er een echte applicatie van op onze engine en zetten die live. De klant sluit de overeenkomst bij Rinsly.',
           'We turn it into a real application on our engine and take it live. The client’s agreement is with Rinsly.',
         ),
-        features: [feature(t(locale, 'Gratis bouw voor de klant bij 36 maanden hosting', 'Free client build on 36 months of hosting'))],
+        features: [feature(
+            t(
+              locale,
+              'Geen bouwkosten voor de klant bij 36 maanden hosting (zie voorwaarden en uitstapkosten op /prijzen)',
+              'No build fee for the client on 36 months of hosting (see the terms and exit costs on the pricing page)',
+            ),
+          ),],
       },
       {
         icon: 'IconRefresh',
@@ -647,8 +653,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         body: richBody(
           t(
             locale,
-            'De klant is eigenaar van de site en de data. Dat is contractueel, geen belofte.',
-            'The client owns the site and the data. That is contractual, not a promise.',
+            'In de overeenkomst staat dat de klant bij beëindiging de gegevens, de website en de broncode meekrijgt (art. 10 algemene voorwaarden). Wat er gebeurt bij een faillissement van Rinsly leggen we op aanvraag uit.',
+            'The agreement states that on termination the client receives the data, the website and the source code (article 10 of the general terms). What happens if Rinsly goes bankrupt we explain on request.',
           ),
         ),
       },
@@ -806,8 +812,8 @@ const platformLayout = (locale: Locale, _ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Van de eindklant: het bedrijf waarvan de website is. De website en alle data zijn en blijven hun eigendom, en dat staat in de overeenkomst tussen Rinsly en die klant.',
-            'The end client’s: the business whose website it is. The website and all its data are and remain their property, and that is in the agreement between Rinsly and that client.',
+            'Van de eindklant: het bedrijf waarvan de website is. De klant houdt zijn gegevens en krijgt bij beëindiging de website en de broncode mee (art. 10 algemene voorwaarden).',
+            'The end client’s: the business whose website it is. The client keeps their data and, on termination, receives the website and the source code (article 10 of the general terms).',
           ),
           t(
             locale,
@@ -857,14 +863,14 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
   pageHero(
     'centered',
     t(locale, 'Prijzen', 'Pricing'),
-    t(locale, 'Gratis bouw', 'Free build'),
+    t(locale, 'Geen bouwkosten bij 36 maanden hosting', 'No build fee on 36 months of hosting'),
     t(
       locale,
-      'De bouw is €0 bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
-      'The build is €0 for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
+      'Kies je een hostingabonnement met een minimumlooptijd van 36 maanden (bijvoorbeeld Care: 36 × €49 = €1.764 excl. btw), dan rekenen we geen bouwkosten voor een bedrijfs- of brochuresite binnen de pakketgrenzen.¹ Daarna is het abonnement maandelijks opzegbaar, met een opzegtermijn van één maand. Alleen voor zakelijke opdrachtgevers. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
+      'Choose a hosting plan with a minimum term of 36 months (for example Care: 36 × €49 = €1,764 excl. VAT) and we charge no build fee for a business or brochure site within the plan limits.¹ After that the subscription can be cancelled monthly, with one month’s notice. For business clients only. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
     ),
   ),
-  // Free build stays in the hero, the loudest block. The paid route is a
+  // The 36-month route stays in the hero, the loudest block. The paid route is a
   // `note`, the quieter block this page already uses under the plans.
   // Not a second `pricing` block: the four tiers below are the one table D1
   // can seed (see FACILITATOR-MIGRATION.md). `services` cards have no
@@ -878,8 +884,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
       title: t(locale, 'Twee routes', 'Two routes'),
       intro: t(
         locale,
-        'Gratis bouw. €0 bij een normale bedrijfs- of brochurewebsite. 36 maanden minimum, daarna maandelijks opzegbaar.',
-        'Free build. €0 for a typical business or brochure site. 36 months minimum, then monthly cancellable.',
+        'Route 1: geen bouwkosten bij 36 maanden hosting¹. Route 2: betaal de bouw, vanaf €2.500 excl. btw; het abonnement is dan maandelijks opzegbaar met een opzegtermijn van één maand.',
+        'Route 1: no build fee on 36 months of hosting¹. Route 2: pay for the build, from €2,500 excl. VAT; the subscription is then cancellable monthly with one month’s notice.',
       ),
     },
   },
@@ -892,6 +898,14 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
     ),
   },
   {
+    blockType: 'note',
+    text: t(
+      locale,
+      '¹ Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte.',
+      '¹ If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote.',
+    ),
+  },
+  {
     blockType: 'pricing',
     anchor: 'pakketten',
     header: {
@@ -899,8 +913,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
       title: t(locale, 'Vier pakketten', 'Four plans'),
       intro: t(
         locale,
-        'Dit is het abonnement dat de eindklant bij Rinsly afsluit: ook als een partner de site heeft ontworpen. De klant is altijd eigenaar van site en data. Facturatie gaat vooraf, per maand of per jaar; bij jaarbetaling krijgt u een maand korting, bij Growth twee. Alle prijzen exclusief 21% btw. Dit is de prijs die u bij Rinsly betaalt; factureert een ontwerpstudio u zelf, dan geldt haar prijs.',
-        'This is the subscription the end client takes with Rinsly: including when a partner designed the site. The client always owns the site and the data. We invoice in advance, monthly or yearly; paying yearly gets you a month free, two on Growth. All prices exclude 21% VAT. This is what you pay Rinsly; if a design studio invoices you themselves, their price applies.',
+        'Dit is het abonnement dat de eindklant bij Rinsly afsluit: ook als een partner de site heeft ontworpen. Bij beëindiging krijgt de klant de gegevens, de website en de broncode mee, mits openstaande facturen zijn betaald (art. 10 algemene voorwaarden). Facturatie gaat vooraf, per maand of per jaar; bij jaarbetaling krijgt u een maand korting, bij Growth twee. Alle prijzen exclusief 21% btw. Dit is de prijs die u bij Rinsly betaalt; factureert een ontwerpstudio u zelf, dan geldt haar prijs.',
+        'This is the subscription the end client takes with Rinsly: including when a partner designed the site. On termination the client receives the data, the website and the source code, provided outstanding invoices have been paid (article 10 of the general terms). We invoice in advance, monthly or yearly; paying yearly gets you a month free, two on Growth. All prices exclude 21% VAT. This is what you pay Rinsly; if a design studio invoices you themselves, their price applies.',
       ),
     },
     tiers: [
@@ -994,8 +1008,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            '**Gratis bouw:** €0 bouwkosten bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar.',
-            '**Free build:** a €0 build fee for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable.',
+            '**Geen bouwkosten bij 36 maanden hosting:** kiest u een hostingabonnement met een minimumlooptijd van 36 maanden, dan rekenen we geen bouwkosten voor een bedrijfs- of brochuresite binnen de pakketgrenzen.¹ Daarna is het abonnement maandelijks opzegbaar, met een opzegtermijn van één maand. Alleen voor zakelijke opdrachtgevers.',
+            '**No build fee on 36 months of hosting:** if you choose a hosting plan with a minimum term of 36 months, we charge no build fee for a business or brochure site within the plan limits.¹ After that the subscription can be cancelled monthly, with one month’s notice. For business clients only.',
           ),
           t(
             locale,
@@ -1004,8 +1018,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           ),
           t(
             locale,
-            'Beide routes bestaan echt. De minimumlooptijd van drie jaar is wat de gratis bouw betaalt. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website. Daarna loopt het abonnement door en is het net zo goed maandelijks opzegbaar.',
-            'Both routes are real. The three-year minimum term is what pays for the free build. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website. After that the subscription continues and is just as monthly-cancellable.',
+            'Beide routes bestaan echt. Na de minimumlooptijd van 36 maanden loopt het abonnement door en is het net zo goed maandelijks opzegbaar. Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte.',
+            'Both routes are real. After the 36-month minimum term the subscription continues and is just as monthly-cancellable. If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote.',
           ),
         ),
       },
@@ -1014,8 +1028,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Dat hangt af van welke route u kiest. Kiest u de gratis bouw, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website; daarna is het maandelijks opzegbaar. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
-            'That depends on the route you choose. If you choose the free build, a minimum term of 36 months applies to the subscription. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website; after that it is monthly cancellable. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
+            'Dat hangt af van welke route u kiest. Kiest u de route zonder bouwkosten bij 36 maanden hosting, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Na die 36 maanden is het maandelijks opzegbaar. Stopt u binnen de 36 maanden, dan betaalt u de uitstapkosten die in uw offerte staan. U krijgt de website en de gegevens mee zodra dit is betaald. Zie de algemene voorwaarden en uw offerte. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
+            'That depends on the route you choose. If you choose the route with no build fee on 36 months of hosting, a minimum term of 36 months applies to the subscription. After those 36 months it is monthly cancellable. If you stop within the 36 months, you pay the exit costs stated in your quote. You receive the website and the data once this is paid. See the general terms and your quote. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
           ),
         ),
       },
@@ -1151,7 +1165,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
       locale === 'nl'
         ? [
             { ol: [
-              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: vanaf €2.500 (excl. btw) voor de bouw, met maandelijks opzegbaar hosting, of gratis bouw als u zich drie jaar vastlegt.',
+              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: vanaf €2.500 (excl. btw) voor de bouw, met maandelijks opzegbaar hosting, of zonder bouwkosten bij 36 maanden hosting.',
               'Er komt een ontwerp: van uw eigen ontwerper, van een partner van ons, of op basis van wat u aanlevert.',
               'Wij bouwen het en zetten het live, inclusief domein en e-mailrouting.',
               'Daarna draaien wij het. U beheert de teksten en foto’s zelf in het CMS; het technische deel hoeft u nooit aan te raken.',
@@ -1159,7 +1173,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
           ]
         : [
             { ol: [
-              'You tell us what you need. We tell you what it costs: from €2,500 (excl. VAT) for the build with monthly-cancellable hosting, or a free build if you commit to three years.',
+              'You tell us what you need. We tell you what it costs: from €2,500 (excl. VAT) for the build with monthly-cancellable hosting, or with no build fee on 36 months of hosting.',
               'A design appears: from your own designer, from one of our partners, or based on what you supply.',
               'We build it and take it live, domain and email routing included.',
               'After that we run it. You manage the words and pictures yourself in the CMS; you never have to touch the technical part.',
