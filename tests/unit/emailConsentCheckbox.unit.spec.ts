@@ -119,9 +119,11 @@ describe('email consent checkbox', () => {
     expect(screen.getByRole('link', { name: 'privacyverklaring' }).getAttribute('href')).toBe(
       '/nl/privacy',
     )
-    expect(
-      screen.getByRole('button', { name: 'Aanvraag versturen' }).hasAttribute('disabled'),
-    ).toBe(false)
+    const submit = screen.getByRole('button', { name: 'Aanvraag versturen' })
+    expect(submit.hasAttribute('disabled')).toBe(true)
+    setValue('offerte-kvk', '1234 5678')
+    fireEvent.click(screen.getByRole('checkbox', { name: /beroep of bedrijf/ }))
+    expect(submit.hasAttribute('disabled')).toBe(false)
   })
 
   it('starts unticked on the English contact quote form', () => {
@@ -139,8 +141,10 @@ describe('email consent checkbox', () => {
     expect(screen.getByRole('link', { name: 'privacy policy' }).getAttribute('href')).toBe(
       '/en/privacy',
     )
-    expect(screen.getByRole('button', { name: 'Send request' }).hasAttribute('disabled')).toBe(
-      false,
-    )
+    const submit = screen.getByRole('button', { name: 'Send request' })
+    expect(submit.hasAttribute('disabled')).toBe(true)
+    setValue('offerte-kvk', '12345678')
+    fireEvent.click(screen.getByRole('checkbox', { name: /trade or business/ }))
+    expect(submit.hasAttribute('disabled')).toBe(false)
   })
 })

@@ -72,6 +72,7 @@ export function offerteNotificationText(input: {
   subscription: string
   bericht: string
   consent: StoredEmailConsent
+  kvkNummer?: string
 }): string {
   const visitor = [
     'Er is een nieuwe offerteaanvraag binnengekomen via de contactwizard.',
@@ -79,6 +80,7 @@ export function offerteNotificationText(input: {
     `Bedrijf: ${stripControlChars(input.bedrijf)}`,
     `Naam: ${stripControlChars(input.naam)}`,
     `E-mail: ${stripControlChars(input.email)}`,
+    ...(input.kvkNummer !== undefined ? [`KvK: ${stripControlChars(input.kvkNummer)}`] : []),
     `Abonnement: ${input.subscription}`,
     ...(input.bericht ? ['', 'Bericht:', input.bericht] : []),
     '',

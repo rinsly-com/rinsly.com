@@ -5,7 +5,9 @@ import { useRef, useState } from 'react'
 import type { Locale } from '@rinsly-com/site-core'
 import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
+import { B2bConfirmCheckbox } from '@/components/B2bConfirmCheckbox'
 import { EmailConsentCheckbox } from '@/components/EmailConsentCheckbox'
+import { normalizeKvk } from '@/lib/b2bConfirmation'
 import { publicString } from '@/lib/env'
 import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
 import { formAckSchema, readJsonResponse } from '@/lib/json'
@@ -36,6 +38,8 @@ type Data = {
   bouwtZelf: boolean
   verkooptHosting: boolean
   emailConsent: boolean
+  b2bConfirmed: boolean
+  kvkNummer: string
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -218,6 +222,8 @@ const EMPTY: Data = {
   bouwtZelf: false,
   verkooptHosting: false,
   emailConsent: false,
+  b2bConfirmed: false,
+  kvkNummer: '',
 }
 
 /**
@@ -284,6 +290,8 @@ export function OfferteForm({ locale }: { locale: Locale }) {
     return add ? (locale === 'nl' ? add.nl : add.en) : value
   }
   const yn = (v: boolean) => (v ? c.yes : c.no)
+  const quoteReady =
+    isPartner || (data.b2bConfirmed === true && normalizeKvk(data.kvkNummer) !== null)
 
   async function submit() {
     if (status === 'submitting') return
@@ -314,6 +322,8 @@ export function OfferteForm({ locale }: { locale: Locale }) {
           additionsOther: data.additionsOther,
           bericht: data.bericht,
           emailConsent: data.emailConsent,
+          b2bConfirmed: data.b2bConfirmed,
+          kvkNummer: data.kvkNummer,
           locale,
         }
 
@@ -574,6 +584,18 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             />
           </dl>
           <NoteField id="offerte-bericht" label={c.bericht} value={data.bericht} onValue={(v) => { set('bericht', v); }} />
+          <TextField
+            id="offerte-kvk"
+            label={locale === 'nl' ? 'KvK-nummer' : 'KvK number'}
+            value={data.kvkNummer}
+            onValue={(v) => { set('kvkNummer', v); }}
+          />
+          <B2bConfirmCheckbox
+            id="offerte-b2b"
+            locale={locale}
+            checked={data.b2bConfirmed}
+            onCheckedChange={(b2bConfirmed) => { set('b2bConfirmed', b2bConfirmed); }}
+          />
           <EmailConsentCheckbox
             id="offerte-email-consent"
             locale={locale}
@@ -634,6 +656,7 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             }}
             disabled={
               status === 'submitting' ||
+              !quoteReady ||
               (Boolean(publicString(process.env.NEXT_PUBLIC_TURNSTILE_SITEKEY)) && !turnstileToken)
             }
             className="rounded-pill bg-accent px-6 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-60"

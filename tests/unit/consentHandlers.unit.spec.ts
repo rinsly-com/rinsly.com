@@ -81,6 +81,8 @@ describe('offerteHandler consent', () => {
     naam: 'Ada',
     email: 'ada@example.nl',
     subscription: 'care',
+    b2bConfirmed: true,
+    kvkNummer: '12345678',
   }
 
   it('stores the server clock and the Dutch sentence, ignoring client consent fields', async () => {
