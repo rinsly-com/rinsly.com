@@ -4,8 +4,21 @@
  * /nl/privacy, /en/privacy, /nl/voorwaarden and /en/voorwaarden are live with
  * noindex,nofollow. The slug is shared across locales, so dropping these two
  * slugs removes exactly those four URLs.
+ *
+ * Placeholder slugs in PLACEHOLDER_NOINDEX_SLUGS are also omitted until
+ * Marketeer's final copy lands. Remove a slug from that set in the same PR
+ * that replaces the placeholders. The seed only writes meta.noindex for a page
+ * row it creates; it never rewrites an existing page. For a page that already
+ * exists, set meta.noindex to false through the content endpoint or in the
+ * admin, or the page stays noindex while the sitemap lists it.
  */
-export const SITEMAP_EXCLUDED_SLUGS = new Set(['privacy', 'voorwaarden'])
+export const PLACEHOLDER_NOINDEX_SLUGS = new Set(['cases', 'website-laten-maken-woerden'])
+
+export const SITEMAP_EXCLUDED_SLUGS = new Set([
+  'privacy',
+  'voorwaarden',
+  ...PLACEHOLDER_NOINDEX_SLUGS,
+])
 
 export function slugsForSitemap(pageSlugs: readonly (string | null | undefined)[]): string[] {
   return [

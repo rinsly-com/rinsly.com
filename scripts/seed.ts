@@ -34,6 +34,11 @@
  * access, including on a local seed. In production the seed also skips
  * orphan-version repair and oldest-user admin promotion.
  *
+ * noindex: the placeholder-noindex helper is applied only to a page row created
+ * by this run. A seed rerun never flips meta.noindex on an existing page; for
+ * /cases and the Woerden page, dropping noindex goes through the content
+ * endpoint or the admin.
+ *
  * Known limit: a deleted page is recreated with a new id; kept pages' header
  * and in-page links to it are not relinked (see seedLock.ts).
  *
@@ -47,6 +52,7 @@ import { sql } from '@payloadcms/db-d1-sqlite'
 import config from '../src/payload.config'
 import { readServerEnv } from '../src/lib/env'
 import { logCaught } from '../src/lib/logCaught'
+import { LOCAL_PAGE_SLUG } from '../src/lib/localPageJsonLd'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
 import { idRowSchema, userRowSchema } from '../src/lib/rows'
 import {
@@ -58,10 +64,26 @@ import {
   type GlobalLinks,
   type PageSeedAction,
 } from './seedLock'
+import { PLACEHOLDER_NOINDEX_SLUGS, SITEMAP_EXCLUDED_SLUGS } from '../src/lib/sitemapSlugs'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 type Block = Record<string, unknown>
 type Locale = 'nl' | 'en'
+
+/**
+ * Placeholder pages are noindex. Every other indexable slug writes false:
+ * Payload updates deep-merge, so omitting the field leaves a former placeholder
+ * noindexed after it leaves PLACEHOLDER_NOINDEX_SLUGS and the sitemap lists it.
+ * Privacy and voorwaarden stay excluded and keep the noindex stored in admin.
+ */
+const placeholderNoindexMeta = (
+  slug: string,
+): { meta: { noindex: boolean } } | Record<string, never> => {
+  if (PLACEHOLDER_NOINDEX_SLUGS.has(slug)) return { meta: { noindex: true } }
+  if (SITEMAP_EXCLUDED_SLUGS.has(slug)) return {}
+  return { meta: { noindex: false } }
+}
+
 
 const t = <T,>(locale: Locale, nl: T, en: T): T => (locale === 'nl' ? nl : en)
 
@@ -118,9 +140,11 @@ const SLUG = {
   partner: 'partnerprogramma',
   platform: 'platform',
   prijzen: 'prijzen',
+  cases: 'cases',
   website: 'website',
   over: 'over',
   contact: 'contact',
+  woerden: LOCAL_PAGE_SLUG,
 } as const
 
 /** Link to another page, optionally to an anchor inside it. */
@@ -168,8 +192,8 @@ const partnerCheckCta = (locale: Locale): Block => ({
   title: t(locale, 'Meet een site in een halve minuut', 'Measure a site in half a minute'),
   text: t(
     locale,
-    'Elke lead die wij aanleveren komt met vijf rapportcijfers en een screenshot. Probeer de meting zelf op elke URL.',
-    'Every lead we supply comes with five grades and a screenshot. Try the measurement yourself on any URL.',
+    'Probeer de meting zelf op elke URL.',
+    'Try the measurement yourself on any URL.',
   ),
   button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
 })
@@ -457,6 +481,55 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
   },
   {
     blockType: 'services',
+    anchor: 'framer',
+    header: {
+      eyebrow: t(locale, 'Eerlijk vergelijken', 'An honest comparison'),
+      title: t(locale, 'Framer of Rinsly?', 'Framer or Rinsly?'),
+      intro: t(
+        locale,
+        'Het hangt af van wat je klant nodig heeft. Een goed gesprek begint met de vraag welke van de twee past.',
+        'It depends on what your client needs. A good conversation starts with which of the two fits.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconBrush',
+        title: t(locale, 'Framer past bij een portfolio of campagne', 'Framer fits a portfolio or a campaign'),
+        description: t(
+          locale,
+          'Bouw je het ontwerp zelf in Framer? Dan heb je een goed gereedschap voor een portfolio of een campagnepagina. Je bent dan zelf verantwoordelijk voor bouw, beheer en support.',
+          'Do you build the design yourself in Framer? Then you have a good tool for a portfolio or a campaign page. You are then responsible for build, management and support yourself.',
+        ),
+        features: [
+          feature(t(locale, 'Portfolio of showcase', 'Portfolio or showcase')),
+          feature(t(locale, 'Campagnepagina', 'Campaign page')),
+        ],
+      },
+      {
+        icon: 'IconPackages',
+        title: t(locale, 'Rinsly past bij een studio die niet zelf bouwt en beheert', 'Rinsly fits a studio that does not itself build and manage sites'),
+        description: t(
+          locale,
+          'Jij ontwerpt en levert het design system. Wij bouwen het als applicatie, hosten en onderhouden het, en jij verdient mee aan het abonnement, afhankelijk van wat je oppakt (zie de ladder).',
+          'You design and deliver the design system. We build it as an application, host and maintain it, and you earn a share of the subscription, depending on what you take on (see the ladder).',
+        ),
+        features: [
+          feature(t(locale, 'Bouw en hosting door Rinsly', 'Build and hosting by Rinsly')),
+          feature(t(locale, 'Beheer en updates door Rinsly', 'Management and updates by Rinsly')),
+        ],
+      },
+    ],
+  },
+  {
+    blockType: 'note',
+    text: t(
+      locale,
+      'Framer is een merk van de eigenaar. Rinsly is niet verbonden aan Framer. Informatie over Framer gecontroleerd op framer.com, 26 november 2026.',
+      'Framer is a brand of its owner. Rinsly is not affiliated with Framer. Information about Framer checked on framer.com, 26 November 2026.',
+    ),
+  },
+  {
+    blockType: 'services',
     anchor: 'hoe',
     header: {
       eyebrow: t(locale, 'Hoe het werkt', 'How it works'),
@@ -541,63 +614,6 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
     ),
   ),
   partnerCheckCta(locale),
-  {
-    blockType: 'services',
-    anchor: 'leads',
-    header: {
-      eyebrow: t(locale, 'Leads voor partners', 'Leads for partners'),
-      title: t(locale, 'Sneller groeien dan je eigen boek toelaat', 'Grow faster than your own book allows'),
-      intro: t(
-        locale,
-        'Wij meten websites op grote schaal: we sporen bedrijven op, scoren hun site op moderniteit, snelheid, mobiel, vindbaarheid en veiligheid, en selecteren de beste kandidaten. Als partner krijg je daar elke maand een deel van, zonder dat het je iets kost; heb je er meer nodig, dan maken we ze op aanvraag aan.',
-        'We measure websites at scale: we find businesses, score their site on modernity, speed, mobile, findability and security, and pick the best candidates. As a partner you get a share of that every month at no cost; if you need more, we generate them on request.',
-      ),
-    },
-    cards: [
-      {
-        icon: 'IconSeeding',
-        title: t(locale, 'Elke maand inbegrepen', 'Included every month'),
-        description: t(
-          locale,
-          'Bij je partnerschap hoort een maandelijkse portie leads. Kost je niets, hoef je niet af te nemen, en je zit er niet aan vast.',
-          'A monthly allocation of leads comes with your partnership. Costs you nothing, nothing to sign up for, nothing to cancel.',
-        ),
-        features: [
-          feature(t(locale, 'Vijf rapportcijfers per site', 'Five grades per site')),
-          feature(t(locale, 'Bevindingen, screenshot & contactgegevens', 'Findings, screenshot & contact details')),
-          feature(t(locale, '30 dagen exclusief voor jou', 'Exclusive to you for 30 days')),
-        ],
-      },
-      {
-        icon: 'IconTargetArrow',
-        title: t(locale, 'Meer op aanvraag', 'More on request'),
-        description: t(
-          locale,
-          'Wil je een specifieke regio of branche uitkammen, of een campagne draaien? Dan maken we ze op aanvraag aan: per stuk, per tien of per honderd.',
-          'Want to comb through a specific region or branch, or run a campaign? We generate them on request: one, ten or a hundred at a time.',
-        ),
-        features: [
-          feature(t(locale, 'Filteren op branche en regio', 'Filter by branch and region')),
-          feature(t(locale, 'Geen abonnement, geen verplichting', 'No subscription, no commitment')),
-          feature(t(locale, 'Prijs op aanvraag', 'Price on request')),
-        ],
-      },
-      {
-        icon: 'IconRocket',
-        title: t(locale, 'Wordt het een klant?', 'Does one become a client?'),
-        description: t(
-          locale,
-          'Dan telt die klant mee in je portfolio, en tilt dus je tarief op de ladder mee omhoog. Een lead die niets blijkt te zijn vervangen we.',
-          'Then that client counts toward your portfolio, and lifts your rate on the ladder with it. A lead that turns out to be nothing gets replaced.',
-        ),
-        features: [
-          feature(t(locale, 'Telt mee voor je omzetniveau', 'Counts toward your revenue level')),
-          feature(t(locale, 'Waardeloze leads worden vervangen', 'Worthless leads are replaced')),
-          feature(t(locale, 'Jij bepaalt wie je belt', 'You decide who you call')),
-        ],
-      },
-    ],
-  },
   {
     blockType: 'accordion',
     anchor: 'faq',
@@ -1172,6 +1188,108 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
   ),
 ]
 
+/* ------------------------------- /cases ------------------------------------ */
+/* Yaron 26 Nov 15:59: a cases page is OK for burojazz.nl and Up2Brand. Before */
+/* this page existed /nl/cases answered 404. Structure by Builder. ALL COPY    */
+/* BELOW IS PLACEHOLDER: Marketeer writes the final text (then Lawyer). No     */
+/* quotes, numbers or results are attributed to a client. Slots:               */
+/* ~/Rinsly/marketing/copy-slots-cases.md                                      */
+/* IMAGE SLOT: no block in the CMS takes a picture yet (needs a new block +    */
+/* migration, so Yaron decides). Until then each case has a "Beeld" card with  */
+/* a placeholder line where the screenshot goes.                               */
+
+const caseBlocks = (
+  locale: Locale,
+  c: { anchor: string; client: string; url: string; host: string },
+): Block[] => [
+  {
+    blockType: 'services',
+    anchor: c.anchor,
+    header: {
+      eyebrow: t(locale, `[Concept] Case ${c.client}`, `[Draft] Case ${c.client}`),
+      title: t(
+        locale,
+        `${c.client}: titel volgt van Marketeer`,
+        `${c.client}: title to follow from Marketeer`,
+      ),
+      intro: t(
+        locale,
+        'Korte inleiding op deze case volgt van Marketeer.',
+        'A short introduction to this case follows from Marketeer.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconUsers',
+        title: t(locale, 'Klant', 'Client'),
+        description: t(
+          locale,
+          `${c.client}. Omschrijving van de klant volgt.`,
+          `${c.client}. Description of the client follows.`,
+        ),
+      },
+      {
+        icon: 'IconCode',
+        title: t(locale, 'Wat we bouwden', 'What we built'),
+        description: t(
+          locale,
+          'Omschrijving van wat Rinsly voor deze klant bouwde volgt van Marketeer.',
+          'A description of what Rinsly built for this client follows from Marketeer.',
+        ),
+      },
+      {
+        icon: 'IconBrush',
+        title: t(locale, 'Beeld', 'Image'),
+        description: t(
+          locale,
+          'IMAGE SLOT: hier komt een screenshot van de website.',
+          'IMAGE SLOT: a screenshot of the website goes here.',
+        ),
+      },
+    ],
+  },
+  {
+    blockType: 'cta',
+    eyebrow: t(locale, '[Concept] Bekijk de site', '[Draft] See the site'),
+    title: t(locale, `Bekijk ${c.host}`, `Visit ${c.host}`),
+    text: t(
+      locale,
+      'Tekst bij de link volgt van Marketeer.',
+      'Text for the link follows from Marketeer.',
+    ),
+    button: externalLink(t(locale, `Naar ${c.host}`, `Go to ${c.host}`), c.url, {
+      variant: 'primary',
+      newTab: true,
+    }),
+  },
+]
+
+const casesLayout = (locale: Locale, ids: PageIds): Block[] => [
+  pageHero(
+    'quiet',
+    t(locale, '[Concept] Cases', '[Draft] Cases'),
+    t(locale, 'Websites die we bouwden en hosten', 'Websites we built and host'),
+    t(
+      locale,
+      'Twee voorbeelden van een ontwerp dat als website live ging. Introductie volgt van Marketeer.',
+      'Two examples of a design that went live as a website. Introduction follows from Marketeer.',
+    ),
+  ),
+  ...caseBlocks(locale, { anchor: 'burojazz', client: 'Burojazz', url: 'https://burojazz.nl', host: 'burojazz.nl' }),
+  ...caseBlocks(locale, { anchor: 'up2brand', client: 'Up2Brand', url: 'https://up2brand.com', host: 'up2brand.com' }),
+  cta(
+    locale,
+    ids,
+    t(locale, '[Concept] Contact', '[Draft] Contact'),
+    t(locale, 'Een ontwerp dat live moet?', 'A design that needs to go live?'),
+    t(
+      locale,
+      'Stuur een bericht en we kijken samen naar jouw ontwerp.',
+      'Send a message and we look at your design together.',
+    ),
+  ),
+]
+
 /* --------------------------------- /over ---------------------------------- */
 
 const overLayout = (locale: Locale, ids: PageIds): Block[] => [
@@ -1270,6 +1388,147 @@ const contactLayout = (locale: Locale): Block[] => [
       { label: t(locale, 'Mail ons direct', 'Email us directly'), variant: 'secondary', type: 'external', url: 'mailto:contact@rinsly.com' },
     ],
   },
+]
+
+/* ----------------- /website-laten-maken-woerden (local page) ---------------- */
+/* Yaron 26 Nov 15:59: remote only from Woerden, no in-person Utrecht service. */
+/* Structure by Builder. ALL COPY BELOW IS PLACEHOLDER: Marketeer writes the   */
+/* final text (then Lawyer). Slots: ~/Rinsly/marketing/copy-slots-local-woerden.md */
+
+const localWoerdenMeta = (locale: Locale) => ({
+  title: t(
+    locale,
+    '[Concept] Website laten maken, op afstand vanuit Woerden',
+    '[Draft] Website building, remotely from Woerden',
+  ),
+  description: t(
+    locale,
+    '[Concept] Rinsly bouwt en host websites voor ontwerpstudio’s in de provincie Utrecht, op afstand vanuit Woerden.',
+    '[Draft] Rinsly builds and hosts websites for design studios in the province of Utrecht, remotely from Woerden.',
+  ),
+})
+
+const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
+  pageHero(
+    'quiet',
+    t(locale, '[Concept] Vanuit Woerden', '[Draft] From Woerden'),
+    t(
+      locale,
+      'Websites bouwen en hosten, op afstand vanuit Woerden',
+      'Building and hosting websites, remotely from Woerden',
+    ),
+    t(
+      locale,
+      'Rinsly zit in Woerden. Voor ontwerpstudio’s in de provincie Utrecht werken we op afstand: kennismaken per telefoon of video, bouwen en beheren zonder dat iemand hoeft te reizen.',
+      'Rinsly is based in Woerden. For design studios in the province of Utrecht we work remotely: an intro by phone or video, building and managing without anyone having to travel.',
+    ),
+    [pageLink(t(locale, 'Neem contact op', 'Get in touch'), ids, SLUG.contact, { variant: 'primary' })],
+  ),
+  {
+    blockType: 'services',
+    anchor: 'werkwijze',
+    header: {
+      eyebrow: t(locale, '[Concept] Op afstand', '[Draft] Remote'),
+      title: t(locale, 'Zo werken we samen', 'How we work together'),
+      intro: t(
+        locale,
+        'We werken op afstand. Dat houdt het eenvoudig, ook als je studio in Utrecht zit.',
+        'We work remotely. That keeps it simple, also if your studio is in Utrecht.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconUsers',
+        title: t(locale, 'Kennismaken op afstand', 'An intro, remotely'),
+        description: t(
+          locale,
+          'We plannen een gesprek per telefoon of video om te horen wat je studio nodig heeft.',
+          'We schedule a call by phone or video to hear what your studio needs.',
+        ),
+      },
+      {
+        icon: 'IconCode',
+        title: t(locale, 'Bouwen op afstand', 'Building, remotely'),
+        description: t(
+          locale,
+          'Je levert het design aan, wij bouwen het als website en delen de voortgang online.',
+          'You deliver the design, we build it as a website and share progress online.',
+        ),
+      },
+      {
+        icon: 'IconRefresh',
+        title: t(locale, 'Hosting en beheer op afstand', 'Hosting and care, remotely'),
+        description: t(
+          locale,
+          'Na livegang houden we de website draaiend en passen we aan waar nodig, via e-mail of een kort gesprek.',
+          'After launch we keep the website running and adjust where needed, by email or a short call.',
+        ),
+      },
+    ],
+  },
+  {
+    blockType: 'richText',
+    anchor: 'regio',
+    width: 'narrow',
+    header: {
+      eyebrow: t(locale, '[Concept] Regio', '[Draft] Region'),
+      title: t(locale, 'Voor ontwerpstudio’s in de provincie Utrecht', 'For design studios in the province of Utrecht'),
+    },
+    content: richBody(
+      ...t(
+        locale,
+        [
+          'Rinsly is gevestigd in Woerden. We werken voor ontwerpstudio’s in de provincie Utrecht, op afstand.',
+          'Wil je liever eerst praten? Plan een telefoongesprek of een videogesprek via het contactformulier.',
+        ],
+        [
+          'Rinsly is based in Woerden. We work for design studios in the province of Utrecht, remotely.',
+          'Prefer to talk first? Schedule a phone call or a video call through the contact form.',
+        ],
+      ),
+    ),
+  },
+  {
+    blockType: 'accordion',
+    anchor: 'faq',
+    header: {
+      eyebrow: t(locale, '[Concept] Veelgestelde vragen', '[Draft] FAQ'),
+      title: t(locale, 'Praktisch', 'Practicalities'),
+    },
+    items: [
+      {
+        title: t(locale, 'Komen jullie langs in Utrecht?', 'Do you visit us in Utrecht?'),
+        body: richBody(
+          t(
+            locale,
+            'Nee. Wij werken op afstand vanuit Woerden: per telefoon, video en e-mail. Er is geen dienstverlening op locatie.',
+            'No. We work remotely from Woerden: by phone, video and email. There is no on-site service.',
+          ),
+        ),
+      },
+      {
+        title: t(locale, 'Voor wie werkt Rinsly?', 'Who does Rinsly work for?'),
+        body: richBody(
+          t(
+            locale,
+            'Voor ontwerpstudio’s die hun ontwerp als website willen laten bouwen en hosten.',
+            'For design studios that want their design built and hosted as a website.',
+          ),
+        ),
+      },
+    ],
+  },
+  cta(
+    locale,
+    ids,
+    t(locale, '[Concept] Contact', '[Draft] Contact'),
+    t(locale, 'Laten we praten', 'Let’s talk'),
+    t(
+      locale,
+      'Stuur een bericht, dan plannen we een gesprek op afstand.',
+      'Send a message and we schedule a remote call.',
+    ),
+  ),
 ]
 
 /* ------------------------------ header / footer ---------------------------- */
@@ -1740,7 +1999,12 @@ async function run() {
   // Every page in the site, in one list. Layouts are written only after all of
   // them exist, because an internal link stores the TARGET PAGE'S id — a page
   // cannot link to a sibling that has not been created yet.
-  const sitePages: { slug: string; title: (l: Locale) => string; layout: (l: Locale, ids: PageIds) => Block[] }[] = [
+  const sitePages: {
+    slug: string
+    title: (l: Locale) => string
+    layout: (l: Locale, ids: PageIds) => Block[]
+    meta?: (l: Locale) => { title: string; description: string }
+  }[] = [
     { slug: SLUG.home, title: () => 'Rinsly', layout: homeLayout },
     {
       slug: SLUG.partner,
@@ -1754,8 +2018,15 @@ async function run() {
       title: (l) => t(l, 'Website bij Rinsly', 'A website from Rinsly'),
       layout: websiteLayout,
     },
+    { slug: SLUG.cases, title: (l) => t(l, 'Cases', 'Cases'), layout: casesLayout },
     { slug: SLUG.over, title: (l) => t(l, 'Over ons', 'About'), layout: overLayout },
     { slug: SLUG.contact, title: () => 'Contact', layout: (l) => contactLayout(l) },
+    {
+      slug: SLUG.woerden,
+      title: (l) => t(l, 'Website laten maken in Woerden', 'Website building from Woerden'),
+      layout: localWoerdenLayout,
+      meta: localWoerdenMeta,
+    },
     // The legal pages carry no internal links, but they ride along so that one
     // loop owns "which pages exist".
     {
@@ -1804,7 +2075,7 @@ async function run() {
           collection: 'pages',
           draft: true,
           locale: 'nl',
-          data: { slug: page.slug, title: page.title('nl') },
+          data: { slug: page.slug, title: page.title('nl'), ...placeholderNoindexMeta(page.slug) },
           user,
         }),
       )
@@ -1859,6 +2130,18 @@ async function run() {
         data: {
           title: page.title(locale),
           layout: page.layout(locale, ids),
+          // Localized meta (title/description) is written with the locale it
+          // completes. `noindex` is document-level, so it is only seeded for a
+          // page row created in this run; completing a locale on an existing
+          // page must not touch an editor's noindex choice.
+          ...(page.meta || created.has(page.slug)
+            ? {
+                meta: {
+                  ...(page.meta ? page.meta(locale) : {}),
+                  ...(created.has(page.slug) ? placeholderNoindexMeta(page.slug).meta : {}),
+                },
+              }
+            : {}),
           _status: 'published',
         } as never,
         user,

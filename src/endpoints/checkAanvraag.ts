@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { getRuntime } from '../lib/bindings'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
+import { checkAanvraagFieldsTooLong, checkMailSubject, checkNotificationText } from '../lib/submissionLimits'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -46,8 +47,9 @@ function normalizeUrl(value: string): string | null {
 export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) => {
   const raw = await readRequestJson(req)
   if (!raw.ok) return json({ ok: false, error: 'invalid_body' }, 400)
-  if (asJsonObject(raw.value) === null) return json({ ok: false, error: 'invalid_body' }, 400)
-  const parsed = checkAanvraagSchema.safeParse(raw.value)
+  const rawObject = asJsonObject(raw.value)
+  if (rawObject === null) return json({ ok: false, error: 'invalid_body' }, 400)
+  const parsed = checkAanvraagSchema.safeParse(rawObject)
   if (!parsed.success) return json({ ok: false, error: 'invalid_body' }, 400)
   const body = parsed.data
 
@@ -55,9 +57,15 @@ export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) 
     return json({ ok: true })
   }
 
-  const url = normalizeUrl(body.url)
+  const urlInput = body.url
   const naam = body.naam
   const telefoon = body.telefoon
+
+  if (checkAanvraagFieldsTooLong({ url: urlInput, naam, telefoon })) {
+    return json({ ok: false, error: 'validation' }, 422)
+  }
+
+  const url = normalizeUrl(urlInput)
 
   if (!url || !naam || !isPhone(telefoon)) {
     return json({ ok: false, error: 'validation' }, 422)
@@ -83,8 +91,8 @@ export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) 
     req.payload
       .sendEmail({
         to: 'contact@rinsly.com',
-        subject: `Nieuwe websitecheck-aanvraag: ${url}`,
-        text: `Er is een nieuwe aanvraag binnengekomen via rinsly.com/check.\n\nWebsite: ${url}\nNaam: ${naam}\nTelefoon: ${telefoon}\n\nDe aanvraag staat ook in het admin-panel onder Websitecheck-aanvragen.`,
+        subject: checkMailSubject(url),
+        text: checkNotificationText({ url, naam, telefoon }),
       })
       .catch((err: unknown) => {
         req.payload.logger.error({
