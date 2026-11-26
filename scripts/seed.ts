@@ -29,15 +29,25 @@ import { readServerEnv } from '../src/lib/env'
 import { logCaught } from '../src/lib/logCaught'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
 import { idRowSchema, userRowSchema } from '../src/lib/rows'
-import { PLACEHOLDER_NOINDEX_SLUGS } from '../src/lib/sitemapSlugs'
+import { PLACEHOLDER_NOINDEX_SLUGS, SITEMAP_EXCLUDED_SLUGS } from '../src/lib/sitemapSlugs'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 type Block = Record<string, unknown>
 type Locale = 'nl' | 'en'
 
-/** meta.noindex for placeholder pages. Driven by PLACEHOLDER_NOINDEX_SLUGS; remove a slug there when final copy lands. */
-const placeholderNoindexMeta = (slug: string): { meta: { noindex: true } } | Record<string, never> =>
-  PLACEHOLDER_NOINDEX_SLUGS.has(slug) ? { meta: { noindex: true } } : {}
+/**
+ * Placeholder pages are noindex. Every other indexable slug writes false:
+ * Payload updates deep-merge, so omitting the field leaves a former placeholder
+ * noindexed after it leaves PLACEHOLDER_NOINDEX_SLUGS and the sitemap lists it.
+ * Privacy and voorwaarden stay excluded and keep the noindex stored in admin.
+ */
+const placeholderNoindexMeta = (
+  slug: string,
+): { meta: { noindex: boolean } } | Record<string, never> => {
+  if (PLACEHOLDER_NOINDEX_SLUGS.has(slug)) return { meta: { noindex: true } }
+  if (SITEMAP_EXCLUDED_SLUGS.has(slug)) return {}
+  return { meta: { noindex: false } }
+}
 
 
 const t = <T,>(locale: Locale, nl: T, en: T): T => (locale === 'nl' ? nl : en)

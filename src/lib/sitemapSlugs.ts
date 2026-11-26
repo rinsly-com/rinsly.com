@@ -6,8 +6,9 @@
  * slugs removes exactly those four URLs.
  *
  * Placeholder slugs in PLACEHOLDER_NOINDEX_SLUGS are also omitted until
- * Marketeer's final copy lands. Remove a slug from that set (seed then stops
- * setting meta.noindex too) in the same PR that replaces the placeholders.
+ * Marketeer's final copy lands. Remove a slug from that set in the same PR
+ * that replaces the placeholders. Seed then writes meta.noindex false; omitting
+ * the field would leave the old true in place while the sitemap lists the page.
  */
 export const PLACEHOLDER_NOINDEX_SLUGS = new Set(['cases'])
 

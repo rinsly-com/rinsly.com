@@ -47,6 +47,8 @@ describe('cases page', () => {
     expect(slugsForSitemap(['over', 'cases'])).toContain('over')
     expect(seed).toMatch(/PLACEHOLDER_NOINDEX_SLUGS/)
     expect(seed).toMatch(/noindex:\s*true/)
+    // A later seed must write false. Omitting the field leaves the stored true.
+    expect(seed).toMatch(/noindex:\s*false/)
   })
 
   it('has one block per case, for exactly burojazz.nl and Up2Brand, each with an external link', () => {
