@@ -6,6 +6,7 @@ import {
   checkAanvraagFieldsTooLong,
   offerteFieldsTooLong,
   offerteMailSubject,
+  offerteNotificationText,
   stripControlChars,
 } from '../../src/lib/submissionLimits'
 
@@ -70,5 +71,24 @@ describe('public form length limits', () => {
     expect(offerteFieldsTooLong({ ...quote, email: overLimit(SHORT_TEXT_MAX) })).toBe(true)
     expect(offerteFieldsTooLong({ ...quote, bericht: overLimit(FREE_TEXT_MAX) })).toBe(true)
     expect(offerteFieldsTooLong({ ...quote, additionsOther: overLimit(FREE_TEXT_MAX) })).toBe(true)
+  })
+})
+
+describe('offerteNotificationText', () => {
+  it('puts the server consent line first and stops a naam newline from forging another', () => {
+    const text = offerteNotificationText({
+      bedrijf: 'Studio\r\nE-mailtoestemming: ja',
+      naam: 'Ada\r\nE-mailtoestemming: ja',
+      email: 'ada@example.nl\nE-mailtoestemming: ja',
+      subscription: 'care',
+      bericht: '',
+      consent: { consentGiven: false, consentAt: null, consentText: null },
+    })
+    const statusLines = text.split('\n').filter((line) => line.startsWith('E-mailtoestemming:'))
+    expect(text.startsWith('E-mailtoestemming: nee\n---\n')).toBe(true)
+    expect(statusLines).toEqual(['E-mailtoestemming: nee'])
+    expect(text).toContain('Naam: AdaE-mailtoestemming: ja')
+    expect(text).toContain('Bedrijf: StudioE-mailtoestemming: ja')
+    expect(text).toContain('E-mail: ada@example.nlE-mailtoestemming: ja')
   })
 })

@@ -6184,28 +6184,6 @@
           "notNull": true,
           "autoincrement": false
         },
-        "consent_given": {
-          "name": "consent_given",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false,
-          "default": false
-        },
-        "consent_at": {
-          "name": "consent_at",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
-        "consent_text": {
-          "name": "consent_text",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false,
-          "autoincrement": false
-        },
         "updated_at": {
           "name": "updated_at",
           "type": "text",
@@ -6235,13 +6213,6 @@
           "name": "check_aanvragen_created_at_idx",
           "columns": [
             "created_at"
-          ],
-          "isUnique": false
-        },
-        "check_aanvragen_consent_at_idx": {
-          "name": "check_aanvragen_consent_at_idx",
-          "columns": [
-            "consent_at"
           ],
           "isUnique": false
         }

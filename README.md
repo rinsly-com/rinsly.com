@@ -25,11 +25,12 @@ Then open:
 
 ## Email consent retention
 
-The public `/check` lead form and the contact quote wizard (`offertes`) can
-store three columns when the visitor ticks the email-consent checkbox:
-`consentGiven`, `consentAt` (ISO-8601 from the server clock) and `consentText`
-(the exact label for the locale, from a server-side constant). The checkbox
-is optional and starts unticked. Unticked submissions store `false` and nulls.
+The contact quote wizard (`offertes`) can store three columns when the visitor
+ticks the email-consent checkbox: `consentGiven`, `consentAt` (ISO-8601 from
+the server clock) and `consentText` (the exact label for the locale, from a
+server-side constant). The checkbox is optional and starts unticked. Unticked
+submissions store `false` and nulls. The website-check form does not ask for
+this consent: it has no email address.
 
 Keep those three fields for **5 years after the last email sent about that
 submission**. There is no deletion job in this repo. A later cleanup can

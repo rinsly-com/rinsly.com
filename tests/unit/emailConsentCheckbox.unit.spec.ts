@@ -83,13 +83,12 @@ function fillCheckForm() {
 }
 
 describe('email consent checkbox', () => {
-  it('starts unticked on the Dutch /check form and is not required to submit', async () => {
+  it('does not ask for email consent on the /check form', async () => {
     const fetchMock = okFetch()
     vi.stubGlobal('fetch', fetchMock)
 
     hydrate(createElement(CheckAanvraagForm))
-    expectUnticked(EMAIL_CONSENT_TEXT.nl)
-    expect(screen.queryByRole('checkbox', { name: EMAIL_CONSENT_TEXT.en })).toBeNull()
+    expect(screen.queryByRole('checkbox')).toBeNull()
 
     fillCheckForm()
     fireEvent.click(screen.getByRole('button', { name: 'Vraag de gratis check aan' }))
@@ -98,34 +97,11 @@ describe('email consent checkbox', () => {
       expect(fetchMock).toHaveBeenCalledTimes(1)
     })
     const body = postedBody(fetchMock)
-    expect(body.emailConsent).toBe(false)
-    expect(body.locale).toBe('nl')
+    expect(body).not.toHaveProperty('emailConsent')
+    expect(body).not.toHaveProperty('locale')
     expect(body).not.toHaveProperty('consentAt')
     expect(body).not.toHaveProperty('consentText')
     expect(body).not.toHaveProperty('consentGiven')
-  })
-
-  it('stays optional after a tick and still does not send a client timestamp or sentence', async () => {
-    const fetchMock = okFetch()
-    vi.stubGlobal('fetch', fetchMock)
-
-    hydrate(createElement(CheckAanvraagForm))
-    fireEvent.click(expectUnticked(EMAIL_CONSENT_TEXT.nl))
-    expect(
-      screen.getByRole('checkbox', { name: EMAIL_CONSENT_TEXT.nl }).getAttribute('aria-checked'),
-    ).toBe('true')
-
-    fillCheckForm()
-    fireEvent.click(screen.getByRole('button', { name: 'Vraag de gratis check aan' }))
-
-    await waitFor(() => {
-      expect(fetchMock).toHaveBeenCalledTimes(1)
-    })
-    const body = postedBody(fetchMock)
-    expect(body.emailConsent).toBe(true)
-    expect(body.locale).toBe('nl')
-    expect(body).not.toHaveProperty('consentAt')
-    expect(body).not.toHaveProperty('consentText')
   })
 
   it('starts unticked on the Dutch contact quote form and does not block submit', () => {
@@ -140,6 +116,9 @@ describe('email consent checkbox', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Volgende' }))
 
     expectUnticked(EMAIL_CONSENT_TEXT.nl)
+    expect(screen.getByRole('link', { name: 'privacyverklaring' }).getAttribute('href')).toBe(
+      '/nl/privacy',
+    )
     expect(
       screen.getByRole('button', { name: 'Aanvraag versturen' }).hasAttribute('disabled'),
     ).toBe(false)
@@ -157,6 +136,9 @@ describe('email consent checkbox', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Next' }))
 
     expectUnticked(EMAIL_CONSENT_TEXT.en)
+    expect(screen.getByRole('link', { name: 'privacy policy' }).getAttribute('href')).toBe(
+      '/en/privacy',
+    )
     expect(screen.getByRole('button', { name: 'Send request' }).hasAttribute('disabled')).toBe(
       false,
     )

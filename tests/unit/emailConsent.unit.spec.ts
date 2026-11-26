@@ -1,11 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
+import { adminFieldOnly } from '@rinsly-com/site-core/access'
+
 import {
   EMAIL_CONSENT_TEXT,
   consentNotice,
   emailConsentFields,
   emailConsentFromSubmission,
-  userCanReadConsent,
 } from '../../src/lib/emailConsent'
 
 const NOW = new Date('2026-11-26T13:50:00.000Z')
@@ -68,8 +69,12 @@ describe('emailConsentFromSubmission', () => {
     })
     expect(stored.consentAt).not.toBe(CLIENT_TIMESTAMP)
     expect(stored.consentText).not.toBe(CLIENT_TEXT)
-    expect(stored.consentText).toBe('Yes, Rinsly may email me about this')
-    expect(EMAIL_CONSENT_TEXT.nl).toBe('Ja, Rinsly mag mij hierover e-mailen')
+    expect(EMAIL_CONSENT_TEXT.en.startsWith('Yes, I would also like Rinsly to e-mail me')).toBe(
+      true,
+    )
+    expect(EMAIL_CONSENT_TEXT.nl.startsWith('Ja, ik wil ook e-mails van Rinsly ontvangen')).toBe(
+      true,
+    )
   })
 })
 
@@ -86,24 +91,12 @@ describe('email consent columns', () => {
 })
 
 describe('consent field access', () => {
-  it('lets admins read the consent columns and hides them from editors', () => {
-    expect(userCanReadConsent(null)).toBe(false)
-    expect(userCanReadConsent(undefined)).toBe(false)
-    expect(userCanReadConsent({})).toBe(false)
-    expect(userCanReadConsent({ roles: ['editor'] })).toBe(false)
-    expect(userCanReadConsent({ roles: 'admin' })).toBe(false)
-    expect(userCanReadConsent({ roles: ['admin'] })).toBe(true)
-    expect(userCanReadConsent({ roles: ['editor', 'admin'] })).toBe(true)
-
+  it('uses adminFieldOnly for read and keeps updates closed', () => {
     for (const field of emailConsentFields()) {
-      const read = field.access?.read
+      expect(field.access?.read).toBe(adminFieldOnly)
       const update = field.access?.update
-      if (!read || !update) throw new Error(`${field.name} is missing access`)
-      const editor = { req: { user: { roles: ['editor'] } } } as Parameters<typeof read>[0]
-      const admin = { req: { user: { roles: ['admin'] } } } as Parameters<typeof read>[0]
-      expect(read(editor)).toBe(false)
-      expect(read(admin)).toBe(true)
-      expect(update(admin)).toBe(false)
+      if (!update) throw new Error(`${field.name} is missing update access`)
+      expect(update({ req: { user: null } })).toBe(false)
     }
   })
 })
@@ -120,7 +113,7 @@ describe('consentNotice', () => {
         consentText: EMAIL_CONSENT_TEXT.nl,
       }),
     ).toBe(
-      'E-mailtoestemming: ja\nToestemmingstekst: Ja, Rinsly mag mij hierover e-mailen\nTijdstip: 2026-11-26T13:50:00.000Z',
+      `E-mailtoestemming: ja\nToestemmingstekst: ${EMAIL_CONSENT_TEXT.nl}\nTijdstip: 2026-11-26T13:50:00.000Z`,
     )
   })
 })

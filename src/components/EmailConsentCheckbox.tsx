@@ -3,7 +3,7 @@
 import { Checkbox } from '@rinsly-com/ui/checkbox'
 import { Field } from '@rinsly-com/ui/field'
 
-import { EMAIL_CONSENT_TEXT, type EmailConsentLocale } from '@/lib/emailConsent'
+import { EMAIL_CONSENT_TEXT, EMAIL_CONSENT_WITHDRAWAL, type EmailConsentLocale } from '@/lib/emailConsent'
 
 /**
  * Optional email-consent box. Defaults to unticked. The label is the server
@@ -59,6 +59,13 @@ export function EmailConsentCheckbox({
         </Checkbox.Root>
         <span className="text-ink">{label}</span>
       </Field.Label>
+      <p className="px-1 text-xs leading-relaxed text-muted">
+        {EMAIL_CONSENT_WITHDRAWAL[locale].before}
+        <a href={EMAIL_CONSENT_WITHDRAWAL[locale].href} className="text-accent underline">
+          {EMAIL_CONSENT_WITHDRAWAL[locale].link}
+        </a>
+        {EMAIL_CONSENT_WITHDRAWAL[locale].after}
+      </p>
     </Field.Root>
   )
 }

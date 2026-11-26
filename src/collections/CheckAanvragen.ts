@@ -2,8 +2,6 @@ import type { CollectionConfig } from 'payload'
 
 import { authenticated } from '@rinsly-com/site-core/access'
 
-import { emailConsentFields } from '@/lib/emailConsent'
-
 /**
  * Check-aanvragen — free website-check requests from the generic /check page
  * (the LeadLens funnel's fallback for organic visitors and expired tokens).
@@ -18,7 +16,7 @@ export const CheckAanvragen: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'url',
-    defaultColumns: ['url', 'naam', 'telefoon', 'consentGiven', 'createdAt'],
+    defaultColumns: ['url', 'naam', 'telefoon', 'createdAt'],
   },
   access: {
     read: authenticated,
@@ -30,7 +28,6 @@ export const CheckAanvragen: CollectionConfig = {
     { name: 'url', label: { en: 'Website', nl: 'Website' }, type: 'text', required: true },
     { name: 'naam', label: { en: 'Name', nl: 'Naam' }, type: 'text', required: true },
     { name: 'telefoon', label: { en: 'Phone', nl: 'Telefoonnummer' }, type: 'text', required: true },
-    ...emailConsentFields(),
   ],
   timestamps: true,
 }

@@ -5,7 +5,6 @@ import { Suspense, useRef, useState } from 'react'
 
 import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
-import { EmailConsentCheckbox } from '@/components/EmailConsentCheckbox'
 import { publicString } from '@/lib/env'
 import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
 import { formAckSchema, readJsonResponse } from '@/lib/json'
@@ -51,7 +50,6 @@ function ExpiredNotice() {
  */
 export function CheckAanvraagForm() {
   const [data, setData] = useState({ url: '', naam: '', telefoon: '', bedrijfsnaam: '' })
-  const [emailConsent, setEmailConsent] = useState(false)
   const [status, setStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle')
   const [touched, setTouched] = useState(false)
   const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
@@ -75,16 +73,7 @@ export function CheckAanvraagForm() {
           'content-type': 'application/json',
           ...turnstileHeaderRecord(tokenToSend),
         },
-        body: JSON.stringify({
-          url: data.url,
-          naam: data.naam,
-          telefoon: data.telefoon,
-          bedrijfsnaam: data.bedrijfsnaam,
-          // Locale of the label on this Dutch-only page. The server picks the
-          // sentence; this body never includes a timestamp or consent text.
-          emailConsent,
-          locale: 'nl',
-        }),
+        body: JSON.stringify(data),
       })
       const parsed = formAckSchema.safeParse(await readJsonResponse(res, '[check-aanvraag] response was not JSON'))
       if (!parsed.success) logCaught('[check-aanvraag] response failed validation', parsed.error)
@@ -178,12 +167,6 @@ export function CheckAanvraagForm() {
             className={inputClass}
           />
         </Field.Root>
-        <EmailConsentCheckbox
-          id="check-email-consent"
-          locale="nl"
-          checked={emailConsent}
-          onCheckedChange={setEmailConsent}
-        />
         {touched && !valid && status !== 'submitting' && (
           <p className="text-sm text-muted" role="alert">
             Vul uw websiteadres, naam en telefoonnummer in, dan kunnen we u bereiken.

@@ -1,3 +1,5 @@
+import { consentNotice, type StoredEmailConsent } from './emailConsent'
+
 /** Identity fields on the public check and quote forms. */
 export const SHORT_TEXT_MAX = 200
 
@@ -51,4 +53,44 @@ export function offerteFieldsTooLong(input: {
     exceedsMax(input.bericht, FREE_TEXT_MAX) ||
     exceedsMax(input.additionsOther, FREE_TEXT_MAX)
   )
+}
+
+/**
+ * Sales mail for a quote. The server consent block is the first lines, then a
+ * separator, then the visitor's answers. Single-line fields lose CR/LF so a
+ * name cannot invent another consent line.
+ */
+export function offerteNotificationText(input: {
+  bedrijf: string
+  naam: string
+  email: string
+  subscription: string
+  bericht: string
+  consent: StoredEmailConsent
+}): string {
+  const visitor = [
+    'Er is een nieuwe offerteaanvraag binnengekomen via de contactwizard.',
+    '',
+    `Bedrijf: ${stripControlChars(input.bedrijf)}`,
+    `Naam: ${stripControlChars(input.naam)}`,
+    `E-mail: ${stripControlChars(input.email)}`,
+    `Abonnement: ${input.subscription}`,
+    ...(input.bericht ? ['', 'Bericht:', input.bericht] : []),
+    '',
+    'De aanvraag staat ook in het admin-panel onder Offerteaanvragen.',
+  ]
+  return `${consentNotice(input.consent)}\n---\n${visitor.join('\n')}`
+}
+
+/** Sales mail for a website-check lead. Name and phone stay on one line each. */
+export function checkNotificationText(input: { url: string; naam: string; telefoon: string }): string {
+  return [
+    'Er is een nieuwe aanvraag binnengekomen via rinsly.com/check.',
+    '',
+    `Website: ${stripControlChars(input.url)}`,
+    `Naam: ${stripControlChars(input.naam)}`,
+    `Telefoon: ${stripControlChars(input.telefoon)}`,
+    '',
+    'De aanvraag staat ook in het admin-panel onder Websitecheck-aanvragen.',
+  ].join('\n')
 }

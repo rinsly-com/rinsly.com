@@ -707,9 +707,6 @@ export interface CheckAanvragen {
   url: string;
   naam: string;
   telefoon: string;
-  consentGiven?: boolean | null;
-  consentAt?: string | null;
-  consentText?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1222,9 +1219,6 @@ export interface CheckAanvragenSelect<T extends boolean = true> {
   url?: T;
   naam?: T;
   telefoon?: T;
-  consentGiven?: T;
-  consentAt?: T;
-  consentText?: T;
   updatedAt?: T;
   createdAt?: T;
 }

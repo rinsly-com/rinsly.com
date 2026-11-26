@@ -2,9 +2,8 @@ import type { PayloadHandler, PayloadRequest } from 'payload'
 import { z } from 'zod'
 
 import { getRuntime } from '../lib/bindings'
-import { consentNotice, emailConsentFromSubmission } from '../lib/emailConsent'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
-import { checkAanvraagFieldsTooLong } from '../lib/submissionLimits'
+import { checkAanvraagFieldsTooLong, checkNotificationText } from '../lib/submissionLimits'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -72,12 +71,10 @@ export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) 
     return json({ ok: false, error: 'validation' }, 422)
   }
 
-  // Server clock and the locale constant. Client consentAt / consentText are ignored.
-  const consent = emailConsentFromSubmission(rawObject)
   try {
     await req.payload.create({
       collection: 'check-aanvragen',
-      data: { url, naam, telefoon, ...consent },
+      data: { url, naam, telefoon },
       overrideAccess: true,
     })
   } catch (err) {
@@ -95,7 +92,7 @@ export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) 
       .sendEmail({
         to: 'contact@rinsly.com',
         subject: `Nieuwe websitecheck-aanvraag: ${url}`,
-        text: `Er is een nieuwe aanvraag binnengekomen via rinsly.com/check.\n\nWebsite: ${url}\nNaam: ${naam}\nTelefoon: ${telefoon}\n${consentNotice(consent)}\nDe aanvraag staat ook in het admin-panel onder Websitecheck-aanvragen.`,
+        text: checkNotificationText({ url, naam, telefoon }),
       })
       .catch((err: unknown) => {
         req.payload.logger.error({
