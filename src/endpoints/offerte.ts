@@ -63,8 +63,11 @@ export const offerteHandler: PayloadHandler = async (req: PayloadRequest) => {
   }
   const chosen = subscription.safeParse(body.subscription)
   const b2b = b2bFromSubmission(rawObject)
-  if (!bedrijf || !naam || !EMAIL_RE.test(email) || !chosen.success || b2b === null) {
+  if (!bedrijf || !naam || !EMAIL_RE.test(email) || !chosen.success) {
     return json({ ok: false, error: 'validation' }, 422)
+  }
+  if (b2b === null) {
+    return json({ ok: false, error: 'b2b' }, 422)
   }
 
   // Server clock and the locale constant. Client consentAt / consentText are ignored.
