@@ -5,6 +5,7 @@ import { useRef, useState } from 'react'
 import type { Locale } from '@rinsly-com/site-core'
 import { Turnstile, type TurnstileHandle } from '@rinsly-com/site-core/ui'
 
+import { EmailConsentCheckbox } from '@/components/EmailConsentCheckbox'
 import { publicString } from '@/lib/env'
 import { turnstileHeaderRecord } from '@/lib/turnstileHeaders'
 import { formAckSchema, readJsonResponse } from '@/lib/json'
@@ -34,6 +35,7 @@ type Data = {
   telefoon: string
   bouwtZelf: boolean
   verkooptHosting: boolean
+  emailConsent: boolean
 }
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
@@ -215,6 +217,7 @@ const EMPTY: Data = {
   telefoon: '',
   bouwtZelf: false,
   verkooptHosting: false,
+  emailConsent: false,
 }
 
 /**
@@ -310,6 +313,8 @@ export function OfferteForm({ locale }: { locale: Locale }) {
           additions: data.additions,
           additionsOther: data.additionsOther,
           bericht: data.bericht,
+          emailConsent: data.emailConsent,
+          locale,
         }
 
     try {
@@ -569,6 +574,12 @@ export function OfferteForm({ locale }: { locale: Locale }) {
             />
           </dl>
           <NoteField id="offerte-bericht" label={c.bericht} value={data.bericht} onValue={(v) => { set('bericht', v); }} />
+          <EmailConsentCheckbox
+            id="offerte-email-consent"
+            locale={locale}
+            checked={data.emailConsent}
+            onCheckedChange={(emailConsent) => { set('emailConsent', emailConsent); }}
+          />
           {status === 'error' && <p className="text-sm text-red-600">{c.error}</p>}
         </div>
       )}

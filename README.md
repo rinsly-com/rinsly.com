@@ -23,6 +23,22 @@ Then open:
 - `/nl/platform`, `/nl/partnerprogramma`, `/nl/prijzen`, `/nl/website`, `/nl/over`, `/nl/contact` (+ `/en/…`)
 - `http://localhost:3000/admin` — the CMS (`dev@rinsly.local` / `rinsly-dev`)
 
+## Email consent retention
+
+The public `/check` lead form and the contact quote wizard (`offertes`) can
+store three columns when the visitor ticks the email-consent checkbox:
+`consentGiven`, `consentAt` (ISO-8601 from the server clock) and `consentText`
+(the exact label for the locale, from a server-side constant). The checkbox
+is optional and starts unticked. Unticked submissions store `false` and nulls.
+
+Keep those three fields for **5 years after the last email sent about that
+submission**. There is no deletion job in this repo. A later cleanup can
+select rows with `consentGiven = true` and null the three columns once the
+last related mail is older than 5 years. `consentAt` is the moment of consent,
+not that last-mail clock. Until outbound mail timestamps exist, use
+`consentAt` as a query anchor together with a future last-mail field, and do
+not delete on `consentAt + 5 years` alone.
+
 ## Deployment
 
 The site is one Worker. Provision the Cloudflare resources noted in the TODOs at

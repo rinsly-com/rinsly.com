@@ -2,6 +2,7 @@ import type { PayloadHandler, PayloadRequest } from 'payload'
 import { z } from 'zod'
 
 import { getRuntime } from '../lib/bindings'
+import { consentNotice, emailConsentFromSubmission } from '../lib/emailConsent'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
 
 function json(body: unknown, status = 200): Response {
@@ -46,8 +47,9 @@ function normalizeUrl(value: string): string | null {
 export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) => {
   const raw = await readRequestJson(req)
   if (!raw.ok) return json({ ok: false, error: 'invalid_body' }, 400)
-  if (asJsonObject(raw.value) === null) return json({ ok: false, error: 'invalid_body' }, 400)
-  const parsed = checkAanvraagSchema.safeParse(raw.value)
+  const rawObject = asJsonObject(raw.value)
+  if (rawObject === null) return json({ ok: false, error: 'invalid_body' }, 400)
+  const parsed = checkAanvraagSchema.safeParse(rawObject)
   if (!parsed.success) return json({ ok: false, error: 'invalid_body' }, 400)
   const body = parsed.data
 
@@ -63,10 +65,12 @@ export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) 
     return json({ ok: false, error: 'validation' }, 422)
   }
 
+  // Server clock and the locale constant. Client consentAt / consentText are ignored.
+  const consent = emailConsentFromSubmission(rawObject)
   try {
     await req.payload.create({
       collection: 'check-aanvragen',
-      data: { url, naam, telefoon },
+      data: { url, naam, telefoon, ...consent },
       overrideAccess: true,
     })
   } catch (err) {
@@ -84,7 +88,7 @@ export const checkAanvraagHandler: PayloadHandler = async (req: PayloadRequest) 
       .sendEmail({
         to: 'contact@rinsly.com',
         subject: `Nieuwe websitecheck-aanvraag: ${url}`,
-        text: `Er is een nieuwe aanvraag binnengekomen via rinsly.com/check.\n\nWebsite: ${url}\nNaam: ${naam}\nTelefoon: ${telefoon}\n\nDe aanvraag staat ook in het admin-panel onder Websitecheck-aanvragen.`,
+        text: `Er is een nieuwe aanvraag binnengekomen via rinsly.com/check.\n\nWebsite: ${url}\nNaam: ${naam}\nTelefoon: ${telefoon}\n${consentNotice(consent)}\nDe aanvraag staat ook in het admin-panel onder Websitecheck-aanvragen.`,
       })
       .catch((err: unknown) => {
         req.payload.logger.error({
