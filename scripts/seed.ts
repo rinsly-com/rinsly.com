@@ -192,8 +192,8 @@ const partnerCheckCta = (locale: Locale): Block => ({
   title: t(locale, 'Meet een site in een halve minuut', 'Measure a site in half a minute'),
   text: t(
     locale,
-    'Probeer de meting zelf op elke URL.',
-    'Try the measurement yourself on any URL.',
+    'Probeer de meting zelf op elke URL. Vijf rapportcijfers, gratis en zonder account.',
+    'Try the measurement yourself on any URL. Five grades, free and without an account.',
   ),
   button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
 })
@@ -1392,26 +1392,27 @@ const contactLayout = (locale: Locale): Block[] => [
 
 /* ----------------- /website-laten-maken-woerden (local page) ---------------- */
 /* Yaron 26 Nov 15:59: remote only from Woerden, no in-person Utrecht service. */
-/* Structure by Builder. ALL COPY BELOW IS PLACEHOLDER: Marketeer writes the   */
-/* final text (then Lawyer). Slots: ~/Rinsly/marketing/copy-slots-local-woerden.md */
+/* Structure by Builder. Copy: Marketeer's final text (LW-01..LW-30), checked by  */
+/* Lawyer (marketing-copy-check §12). Source: copy-local-woerden-final.md.        */
+/* Word for word; do not edit copy here without the same change in that file.     */
 
 const localWoerdenMeta = (locale: Locale) => ({
   title: t(
     locale,
-    '[Concept] Website laten maken, op afstand vanuit Woerden',
-    '[Draft] Website building, remotely from Woerden',
+    'Website laten bouwen, op afstand vanuit Woerden · Rinsly',
+    'Website building, remotely from Woerden · Rinsly',
   ),
   description: t(
     locale,
-    '[Concept] Rinsly bouwt en host websites voor ontwerpstudio’s in de provincie Utrecht, op afstand vanuit Woerden.',
-    '[Draft] Rinsly builds and hosts websites for design studios in the province of Utrecht, remotely from Woerden.',
+    'Rinsly bouwt en host websites voor ontwerpstudio’s in de provincie Utrecht, op afstand vanuit Woerden. Alleen voor zakelijke opdrachtgevers.',
+    'Rinsly builds and hosts websites for design studios in the province of Utrecht, remotely from Woerden. For business clients only.',
   ),
 })
 
 const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
   pageHero(
     'quiet',
-    t(locale, '[Concept] Vanuit Woerden', '[Draft] From Woerden'),
+    t(locale, 'Vanuit Woerden', 'From Woerden'),
     t(
       locale,
       'Websites bouwen en hosten, op afstand vanuit Woerden',
@@ -1428,12 +1429,12 @@ const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
     blockType: 'services',
     anchor: 'werkwijze',
     header: {
-      eyebrow: t(locale, '[Concept] Op afstand', '[Draft] Remote'),
+      eyebrow: t(locale, 'Op afstand', 'Remote'),
       title: t(locale, 'Zo werken we samen', 'How we work together'),
       intro: t(
         locale,
-        'We werken op afstand. Dat houdt het eenvoudig, ook als je studio in Utrecht zit.',
-        'We work remotely. That keeps it simple, also if your studio is in Utrecht.',
+        'We werken op afstand. Dat houdt het eenvoudig, ook als je studio in de stad Utrecht of elders in de provincie zit.',
+        'We work remotely. That keeps it simple, whether your studio is in the city of Utrecht or elsewhere in the province.',
       ),
     },
     cards: [
@@ -1451,17 +1452,17 @@ const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
         title: t(locale, 'Bouwen op afstand', 'Building, remotely'),
         description: t(
           locale,
-          'Je levert het design aan, wij bouwen het als website en delen de voortgang online.',
+          'Je levert het ontwerp aan, wij bouwen het als website en delen de voortgang online.',
           'You deliver the design, we build it as a website and share progress online.',
         ),
       },
       {
         icon: 'IconRefresh',
-        title: t(locale, 'Hosting en beheer op afstand', 'Hosting and care, remotely'),
+        title: t(locale, 'Hosting en beheer op afstand', 'Hosting and management, remotely'),
         description: t(
           locale,
-          'Na livegang houden we de website draaiend en passen we aan waar nodig, via e-mail of een kort gesprek.',
-          'After launch we keep the website running and adjust where needed, by email or a short call.',
+          'Na livegang hosten en onderhouden we de website en passen we aan waar nodig, via e-mail of een kort gesprek.',
+          'After launch we host and maintain the website and adjust where needed, by email or a short call.',
         ),
       },
     ],
@@ -1471,18 +1472,18 @@ const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
     anchor: 'regio',
     width: 'narrow',
     header: {
-      eyebrow: t(locale, '[Concept] Regio', '[Draft] Region'),
+      eyebrow: t(locale, 'Regio', 'Region'),
       title: t(locale, 'Voor ontwerpstudio’s in de provincie Utrecht', 'For design studios in the province of Utrecht'),
     },
     content: richBody(
       ...t(
         locale,
         [
-          'Rinsly is gevestigd in Woerden. We werken voor ontwerpstudio’s in de provincie Utrecht, op afstand.',
+          'Rinsly is gevestigd in Woerden. We werken voor ontwerpstudio’s in de provincie Utrecht, op afstand: per telefoon, video en e-mail. Er is geen dienstverlening op locatie.',
           'Wil je liever eerst praten? Plan een telefoongesprek of een videogesprek via het contactformulier.',
         ],
         [
-          'Rinsly is based in Woerden. We work for design studios in the province of Utrecht, remotely.',
+          'Rinsly is based in Woerden. We work for design studios in the province of Utrecht, remotely: by phone, video and email. There is no on-site service.',
           'Prefer to talk first? Schedule a phone call or a video call through the contact form.',
         ],
       ),
@@ -1492,7 +1493,7 @@ const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
     blockType: 'accordion',
     anchor: 'faq',
     header: {
-      eyebrow: t(locale, '[Concept] Veelgestelde vragen', '[Draft] FAQ'),
+      eyebrow: t(locale, 'Veelgestelde vragen', 'FAQ'),
       title: t(locale, 'Praktisch', 'Practicalities'),
     },
     items: [
@@ -1511,8 +1512,8 @@ const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Voor ontwerpstudio’s die hun ontwerp als website willen laten bouwen en hosten.',
-            'For design studios that want their design built and hosted as a website.',
+            'Voor ontwerpstudio’s die hun ontwerp als website willen laten bouwen en hosten. Ook een zakelijke opdrachtgever die zelf een website wil, zonder studio, kan contact opnemen. Alleen voor zakelijke opdrachtgevers.',
+            'For design studios that want their design built and hosted as a website. A business or professional that wants a website without a studio can also get in touch. For business clients only.',
           ),
         ),
       },
@@ -1521,7 +1522,7 @@ const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
   cta(
     locale,
     ids,
-    t(locale, '[Concept] Contact', '[Draft] Contact'),
+    t(locale, 'Contact', 'Contact'),
     t(locale, 'Laten we praten', 'Let’s talk'),
     t(
       locale,
