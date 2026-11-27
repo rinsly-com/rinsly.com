@@ -64,6 +64,50 @@ export const contentAllowlist = {
       'layout.6b08719fbb5dd40a0f68b125.title', // en /woerden page CTA title
       'layout.6b08719cbb5dd40a0f68b11a.text', // nl /woerden page CTA text
       'layout.6b08719fbb5dd40a0f68b125.text', // en /woerden page CTA text
+      'layout.6b087164bb5dd40a0f68b081.tiers.6b087164bb5dd40a0f68b06c.features.6b087164bb5dd40a0f68b069.text', // nl P2-02 /prijzen Care feature 7
+      'layout.6b087167bb5dd40a0f68b0ac.tiers.6b087167bb5dd40a0f68b097.features.6b087167bb5dd40a0f68b094.text', // en P2-02 /prijzen Care feature 7
+      'layout.6b087164bb5dd40a0f68b081.tiers.6b087164bb5dd40a0f68b080.features.6b087164bb5dd40a0f68b07e.text', // nl P2-02 /prijzen Op maat feature 3
+      'layout.6b087167bb5dd40a0f68b0ac.tiers.6b087167bb5dd40a0f68b0ab.features.6b087167bb5dd40a0f68b0a9.text', // en P2-02 /prijzen Op maat feature 3
+      'layout.6b087164bb5dd40a0f68b081.tiers.6b087164bb5dd40a0f68b06c.features.6b087164bb5dd40a0f68b06b.text', // nl P2-17 /prijzen Care feature 9
+      'layout.6b087167bb5dd40a0f68b0ac.tiers.6b087167bb5dd40a0f68b097.features.6b087167bb5dd40a0f68b096.text', // en P2-17 /prijzen Care feature 9
+      'layout.6b087164bb5dd40a0f68b089.items.6b087164bb5dd40a0f68b088.title', // nl P2-02 /prijzen FAQ question 6
+      'layout.6b087167bb5dd40a0f68b0b4.items.6b087167bb5dd40a0f68b0b3.title', // en P2-02 /prijzen FAQ question 6
+      'layout.6b087164bb5dd40a0f68b08a.title', // nl P2-02 /prijzen CTA title
+      'layout.6b087167bb5dd40a0f68b0b5.title', // en P2-02 /prijzen CTA title
+      'layout.6b087164bb5dd40a0f68b08a.text', // nl P2-02 /prijzen CTA text
+      'layout.6b087167bb5dd40a0f68b0b5.text', // en P2-02 /prijzen CTA text
+      'layout.6b087164bb5dd40a0f68b081.header.intro', // nl P2-07 /prijzen pricing intro
+      'layout.6b087167bb5dd40a0f68b0ac.header.intro', // en P2-07 /prijzen pricing intro
+      'layout.6b087172bb5dd40a0f68b0c6.text', // nl P2-02 /website CTA text
+      'layout.6b087175bb5dd40a0f68b0d7.text', // en P2-02 /website CTA text
+      'layout.6b087172bb5dd40a0f68b0b7.header.intro', // nl P2-04 /website hero intro
+      'layout.6b087175bb5dd40a0f68b0c8.header.intro', // en P2-04 /website hero intro
+      'layout.6b087147bb5dd40a0f68afc0.header.intro', // nl P2-03 /partnerprogramma hero intro
+      'layout.6b08714bbb5dd40a0f68affa.header.intro', // en P2-03 /partnerprogramma hero intro
+      'layout.6b087147bb5dd40a0f68afed.title', // nl P2-16 /partnerprogramma calculator title
+      'layout.6b08714bbb5dd40a0f68b027.title', // en P2-16 /partnerprogramma calculator title
+      'layout.6b08713abb5dd40a0f68af9e.buttons.6b08713abb5dd40a0f68af9d.label', // nl P2-06 / hero button 2
+      'layout.6b08713dbb5dd40a0f68afaf.buttons.6b08713dbb5dd40a0f68afae.label', // en P2-06 / hero button 2
+      'layout.6b08713abb5dd40a0f68afaa.title', // nl P2-14 / platform CTA title
+      'layout.6b08713dbb5dd40a0f68afbb.title', // en P2-14 / platform CTA title
+      'layout.6b08713abb5dd40a0f68afaa.text', // nl P2-15 / platform CTA text
+      'layout.6b08713dbb5dd40a0f68afbb.text', // en P2-15 / platform CTA text
+      'layout.6b087189bb5dd40a0f68b0fa.header.title', // nl P2-10 /over data title
+      'layout.6b08718bbb5dd40a0f68b105.header.title', // en P2-10 /over data title
+      'layout.6b087189bb5dd40a0f68b0fa.header.intro', // nl P2-10 /over data intro
+      'layout.6b08718bbb5dd40a0f68b105.header.intro', // en P2-10 /over data intro
+      'layout.6b087159bb5dd40a0f68b047.items.6b087159bb5dd40a0f68b045.title', // nl P2-11 /platform FAQ question 5
+      'layout.6b08715bbb5dd40a0f68b05e.items.6b08715bbb5dd40a0f68b05c.title', // en P2-11 /platform FAQ question 5
+      'layout.6b087159bb5dd40a0f68b040.title', // nl P2-14 /platform diagram title
+      'layout.6b08715bbb5dd40a0f68b057.title', // en P2-14 /platform diagram title
+    ],
+  },
+  globals: {
+    footer: [
+      // Pinned to one menu row by its Payload row id (per locale).
+      'menuItems.6b0871b9bb5dd40a0f68b137.label', // nl P2-06 footer menu item 4 label
+      'menuItems.6b0871bbbb5dd40a0f68b140.label', // en P2-06 footer menu item 4 label
+      'copyright', // nl+en P2-22 footer copyright
     ],
   },
 } as const satisfies ContentAllowlist

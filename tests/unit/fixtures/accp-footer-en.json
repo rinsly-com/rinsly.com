@@ -1,0 +1,54 @@
+{
+ "id": 1,
+ "menuItems": [
+  {
+   "label": "Platform",
+   "url": "/en/platform",
+   "id": "6b0871bbbb5dd40a0f68b13d"
+  },
+  {
+   "label": "Partner programme",
+   "url": "/en/partnerprogramma",
+   "id": "6b0871bbbb5dd40a0f68b13e"
+  },
+  {
+   "label": "Pricing",
+   "url": "/en/prijzen",
+   "id": "6b0871bbbb5dd40a0f68b13f"
+  },
+  {
+   "label": "A website from Rinsly",
+   "url": "/en/website",
+   "id": "6b0871bbbb5dd40a0f68b140"
+  },
+  {
+   "label": "About",
+   "url": "/en/over",
+   "id": "6b0871bbbb5dd40a0f68b141"
+  },
+  {
+   "label": "Website check",
+   "url": "/check",
+   "id": "6b0871bbbb5dd40a0f68b142"
+  },
+  {
+   "label": "Contact",
+   "url": "/en/contact",
+   "id": "6b0871bbbb5dd40a0f68b143"
+  }
+ ],
+ "infoLinks": [
+  {
+   "label": "Privacy policy",
+   "url": "/en/privacy",
+   "id": "6b0871bbbb5dd40a0f68b144"
+  },
+  {
+   "label": "Terms & conditions",
+   "url": "/en/voorwaarden",
+   "id": "6b0871bbbb5dd40a0f68b145"
+  }
+ ],
+ "copyright": "© Rinsly 2026: All rights reserved.",
+ "globalType": "footer"
+}
