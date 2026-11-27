@@ -46,6 +46,8 @@ Collection `pages` only. No globals, no other collection, no `title`, `slug`, `m
 | `layout.<blockId>.cards.<cardId>.title` / `.description` (Woerden services) | Woerden service card title and text | Each of the three cards, per locale, pinned by row id |
 | `layout.<blockId>.header.eyebrow` / `.title` (Woerden FAQ) | Woerden FAQ section eyebrow and title | That one accordion, per locale |
 | `layout.<blockId>.items.<itemId>.title` (Woerden FAQ) | Woerden FAQ question | Each of the two questions, per locale, pinned by row id. Answers (`body`) are rich text and are not pinned. |
+| `layout.<blockId>.header.eyebrow` / `.title` (Woerden regio) | Woerden regio section eyebrow and title | That one richText block, per locale. The body (`content`) is rich text and is not pinned. |
+| `layout.<blockId>.eyebrow` / `.title` / `.text` (Woerden page CTA) | Woerden closing CTA plain text | That one CTA, per locale |
 
 Marketeer's four SEO pages are /website (id 7), /prijzen (id 6), /over (id 8) and
 /partnerprogramma (id 4). Because `meta.*` is allowed everywhere, it also reaches the noindex
@@ -60,9 +62,6 @@ Not covered, on purpose:
   refused unless the stored value is one plain paragraph. Needs the rich-text codec (plan Part C).
 - Privacy and voorwaarden body text, and any other field on those legal pages besides the
   already-global `meta.title` / `meta.description`. No legal-page block is pinned.
-- The Woerden regio header (`header.eyebrow` / `header.title`) and the Woerden page CTA
-  (`eyebrow` / `title` / `text`): those are also #107 plain-text changes, but they are outside
-  the scope of the #107 allowlist expansion (hero, services, FAQ, plus the partner check-CTA).
 - The first step of the quote wizard ("Wie ben je?") is hard-coded in `OfferteForm.tsx`, not in
   the CMS. The pinned "contact" heading is the section heading above the form ("Vertel wat u
   nodig heeft" / "Tell us what you need").

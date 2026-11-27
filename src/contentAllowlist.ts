@@ -54,6 +54,16 @@ export const contentAllowlist = {
       'layout.6b08719cbb5dd40a0f68b119.items.6b08719cbb5dd40a0f68b118.title', // nl /woerden FAQ question 2
       'layout.6b08719fbb5dd40a0f68b124.items.6b08719fbb5dd40a0f68b122.title', // en /woerden FAQ question 1
       'layout.6b08719fbb5dd40a0f68b124.items.6b08719fbb5dd40a0f68b123.title', // en /woerden FAQ question 2
+      'layout.6b08719cbb5dd40a0f68b116.header.eyebrow', // nl /woerden regio eyebrow
+      'layout.6b08719fbb5dd40a0f68b121.header.eyebrow', // en /woerden regio eyebrow
+      'layout.6b08719cbb5dd40a0f68b116.header.title', // nl /woerden regio title
+      'layout.6b08719fbb5dd40a0f68b121.header.title', // en /woerden regio title
+      'layout.6b08719cbb5dd40a0f68b11a.eyebrow', // nl /woerden page CTA eyebrow
+      'layout.6b08719fbb5dd40a0f68b125.eyebrow', // en /woerden page CTA eyebrow
+      'layout.6b08719cbb5dd40a0f68b11a.title', // nl /woerden page CTA title
+      'layout.6b08719fbb5dd40a0f68b125.title', // en /woerden page CTA title
+      'layout.6b08719cbb5dd40a0f68b11a.text', // nl /woerden page CTA text
+      'layout.6b08719fbb5dd40a0f68b125.text', // en /woerden page CTA text
     ],
   },
 } as const satisfies ContentAllowlist

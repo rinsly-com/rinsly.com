@@ -75,11 +75,9 @@ export const PINNED_BLOCKS = [
     match: { path: 'button.url', equals: '/check' },
     label: '/partnerprogramma check-CTA text',
   },
-  // #107: Woerden hero, services and FAQ plain-text fields. Rich-text leaves
-  // (regio body, FAQ answers) stay out; they wait for Part C. The regio
-  // eyebrow and the page CTA eyebrow are also #107 plain text, but they are
-  // outside this PR's stated scope (hero, services, FAQ, plus the partner
-  // check-CTA).
+  // #107: Woerden hero, services, regio header, FAQ and page-CTA plain-text
+  // fields. Rich-text leaves (regio body, FAQ answers) stay out; they wait
+  // for Part C.
   {
     page: 'website-laten-maken-woerden',
     blockType: 'hero',
@@ -148,6 +146,36 @@ export const PINNED_BLOCKS = [
     rows: 'items',
     field: 'title',
     label: '/woerden FAQ question',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'richText',
+    field: 'header.eyebrow',
+    label: '/woerden regio eyebrow',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'richText',
+    field: 'header.title',
+    label: '/woerden regio title',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'cta',
+    field: 'eyebrow',
+    label: '/woerden page CTA eyebrow',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'cta',
+    field: 'title',
+    label: '/woerden page CTA title',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'cta',
+    field: 'text',
+    label: '/woerden page CTA text',
   },
 ]
 

@@ -59,7 +59,7 @@ function findField(
 }
 
 const PINNED_PATH_RE =
-  /^layout\.[0-9a-f]{24}\.(header\.(title|eyebrow|intro)|text|cards\.[0-9a-f]{24}\.(title|description)|items\.[0-9a-f]{24}\.title)$/
+  /^layout\.[0-9a-f]{24}\.(header\.(title|eyebrow|intro)|text|eyebrow|title|cards\.[0-9a-f]{24}\.(title|description)|items\.[0-9a-f]{24}\.title)$/
 
 describe('src/contentAllowlist.ts', () => {
   it('parses as an allowlist and loses no entry to the endpoint parser', () => {
@@ -171,7 +171,14 @@ describe('src/contentAllowlist.ts', () => {
     const woerdenRichTextEn = '6b08719fbb5dd40a0f68b121'
     expect(allowed(`layout.${woerdenRichTextNl}.content`)).toBe(false)
     expect(allowed(`layout.${woerdenRichTextEn}.content`)).toBe(false)
-    expect(allowed(`layout.${woerdenRichTextNl}.header.eyebrow`)).toBe(false)
+    expect(allowed(`layout.${woerdenRichTextNl}.header.eyebrow`)).toBe(true)
+    expect(allowed(`layout.${woerdenRichTextNl}.header.title`)).toBe(true)
+    const woerdenCtaNl = '6b08719cbb5dd40a0f68b11a'
+    expect(allowed(`layout.${woerdenCtaNl}.eyebrow`)).toBe(true)
+    expect(allowed(`layout.${woerdenCtaNl}.title`)).toBe(true)
+    expect(allowed(`layout.${woerdenCtaNl}.text`)).toBe(true)
+    expect(allowed(`layout.${woerdenCtaNl}.button`)).toBe(false)
+    expect(allowed(`layout.${woerdenCtaNl}.button.label`)).toBe(false)
   })
 
   it('rejects every other collection and every global', () => {
@@ -265,6 +272,7 @@ type Block = {
   blockType: string
   id?: string
   header?: { eyebrow?: string; title?: string; intro?: string }
+  eyebrow?: string
   title?: string
   text?: string
   button?: Button
@@ -292,6 +300,7 @@ const IDS = {
     en: ['dddddddddddddddddddd0042', 'dddddddddddddddddddd0043'],
   },
   woerdenRichText: { nl: 'dddddddddddddddddddd0050', en: 'dddddddddddddddddddd0051' },
+  woerdenCta: { nl: 'dddddddddddddddddddd0060', en: 'dddddddddddddddddddd0061' },
   privacy: { nl: 'eeeeeeeeeeeeeeeeeeee0001', en: 'eeeeeeeeeeeeeeeeeeee0002' },
 }
 
@@ -332,6 +341,13 @@ function woerden(locale: 'nl' | 'en'): Doc {
         id: IDS.woerdenFaq[locale],
         header: { eyebrow: `faq-eye ${locale}`, title: `faq ${locale}` },
         items,
+      },
+      {
+        blockType: 'cta',
+        id: IDS.woerdenCta[locale],
+        eyebrow: `cta-eye ${locale}`,
+        title: `cta ${locale}`,
+        text: `cta text ${locale}`,
       },
     ],
   }
@@ -475,11 +491,23 @@ function expectedFixturePaths(): string[] {
       paths.push(`layout.${blockId}.items.${itemId}.title`)
     }
   }
+  paths.push(
+    `layout.${IDS.woerdenRichText.nl}.header.eyebrow`,
+    `layout.${IDS.woerdenRichText.en}.header.eyebrow`,
+    `layout.${IDS.woerdenRichText.nl}.header.title`,
+    `layout.${IDS.woerdenRichText.en}.header.title`,
+    `layout.${IDS.woerdenCta.nl}.eyebrow`,
+    `layout.${IDS.woerdenCta.en}.eyebrow`,
+    `layout.${IDS.woerdenCta.nl}.title`,
+    `layout.${IDS.woerdenCta.en}.title`,
+    `layout.${IDS.woerdenCta.nl}.text`,
+    `layout.${IDS.woerdenCta.en}.text`,
+  )
   return paths
 }
 
 describe('scripts/content-allowlist-ids.mjs', () => {
-  it('pins the website, contact, partner check-CTA and Woerden plain-text fields in a fixed order', () => {
+  it('pins the website, contact, partner check-CTA and all #107 Woerden plain-text fields in a fixed order', () => {
     expect(pinsOf(fixture()).map((pin) => pin.path)).toEqual(expectedFixturePaths())
   })
 
@@ -517,7 +545,9 @@ describe('scripts/content-allowlist-ids.mjs', () => {
     expect(ok(`layout.${IDS.otherCta.en}.text`)).toBe(false)
     expect(ok(`layout.${IDS.woerdenFaq.nl}.items.${IDS.woerdenFaqItems.nl[0]}.body`)).toBe(false)
     expect(ok(`layout.${IDS.woerdenRichText.nl}.content`)).toBe(false)
-    expect(ok(`layout.${IDS.woerdenRichText.nl}.header.eyebrow`)).toBe(false)
+    expect(ok(`layout.${IDS.woerdenRichText.nl}.header.eyebrow`)).toBe(true)
+    expect(ok(`layout.${IDS.woerdenCta.nl}.text`)).toBe(true)
+    expect(ok(`layout.${IDS.woerdenCta.nl}.button`)).toBe(false)
     expect(ok(`layout.${IDS.privacy.nl}.content`)).toBe(false)
     expect(ok(`layout.${IDS.privacy.nl}.header.title`)).toBe(false)
     expect(ok(`layout.${IDS.privacy.en}.content`)).toBe(false)
