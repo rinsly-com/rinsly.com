@@ -83,4 +83,8 @@ jobs:
           # Re-enable with the repo Actions variable of the same name, together
           # with the accp Worker var — see docs/cases-page.md.
           RINSLY_CASES_PAGE_ENABLED: ${{ vars.RINSLY_CASES_PAGE_ENABLED }}
+          # Unset / empty keeps the quote form without a KvK field (default off).
+          # Re-enable with the repo Actions variable of the same name, together
+          # with the accp Worker var. Do not put it in wrangler.jsonc.
+          RINSLY_KVK_COLLECTION_ENABLED: ${{ vars.RINSLY_KVK_COLLECTION_ENABLED }}
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
