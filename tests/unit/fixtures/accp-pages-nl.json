@@ -1,0 +1,1713 @@
+{
+ "docs": [
+  {
+   "id": 11,
+   "title": "Website laten maken in Woerden",
+   "generateSlug": false,
+   "slug": "website-laten-maken-woerden",
+   "layout": [
+    {
+     "id": "6b08719cbb5dd40a0f68b111",
+     "variant": "quiet",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b08719cbb5dd40a0f68b110",
+       "label": "Neem contact op",
+       "variant": "primary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "[Concept] Vanuit Woerden",
+      "title": "Websites bouwen en hosten, op afstand vanuit Woerden",
+      "intro": "Rinsly zit in Woerden. Voor ontwerpstudio’s in de provincie Utrecht werken we op afstand: kennismaken per telefoon of video, bouwen en beheren zonder dat iemand hoeft te reizen."
+     }
+    },
+    {
+     "id": "6b08719cbb5dd40a0f68b115",
+     "anchor": "werkwijze",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b08719cbb5dd40a0f68b112",
+       "icon": "IconUsers",
+       "title": "Kennismaken op afstand",
+       "description": "We plannen een gesprek per telefoon of video om te horen wat je studio nodig heeft.",
+       "features": []
+      },
+      {
+       "id": "6b08719cbb5dd40a0f68b113",
+       "icon": "IconCode",
+       "title": "Bouwen op afstand",
+       "description": "Je levert het design aan, wij bouwen het als website en delen de voortgang online.",
+       "features": []
+      },
+      {
+       "id": "6b08719cbb5dd40a0f68b114",
+       "icon": "IconRefresh",
+       "title": "Hosting en beheer op afstand",
+       "description": "Na livegang houden we de website draaiend en passen we aan waar nodig, via e-mail of een kort gesprek.",
+       "features": []
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "[Concept] Op afstand",
+      "title": "Zo werken we samen",
+      "intro": "We werken op afstand. Dat houdt het eenvoudig, ook als je studio in Utrecht zit."
+     }
+    },
+    {
+     "id": "6b08719cbb5dd40a0f68b116",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "narrow",
+     "anchor": "regio",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "[Concept] Regio",
+      "title": "Voor ontwerpstudio’s in de provincie Utrecht",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08719cbb5dd40a0f68b119",
+     "anchor": "faq",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b08719cbb5dd40a0f68b117",
+       "title": "Komen jullie langs in Utrecht?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08719cbb5dd40a0f68b118",
+       "title": "Voor wie werkt Rinsly?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      }
+     ],
+     "blockType": "accordion",
+     "header": {
+      "eyebrow": "[Concept] Veelgestelde vragen",
+      "title": "Praktisch",
+      "subtitle": null,
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08719cbb5dd40a0f68b11a",
+     "eyebrow": "[Concept] Contact",
+     "title": "Laten we praten",
+     "text": "Stuur een bericht, dan plannen we een gesprek op afstand.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Neem contact op",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "[Concept] Website laten maken, op afstand vanuit Woerden",
+    "description": "[Concept] Rinsly bouwt en host websites voor ontwerpstudio’s in de provincie Utrecht, op afstand vanuit Woerden.",
+    "image": null,
+    "noindex": true
+   },
+   "updatedAt": "2026-11-26T17:51:29.756Z",
+   "createdAt": "2026-11-26T17:49:41.055Z",
+   "_status": "published"
+  },
+  {
+   "id": 9,
+   "title": "Contact",
+   "generateSlug": false,
+   "slug": "contact",
+   "layout": [
+    {
+     "id": "6b087194bb5dd40a0f68b106",
+     "variant": "quiet",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Contact",
+      "title": "Waar kunnen we mee helpen?",
+      "intro": "Ontwerpstudio en nieuwsgierig naar het partnerprogramma, of ondernemer met een site in gedachten? Kies hieronder wie u bent, dan stellen we de juiste vragen en geen enkele overbodige."
+     }
+    },
+    {
+     "id": "6b087194bb5dd40a0f68b10a",
+     "showForm": true,
+     "anchor": "formulier",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b087194bb5dd40a0f68b107",
+       "kind": "email",
+       "label": "E-mail",
+       "value": "contact@rinsly.com"
+      },
+      {
+       "id": "6b087194bb5dd40a0f68b108",
+       "kind": "phone",
+       "label": "Telefoon",
+       "value": "+31 6 24118912"
+      }
+     ],
+     "buttons": [
+      {
+       "id": "6b087194bb5dd40a0f68b109",
+       "label": "Mail ons direct",
+       "variant": "secondary",
+       "type": "external",
+       "page": null,
+       "url": "mailto:contact@rinsly.com",
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "contact",
+     "header": {
+      "eyebrow": "Stuur een bericht",
+      "title": "Vertel wat u nodig heeft",
+      "intro": null
+     }
+    }
+   ],
+   "meta": {
+    "title": "Contact · Rinsly",
+    "description": "Neem contact op met Rinsly in Woerden: contact@rinsly.com. Vragen over partnerprogramma, hosting of een nieuwe website.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:51:19.771Z",
+   "createdAt": "2026-08-05T21:56:56.454Z",
+   "_status": "published"
+  },
+  {
+   "id": 8,
+   "title": "Over ons",
+   "generateSlug": false,
+   "slug": "over",
+   "layout": [
+    {
+     "id": "6b087189bb5dd40a0f68b0f0",
+     "variant": "quiet",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Over Rinsly",
+      "title": "Een technisch bedrijf, geen websitebouwer",
+      "intro": "Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Wij verkopen geen ontwerp. Dat doen onze partners. Wij nemen hun design system en maken er een applicatie van die we daarna blijven draaien."
+     }
+    },
+    {
+     "id": "6b087189bb5dd40a0f68b0f1",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "narrow",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Hoe we werken",
+      "title": "Korte lijnen, harde cijfers",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087189bb5dd40a0f68b0f4",
+     "alignment": "left",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b087189bb5dd40a0f68b0f2",
+       "label": "Gratis websitecheck",
+       "variant": "primary",
+       "type": "external",
+       "page": null,
+       "url": "/check",
+       "anchor": null,
+       "newTab": false
+      },
+      {
+       "id": "6b087189bb5dd40a0f68b0f3",
+       "label": "Neem contact op",
+       "variant": "secondary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "buttonRow"
+    },
+    {
+     "id": "6b087189bb5dd40a0f68b0fa",
+     "showForm": false,
+     "anchor": "gegevens",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b087189bb5dd40a0f68b0f5",
+       "kind": "email",
+       "label": "E-mail",
+       "value": "contact@rinsly.com"
+      },
+      {
+       "id": "6b087189bb5dd40a0f68b0f6",
+       "kind": "address",
+       "label": "Adres",
+       "value": "Kazernestraat 6, 3441 BB Woerden"
+      },
+      {
+       "id": "6b087189bb5dd40a0f68b0f7",
+       "kind": "text",
+       "label": "KvK",
+       "value": "85578835"
+      },
+      {
+       "id": "6b087189bb5dd40a0f68b0f8",
+       "kind": "text",
+       "label": "BTW",
+       "value": "NL004117041B25"
+      }
+     ],
+     "buttons": [
+      {
+       "id": "6b087189bb5dd40a0f68b0f9",
+       "label": "Neem contact op",
+       "variant": "primary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "contact",
+     "header": {
+      "eyebrow": "Gegevens",
+      "title": "Rinsly",
+      "intro": "Rinsly: Rinse Yaron Schaeffer, webontwikkeling & hosting. Gevestigd in Woerden."
+     }
+    }
+   ],
+   "meta": {
+    "title": "Over ons · Rinsly",
+    "description": "Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Eén persoon, echte infrastructuur, korte lijnen.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:51:10.198Z",
+   "createdAt": "2026-08-05T21:56:55.308Z",
+   "_status": "published"
+  },
+  {
+   "id": 7,
+   "title": "Website bij Rinsly",
+   "generateSlug": false,
+   "slug": "website",
+   "layout": [
+    {
+     "id": "6b087172bb5dd40a0f68b0b7",
+     "variant": "offset",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b087172bb5dd40a0f68b0b6",
+       "label": "Vraag een offerte aan",
+       "variant": "primary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Direct bij Rinsly",
+      "title": "Een website bij ons, zonder tussenpersoon? Dat kan gewoon.",
+      "intro": "Rinsly werkt vooral samen met ontwerpstudio’s, maar u kunt net zo goed zelf aankloppen. U krijgt dezelfde engine, dezelfde limieten en dezelfde prijzen: er verandert niets aan de dienst omdat u er direct om vraagt."
+     }
+    },
+    {
+     "id": "6b087172bb5dd40a0f68b0c1",
+     "anchor": "wat",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b087172bb5dd40a0f68b0ba",
+       "icon": "IconCode",
+       "title": "Gebouwd, niet in elkaar geklikt",
+       "description": "Uw site wordt een echte applicatie op ons platform: geen thema met twintig plug-ins die elkaar in de weg zitten.",
+       "features": [
+        {
+         "id": "6b087172bb5dd40a0f68b0b8",
+         "text": "Volwaardig CMS, zelf te beheren"
+        },
+        {
+         "id": "6b087172bb5dd40a0f68b0b9",
+         "text": "Snel, ook op een telefoon"
+        }
+       ]
+      },
+      {
+       "id": "6b087172bb5dd40a0f68b0bd",
+       "icon": "IconServer2",
+       "title": "Hosting en onderhoud inbegrepen",
+       "description": "Eén maandbedrag voor hosting, SSL, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up) en updates. Geen losse rekeningen voor een plugin-update.",
+       "features": [
+        {
+         "id": "6b087172bb5dd40a0f68b0bb",
+         "text": "Vaste limieten, vooraf bekend"
+        },
+        {
+         "id": "6b087172bb5dd40a0f68b0bc",
+         "text": "Staging vóór elke livegang"
+        }
+       ]
+      },
+      {
+       "id": "6b087172bb5dd40a0f68b0c0",
+       "icon": "IconUsers",
+       "title": "Nog geen ontwerper?",
+       "description": "Wij ontwerpen zelf niet. Heeft u geen ontwerper, dan brengen we u in contact met een van onze partners: daar kiest u zelf uit.",
+       "features": [
+        {
+         "id": "6b087172bb5dd40a0f68b0be",
+         "text": "Vrijblijvend doorverwezen"
+        },
+        {
+         "id": "6b087172bb5dd40a0f68b0bf",
+         "text": "Of lever uw eigen ontwerp aan"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "Wat u krijgt",
+      "title": "Een site die blijft werken",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087172bb5dd40a0f68b0c2",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "wide",
+     "anchor": "hoe",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Hoe het gaat",
+      "title": "Van eerste gesprek tot live",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087172bb5dd40a0f68b0c5",
+     "alignment": "left",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b087172bb5dd40a0f68b0c3",
+       "label": "Bekijk de prijzen",
+       "variant": "primary",
+       "type": "internal",
+       "page": 6,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      },
+      {
+       "id": "6b087172bb5dd40a0f68b0c4",
+       "label": "Gratis websitecheck",
+       "variant": "secondary",
+       "type": "external",
+       "page": null,
+       "url": "/check",
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "buttonRow"
+    },
+    {
+     "id": "6b087172bb5dd40a0f68b0c6",
+     "eyebrow": "Aan de slag",
+     "title": "Klaar om online te gaan?",
+     "text": "Vertel ons over uw project: u krijgt snel een helder antwoord.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Neem contact op",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "Website bij Rinsly · Rinsly",
+    "description": "Een echte applicatie, geen thema: gebouwd uit Figma, gedraaid door Rinsly. Hosting, updates en databaseherstel in één maandbedrag.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:50:48.967Z",
+   "createdAt": "2026-08-05T21:56:54.210Z",
+   "_status": "published"
+  },
+  {
+   "id": 6,
+   "title": "Prijzen",
+   "generateSlug": false,
+   "slug": "prijzen",
+   "layout": [
+    {
+     "id": "6b087164bb5dd40a0f68b060",
+     "variant": "centered",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Prijzen",
+      "title": "Gratis bouw",
+      "intro": "De bouw is €0 bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is."
+     }
+    },
+    {
+     "id": "6b087164bb5dd40a0f68b061",
+     "content": null,
+     "width": "wide",
+     "anchor": "bouw",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "De bouw",
+      "title": "Twee routes",
+      "intro": "Gratis bouw. €0 bij een normale bedrijfs- of brochurewebsite. 36 maanden minimum, daarna maandelijks opzegbaar."
+     }
+    },
+    {
+     "id": "6b087164bb5dd40a0f68b062",
+     "text": "Of betaal de bouw: vanaf €2.500, daarna doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar. Alle prijzen exclusief 21% btw. Een betaalde bouw schaalt met de complexiteit.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "note"
+    },
+    {
+     "id": "6b087164bb5dd40a0f68b081",
+     "anchor": "pakketten",
+     "blockName": null,
+     "tiers": [
+      {
+       "id": "6b087164bb5dd40a0f68b06c",
+       "name": "Care",
+       "for": "Voor sites die wij bouwden",
+       "price": "€49",
+       "per": "/ mnd",
+       "priceNote": "of €539 per jaar (1 maand gratis)",
+       "recommended": false,
+       "badge": null,
+       "features": [
+        {
+         "id": "6b087164bb5dd40a0f68b063",
+         "text": "Tot 5 GB media",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b064",
+         "text": "Tot 250 MB database",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b065",
+         "text": "Tot 1 miljoen requests per maand",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b066",
+         "text": "Edge-hosting & SSL",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b067",
+         "text": "Beveiligings- & CMS-updates",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b068",
+         "text": "Dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up)",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b069",
+         "text": "E-mailantwoord op vragen binnen een week",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b06a",
+         "text": "Staging-omgeving",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b06b",
+         "text": "Wijzigingen inbegrepen",
+         "included": false
+        }
+       ]
+      },
+      {
+       "id": "6b087164bb5dd40a0f68b073",
+       "name": "Managed",
+       "for": "Volledig ontzorgd",
+       "price": "€99",
+       "per": "/ mnd",
+       "priceNote": "of €1.089 per jaar (1 maand gratis)",
+       "recommended": true,
+       "badge": "Aanbevolen",
+       "features": [
+        {
+         "id": "6b087164bb5dd40a0f68b06d",
+         "text": "Tot 25 GB media",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b06e",
+         "text": "Tot 1 GB database",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b06f",
+         "text": "Tot 5 miljoen requests per maand",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b070",
+         "text": "Alles uit Care",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b071",
+         "text": "Tot 1 uur/mnd wijzigingen",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b072",
+         "text": "Eén vast aanspreekpunt",
+         "included": true
+        }
+       ]
+      },
+      {
+       "id": "6b087164bb5dd40a0f68b07b",
+       "name": "Growth",
+       "for": "Voor sites die moeten groeien",
+       "price": "€249",
+       "per": "/ mnd",
+       "priceNote": "of €2.490 per jaar (2 maanden gratis)",
+       "recommended": false,
+       "badge": null,
+       "features": [
+        {
+         "id": "6b087164bb5dd40a0f68b074",
+         "text": "Tot 100 GB media",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b075",
+         "text": "Tot 5 GB database",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b076",
+         "text": "Tot 25 miljoen requests per maand",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b077",
+         "text": "Alles uit Managed",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b078",
+         "text": "Tot 4 uur/mnd doorontwikkeling",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b079",
+         "text": "SEO- & performance-optimalisatie",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b07a",
+         "text": "Kwartaalreview & roadmap",
+         "included": true
+        }
+       ]
+      },
+      {
+       "id": "6b087164bb5dd40a0f68b080",
+       "name": "Op maat",
+       "for": "Grotere organisaties",
+       "price": "vanaf €499",
+       "per": "/ mnd",
+       "priceNote": "opslag en verkeer naar volume",
+       "recommended": false,
+       "badge": null,
+       "features": [
+        {
+         "id": "6b087164bb5dd40a0f68b07c",
+         "text": "Opslag, database en verkeer op maat",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b07d",
+         "text": "Alles uit Growth",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b07e",
+         "text": "SLA met gegarandeerde reactietijden",
+         "included": true
+        },
+        {
+         "id": "6b087164bb5dd40a0f68b07f",
+         "text": "Verwerkersovereenkomst (AVG)",
+         "included": true
+        }
+       ]
+      }
+     ],
+     "blockType": "pricing",
+     "header": {
+      "eyebrow": "Wat de klant betaalt",
+      "title": "Vier pakketten",
+      "intro": "Dit is het abonnement dat de eindklant bij Rinsly afsluit: ook als een partner de site heeft ontworpen. De klant is altijd eigenaar van site en data. Facturatie gaat vooraf, per maand of per jaar; bij jaarbetaling krijgt u een maand korting, bij Growth twee. Alle prijzen exclusief 21% btw. Dit is de prijs die u bij Rinsly betaalt; factureert een ontwerpstudio u zelf, dan geldt haar prijs."
+     }
+    },
+    {
+     "id": "6b087164bb5dd40a0f68b082",
+     "text": "Over een limiet? Dan melden we dat en kiest u: bijbetalen per eenheid (€1 per extra GB media, €5 per extra GB database, €2 per extra miljoen requests per maand) of een pakket omhoog. We knijpen uw site nooit stilletjes af.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "note"
+    },
+    {
+     "id": "6b087164bb5dd40a0f68b089",
+     "anchor": "faq",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b087164bb5dd40a0f68b083",
+       "title": "Wat kost het bouwen van de website?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087164bb5dd40a0f68b084",
+       "title": "Zit ik ergens aan vast?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087164bb5dd40a0f68b085",
+       "title": "Van wie krijgen we de factuur?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087164bb5dd40a0f68b086",
+       "title": "Wat valt onder de inbegrepen wijzigingen?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087164bb5dd40a0f68b087",
+       "title": "Wat kost werk buiten het abonnement?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087164bb5dd40a0f68b088",
+       "title": "Gaat de week ook over storingen?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      }
+     ],
+     "blockType": "accordion",
+     "header": {
+      "eyebrow": "Veelgestelde vragen",
+      "title": "Over prijs en looptijd",
+      "subtitle": null,
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087164bb5dd40a0f68b08a",
+     "eyebrow": "Aan de slag",
+     "title": "Een offerte binnen een dag",
+     "text": "Vertel wat u nodig hebt: u krijgt een heldere offerte, geen verrassingen achteraf.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Neem contact op",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "Prijzen · Rinsly",
+    "description": "Hosting vanaf €49 per maand. Bouwen vanaf €2.500, of gratis bij drie jaar hosting. Limieten in gigabytes en requests, niet in bijvoeglijke naamwoorden.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:50:35.340Z",
+   "createdAt": "2026-08-05T21:56:53.043Z",
+   "_status": "published"
+  },
+  {
+   "id": 5,
+   "title": "Platform",
+   "generateSlug": false,
+   "slug": "platform",
+   "layout": [
+    {
+     "id": "6b087159bb5dd40a0f68b032",
+     "variant": "default",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Het platform",
+      "title": "Eén engine, al onze sites, één maandbedrag",
+      "intro": "Elke site die wij bouwen is een applicatie op dezelfde geversioneerde engine. Dat is geen technische voorkeur maar de reden dat we veel sites tegelijk kunnen onderhouden zonder dat het onderhoud ontspoort."
+     }
+    },
+    {
+     "id": "6b087159bb5dd40a0f68b03f",
+     "anchor": "stack",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b087159bb5dd40a0f68b036",
+       "icon": "IconBrush",
+       "title": "Van design system naar productie",
+       "description": "Wij bouwen vanuit het design system. Type-scale, spacing, responsive gedrag en motion zitten in de engine, dus het ontwerp overleeft de bouw.",
+       "features": [
+        {
+         "id": "6b087159bb5dd40a0f68b033",
+         "text": "Next.js met Rinsly CMS"
+        },
+        {
+         "id": "6b087159bb5dd40a0f68b034",
+         "text": "Meertalig en toegankelijk"
+        },
+        {
+         "id": "6b087159bb5dd40a0f68b035",
+         "text": "Gecontroleerd voordat het live gaat"
+        }
+       ]
+      },
+      {
+       "id": "6b087159bb5dd40a0f68b03a",
+       "icon": "IconPackages",
+       "title": "Eén geversioneerde engine",
+       "description": "Elke site deelt één engine en houdt zijn eigen ontwerp. Een lek fixen we één keer.",
+       "features": [
+        {
+         "id": "6b087159bb5dd40a0f68b037",
+         "text": "Fix in één release, uitrol over al onze sites"
+        },
+        {
+         "id": "6b087159bb5dd40a0f68b038",
+         "text": "Geen plugin-sprawl, geen WordPress"
+        },
+        {
+         "id": "6b087159bb5dd40a0f68b039",
+         "text": "Elke site houdt zijn eigen ontwerp"
+        }
+       ]
+      },
+      {
+       "id": "6b087159bb5dd40a0f68b03e",
+       "icon": "IconServer2",
+       "title": "Eén platform, aan de edge",
+       "description": "Eén omgeving per site, met de database en de media op hetzelfde platform. Geen server die van u is en waar u wakker van ligt.",
+       "features": [
+        {
+         "id": "6b087159bb5dd40a0f68b03b",
+         "text": "SSL, aan de edge"
+        },
+        {
+         "id": "6b087159bb5dd40a0f68b03c",
+         "text": "Dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up)"
+        },
+        {
+         "id": "6b087159bb5dd40a0f68b03d",
+         "text": "Vaste opslag- en verkeerslimieten"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "De stack",
+      "title": "Waar het op draait",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087159bb5dd40a0f68b040",
+     "kind": "oneEngineFleet",
+     "eyebrow": "Al onze sites",
+     "title": "Eén release raakt elke site",
+     "caption": "Elke site deelt één engine en houdt zijn eigen ontwerp. Een beveiligingsfix maken we één keer en rollen we uit over al onze sites.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "diagram"
+    },
+    {
+     "id": "6b087159bb5dd40a0f68b047",
+     "anchor": "techniek",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b087159bb5dd40a0f68b041",
+       "title": "Hoe beheer ik mijn site?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087159bb5dd40a0f68b042",
+       "title": "Waarom geen WordPress?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087159bb5dd40a0f68b043",
+       "title": "Hoe zit het met dagelijkse back-ups en storingen?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087159bb5dd40a0f68b044",
+       "title": "Van wie is de website?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087159bb5dd40a0f68b045",
+       "title": "Hoe wordt afwezigheid aangekondigd?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087159bb5dd40a0f68b046",
+       "title": "Werken jullie ook met een andere techniek?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      }
+     ],
+     "blockType": "accordion",
+     "header": {
+      "eyebrow": "Goed om te weten",
+      "title": "De techniek, zonder omhaal",
+      "subtitle": null,
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087159bb5dd40a0f68b048",
+     "eyebrow": "Meten",
+     "title": "Vijf rapportcijfers in een halve minuut",
+     "text": "Probeer onze meting op elke URL. Gratis, zonder account.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Gratis websitecheck",
+      "variant": "primary",
+      "type": "external",
+      "page": null,
+      "url": "/check",
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "Platform · Rinsly",
+    "description": "Eén geversioneerde engine, Rinsly CMS en Next.js aan de edge. Een beveiligingsfix maken we één keer en rollen we uit over de hele fleet.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:50:22.495Z",
+   "createdAt": "2026-08-05T21:56:51.908Z",
+   "_status": "published"
+  },
+  {
+   "id": 4,
+   "title": "Partnerprogramma",
+   "generateSlug": false,
+   "slug": "partnerprogramma",
+   "layout": [
+    {
+     "id": "6b087147bb5dd40a0f68afc0",
+     "variant": "offset",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b087147bb5dd40a0f68afbe",
+       "label": "Vraag een partnergesprek aan",
+       "variant": "primary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afbf",
+       "label": "Bekijk de ladder",
+       "variant": "secondary",
+       "type": "internal",
+       "page": 4,
+       "url": null,
+       "anchor": "ladder",
+       "newTab": false
+      }
+     ],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Partnerprogramma",
+      "title": "Jullie factuur, jullie prijs, jullie merk",
+      "intro": "Doorverkoop en eigen branding zijn toegestaan. Factureer je de eindklant zelf, dan koop je bij Rinsly in tegen de lijstprijs min jouw percentage, zet je ontwerp en hosting op één factuur, en bepaal je zelf de prijs en desgewenst de abonnementsvorm. Rinsly noem je zoals je Cloudflare noemt: hosting bij Rinsly. Het percentage is in beide factuurroutes hetzelfde getal, van 0% tot 35% van de doorlopende abonnementsomzet exclusief btw, per betaalde factuur."
+     }
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afcd",
+     "anchor": "ladder",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b087147bb5dd40a0f68afc2",
+       "icon": "IconTargetArrow",
+       "title": "+10% Exclusiviteit",
+       "description": "Nieuw klantwerk en updates gaan naar Rinsly. Klanten die al elders gehost worden, blijven daar. Een grote update (herbouw, migratie, redesign, substantiële uitbreiding) leidt tot een gesprek over migratie.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afc1",
+         "text": "Keuze"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afc4",
+       "icon": "IconRefresh",
+       "title": "+5% Relatiebeheer",
+       "description": "De partner is de eerste lijn. De klant belt de partner; de partner maakt een ticket. Rinsly heeft geen direct contact met de klant.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afc3",
+         "text": "Keuze"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afc6",
+       "icon": "IconBolt",
+       "title": "+5% Marketing",
+       "description": "De partner noemt en verkoopt Rinsly als hostingpartner.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afc5",
+         "text": "Keuze"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afc8",
+       "icon": "IconPackages",
+       "title": "+5% Portfolio boven €1.000 per maand",
+       "description": "Doorlopende abonnementsomzet boven €1.000 per maand.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afc7",
+         "text": "Gemeten"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afca",
+       "icon": "IconRocket",
+       "title": "+5% Portfolio boven €5.000 per maand",
+       "description": "Doorlopende abonnementsomzet boven €5.000 per maand.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afc9",
+         "text": "Gemeten"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afcc",
+       "icon": "IconSeeding",
+       "title": "+5% Portfolio boven €25.000 per maand",
+       "description": "Doorlopende abonnementsomzet boven €25.000 per maand.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afcb",
+         "text": "Gemeten"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "Omzetaandeel",
+      "title": "De ladder, van 0% tot 35%",
+      "intro": "Het aandeel wordt niet per partner onderhandeld: het is opgebouwd uit deze vaste ladder. De basis is 0%. De omzetniveaus zijn cumulatief, dus de ladder eindigt op 35%."
+     }
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afce",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "wide",
+     "anchor": "basis",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "De basis",
+      "title": "Doorlopende abonnementsomzet, per betaalde factuur",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afdb",
+     "anchor": "waarom",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b087147bb5dd40a0f68afd1",
+       "icon": "IconPackages",
+       "title": "Eén engine, al onze sites",
+       "description": "Elke site deelt één engine en houdt zijn eigen ontwerp. Een beveiligingsfix maken we één keer en rollen uit over alle klanten tegelijk.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afcf",
+         "text": "Geen plugin-sprawl"
+        },
+        {
+         "id": "6b087147bb5dd40a0f68afd0",
+         "text": "Fix in één release"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afd4",
+       "icon": "IconBrush",
+       "title": "Van design system naar productie",
+       "description": "We bouwen vanuit het design system: type-scale, spacing en motion zitten in de engine, dus het ontwerp overleeft de bouw.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afd2",
+         "text": "Next.js met Rinsly CMS"
+        },
+        {
+         "id": "6b087147bb5dd40a0f68afd3",
+         "text": "Gecontroleerd voordat het live gaat"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afd7",
+       "icon": "IconBolt",
+       "title": "Gemeten snelheid",
+       "description": "Performance is geen marketingwoord maar een meting. Vijf rapportcijfers op elke URL, gratis via onze websitecheck.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afd5",
+         "text": "Edge-hosting, geen WordPress-bloat"
+        },
+        {
+         "id": "6b087147bb5dd40a0f68afd6",
+         "text": "Gratis websitecheck op /check"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afda",
+       "icon": "IconServer2",
+       "title": "Operatie met harde cijfers",
+       "description": "Limieten in gigabytes en requests, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up). Geen \"ruime opslag\", geen kleine letters.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afd8",
+         "text": "Staging bij elke site"
+        },
+        {
+         "id": "6b087147bb5dd40a0f68afd9",
+         "text": "Klant is eigenaar van site en data"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "Waarom Rinsly",
+      "title": "Niet nog een websitebouwer",
+      "intro": "Geen thema, geen pagebuilder, geen tien losse WordPress-installaties. Eén geversioneerde engine voor al onze sites, en cijfers in plaats van bijvoeglijke naamwoorden."
+     }
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afe2",
+     "anchor": "framer",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b087147bb5dd40a0f68afde",
+       "icon": "IconBrush",
+       "title": "Framer past bij een portfolio of campagne",
+       "description": "Bouw je het ontwerp zelf in Framer? Dan heb je een goed gereedschap voor een portfolio of een campagnepagina. Je bent dan zelf verantwoordelijk voor bouw, beheer en support.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afdc",
+         "text": "Portfolio of showcase"
+        },
+        {
+         "id": "6b087147bb5dd40a0f68afdd",
+         "text": "Campagnepagina"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afe1",
+       "icon": "IconPackages",
+       "title": "Rinsly past bij een studio die niet zelf bouwt en beheert",
+       "description": "Jij ontwerpt en levert het design system. Wij bouwen het als applicatie, hosten en onderhouden het, en jij verdient mee aan het abonnement, afhankelijk van wat je oppakt (zie de ladder).",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afdf",
+         "text": "Bouw en hosting door Rinsly"
+        },
+        {
+         "id": "6b087147bb5dd40a0f68afe0",
+         "text": "Beheer en updates door Rinsly"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "Eerlijk vergelijken",
+      "title": "Framer of Rinsly?",
+      "intro": "Het hangt af van wat je klant nodig heeft. Een goed gesprek begint met de vraag welke van de twee past."
+     }
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afe3",
+     "text": "Framer is een merk van de eigenaar. Rinsly is niet verbonden aan Framer. Informatie over Framer gecontroleerd op framer.com, 26 november 2026.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "note"
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afeb",
+     "anchor": "hoe",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b087147bb5dd40a0f68afe5",
+       "icon": "IconBrush",
+       "title": "1. Jullie ontwerpen",
+       "description": "Wat jullie al doen: het design system. Partners leveren een design system aan; de tool is aan jullie, en het verandert het percentage niet.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afe4",
+         "text": "Jullie leveren het design system aan"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afe7",
+       "icon": "IconCode",
+       "title": "2. Wij bouwen en zetten live",
+       "description": "Wij maken er een echte applicatie van op onze engine en zetten die live. De klant sluit de overeenkomst bij Rinsly.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afe6",
+         "text": "Gratis bouw voor de klant bij 36 maanden hosting"
+        }
+       ]
+      },
+      {
+       "id": "6b087147bb5dd40a0f68afea",
+       "icon": "IconRefresh",
+       "title": "3. Wij draaien het",
+       "description": "Edge-hosting, SSL, uptime-monitoring, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up), beveiliging en CMS-updates, en uitrol over alle sites.",
+       "features": [
+        {
+         "id": "6b087147bb5dd40a0f68afe8",
+         "text": "Aandeel van de doorlopende abonnementsomzet"
+        },
+        {
+         "id": "6b087147bb5dd40a0f68afe9",
+         "text": "Bouwkosten en meerwerk worden niet gedeeld"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "Hoe het werkt",
+      "title": "Jullie ontwerpen, wij doen de rest",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afec",
+     "kind": "figmaToProduction",
+     "eyebrow": "Van ontwerp naar live",
+     "title": "Drie stappen, en maar één ervan is van jou",
+     "caption": "Jullie leveren het design system aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna edge-hosting, SSL, uptime-monitoring, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up), beveiliging en CMS-updates.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "diagram"
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afed",
+     "eyebrow": "Rekenen",
+     "title": "Wat zou jij eraan overhouden?",
+     "intro": "Kies een pakket, schuif het aantal klanten en vink aan wat je zou oppakken. Het tarief en je aandeel rekenen mee.",
+     "footnote": "Elk omzetniveau is +5% en de niveaus zijn cumulatief, dus de ladder eindigt op 35% van de doorlopende abonnementsomzet exclusief btw, per betaalde factuur. Eenmalige bouwkosten en meerwerk vallen erbuiten. Commissie ontstaat als de factuur betaald is, niet als die verstuurd is, en wordt uitbetaald op het factuurritme van die klant. Dit is een indicatie, geen aanbod.",
+     "anchor": "rekenen",
+     "blockName": null,
+     "blockType": "revenueCalculator"
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afee",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "wide",
+     "anchor": "facturatie",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Facturatie",
+      "title": "Jij kiest wie de klant factureert",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087147bb5dd40a0f68afef",
+     "kind": "invoicingRoutes",
+     "eyebrow": "Twee routes",
+     "title": "Wie stuurt welke factuur",
+     "caption": "Opzet A: Rinsly factureert de eindklant de lijstprijs en betaalt de commissie uit zodra die factuur betaald is. Opzet B: de partner factureert de eigen klant en koopt in tegen de lijstprijs min het ladderpercentage. De overeenkomst loopt in beide gevallen tussen Rinsly en de eindklant.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "diagram"
+    },
+    {
+     "id": "6b087147bb5dd40a0f68aff0",
+     "eyebrow": "Proef onze meting",
+     "title": "Meet een site in een halve minuut",
+     "text": "Probeer de meting zelf op elke URL.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Gratis websitecheck",
+      "variant": "secondary",
+      "type": "external",
+      "page": null,
+      "url": "/check",
+      "anchor": null,
+      "newTab": false
+     }
+    },
+    {
+     "id": "6b087147bb5dd40a0f68aff6",
+     "anchor": "faq",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b087147bb5dd40a0f68aff1",
+       "title": "Zijn jullie dan niet mijn concurrent?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087147bb5dd40a0f68aff2",
+       "title": "Ik bouw zelf websites. Is dit dan iets voor mij?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087147bb5dd40a0f68aff3",
+       "title": "Wat als jullie omvallen?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087147bb5dd40a0f68aff4",
+       "title": "Mag ik het als mijn eigen dienst verkopen?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087147bb5dd40a0f68aff5",
+       "title": "Wat kost het mij?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      }
+     ],
+     "blockType": "accordion",
+     "header": {
+      "eyebrow": "Veelgestelde vragen",
+      "title": "Eerlijk antwoord",
+      "subtitle": null,
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087147bb5dd40a0f68aff7",
+     "eyebrow": "Aan de slag",
+     "title": "Zullen we het gewoon bespreken?",
+     "text": "Vertel wat je maakt en hoe je het nu oplevert. Past het niet, dan zeggen we dat.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Neem contact op",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "Partnerprogramma · Rinsly",
+    "description": "Jullie ontwerpen. Wij bouwen en hosten. Een aandeel in de doorlopende omzet zolang de klant blijft, tot 35%, samengesteld uit wat jullie oppakken.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:50:08.016Z",
+   "createdAt": "2026-08-05T21:56:50.764Z",
+   "_status": "published"
+  },
+  {
+   "id": 3,
+   "title": "Algemene voorwaarden",
+   "generateSlug": false,
+   "slug": "voorwaarden",
+   "layout": [
+    {
+     "id": "6b0871afbb5dd40a0f68b128",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "narrow",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Juridisch",
+      "title": "Algemene voorwaarden",
+      "intro": null
+     }
+    }
+   ],
+   "meta": {
+    "title": "Algemene voorwaarden · Rinsly",
+    "description": "Algemene voorwaarden van Rinsly voor webontwikkeling, hosting en het partnerprogramma.",
+    "image": null,
+    "noindex": true
+   },
+   "updatedAt": "2026-11-26T17:51:46.150Z",
+   "createdAt": "2026-07-23T18:19:50.834Z",
+   "_status": "published"
+  },
+  {
+   "id": 2,
+   "title": "Privacyverklaring",
+   "generateSlug": false,
+   "slug": "privacy",
+   "layout": [
+    {
+     "id": "6b0871a7bb5dd40a0f68b126",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "narrow",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Juridisch",
+      "title": "Privacyverklaring",
+      "intro": null
+     }
+    }
+   ],
+   "meta": {
+    "title": "Privacyverklaring · Rinsly",
+    "description": "Privacyverklaring van Rinsly: hoe wij persoonsgegevens verwerken bij hosting, het partnerprogramma en deze website.",
+    "image": null,
+    "noindex": true
+   },
+   "updatedAt": "2026-11-26T17:51:39.027Z",
+   "createdAt": "2026-07-23T18:19:43.961Z",
+   "_status": "published"
+  },
+  {
+   "id": 1,
+   "title": "Rinsly",
+   "generateSlug": false,
+   "slug": "home",
+   "layout": [
+    {
+     "id": "6b08713abb5dd40a0f68af9e",
+     "variant": "spotlight",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b08713abb5dd40a0f68af9c",
+       "label": "Word partner",
+       "variant": "primary",
+       "type": "internal",
+       "page": 4,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      },
+      {
+       "id": "6b08713abb5dd40a0f68af9d",
+       "label": "Ik wil zelf een website",
+       "variant": "secondary",
+       "type": "internal",
+       "page": 7,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Bouw & hosting voor ontwerpstudio’s",
+      "title": "Jullie ontwerpen. Wij bouwen het en houden het draaiend.",
+      "intro": "Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het design system aan, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates en dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up). Elke keer dat de klant betaalt, gaat er een deel naar jullie."
+     }
+    },
+    {
+     "id": "6b08713abb5dd40a0f68afa8",
+     "anchor": "platform",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b08713abb5dd40a0f68afa1",
+       "icon": "IconBrush",
+       "title": "Van design system naar productie",
+       "description": "Wij bouwen vanuit het design system. Type-scale, spacing, responsive gedrag en motion zitten in de engine, dus het ontwerp overleeft de bouw.",
+       "features": [
+        {
+         "id": "6b08713abb5dd40a0f68af9f",
+         "text": "Next.js met Rinsly CMS"
+        },
+        {
+         "id": "6b08713abb5dd40a0f68afa0",
+         "text": "Meertalig, toegankelijk, gecontroleerd voordat het live gaat"
+        }
+       ]
+      },
+      {
+       "id": "6b08713abb5dd40a0f68afa4",
+       "icon": "IconPackages",
+       "title": "Eén geversioneerde engine",
+       "description": "Een beveiligingsfix maken we één keer en rollen we uit over al onze sites. Geen plugin-sprawl, geen WordPress.",
+       "features": [
+        {
+         "id": "6b08713abb5dd40a0f68afa2",
+         "text": "Fix in één release"
+        },
+        {
+         "id": "6b08713abb5dd40a0f68afa3",
+         "text": "Elke site houdt zijn eigen ontwerp"
+        }
+       ]
+      },
+      {
+       "id": "6b08713abb5dd40a0f68afa7",
+       "icon": "IconServer2",
+       "title": "Draaien aan de edge",
+       "description": "Eén omgeving per site, aan de edge, met limieten die we gewoon opschrijven.",
+       "features": [
+        {
+         "id": "6b08713abb5dd40a0f68afa5",
+         "text": "Edge-hosting & SSL"
+        },
+        {
+         "id": "6b08713abb5dd40a0f68afa6",
+         "text": "Dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up)"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "Het platform",
+      "title": "Eén engine, al onze sites",
+      "intro": "Geen thema en geen pagebuilder. Elke site is een applicatie op één gedeelde, geversioneerde engine. Daarom kan een beveiligingsfix één keer gemaakt worden en over alle sites tegelijk uitgerold."
+     }
+    },
+    {
+     "id": "6b08713abb5dd40a0f68afa9",
+     "eyebrow": "Meten",
+     "title": "Vijf rapportcijfers in een halve minuut",
+     "text": "Vijf rapportcijfers voor elke site in een halve minuut. Probeer het op elke URL, gratis en zonder account.",
+     "anchor": "websitecheck",
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Gratis websitecheck",
+      "variant": "secondary",
+      "type": "external",
+      "page": null,
+      "url": "/check",
+      "anchor": null,
+      "newTab": false
+     }
+    },
+    {
+     "id": "6b08713abb5dd40a0f68afaa",
+     "eyebrow": "De techniek",
+     "title": "Eén fix, al onze sites",
+     "text": "Hoe die engine werkt, wat er in een release gebeurt en waar de data staat. Dat leggen we liever uit dan dat we het samenvatten.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Zo werkt het platform",
+      "variant": "primary",
+      "type": "internal",
+      "page": 5,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    },
+    {
+     "id": "6b08713abb5dd40a0f68afab",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "wide",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Twee deuren",
+      "title": "Voor wie is Rinsly?",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08713abb5dd40a0f68afac",
+     "eyebrow": "Aan de slag",
+     "title": "Klaar om samen te werken?",
+     "text": "Vertel wat je maakt en hoe je het nu oplevert, dan zeggen we eerlijk of dit iets voor je is.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Neem contact op",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "Rinsly · bouw & hosting voor ontwerpstudio’s",
+    "description": "Rinsly bouwt en host websites voor ontwerpstudio’s. Jullie leveren het ontwerp in Figma, wij bouwen het als een echte applicatie en houden het draaiend.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:49:52.508Z",
+   "createdAt": "2026-07-23T18:19:19.391Z",
+   "_status": "published"
+  }
+ ]
+}

@@ -94,9 +94,9 @@ describe('src/contentAllowlist.ts', () => {
       new Set(['website', 'contact', 'partnerprogramma', 'website-laten-maken-woerden']),
     )
     for (const spec of PINNED_BLOCKS) {
-      expect(spec.field === 'content' || spec.field === 'body' || /\.(content|body)$/.test(spec.field)).toBe(
-        false,
-      )
+      expect(
+        spec.field === 'content' || spec.field === 'body' || /\.(content|body)$/.test(spec.field),
+      ).toBe(false)
     }
     for (const path of pinnedPaths) {
       expect(path.endsWith('.content') || path.endsWith('.body')).toBe(false)
@@ -301,7 +301,8 @@ const IDS = {
   },
   woerdenRichText: { nl: 'dddddddddddddddddddd0050', en: 'dddddddddddddddddddd0051' },
   woerdenCta: { nl: 'dddddddddddddddddddd0060', en: 'dddddddddddddddddddd0061' },
-  privacy: { nl: 'eeeeeeeeeeeeeeeeeeee0001', en: 'eeeeeeeeeeeeeeeeeeee0002' },
+  // The real accp privacy richText block ids (page 2), not made-up ones.
+  privacy: { nl: '6b0871a7bb5dd40a0f68b126', en: '6b0871a9bb5dd40a0f68b127' },
 }
 
 function woerden(locale: 'nl' | 'en'): Doc {
@@ -327,7 +328,11 @@ function woerden(locale: 'nl' | 'en'): Doc {
       {
         blockType: 'services',
         id: IDS.woerdenServices[locale],
-        header: { eyebrow: `svc-eye ${locale}`, title: `svc ${locale}`, intro: `svc-intro ${locale}` },
+        header: {
+          eyebrow: `svc-eye ${locale}`,
+          title: `svc ${locale}`,
+          intro: `svc-intro ${locale}`,
+        },
         cards,
       },
       {
@@ -377,10 +382,7 @@ function partner(locale: 'nl' | 'en'): Doc {
 }
 
 /** A trimmed copy of what GET /api/pages?depth=0 returns, per locale. */
-function response(
-  locale: 'nl' | 'en',
-  ids: { website: string; contact: string },
-): { docs: Doc[] } {
+function response(locale: 'nl' | 'en', ids: { website: string; contact: string }): { docs: Doc[] } {
   return {
     docs: [
       {
@@ -599,9 +601,7 @@ describe('scripts/content-allowlist-ids.mjs', () => {
     twoPages.en.docs.push(structuredClone(pageOf(twoPages, 'en', 'website')))
     expect(() => {
       collectPins(twoPages)
-    }).toThrow(
-      /en: expected one page with slug "website", found 2/,
-    )
+    }).toThrow(/en: expected one page with slug "website", found 2/)
 
     const twoBlocks = fixture()
     pageOf(twoBlocks, 'nl', 'website').layout.push({
@@ -742,5 +742,125 @@ describe('scripts/content-allowlist-ids.mjs', () => {
     expect(source).not.toMatch(/method:\s*['"](POST|PUT|PATCH|DELETE)/i)
     expect(source).not.toMatch(/process\.env|authorization|wrangler|\bD1\b/i)
     expect(source.match(/writeFileSync\(/g)).toHaveLength(1)
+  })
+})
+
+type SnapRow = { id?: string; [key: string]: unknown }
+type SnapBlock = { id: string; blockType: string; [key: string]: unknown }
+type SnapDoc = { id: number; slug: string; layout: SnapBlock[] }
+const snapshot = (locale: Locale): { docs: SnapDoc[] } =>
+  JSON.parse(read(`tests/unit/fixtures/accp-pages-${locale}.json`)) as { docs: SnapDoc[] }
+
+describe('page ownership of the pinned ids (accp snapshot, depth 0)', () => {
+  const locales: readonly Locale[] = ['nl', 'en']
+  const snaps = { nl: snapshot('nl'), en: snapshot('en') }
+
+  /** Which page of the snapshot holds a block id, found by scanning every page. */
+  const ownersOf = (locale: Locale, blockId: string) =>
+    snaps[locale].docs.filter((doc) => doc.layout.some((block) => block.id === blockId))
+
+  /** The generator's own source map: pin path to the page its spec names. */
+  const buildSourceMap = () => {
+    const sourceMap = new Map<string, { page: string; locale: Locale }>()
+    for (const locale of locales) {
+      for (const spec of PINNED_BLOCKS) {
+        const block = findBlock(snaps[locale].docs, spec, locale) as SnapBlock
+        for (const pin of pinsForBlock(block, spec, locale) as Pin[]) {
+          sourceMap.set(pin.path, { page: spec.page, locale })
+        }
+      }
+    }
+    return sourceMap
+  }
+
+  const committed = [
+    ...read('src/contentAllowlist.ts').matchAll(/^\s+'(layout\.[^']+)', \/\/ (nl|en) /gm),
+  ].map((match) => ({ path: match[1], locale: match[2] as Locale }))
+
+  it('snapshot regenerates exactly the committed allowlist (the snapshot is not stale)', () => {
+    expect(committed.map((pin) => pin.path)).toEqual(pinnedPaths)
+    expect(renderModule(collectPins(snaps) as Pin[])).toBe(read('src/contentAllowlist.ts'))
+    expect([...buildSourceMap().keys()].sort()).toEqual([...pinnedPaths].sort())
+  })
+
+  it('block ids are unique across pages and locales, so an id names exactly one page', () => {
+    const seen = new Set<string>()
+    for (const locale of locales) {
+      for (const doc of snaps[locale].docs) {
+        for (const block of doc.layout) {
+          expect(seen.has(block.id), block.id).toBe(false)
+          seen.add(block.id)
+        }
+      }
+    }
+  })
+
+  it('each pinned block id belongs to the page its spec names, in its own locale', () => {
+    expect(committed).toHaveLength(pinnedPaths.length)
+    const sourceMap = buildSourceMap()
+    for (const { path, locale } of committed) {
+      const [, blockId] = path.split('.')
+      const expected = sourceMap.get(path)
+      expect(expected, path).toBeTruthy()
+      expect(expected?.locale, path).toBe(locale)
+      const other = locales.find((candidate) => candidate !== locale) as Locale
+      const owners = ownersOf(locale, blockId)
+      expect(
+        owners.map((doc) => doc.slug),
+        path,
+      ).toEqual([expected?.page])
+      // An nl row id is never an en row id: the other locale does not hold this block.
+      expect(ownersOf(other, blockId), path).toHaveLength(0)
+    }
+  })
+
+  it('each pinned row id is a row of that block, and the leaf is non-empty text', () => {
+    for (const { path, locale } of committed) {
+      const [, blockId, ...rest] = path.split('.')
+      const block = ownersOf(locale, blockId)[0]?.layout.find(
+        (candidate) => candidate.id === blockId,
+      )
+      expect(block, path).toBeTruthy()
+      let node: unknown = block
+      const leaf = rest.pop() as string
+      // Walk `field`, or `header.field`, or `<array>.<rowId>.field`.
+      for (let index = 0; index < rest.length; index += 1) {
+        const segment = rest[index]
+        const next = (node as Record<string, unknown>)[segment]
+        if (Array.isArray(next)) {
+          const rowId = rest[index + 1]
+          const row = (next as SnapRow[]).find((candidate) => candidate.id === rowId)
+          expect(row, `${path} row ${rowId}`).toBeTruthy()
+          node = row
+          index += 1
+        } else {
+          node = next
+        }
+      }
+      const text = (node as Record<string, unknown>)[leaf]
+      expect(typeof text === 'string' && text.trim() !== '', path).toBe(true)
+    }
+  })
+
+  it('no pinned id is on a legal page, and the real privacy ids are refused', () => {
+    const real = {
+      nl: { privacy: '6b0871a7bb5dd40a0f68b126', voorwaarden: '6b0871afbb5dd40a0f68b128' },
+      en: { privacy: '6b0871a9bb5dd40a0f68b127', voorwaarden: '6b0871b0bb5dd40a0f68b129' },
+    }
+    expect(IDS.privacy).toEqual({ nl: real.nl.privacy, en: real.en.privacy })
+    for (const locale of locales) {
+      for (const slug of LEGAL_SLUGS as readonly ('privacy' | 'voorwaarden')[]) {
+        const doc = snaps[locale].docs.find((candidate) => candidate.slug === slug)
+        const ids = doc?.layout.map((block) => block.id)
+        expect(ids, `${locale} ${slug}`).toEqual([real[locale][slug]])
+        for (const pin of pinnedPaths) expect(pin).not.toContain(real[locale][slug])
+        for (const leaf of ['content', 'header.title', 'header.intro', 'header.eyebrow', 'text']) {
+          expect(allowed(`layout.${real[locale][slug]}.${leaf}`)).toBe(false)
+        }
+      }
+    }
+    expect(read('src/contentAllowlist.ts')).not.toMatch(
+      /6b0871a7bb5dd40a0f68b126|6b0871a9bb5dd40a0f68b127|6b0871afbb5dd40a0f68b128|6b0871b0bb5dd40a0f68b129/,
+    )
   })
 })

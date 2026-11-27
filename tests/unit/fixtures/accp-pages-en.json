@@ -1,0 +1,1713 @@
+{
+ "docs": [
+  {
+   "id": 11,
+   "title": "Website building from Woerden",
+   "generateSlug": false,
+   "slug": "website-laten-maken-woerden",
+   "layout": [
+    {
+     "id": "6b08719fbb5dd40a0f68b11c",
+     "variant": "quiet",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b08719fbb5dd40a0f68b11b",
+       "label": "Get in touch",
+       "variant": "primary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "[Draft] From Woerden",
+      "title": "Building and hosting websites, remotely from Woerden",
+      "intro": "Rinsly is based in Woerden. For design studios in the province of Utrecht we work remotely: an intro by phone or video, building and managing without anyone having to travel."
+     }
+    },
+    {
+     "id": "6b08719fbb5dd40a0f68b120",
+     "anchor": "werkwijze",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b08719fbb5dd40a0f68b11d",
+       "icon": "IconUsers",
+       "title": "An intro, remotely",
+       "description": "We schedule a call by phone or video to hear what your studio needs.",
+       "features": []
+      },
+      {
+       "id": "6b08719fbb5dd40a0f68b11e",
+       "icon": "IconCode",
+       "title": "Building, remotely",
+       "description": "You deliver the design, we build it as a website and share progress online.",
+       "features": []
+      },
+      {
+       "id": "6b08719fbb5dd40a0f68b11f",
+       "icon": "IconRefresh",
+       "title": "Hosting and care, remotely",
+       "description": "After launch we keep the website running and adjust where needed, by email or a short call.",
+       "features": []
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "[Draft] Remote",
+      "title": "How we work together",
+      "intro": "We work remotely. That keeps it simple, also if your studio is in Utrecht."
+     }
+    },
+    {
+     "id": "6b08719fbb5dd40a0f68b121",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "narrow",
+     "anchor": "regio",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "[Draft] Region",
+      "title": "For design studios in the province of Utrecht",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08719fbb5dd40a0f68b124",
+     "anchor": "faq",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b08719fbb5dd40a0f68b122",
+       "title": "Do you visit us in Utrecht?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08719fbb5dd40a0f68b123",
+       "title": "Who does Rinsly work for?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      }
+     ],
+     "blockType": "accordion",
+     "header": {
+      "eyebrow": "[Draft] FAQ",
+      "title": "Practicalities",
+      "subtitle": null,
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08719fbb5dd40a0f68b125",
+     "eyebrow": "[Draft] Contact",
+     "title": "Let’s talk",
+     "text": "Send a message and we schedule a remote call.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Get in touch",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "[Draft] Website building, remotely from Woerden",
+    "description": "[Draft] Rinsly builds and hosts websites for design studios in the province of Utrecht, remotely from Woerden.",
+    "image": null,
+    "noindex": true
+   },
+   "updatedAt": "2026-11-26T17:51:29.756Z",
+   "createdAt": "2026-11-26T17:49:41.055Z",
+   "_status": "published"
+  },
+  {
+   "id": 9,
+   "title": "Contact",
+   "generateSlug": false,
+   "slug": "contact",
+   "layout": [
+    {
+     "id": "6b087195bb5dd40a0f68b10b",
+     "variant": "quiet",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Contact",
+      "title": "What can we help with?",
+      "intro": "A design studio curious about the partner programme, or a business with a site in mind? Choose below who you are, then we ask the right questions and none of the pointless ones."
+     }
+    },
+    {
+     "id": "6b087195bb5dd40a0f68b10f",
+     "showForm": true,
+     "anchor": "formulier",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b087195bb5dd40a0f68b10c",
+       "kind": "email",
+       "label": "E-mail",
+       "value": "contact@rinsly.com"
+      },
+      {
+       "id": "6b087195bb5dd40a0f68b10d",
+       "kind": "phone",
+       "label": "Phone",
+       "value": "+31 6 24118912"
+      }
+     ],
+     "buttons": [
+      {
+       "id": "6b087195bb5dd40a0f68b10e",
+       "label": "Email us directly",
+       "variant": "secondary",
+       "type": "external",
+       "page": null,
+       "url": "mailto:contact@rinsly.com",
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "contact",
+     "header": {
+      "eyebrow": "Send a message",
+      "title": "Tell us what you need",
+      "intro": null
+     }
+    }
+   ],
+   "meta": {
+    "title": "Contact · Rinsly",
+    "description": "Get in touch with Rinsly in Woerden, the Netherlands: contact@rinsly.com. Questions about the partner programme, hosting or a new website.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:51:19.771Z",
+   "createdAt": "2026-08-05T21:56:56.454Z",
+   "_status": "published"
+  },
+  {
+   "id": 8,
+   "title": "About",
+   "generateSlug": false,
+   "slug": "over",
+   "layout": [
+    {
+     "id": "6b08718bbb5dd40a0f68b0fb",
+     "variant": "quiet",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "About Rinsly",
+      "title": "A technical company, not a website maker",
+      "intro": "Rinsly is the build-and-run department design studios don’t have. We don’t sell design: our partners do that. We take their design system and turn it into an application that we then keep running."
+     }
+    },
+    {
+     "id": "6b08718bbb5dd40a0f68b0fc",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "narrow",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "How we work",
+      "title": "Short lines, hard numbers",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08718bbb5dd40a0f68b0ff",
+     "alignment": "left",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b08718bbb5dd40a0f68b0fd",
+       "label": "Free website check",
+       "variant": "primary",
+       "type": "external",
+       "page": null,
+       "url": "/check",
+       "anchor": null,
+       "newTab": false
+      },
+      {
+       "id": "6b08718bbb5dd40a0f68b0fe",
+       "label": "Get in touch",
+       "variant": "secondary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "buttonRow"
+    },
+    {
+     "id": "6b08718bbb5dd40a0f68b105",
+     "showForm": false,
+     "anchor": "gegevens",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b08718bbb5dd40a0f68b100",
+       "kind": "email",
+       "label": "E-mail",
+       "value": "contact@rinsly.com"
+      },
+      {
+       "id": "6b08718bbb5dd40a0f68b101",
+       "kind": "address",
+       "label": "Address",
+       "value": "Kazernestraat 6, 3441 BB Woerden"
+      },
+      {
+       "id": "6b08718bbb5dd40a0f68b102",
+       "kind": "text",
+       "label": "KvK",
+       "value": "85578835"
+      },
+      {
+       "id": "6b08718bbb5dd40a0f68b103",
+       "kind": "text",
+       "label": "VAT",
+       "value": "NL004117041B25"
+      }
+     ],
+     "buttons": [
+      {
+       "id": "6b08718bbb5dd40a0f68b104",
+       "label": "Get in touch",
+       "variant": "primary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "contact",
+     "header": {
+      "eyebrow": "Details",
+      "title": "Rinsly",
+      "intro": "Rinsly: Rinse Yaron Schaeffer, web development & hosting. Based in Woerden, the Netherlands."
+     }
+    }
+   ],
+   "meta": {
+    "title": "About · Rinsly",
+    "description": "Rinsly is the build-and-run department design studios don’t have. One person, real infrastructure, short lines.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:51:10.198Z",
+   "createdAt": "2026-08-05T21:56:55.308Z",
+   "_status": "published"
+  },
+  {
+   "id": 7,
+   "title": "A website from Rinsly",
+   "generateSlug": false,
+   "slug": "website",
+   "layout": [
+    {
+     "id": "6b087175bb5dd40a0f68b0c8",
+     "variant": "offset",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b087175bb5dd40a0f68b0c7",
+       "label": "Request a quote",
+       "variant": "primary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Directly from Rinsly",
+      "title": "A website from us, without a middleman? That works fine.",
+      "intro": "Rinsly mostly works with design studios, but you are just as welcome to come to us directly. You get the same engine, the same limits and the same prices: nothing about the service changes because you asked for it yourself."
+     }
+    },
+    {
+     "id": "6b087175bb5dd40a0f68b0d2",
+     "anchor": "wat",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b087175bb5dd40a0f68b0cb",
+       "icon": "IconCode",
+       "title": "Built, not clicked together",
+       "description": "Your site becomes a real application on our platform: not a theme with twenty plugins tripping over each other.",
+       "features": [
+        {
+         "id": "6b087175bb5dd40a0f68b0c9",
+         "text": "A real CMS you manage yourself"
+        },
+        {
+         "id": "6b087175bb5dd40a0f68b0ca",
+         "text": "Fast, on a phone too"
+        }
+       ]
+      },
+      {
+       "id": "6b087175bb5dd40a0f68b0ce",
+       "icon": "IconServer2",
+       "title": "Hosting and maintenance included",
+       "description": "One monthly fee for hosting, SSL, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup) and updates. No separate bills for a plugin update.",
+       "features": [
+        {
+         "id": "6b087175bb5dd40a0f68b0cc",
+         "text": "Stated limits, known up front"
+        },
+        {
+         "id": "6b087175bb5dd40a0f68b0cd",
+         "text": "Staging before every go-live"
+        }
+       ]
+      },
+      {
+       "id": "6b087175bb5dd40a0f68b0d1",
+       "icon": "IconUsers",
+       "title": "No designer yet?",
+       "description": "We don’t design ourselves. If you have no designer, we’ll introduce you to one of our partners, and you choose.",
+       "features": [
+        {
+         "id": "6b087175bb5dd40a0f68b0cf",
+         "text": "Introduced with no obligation"
+        },
+        {
+         "id": "6b087175bb5dd40a0f68b0d0",
+         "text": "Or supply your own design"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "What you get",
+      "title": "A site that keeps working",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087175bb5dd40a0f68b0d3",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "wide",
+     "anchor": "hoe",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "How it goes",
+      "title": "From first conversation to live",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087175bb5dd40a0f68b0d6",
+     "alignment": "left",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b087175bb5dd40a0f68b0d4",
+       "label": "See the pricing",
+       "variant": "primary",
+       "type": "internal",
+       "page": 6,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      },
+      {
+       "id": "6b087175bb5dd40a0f68b0d5",
+       "label": "Free website check",
+       "variant": "secondary",
+       "type": "external",
+       "page": null,
+       "url": "/check",
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "buttonRow"
+    },
+    {
+     "id": "6b087175bb5dd40a0f68b0d7",
+     "eyebrow": "Get started",
+     "title": "Ready to go live?",
+     "text": "Tell us about your project: you’ll get a clear answer quickly.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Get in touch",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "A website from Rinsly · Rinsly",
+    "description": "A real application, not a theme: built from Figma, run by Rinsly. Hosting, updates and database recovery in one monthly fee.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:50:48.967Z",
+   "createdAt": "2026-08-05T21:56:54.210Z",
+   "_status": "published"
+  },
+  {
+   "id": 6,
+   "title": "Pricing",
+   "generateSlug": false,
+   "slug": "prijzen",
+   "layout": [
+    {
+     "id": "6b087167bb5dd40a0f68b08b",
+     "variant": "centered",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Pricing",
+      "title": "Free build",
+      "intro": "The build is €0 for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed."
+     }
+    },
+    {
+     "id": "6b087167bb5dd40a0f68b08c",
+     "content": null,
+     "width": "wide",
+     "anchor": "bouw",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "The build",
+      "title": "Two routes",
+      "intro": "Free build. €0 for a typical business or brochure site. 36 months minimum, then monthly cancellable."
+     }
+    },
+    {
+     "id": "6b087167bb5dd40a0f68b08d",
+     "text": "Or pay for the build: from €2,500, then ongoing and cancellable monthly with one month’s notice. A paid build can, by arrangement, be spread over the first year. All prices exclude 21% VAT. A paid build scales with complexity.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "note"
+    },
+    {
+     "id": "6b087167bb5dd40a0f68b0ac",
+     "anchor": "pakketten",
+     "blockName": null,
+     "tiers": [
+      {
+       "id": "6b087167bb5dd40a0f68b097",
+       "name": "Care",
+       "for": "For sites we built",
+       "price": "€49",
+       "per": "/ mo",
+       "priceNote": "or €539 per year (1 month free)",
+       "recommended": false,
+       "badge": null,
+       "features": [
+        {
+         "id": "6b087167bb5dd40a0f68b08e",
+         "text": "Up to 5 GB media",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b08f",
+         "text": "Up to 250 MB database",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b090",
+         "text": "Up to 1 million requests a month",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b091",
+         "text": "Edge hosting & SSL",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b092",
+         "text": "Security & CMS updates",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b093",
+         "text": "Daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup)",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b094",
+         "text": "Email reply to questions within a week",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b095",
+         "text": "Staging environment",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b096",
+         "text": "Changes included",
+         "included": false
+        }
+       ]
+      },
+      {
+       "id": "6b087167bb5dd40a0f68b09e",
+       "name": "Managed",
+       "for": "Everything taken care of",
+       "price": "€99",
+       "per": "/ mo",
+       "priceNote": "or €1,089 per year (1 month free)",
+       "recommended": true,
+       "badge": "Recommended",
+       "features": [
+        {
+         "id": "6b087167bb5dd40a0f68b098",
+         "text": "Up to 25 GB media",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b099",
+         "text": "Up to 1 GB database",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b09a",
+         "text": "Up to 5 million requests a month",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b09b",
+         "text": "Everything in Care",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b09c",
+         "text": "Up to 1 hr/mo changes",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b09d",
+         "text": "One dedicated point of contact",
+         "included": true
+        }
+       ]
+      },
+      {
+       "id": "6b087167bb5dd40a0f68b0a6",
+       "name": "Growth",
+       "for": "For sites that need to grow",
+       "price": "€249",
+       "per": "/ mo",
+       "priceNote": "or €2,490 per year (2 months free)",
+       "recommended": false,
+       "badge": null,
+       "features": [
+        {
+         "id": "6b087167bb5dd40a0f68b09f",
+         "text": "Up to 100 GB media",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b0a0",
+         "text": "Up to 5 GB database",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b0a1",
+         "text": "Up to 25 million requests a month",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b0a2",
+         "text": "Everything in Managed",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b0a3",
+         "text": "Up to 4 hrs/mo development",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b0a4",
+         "text": "SEO & performance optimisation",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b0a5",
+         "text": "Quarterly review & roadmap",
+         "included": true
+        }
+       ]
+      },
+      {
+       "id": "6b087167bb5dd40a0f68b0ab",
+       "name": "Custom",
+       "for": "Larger organisations",
+       "price": "from €499",
+       "per": "/ mo",
+       "priceNote": "storage and traffic to volume",
+       "recommended": false,
+       "badge": null,
+       "features": [
+        {
+         "id": "6b087167bb5dd40a0f68b0a7",
+         "text": "Storage, database and traffic to measure",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b0a8",
+         "text": "Everything in Growth",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b0a9",
+         "text": "SLA with guaranteed response times",
+         "included": true
+        },
+        {
+         "id": "6b087167bb5dd40a0f68b0aa",
+         "text": "Data-processing agreement (GDPR)",
+         "included": true
+        }
+       ]
+      }
+     ],
+     "blockType": "pricing",
+     "header": {
+      "eyebrow": "What the client pays",
+      "title": "Four plans",
+      "intro": "This is the subscription the end client takes with Rinsly: including when a partner designed the site. The client always owns the site and the data. We invoice in advance, monthly or yearly; paying yearly gets you a month free, two on Growth. All prices exclude 21% VAT. This is what you pay Rinsly; if a design studio invoices you themselves, their price applies."
+     }
+    },
+    {
+     "id": "6b087167bb5dd40a0f68b0ad",
+     "text": "Over a limit? We tell you, and you choose: pay per unit (€1 per extra GB of media, €5 per extra GB of database, €2 per extra million requests a month) or move up a plan. We never throttle your site quietly.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "note"
+    },
+    {
+     "id": "6b087167bb5dd40a0f68b0b4",
+     "anchor": "faq",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b087167bb5dd40a0f68b0ae",
+       "title": "What does building the website cost?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087167bb5dd40a0f68b0af",
+       "title": "Am I locked in?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087167bb5dd40a0f68b0b0",
+       "title": "Who sends us the invoice?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087167bb5dd40a0f68b0b1",
+       "title": "What counts as included changes?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087167bb5dd40a0f68b0b2",
+       "title": "What does work outside the plan cost?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b087167bb5dd40a0f68b0b3",
+       "title": "Does the week cover outages too?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      }
+     ],
+     "blockType": "accordion",
+     "header": {
+      "eyebrow": "FAQ",
+      "title": "On price and term",
+      "subtitle": null,
+      "intro": null
+     }
+    },
+    {
+     "id": "6b087167bb5dd40a0f68b0b5",
+     "eyebrow": "Get started",
+     "title": "A quote within a day",
+     "text": "Tell us what you need: you’ll get a clear quote, with no surprises later.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Get in touch",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "Pricing · Rinsly",
+    "description": "Hosting from €49 per month. Build from €2.500, or free with three years of hosting. Limits in gigabytes and requests, not in adjectives.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:50:35.340Z",
+   "createdAt": "2026-08-05T21:56:53.043Z",
+   "_status": "published"
+  },
+  {
+   "id": 5,
+   "title": "Platform",
+   "generateSlug": false,
+   "slug": "platform",
+   "layout": [
+    {
+     "id": "6b08715bbb5dd40a0f68b049",
+     "variant": "default",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "The platform",
+      "title": "One engine, every site, one monthly fee",
+      "intro": "Every site we build is an application on the same versioned engine. That is not a technical preference but the reason we can maintain many sites at once without maintenance running away from us."
+     }
+    },
+    {
+     "id": "6b08715bbb5dd40a0f68b056",
+     "anchor": "stack",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b08715bbb5dd40a0f68b04d",
+       "icon": "IconBrush",
+       "title": "From design system to production",
+       "description": "We build from the design system. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.",
+       "features": [
+        {
+         "id": "6b08715bbb5dd40a0f68b04a",
+         "text": "Next.js with Rinsly CMS"
+        },
+        {
+         "id": "6b08715bbb5dd40a0f68b04b",
+         "text": "Multilingual and accessible"
+        },
+        {
+         "id": "6b08715bbb5dd40a0f68b04c",
+         "text": "Checked before it goes live"
+        }
+       ]
+      },
+      {
+       "id": "6b08715bbb5dd40a0f68b051",
+       "icon": "IconPackages",
+       "title": "One versioned engine",
+       "description": "Every site shares one engine and keeps its own design. A vulnerability is fixed once.",
+       "features": [
+        {
+         "id": "6b08715bbb5dd40a0f68b04e",
+         "text": "Fixed in one release, rolled out to every site"
+        },
+        {
+         "id": "6b08715bbb5dd40a0f68b04f",
+         "text": "No plugin sprawl, no WordPress"
+        },
+        {
+         "id": "6b08715bbb5dd40a0f68b050",
+         "text": "Every site keeps its own design"
+        }
+       ]
+      },
+      {
+       "id": "6b08715bbb5dd40a0f68b055",
+       "icon": "IconServer2",
+       "title": "One platform, at the edge",
+       "description": "One environment per site, with the database and the media on the same platform. No server of your own to lie awake about.",
+       "features": [
+        {
+         "id": "6b08715bbb5dd40a0f68b052",
+         "text": "SSL, at the edge"
+        },
+        {
+         "id": "6b08715bbb5dd40a0f68b053",
+         "text": "Daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup)"
+        },
+        {
+         "id": "6b08715bbb5dd40a0f68b054",
+         "text": "Stated storage and traffic limits"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "The stack",
+      "title": "What it runs on",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08715bbb5dd40a0f68b057",
+     "kind": "oneEngineFleet",
+     "eyebrow": "Every site",
+     "title": "One release reaches every site",
+     "caption": "Every site shares one engine and keeps its own design. A security fix is made once and rolled out to every site.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "diagram"
+    },
+    {
+     "id": "6b08715bbb5dd40a0f68b05e",
+     "anchor": "techniek",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b08715bbb5dd40a0f68b058",
+       "title": "How do I manage my site?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08715bbb5dd40a0f68b059",
+       "title": "Why not WordPress?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08715bbb5dd40a0f68b05a",
+       "title": "What about daily backups and outages?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08715bbb5dd40a0f68b05b",
+       "title": "Who owns the website?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08715bbb5dd40a0f68b05c",
+       "title": "How are absences announced?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08715bbb5dd40a0f68b05d",
+       "title": "Do you work with other technology?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      }
+     ],
+     "blockType": "accordion",
+     "header": {
+      "eyebrow": "Good to know",
+      "title": "The technical part, plainly",
+      "subtitle": null,
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08715bbb5dd40a0f68b05f",
+     "eyebrow": "Measure",
+     "title": "Five grades in half a minute",
+     "text": "Try our measurement on any URL. Free, without an account.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Free website check",
+      "variant": "primary",
+      "type": "external",
+      "page": null,
+      "url": "/check",
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "Platform · Rinsly",
+    "description": "One versioned engine, Rinsly CMS and Next.js at the edge. A security fix is made once and rolled out across the whole fleet.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:50:22.495Z",
+   "createdAt": "2026-08-05T21:56:51.908Z",
+   "_status": "published"
+  },
+  {
+   "id": 4,
+   "title": "Partner programme",
+   "generateSlug": false,
+   "slug": "partnerprogramma",
+   "layout": [
+    {
+     "id": "6b08714bbb5dd40a0f68affa",
+     "variant": "offset",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b08714bbb5dd40a0f68aff8",
+       "label": "Request a partner call",
+       "variant": "primary",
+       "type": "internal",
+       "page": 9,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68aff9",
+       "label": "See the ladder",
+       "variant": "secondary",
+       "type": "internal",
+       "page": 4,
+       "url": null,
+       "anchor": "ladder",
+       "newTab": false
+      }
+     ],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Partner programme",
+      "title": "Your invoice, your price, your brand",
+      "intro": "Reselling and your own branding are allowed. If you invoice the end client yourself, you buy from Rinsly at list minus your percentage, put design and hosting on one invoice, and set the price and your own tiers if you want. You may name Rinsly the way anyone names Cloudflare: hosting at Rinsly. The percentage is the same number on both invoice routes, from 0% to 35% of the recurring subscription revenue excluding VAT, per settled invoice."
+     }
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b007",
+     "anchor": "ladder",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b08714bbb5dd40a0f68affc",
+       "icon": "IconTargetArrow",
+       "title": "+10% Exclusivity",
+       "description": "New client work and updates go to Rinsly. Clients already hosted elsewhere stay where they are. A big update (rebuild, migration, redesign, substantial expansion) triggers a migration conversation.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68affb",
+         "text": "Choice"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68affe",
+       "icon": "IconRefresh",
+       "title": "+5% Relationship management",
+       "description": "The partner is the first line. The client calls the partner; the partner files a ticket. Rinsly does no direct client contact.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68affd",
+         "text": "Choice"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b000",
+       "icon": "IconBolt",
+       "title": "+5% Marketing",
+       "description": "The partner names and sells Rinsly as their hosting partner.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68afff",
+         "text": "Choice"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b002",
+       "icon": "IconPackages",
+       "title": "+5% Portfolio above €1.000 a month",
+       "description": "Recurring subscription revenue above €1.000 a month.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b001",
+         "text": "Measured"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b004",
+       "icon": "IconRocket",
+       "title": "+5% Portfolio above €5.000 a month",
+       "description": "Recurring subscription revenue above €5.000 a month.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b003",
+         "text": "Measured"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b006",
+       "icon": "IconSeeding",
+       "title": "+5% Portfolio above €25.000 a month",
+       "description": "Recurring subscription revenue above €25.000 a month.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b005",
+         "text": "Measured"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "Revenue share",
+      "title": "The ladder, from 0% to 35%",
+      "intro": "The share is not negotiated per partner: it is composed from this fixed ladder. The base is 0%. The volume levels are cumulative, so the ladder tops out at 35%."
+     }
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b008",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "wide",
+     "anchor": "basis",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "The base",
+      "title": "Recurring subscription revenue, per settled invoice",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b015",
+     "anchor": "waarom",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b08714bbb5dd40a0f68b00b",
+       "icon": "IconPackages",
+       "title": "One engine, every site",
+       "description": "Every site shares one engine and keeps its own design. A security fix is made once and rolled out to every client at once.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b009",
+         "text": "No plugin sprawl"
+        },
+        {
+         "id": "6b08714bbb5dd40a0f68b00a",
+         "text": "Fixed in one release"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b00e",
+       "icon": "IconBrush",
+       "title": "From design system to production",
+       "description": "We build from the design system: type scale, spacing and motion live in the engine, so the design survives the build.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b00c",
+         "text": "Next.js with Rinsly CMS"
+        },
+        {
+         "id": "6b08714bbb5dd40a0f68b00d",
+         "text": "Checked before it goes live"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b011",
+       "icon": "IconBolt",
+       "title": "Measured speed",
+       "description": "Performance is not a marketing word but a measurement. Five grades on any URL, free through our website check.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b00f",
+         "text": "Edge hosting, no WordPress bloat"
+        },
+        {
+         "id": "6b08714bbb5dd40a0f68b010",
+         "text": "Free website check at /check"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b014",
+       "icon": "IconServer2",
+       "title": "Operations in hard numbers",
+       "description": "Limits in gigabytes and requests, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup). No \"generous storage\", no fine print.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b012",
+         "text": "Staging on every site"
+        },
+        {
+         "id": "6b08714bbb5dd40a0f68b013",
+         "text": "Client owns site and data"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "Why Rinsly",
+      "title": "Not another website builder",
+      "intro": "No theme, no page builder, no ten separate WordPress installs. One versioned engine for every site, and numbers instead of adjectives."
+     }
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b01c",
+     "anchor": "framer",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b08714bbb5dd40a0f68b018",
+       "icon": "IconBrush",
+       "title": "Framer fits a portfolio or a campaign",
+       "description": "Do you build the design yourself in Framer? Then you have a good tool for a portfolio or a campaign page. You are then responsible for build, management and support yourself.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b016",
+         "text": "Portfolio or showcase"
+        },
+        {
+         "id": "6b08714bbb5dd40a0f68b017",
+         "text": "Campaign page"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b01b",
+       "icon": "IconPackages",
+       "title": "Rinsly fits a studio that does not itself build and manage sites",
+       "description": "You design and deliver the design system. We build it as an application, host and maintain it, and you earn a share of the subscription, depending on what you take on (see the ladder).",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b019",
+         "text": "Build and hosting by Rinsly"
+        },
+        {
+         "id": "6b08714bbb5dd40a0f68b01a",
+         "text": "Management and updates by Rinsly"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "An honest comparison",
+      "title": "Framer or Rinsly?",
+      "intro": "It depends on what your client needs. A good conversation starts with which of the two fits."
+     }
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b01d",
+     "text": "Framer is a brand of its owner. Rinsly is not affiliated with Framer. Information about Framer checked on framer.com, 26 November 2026.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "note"
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b025",
+     "anchor": "hoe",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b08714bbb5dd40a0f68b01f",
+       "icon": "IconBrush",
+       "title": "1. You design",
+       "description": "What you already do: the design system. Partners deliver a design system; the tool is up to you, and it does not change the percentage.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b01e",
+         "text": "You deliver the design system"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b021",
+       "icon": "IconCode",
+       "title": "2. We build and launch",
+       "description": "We turn it into a real application on our engine and take it live. The client’s agreement is with Rinsly.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b020",
+         "text": "Free client build on 36 months of hosting"
+        }
+       ]
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b024",
+       "icon": "IconRefresh",
+       "title": "3. We run it",
+       "description": "Edge hosting, SSL, uptime monitoring, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup), security and CMS updates, and rollout across every site.",
+       "features": [
+        {
+         "id": "6b08714bbb5dd40a0f68b022",
+         "text": "A share of the recurring subscription revenue"
+        },
+        {
+         "id": "6b08714bbb5dd40a0f68b023",
+         "text": "Build fees and meerwerk are not shared"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "How it works",
+      "title": "You design, we do the rest",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b026",
+     "kind": "figmaToProduction",
+     "eyebrow": "From design to live",
+     "title": "Three steps, and only one of them is yours",
+     "caption": "You deliver the design system. Rinsly builds it as a real application on the shared engine and takes it live, then runs edge hosting, SSL, uptime monitoring, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup), security and CMS updates.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "diagram"
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b027",
+     "eyebrow": "Do the maths",
+     "title": "What would you take home?",
+     "intro": "Pick a plan, drag the number of clients and tick what you would take on. The rate and your share follow along.",
+     "footnote": "Each volume level is +5% and the levels are cumulative, so the ladder tops out at 35% of the recurring subscription revenue excluding VAT, per settled invoice. One-off build fees and meerwerk are not shared. Commission accrues when the invoice is settled, not when it is issued, and is paid on that client’s billing interval. This is an indication, not an offer.",
+     "anchor": "rekenen",
+     "blockName": null,
+     "blockType": "revenueCalculator"
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b028",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "wide",
+     "anchor": "facturatie",
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Invoicing",
+      "title": "You choose who invoices the client",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b029",
+     "kind": "invoicingRoutes",
+     "eyebrow": "Two routes",
+     "title": "Who sends which invoice",
+     "caption": "Setup A: Rinsly invoices the end client at list and pays the commission once that invoice is settled. Setup B: the partner invoices their own client and buys at list minus their ladder percentage. Either way the agreement runs between Rinsly and the end client.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "diagram"
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b02a",
+     "eyebrow": "Try our measurement",
+     "title": "Measure a site in half a minute",
+     "text": "Try the measurement yourself on any URL.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Free website check",
+      "variant": "secondary",
+      "type": "external",
+      "page": null,
+      "url": "/check",
+      "anchor": null,
+      "newTab": false
+     }
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b030",
+     "anchor": "faq",
+     "blockName": null,
+     "items": [
+      {
+       "id": "6b08714bbb5dd40a0f68b02b",
+       "title": "Aren’t you my competitor?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b02c",
+       "title": "I build websites myself. Is this for me?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b02d",
+       "title": "What if you disappear?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b02e",
+       "title": "Can I sell it as my own service?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      },
+      {
+       "id": "6b08714bbb5dd40a0f68b02f",
+       "title": "What does it cost me?",
+       "body": {
+        "root": "<rich text omitted>"
+       }
+      }
+     ],
+     "blockType": "accordion",
+     "header": {
+      "eyebrow": "FAQ",
+      "title": "Straight answers",
+      "subtitle": null,
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08714bbb5dd40a0f68b031",
+     "eyebrow": "Get started",
+     "title": "Shall we just talk it through?",
+     "text": "Tell us what you make and how you deliver it today. If it doesn’t fit, we’ll say so.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Get in touch",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "Partner programme · Rinsly",
+    "description": "You design. We build and host. A share of the recurring revenue for as long as the client stays, up to 35%, composed from what you take on.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:50:08.016Z",
+   "createdAt": "2026-08-05T21:56:50.764Z",
+   "_status": "published"
+  },
+  {
+   "id": 3,
+   "title": "Terms & conditions",
+   "generateSlug": false,
+   "slug": "voorwaarden",
+   "layout": [
+    {
+     "id": "6b0871b0bb5dd40a0f68b129",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "narrow",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Legal",
+      "title": "Terms & conditions",
+      "intro": null
+     }
+    }
+   ],
+   "meta": {
+    "title": "Terms & conditions · Rinsly",
+    "description": "Rinsly terms and conditions for web development, hosting and the partner programme.",
+    "image": null,
+    "noindex": true
+   },
+   "updatedAt": "2026-11-26T17:51:46.150Z",
+   "createdAt": "2026-07-23T18:19:50.834Z",
+   "_status": "published"
+  },
+  {
+   "id": 2,
+   "title": "Privacy policy",
+   "generateSlug": false,
+   "slug": "privacy",
+   "layout": [
+    {
+     "id": "6b0871a9bb5dd40a0f68b127",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "narrow",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Legal",
+      "title": "Privacy policy",
+      "intro": null
+     }
+    }
+   ],
+   "meta": {
+    "title": "Privacy policy · Rinsly",
+    "description": "Rinsly privacy policy: how we process personal data for hosting, the partner programme and this website.",
+    "image": null,
+    "noindex": true
+   },
+   "updatedAt": "2026-11-26T17:51:39.027Z",
+   "createdAt": "2026-07-23T18:19:43.961Z",
+   "_status": "published"
+  },
+  {
+   "id": 1,
+   "title": "Rinsly",
+   "generateSlug": false,
+   "slug": "home",
+   "layout": [
+    {
+     "id": "6b08713dbb5dd40a0f68afaf",
+     "variant": "spotlight",
+     "anchor": null,
+     "blockName": null,
+     "buttons": [
+      {
+       "id": "6b08713dbb5dd40a0f68afad",
+       "label": "Become a partner",
+       "variant": "primary",
+       "type": "internal",
+       "page": 4,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      },
+      {
+       "id": "6b08713dbb5dd40a0f68afae",
+       "label": "I just want a website",
+       "variant": "secondary",
+       "type": "internal",
+       "page": 7,
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     ],
+     "blockType": "hero",
+     "header": {
+      "eyebrow": "Build & hosting for design studios",
+      "title": "You design. We build it and keep it running.",
+      "intro": "Rinsly is the build-and-run department design studios don’t have. You deliver the design system, we build it as a real application and run it from there: hosting, updates and daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup). Every time the client pays, a share of it comes to you."
+     }
+    },
+    {
+     "id": "6b08713dbb5dd40a0f68afb9",
+     "anchor": "platform",
+     "blockName": null,
+     "cards": [
+      {
+       "id": "6b08713dbb5dd40a0f68afb2",
+       "icon": "IconBrush",
+       "title": "From design system to production",
+       "description": "We build from the design system. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.",
+       "features": [
+        {
+         "id": "6b08713dbb5dd40a0f68afb0",
+         "text": "Next.js with Rinsly CMS"
+        },
+        {
+         "id": "6b08713dbb5dd40a0f68afb1",
+         "text": "Multilingual, accessible, checked before it goes live"
+        }
+       ]
+      },
+      {
+       "id": "6b08713dbb5dd40a0f68afb5",
+       "icon": "IconPackages",
+       "title": "One versioned engine",
+       "description": "A security fix is made once and rolled out to every site. No plugin sprawl, no WordPress.",
+       "features": [
+        {
+         "id": "6b08713dbb5dd40a0f68afb3",
+         "text": "Fixed in one release"
+        },
+        {
+         "id": "6b08713dbb5dd40a0f68afb4",
+         "text": "Every site keeps its own design"
+        }
+       ]
+      },
+      {
+       "id": "6b08713dbb5dd40a0f68afb8",
+       "icon": "IconServer2",
+       "title": "Running at the edge",
+       "description": "One environment per site, at the edge, with limits we simply write down.",
+       "features": [
+        {
+         "id": "6b08713dbb5dd40a0f68afb6",
+         "text": "Edge hosting & SSL"
+        },
+        {
+         "id": "6b08713dbb5dd40a0f68afb7",
+         "text": "Daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup)"
+        }
+       ]
+      }
+     ],
+     "blockType": "services",
+     "header": {
+      "eyebrow": "The platform",
+      "title": "One engine, every site",
+      "intro": "No theme, no page builder. Every site is an application on one shared, versioned engine, which is why a security fix can be made once and rolled out across every site at the same time."
+     }
+    },
+    {
+     "id": "6b08713dbb5dd40a0f68afba",
+     "eyebrow": "Measure",
+     "title": "Five grades in half a minute",
+     "text": "Five grades for any site in half a minute. Try it on any URL, free and without an account.",
+     "anchor": "websitecheck",
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Free website check",
+      "variant": "secondary",
+      "type": "external",
+      "page": null,
+      "url": "/check",
+      "anchor": null,
+      "newTab": false
+     }
+    },
+    {
+     "id": "6b08713dbb5dd40a0f68afbb",
+     "eyebrow": "The technical part",
+     "title": "One fix, every site",
+     "text": "How that engine works, what happens in a release, and where the data lives: we would rather explain it than summarise it.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "How the platform works",
+      "variant": "primary",
+      "type": "internal",
+      "page": 5,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    },
+    {
+     "id": "6b08713dbb5dd40a0f68afbc",
+     "content": {
+      "root": "<rich text omitted>"
+     },
+     "width": "wide",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "richText",
+     "header": {
+      "eyebrow": "Two doors",
+      "title": "Who is Rinsly for?",
+      "intro": null
+     }
+    },
+    {
+     "id": "6b08713dbb5dd40a0f68afbd",
+     "eyebrow": "Get started",
+     "title": "Ready to work together?",
+     "text": "Tell us what you make and how you deliver it today: we’ll tell you honestly whether this is for you.",
+     "anchor": null,
+     "blockName": null,
+     "blockType": "cta",
+     "button": {
+      "label": "Get in touch",
+      "variant": "primary",
+      "type": "internal",
+      "page": 9,
+      "url": null,
+      "anchor": null,
+      "newTab": false
+     }
+    }
+   ],
+   "meta": {
+    "title": "Rinsly · build & hosting for design studios",
+    "description": "Rinsly builds and hosts websites for design studios. You deliver the design in Figma, we build it as a real application and keep it running.",
+    "image": null,
+    "noindex": false
+   },
+   "updatedAt": "2026-11-26T17:49:52.508Z",
+   "createdAt": "2026-07-23T18:19:19.391Z",
+   "_status": "published"
+  }
+ ]
+}

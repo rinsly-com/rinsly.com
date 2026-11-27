@@ -188,3 +188,8 @@ site-core's own parser and matcher, only the pinned ids and fields pass (other i
 wildcards, fields, collections and globals are rejected, as are rich-text leaves and privacy or
 voorwaarden block paths), the paths exist as writable text leaves in the real pages schema, the
 generated file has no hand edits, and the generator's output is deterministic.
+The same spec asserts page ownership against a committed snapshot of the public accp pages API
+(`tests/unit/fixtures/accp-pages-nl.json` / `-en.json`, depth 0, rich text bodies omitted): every
+pinned block id and row id belongs to the page its spec names, in its own locale, and the real
+privacy and voorwaarden block ids are never allowlisted. Refresh the snapshot together with
+`--write` (see `tests/unit/fixtures/README.md`).
