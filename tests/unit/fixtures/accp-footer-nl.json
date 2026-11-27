@@ -1,0 +1,54 @@
+{
+ "id": 1,
+ "menuItems": [
+  {
+   "label": "Platform",
+   "url": "/nl/platform",
+   "id": "6b0871b9bb5dd40a0f68b134"
+  },
+  {
+   "label": "Partnerprogramma",
+   "url": "/nl/partnerprogramma",
+   "id": "6b0871b9bb5dd40a0f68b135"
+  },
+  {
+   "label": "Prijzen",
+   "url": "/nl/prijzen",
+   "id": "6b0871b9bb5dd40a0f68b136"
+  },
+  {
+   "label": "Website bij Rinsly",
+   "url": "/nl/website",
+   "id": "6b0871b9bb5dd40a0f68b137"
+  },
+  {
+   "label": "Over ons",
+   "url": "/nl/over",
+   "id": "6b0871b9bb5dd40a0f68b138"
+  },
+  {
+   "label": "Websitecheck",
+   "url": "/check",
+   "id": "6b0871b9bb5dd40a0f68b139"
+  },
+  {
+   "label": "Contact",
+   "url": "/nl/contact",
+   "id": "6b0871b9bb5dd40a0f68b13a"
+  }
+ ],
+ "infoLinks": [
+  {
+   "label": "Privacyverklaring",
+   "url": "/nl/privacy",
+   "id": "6b0871b9bb5dd40a0f68b13b"
+  },
+  {
+   "label": "Algemene voorwaarden",
+   "url": "/nl/voorwaarden",
+   "id": "6b0871b9bb5dd40a0f68b13c"
+  }
+ ],
+ "copyright": "© Rinsly 2026: Alle rechten voorbehouden.",
+ "globalType": "footer"
+}
