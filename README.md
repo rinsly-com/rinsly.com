@@ -2,6 +2,8 @@
 
 Screenshots and logs for the rinsly.com PR "feat(redesign): direction B v5". This branch is an orphan proof branch; never merge it.
 
+**Current: `v5-896bd12/` = PR head 896bd12** (after merging develop with #125, the Bugbot autofix and the #125 optionals; drafts and manifest hashes unchanged), same layout as below. Earlier runs: `v5-4d3d17a/`, `v5-2e75da6-motion-recheck/`.
+
 `v5-4d3d17a/` was rendered at feature commit 4d3d17a. The PR head 5987c8b differs from it only by
 `src/migrations/20261127_200500_redesign_v5_content.json` (the drizzle snapshot lint:migrations wants), so the render is the same.
 
