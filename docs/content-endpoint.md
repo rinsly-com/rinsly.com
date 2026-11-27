@@ -43,8 +43,10 @@ Collection `pages` only. No globals, no other collection, no `title`, `slug`, `m
 
 Marketeer's four SEO pages are /website (id 7), /prijzen (id 6), /over (id 8) and
 /partnerprogramma (id 4). Because `meta.*` is allowed everywhere, it also reaches the noindex
-legal pages (privacy, voorwaarden) and the draft pages (cases, Woerden). Accepted in the plan
-(`PLAN.md` step 2); the audit table records every write.
+legal pages (privacy id 2, voorwaarden id 3) and the published noindex pages cases (id 10) and
+Woerden (id 11). These are published, not drafts, so a `meta.*` write to them is accepted:
+it publishes the page and starts a production rebuild like any other write. Accepted in the
+plan (`PLAN.md` step 2); the audit table records every write.
 
 Not covered, on purpose:
 
@@ -111,7 +113,8 @@ rinsly content set rinsly --collection pages --id 7 --path meta.title --locale n
 ```
 
 Page ids on accp: home 1, privacy 2, voorwaarden 3, partnerprogramma 4, platform 5,
-prijzen 6, website 7, over 8, contact 9.
+prijzen 6, website 7, over 8, contact 9, cases 10 (noindex, route 404s while
+`RINSLY_CASES_PAGE_ENABLED` is off), website-laten-maken-woerden 11 (noindex).
 
 Rules of use:
 
