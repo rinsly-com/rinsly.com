@@ -1,13 +1,52 @@
 /**
  * Partner revenue-share ladder for the public site.
  *
- * Every number and condition here is taken from the commercial summary's
- * partner section (base 0%, choices +10/+5/+5, measured volume +5 at each
- * exclusive threshold, cumulative, cap 35%, base = recurring subscription
- * revenue ex VAT per settled invoice, build fees and meerwerk excluded).
- * The same percentages live in Ledger's tenantRate.ts and the contract
- * generator. Do not add a rung, a threshold or a duty in this file.
+ * Two models live here on purpose, until Ledger moves too:
+ *
+ *  1. **v3.3 (current, terms v3.3 art. 5, Yaron 27 Nov 2026)**: `LADDER_V33`
+ *     and `partnerRateV33`. Basis 10% for every attributed, paying site;
+ *     Eerste lijn +10% and Verkoop +10% while that rung applies; Volume +5%
+ *     from five paying attributed end clients; maximum 35%. Base = recurring
+ *     subscription revenue excl. VAT that Rinsly actually received per paid
+ *     invoice; build fees and extra work are not shared. The public calculator
+ *     on /partnerprogramma uses this model.
+ *
+ *  2. **Legacy (summary of Aug 2026)**: base 0%, choices +10/+5/+5, measured
+ *     revenue levels. Still used by the invite-only /partner application form,
+ *     whose answers (exclusiviteit / relatiebeheer / marketing) are stored in
+ *     PartnerAanvragen and pulled by Ledger. Ledger's src/types.ts (DUTY_PCT)
+ *     and src/domain/tenantRate.ts (base 0, revenue tiers) and the contract
+ *     generator script still compute this model, so the form and the pull move
+ *     together with Ledger, not in this file alone.
  */
+
+/** Terms v3.3 art. 5. Keep in step with Ledger tenantRate.ts and the contract generator. */
+export const LADDER_V33 = {
+  basePct: 10,
+  firstLinePct: 10,
+  salesPct: 10,
+  volumePct: 5,
+  /** Volume counts from this many paying attributed end clients (art. 6.4). */
+  volumeMinClients: 5,
+  maxPct: 35,
+} as const
+
+export type RungsV33 = { firstLine: boolean; sales: boolean }
+
+export type RateV33 = { base: number; firstLine: number; sales: number; volume: number; total: number }
+
+/** The v3.3 share for a partner with `payingClients` attributed, paying end clients. */
+export function partnerRateV33(rungs: RungsV33, payingClients: number): RateV33 {
+  const base = payingClients > 0 ? LADDER_V33.basePct : 0
+  const firstLine = rungs.firstLine && base ? LADDER_V33.firstLinePct : 0
+  const sales = rungs.sales && base ? LADDER_V33.salesPct : 0
+  const volume = payingClients >= LADDER_V33.volumeMinClients ? LADDER_V33.volumePct : 0
+  return { base, firstLine, sales, volume, total: Math.min(base + firstLine + sales + volume, LADDER_V33.maxPct) }
+}
+
+// ---------------------------------------------------------------------------
+// Legacy model (invite-only /partner form; see the header comment)
+// ---------------------------------------------------------------------------
 
 export type LadderLocale = 'nl' | 'en'
 export type LadderKind = 'choice' | 'measured'

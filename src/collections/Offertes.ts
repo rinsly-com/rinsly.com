@@ -41,6 +41,8 @@ export const Offertes: CollectionConfig = {
         // (see FACILITATOR-MIGRATION.md). "Partner" now means a design studio.
         { label: { en: 'Growth', nl: 'Growth' }, value: 'partner' },
         { label: { en: 'Custom', nl: 'Op maat' }, value: 'opmaat' },
+        // C-02 (plan 003): the visitor has not picked a plan yet.
+        { label: { en: 'Not sure yet', nl: 'Weet ik nog niet' }, value: 'onbekend' },
       ],
     },
     {
@@ -50,8 +52,8 @@ export const Offertes: CollectionConfig = {
       hasMany: true,
       options: [
         { label: { en: 'Localization', nl: 'Meertaligheid' }, value: 'localization' },
-        { label: { en: 'Email on your domain', nl: 'E-mail op eigen domein' }, value: 'email' },
-        { label: { en: 'Design & branding', nl: 'Vormgeving & huisstijl' }, value: 'design' },
+        { label: { en: 'Email routing on your own domain', nl: 'E-mailroutering op eigen domein' }, value: 'email' },
+        { label: { en: 'I still need a designer', nl: 'Ik zoek nog een ontwerper' }, value: 'design' },
         { label: { en: 'SEO', nl: 'SEO & vindbaarheid' }, value: 'seo' },
         { label: { en: 'Content & copy', nl: 'Content & teksten' }, value: 'content' },
         { label: { en: 'Other', nl: 'Anders' }, value: 'other' },
