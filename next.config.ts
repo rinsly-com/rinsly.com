@@ -96,12 +96,6 @@ if (!isStatic) {
   config.headers = async () => {
     const entries = payloadHeaders ? await payloadHeaders() : []
     return [
-      // More specific than the catch-all Referrer-Policy below, so ?token=
-      // is not sent as Referer on same-origin clicks. First match wins.
-      ...UNSUBSCRIBE_HEADER_SOURCES.map((source) => ({
-        source,
-        headers: [...UNSUBSCRIBE_HTTP_HEADERS],
-      })),
       ...entries.map((entry) =>
         entry.source === '/:path*' && entry.headers.some((h) => h.key === 'Critical-CH')
           ? { ...entry, source: '/((?!check).*)' }
@@ -121,6 +115,13 @@ if (!isStatic) {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
+      // Next.js applies every matching headers() source; the last value for a
+      // key wins. These must follow the catch-all so Referrer-Policy stays
+      // no-referrer and ?token= is not sent as Referer on same-origin clicks.
+      ...UNSUBSCRIBE_HEADER_SOURCES.map((source) => ({
+        source,
+        headers: [...UNSUBSCRIBE_HTTP_HEADERS],
+      })),
     ]
   }
 }
