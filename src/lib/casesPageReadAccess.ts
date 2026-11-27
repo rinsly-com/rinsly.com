@@ -8,9 +8,19 @@ export function casesPageAnonymousConstraint(): Where {
 }
 
 /**
+ * Only the admin-panel auth collection (`users`) may see the hidden cases doc.
+ * Any other login collection added later (partners, clients) is treated as
+ * anonymous here, so it cannot read the cases page while the flag is off.
+ */
+export function isAdminUser(user: unknown): boolean {
+  if (!user || typeof user !== 'object') return false
+  return (user as { collection?: unknown }).collection === 'users'
+}
+
+/**
  * Collection-level read access for `pages`.
  *
- * Signed-in users (the admin panel) and a turned-on public flag see every page.
+ * Signed-in admin users (`users` collection) and a turned-on public flag see every page.
  * Otherwise anonymous REST and GraphQL reads are constrained so the cases doc
  * is not returned — by slug, by id, in a list, or with depth/locale variants.
  *
@@ -22,7 +32,7 @@ export function casesPageReadAccess(previous?: Access): Access {
     const previousResult = previous ? await previous(args) : true
     if (previousResult === false) return false
 
-    const allowCases = Boolean(args.req.user) || isCasesPageEnabled()
+    const allowCases = isAdminUser(args.req.user) || isCasesPageEnabled()
     if (allowCases) return previousResult
 
     const hide = casesPageAnonymousConstraint()

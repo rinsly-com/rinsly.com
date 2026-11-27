@@ -26,7 +26,7 @@ function anonArgs(): AccessArgs {
 }
 
 function userArgs(): AccessArgs {
-  return { req: { user: { id: 'admin-1', email: 'dev@rinsly.local' } } } as unknown as AccessArgs
+  return { req: { user: { id: 'admin-1', email: 'dev@rinsly.local', collection: 'users' } } } as unknown as AccessArgs
 }
 
 async function withFlag<T>(value: string | undefined, run: () => Promise<T> | T): Promise<T> {
@@ -72,6 +72,15 @@ describe('casesPageReadAccess', () => {
     })
     await withFlag('YES', async () => {
       expect(await read(anonArgs())).toBe(true)
+    })
+  })
+
+  it('treats a non-admin login collection like an anonymous reader', async () => {
+    const partner = { req: { user: { id: 'p-1', email: 'p@x.nl', collection: 'partners' } } } as unknown as AccessArgs
+    const noCollection = { req: { user: { id: 'u-1' } } } as unknown as AccessArgs
+    await withFlag(undefined, async () => {
+      expect(await casesPageReadAccess()(partner)).toEqual({ slug: { not_equals: 'cases' } })
+      expect(await casesPageReadAccess()(noCollection)).toEqual({ slug: { not_equals: 'cases' } })
     })
   })
 
