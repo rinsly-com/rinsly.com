@@ -26,5 +26,6 @@ declare namespace NodeJS {
     RESET_PASSWORD?: string
     SEED_ADMIN_EMAIL?: string
     SEED_ADMIN_PASSWORD?: string
+    UNSUBSCRIBE_TOKEN_SECRET?: string
   }
 }

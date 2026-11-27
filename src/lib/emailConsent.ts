@@ -34,6 +34,22 @@ export const EMAIL_CONSENT_WITHDRAWAL = {
   },
 } as const
 
+/**
+ * Version id for the exact sentences shown at the tick (label + helper).
+ * Storing this on the offerte row needs a new `consent_version` column; that
+ * migration is proposed in docs/marketing-unsubscribe.md and is not written
+ * here (it needs Yaron's OK). Until then the constant is the changelog key
+ * only. Do not invent new sentences under an old id.
+ */
+export const EMAIL_CONSENT_VERSION = '2026-11-26'
+
+export const EMAIL_CONSENT_CHANGELOG = {
+  '2026-11-26': {
+    label: EMAIL_CONSENT_TEXT,
+    withdrawal: EMAIL_CONSENT_WITHDRAWAL,
+  },
+} as const
+
 export type StoredEmailConsent = {
   consentGiven: boolean
   /** Server clock, ISO-8601, or null when the box was not ticked. */

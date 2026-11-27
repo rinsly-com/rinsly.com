@@ -3,7 +3,10 @@ import { describe, expect, it } from 'vitest'
 import { adminFieldOnly } from '@rinsly-com/site-core/access'
 
 import {
+  EMAIL_CONSENT_CHANGELOG,
   EMAIL_CONSENT_TEXT,
+  EMAIL_CONSENT_VERSION,
+  EMAIL_CONSENT_WITHDRAWAL,
   consentNotice,
   emailConsentFields,
   emailConsentFromSubmission,
@@ -115,5 +118,15 @@ describe('consentNotice', () => {
     ).toBe(
       `E-mailtoestemming: ja\nToestemmingstekst: ${EMAIL_CONSENT_TEXT.nl}\nTijdstip: 2026-11-26T13:50:00.000Z`,
     )
+  })
+})
+
+describe('email consent version', () => {
+  it('keys the current label and helper under a stable version id, without a new column yet', () => {
+    expect(EMAIL_CONSENT_VERSION).toBe('2026-11-26')
+    expect(EMAIL_CONSENT_CHANGELOG[EMAIL_CONSENT_VERSION]).toEqual({
+      label: EMAIL_CONSENT_TEXT,
+      withdrawal: EMAIL_CONSENT_WITHDRAWAL,
+    })
   })
 })

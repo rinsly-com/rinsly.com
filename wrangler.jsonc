@@ -63,6 +63,11 @@
     // add route `rinsly.com/check/*` -> rinsly-accp (same dashboard-not-CI
     // reasoning as the custom domain above). Until then, LeadLens can link to
     // accp.rinsly.com/check/<token>.
+    //
+    // Marketing unsubscribe (`/{nl,en}/afmelden`) also needs that dashboard
+    // step: `rinsly.com/nl/afmelden*` and `rinsly.com/en/afmelden*` (and www)
+    // -> rinsly-accp. UNSUBSCRIBE_TOKEN_SECRET is a Worker SECRET, set by
+    // Fleet/Yaron, never in this file. See docs/marketing-unsubscribe.md.
     { "binding": "LEADLENS_CHECKS", "bucket_name": "leadlens-checks" },
   ],
   // Shared fleet read tokens (Cloudflare Secrets Store). Mid-migration both

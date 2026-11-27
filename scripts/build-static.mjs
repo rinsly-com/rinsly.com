@@ -43,6 +43,9 @@ const DEFAULT_LOCALE = 'nl'
 const EXCLUDED = [
   { live: 'src/app/(payload)', stashed: 'app__payload' },
   { live: 'src/app/(frontend)/check/[token]', stashed: 'app__frontend_check_token' },
+  // Request-time HMAC + opt-out write; the static worker has no runtime.
+  // Zone-route /{nl,en}/afmelden* to rinsly-accp (see docs/marketing-unsubscribe.md).
+  { live: 'src/app/(frontend)/[locale]/afmelden', stashed: 'app__frontend_locale_afmelden' },
 ]
 
 const stash = () => {

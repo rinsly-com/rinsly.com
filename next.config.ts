@@ -76,6 +76,9 @@ if (!isStatic) {
     // recruiting may not be Dutch. Bare /partner keeps working — invites already
     // sent carry that form, and Next preserves the ?token= query across this.
     { source: '/partner', destination: '/nl/partner', permanent: false },
+    // Marketing unsubscribe lives under a locale. Bare /afmelden keeps a
+    // typable shortcut; the query token is preserved by the redirect.
+    { source: '/afmelden', destination: '/nl/afmelden', permanent: false },
   ]
 }
 
