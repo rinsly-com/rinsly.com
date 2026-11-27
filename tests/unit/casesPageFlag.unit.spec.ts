@@ -55,13 +55,17 @@ describe('isCasesPageHidden', () => {
 })
 
 describe('cases public route', () => {
-  it('404s /cases from the slug page and OG image until the flag is on', () => {
-    expect(pageSource).toMatch(/isCasesPageHidden/)
+  it('404s /cases and a renamed cases document from the slug page and OG image until the flag is on', () => {
+    expect(pageSource).toMatch(/isCasesPublicRouteHidden/)
+    expect(pageSource).toMatch(/excludeHiddenCasesParams/)
     expect(pageSource).toMatch(/notFound\(/)
     expect(pageSource).toMatch(/generateStaticParams/)
     expect(pageSource).toMatch(/generateMetadata/)
-    expect(ogSource).toMatch(/isCasesPageHidden/)
+    expect(ogSource).toMatch(/isCasesPublicRouteHidden/)
+    expect(ogSource).toMatch(/excludeHiddenCasesParams/)
     expect(ogSource).toMatch(/notFound\(/)
+    expect(pageSource).not.toMatch(/isCasesPageHidden\(/)
+    expect(ogSource).not.toMatch(/isCasesPageHidden\(/)
   })
 
   it('has no header or footer nav link to /cases', () => {

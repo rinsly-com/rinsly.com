@@ -5,8 +5,9 @@ consent (Lawyer §13 P2-01). While the flag is off:
 
 - both locales 404, stay `noindex`, and are omitted from `sitemap.xml`
 - unauthenticated Payload API reads (`GET /api/pages`, including by slug, by
-  id, with depth or locale, and GraphQL if enabled) do not return the cases
-  document
+  id, with depth or locale, and GraphQL) do not return the cases
+  document. The hide matches the slug `cases` and the seeded block anchors
+  (`burojazz`, `up2brand`), so renaming the slug alone does not publish it.
 - signed-in editors still see the document in the admin, and the seed row is
   kept so the page can be turned back on
 
