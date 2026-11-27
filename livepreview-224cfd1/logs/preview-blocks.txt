@@ -3,9 +3,9 @@ local D1 = accp-like snapshot + 170000/190000 + 200000/200500 (v5 drafts, not pu
 Rendered height (px) of each block wrapper [data-rinsly-block-type] in the admin live-preview iframe (/nl...?preview=1):
 
 BEFORE (9939f05)
-  /nl?preview=1                  productHero:0 doorCards:0 stepsShowcase:0 trustBar:0 accordion:403 cta:250
-  /nl/prijzen?preview=1          productHero:0 pricingCards:0 note:146 productShowcase:0 accordion:705 cta:270
-  /nl/partnerprogramma?preview=1 productHero:0 ladderSteps:0 stepsShowcase:0 revenueCalculator:739 diagram:735 accordion:705 cta:270   (direct ?preview=1 load)
+  /nl?preview=1                  productHero:0 doorCards:0 stepsShowcase:0 trustBar:0 accordion:403 cta:250   (direct ?preview=1 load)
+  /nl/prijzen?preview=1          productHero:0 pricingCards:0 note:146 productShowcase:0 accordion:705 cta:270   (direct ?preview=1 load; same in the admin iframe)
+  /nl/partnerprogramma?preview=1 not measured on a direct load; see shots/admin-livepreview-before-partnerprogramma.png
 
 AFTER (224cfd1)
   /nl?preview=1                  productHero:279 doorCards:499 stepsShowcase:447 trustBar:113 accordion:403 cta:250
