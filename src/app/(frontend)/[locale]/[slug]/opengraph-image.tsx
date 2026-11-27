@@ -7,6 +7,8 @@ import { getPayload } from 'payload'
 import { excludeHiddenCasesParams, isCasesPublicRouteHidden } from '@/lib/casesPagePublicRoute'
 import { siteConfig } from '@/site.config'
 
+const loadPayload = () => getPayload({ config })
+
 // force-dynamic on accp; build-static.mjs strips it for the static export.
 export const dynamic = 'force-dynamic'
 
@@ -24,13 +26,11 @@ export const alt = og.alt
 
 export const generateStaticParams = async () => {
   const params = await og.generateStaticParams()
-  const payload = await getPayload({ config })
-  return excludeHiddenCasesParams(params, payload)
+  return excludeHiddenCasesParams(params, loadPayload)
 }
 
 export default async function Image(props: Parameters<typeof og.Image>[0]) {
   const { slug } = await props.params
-  const payload = await getPayload({ config })
-  if (typeof slug === 'string' && (await isCasesPublicRouteHidden(slug, payload))) notFound()
+  if (typeof slug !== 'string' || (await isCasesPublicRouteHidden(slug, loadPayload))) notFound()
   return og.Image(props)
 }
