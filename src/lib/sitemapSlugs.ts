@@ -36,6 +36,7 @@ export function slugsForSitemap(pageSlugs: readonly (string | null | undefined)[
 /** Page rows from getRenderablePages (slug plus optional meta.noindex). */
 export type SitemapPage = {
   slug?: string | null
+  updatedAt?: string | null
   meta?: { noindex?: boolean | null } | null
 }
 
@@ -46,4 +47,20 @@ export type SitemapPage = {
  */
 export function slugsForSitemapFromPages(pages: readonly SitemapPage[]): string[] {
   return slugsForSitemap(pages.filter((page) => page.meta?.noindex !== true).map((page) => page.slug))
+}
+
+/**
+ * `<lastmod>` per slug: the page row's `updatedAt` as an ISO string. Rows
+ * without a valid date are left out, so the sitemap omits lastmod rather than
+ * inventing one.
+ */
+export function lastModifiedBySlug(pages: readonly SitemapPage[]): Map<string, string> {
+  const out = new Map<string, string>()
+  for (const page of pages) {
+    if (typeof page.slug !== 'string' || page.slug === '' || typeof page.updatedAt !== 'string') continue
+    const time = Date.parse(page.updatedAt)
+    if (Number.isNaN(time)) continue
+    out.set(page.slug, new Date(time).toISOString())
+  }
+  return out
 }

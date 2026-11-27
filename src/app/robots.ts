@@ -1,16 +1,17 @@
 import type { MetadataRoute } from 'next'
 
-import { absoluteUrl, siteUrl } from '@rinsly-com/site-core/lib/siteUrl'
+import { absoluteUrl } from '@rinsly-com/site-core/lib/siteUrl'
 import { siteConfig } from '@/site.config'
 
 export const dynamic = 'force-static'
 
 export default function robots(): MetadataRoute.Robots {
   return {
-    // /check pages (LeadLens scorecards + the fallback form) are noindex and
-    // never in the sitemap (handoff §4) — the disallow is belt-and-braces.
-    rules: { userAgent: '*', allow: '/', disallow: ['/check', '/check/'] },
+    // No `Disallow: /check` (plan 003 K-03): a disallow stops crawlers from
+    // reading the page, so they never see its noindex. /check pages stay
+    // noindex (their metadata) and out of the sitemap. No `Host:` either; it
+    // is not a standard directive.
+    rules: { userAgent: '*', allow: '/' },
     sitemap: absoluteUrl(siteConfig, '/sitemap.xml'),
-    host: siteUrl(siteConfig),
   }
 }

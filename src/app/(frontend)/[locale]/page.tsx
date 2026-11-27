@@ -3,6 +3,7 @@ import config from '@payload-config'
 import { createHomeRoute } from '@rinsly-com/site-core/app'
 import { siteConfig } from '@/site.config'
 import { extraRenderers } from '@/blockRenderers'
+import { withXDefault } from '@/lib/siteJsonLd'
 
 // force-dynamic on the accp worker (render live). The static prod build
 // (scripts/build-static.mjs) strips this line so `/[locale]` prerenders from
@@ -19,5 +20,7 @@ const home = createHomeRoute({
   loadPreviewShell: () => import('@/components/PreviewShell'),
 })
 
-export const generateMetadata = home.generateMetadata
+// hreflang x-default → the Dutch home (plan 003 T-02).
+export const generateMetadata = async (props: Parameters<typeof home.generateMetadata>[0]) =>
+  withXDefault(await home.generateMetadata(props))
 export default home.Page

@@ -9,15 +9,33 @@ import { CheckRunner } from '@/components/check/CheckRunner'
  * Generic /check page — the self-service website check (visitor enters a
  * domain, our pipeline generates a personal /check/<token> scorecard), plus
  * the manual "wij kijken mee" lead form as secondary path and as the landing
- * spot for expired personal links (?link=verlopen). Fully static (part of the
- * rinsly.com export); both forms talk to the accp API cross-origin.
+ * spot for expired personal links (?link=verlopen). Static in the rinsly.com
+ * export, live on accp; both forms talk to the accp API cross-origin.
  */
 
+// force-dynamic on the accp worker: the layout reads the CMS header and footer,
+// so a build-time render would freeze them. build-static.mjs swaps this to
+// force-static for the rinsly.com export (the content snapshot).
+export const dynamic = 'force-dynamic'
+
+const TITLE = 'Gratis websitecheck | Rinsly'
+const DESCRIPTION =
+  'Test uw website gratis op moderniteit, snelheid, mobiel gebruik, vindbaarheid en veiligheid, met direct resultaat.'
+
+// Social tags reuse the existing title and description (plan 002 B-08).
 export const metadata: Metadata = {
-  title: 'Gratis websitecheck | Rinsly',
-  description:
-    'Test uw website gratis op moderniteit, snelheid, mobiel gebruik, vindbaarheid en veiligheid, met direct resultaat.',
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
   robots: { index: false, follow: false },
+  openGraph: {
+    type: 'website',
+    siteName: 'Rinsly',
+    locale: 'nl_NL',
+    url: '/check',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
 }
 
 const CHECKS = [

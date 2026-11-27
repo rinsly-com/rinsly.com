@@ -67,7 +67,8 @@ const nextConfig: NextConfig = {
 // which also mirrors the locale-prefixed /check redirects below).
 if (!isStatic) {
   nextConfig.redirects = () => [
-    { source: '/', destination: '/nl', permanent: false },
+    // Permanent (308): the default locale is the canonical home (plan 003 T-03).
+    { source: '/', destination: '/nl', permanent: true },
     // /check is deliberately locale-less (short URL in the LeadLens mail, Dutch
     // only) — catch intuitive locale-prefixed variants instead of 404ing.
     { source: '/:locale(nl|en)/check/:path*', destination: '/check/:path*', permanent: true },
