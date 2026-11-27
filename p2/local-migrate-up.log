@@ -1,0 +1,25 @@
+$ cross-env NODE_OPTIONS=--no-deprecation payload migrate
+[16:38:35] [32mINFO[39m: [36mReading migration files from /workspace/builder-refactor-p1/src/migrations[39m
+[16:38:35] [32mINFO[39m: [36mMigrating: 20261127_170000_content_refactor[39m
+[16:38:35] [32mINFO[39m: [36m[static-deploy] skipped (pages 1 published-change) — dispatch not configured[39m
+[16:38:36] [32mINFO[39m: [36m[static-deploy] skipped (pages 4 published-change) — dispatch not configured[39m
+[16:38:37] [32mINFO[39m: [36m[static-deploy] skipped (pages 2 published-change) — dispatch not configured[39m
+[16:38:37] [32mINFO[39m: [36m[static-deploy] skipped (pages 8 published-change) — dispatch not configured[39m
+[16:38:37] [32mINFO[39m: [36m[static-deploy] skipped (global header changed) — dispatch not configured[39m
+[16:38:37] [32mINFO[39m: [36m[static-deploy] skipped (global header changed) — dispatch not configured[39m
+[16:38:38] [32mINFO[39m: [36m[static-deploy] skipped (global footer changed) — dispatch not configured[39m
+[16:38:38] [32mINFO[39m: [36m[static-deploy] skipped (global footer changed) — dispatch not configured[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote home.nl (draft)[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote home.en (draft)[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote prijzen.nl (draft)[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote prijzen.en (draft)[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote partnerprogramma.nl (draft)[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote partnerprogramma.en (draft)[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote contact.nl (draft)[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote contact.en (draft)[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote header.nl[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote header.en[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote footer.nl[39m
+[16:38:38] [32mINFO[39m: [36m[content-refactor up] wrote footer.en[39m
+[16:38:38] [32mINFO[39m: [36mMigrated:  20261127_170000_content_refactor (2932ms)[39m
+[16:38:38] [32mINFO[39m: [36mDone.[39m

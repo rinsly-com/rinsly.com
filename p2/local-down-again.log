@@ -1,0 +1,12 @@
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged home.nl[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged home.en[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged prijzen.nl[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged prijzen.en[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged partnerprogramma.nl[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged partnerprogramma.en[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged contact.nl[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged contact.en[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged header.nl[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged header.en[39m
+[16:39:31] [32mINFO[39m: [36m[content-refactor down] unchanged footer.nl[39m
+[16:39:31] [33mWARN[39m: [36m[content-refactor down] SKIPPED footer.en: edited after the migration, not reverting[39m

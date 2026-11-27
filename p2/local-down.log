@@ -1,0 +1,12 @@
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote home.nl (draft)[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote home.en (draft)[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote prijzen.nl (draft)[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote prijzen.en (draft)[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote partnerprogramma.nl (draft)[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote partnerprogramma.en (draft)[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote contact.nl (draft)[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote contact.en (draft)[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote header.nl[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote header.en[39m
+[16:39:25] [32mINFO[39m: [36m[content-refactor down] wrote footer.nl[39m
+[16:39:25] [33mWARN[39m: [36m[content-refactor down] SKIPPED footer.en: edited after the migration, not reverting[39m
