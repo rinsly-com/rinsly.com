@@ -1,6 +1,7 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 
 import { readServerEnv } from './src/lib/env'
+import { UNSUBSCRIBE_HEADER_SOURCES, UNSUBSCRIBE_HTTP_HEADERS } from './src/lib/unsubscribeHeaders'
 import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -95,6 +96,12 @@ if (!isStatic) {
   config.headers = async () => {
     const entries = payloadHeaders ? await payloadHeaders() : []
     return [
+      // More specific than the catch-all Referrer-Policy below, so ?token=
+      // is not sent as Referer on same-origin clicks. First match wins.
+      ...UNSUBSCRIBE_HEADER_SOURCES.map((source) => ({
+        source,
+        headers: [...UNSUBSCRIBE_HTTP_HEADERS],
+      })),
       ...entries.map((entry) =>
         entry.source === '/:path*' && entry.headers.some((h) => h.key === 'Critical-CH')
           ? { ...entry, source: '/((?!check).*)' }

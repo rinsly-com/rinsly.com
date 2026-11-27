@@ -9,6 +9,11 @@ import {
   UNSUBSCRIBE_COPY_STATUS,
 } from '../../src/lib/unsubscribeCopy'
 import { renderUnsubscribePage } from '../../src/lib/unsubscribePage'
+import {
+  applyUnsubscribeHeaders,
+  UNSUBSCRIBE_HEADER_SOURCES,
+  UNSUBSCRIBE_HTTP_HEADERS,
+} from '../../src/lib/unsubscribeHeaders'
 import { handleUnsubscribeRequest, parseUnsubscribePost } from '../../src/lib/unsubscribeRequest'
 import { unsubscribePostRewrite } from '../../src/lib/unsubscribePostRewrite'
 import { MemoryUnsubscribeStore, UnavailableUnsubscribeStore } from '../../src/lib/unsubscribeStore'
@@ -182,6 +187,38 @@ describe('handleUnsubscribeRequest', () => {
     assertNoRecipientEmail(result.body)
   })
 
+  it('a no-JS confirm form POST records the opt-out and shows success', async () => {
+    const formSrc = readFileSync('src/components/unsubscribe/UnsubscribeConfirmForm.tsx', 'utf8')
+    expect(formSrc).toContain('method="post"')
+    expect(formSrc).toContain('/${locale}/afmelden?token=${encodeURIComponent(token)}')
+    expect(formSrc).toContain('name="token"')
+    expect(formSrc).toContain('name="confirm"')
+    expect(formSrc).not.toContain("'use client'")
+    expect(formSrc).not.toContain('confirmUnsubscribeAction')
+    expect(formSrc).not.toContain('useState')
+
+    const store = new MemoryUnsubscribeStore()
+    const token = await tokenFor()
+    const result = await handleUnsubscribeRequest({
+      method: 'POST',
+      token: '',
+      locale: 'nl',
+      body: `token=${encodeURIComponent(token)}&confirm=1`,
+      contentType: 'application/x-www-form-urlencoded',
+      secret: SECRET,
+      store,
+      now: NOW,
+    })
+    expect(result.status).toBe(200)
+    expect(result.view).toBe('success')
+    expect(result.body).toContain('Je bent afgemeld voor marketingberichten van Rinsly.')
+    expect(result.body).not.toContain('Ja, meld mij af')
+    expect(result.body).not.toContain('name="confirm"')
+    expect(store.rows).toHaveLength(1)
+    expect(store.rows[0]?.source).toBe('confirm')
+    assertNoRecipientEmail(result.body)
+  })
+
   it('POST with an invalid token does not write and tells the visitor to use contact@', async () => {
     const store = new MemoryUnsubscribeStore()
     const result = await handleUnsubscribeRequest({
@@ -277,6 +314,41 @@ describe('unsubscribe POST rewrite', () => {
     expect(
       unsubscribePostRewrite({ method: 'POST', pathname: '/nl/partner', hasNextAction: false }),
     ).toBeNull()
+  })
+})
+
+describe('unsubscribe HTTP headers', () => {
+  it('sets Referrer-Policy: no-referrer and Cache-Control: no-store on GET and one-click', () => {
+    expect(UNSUBSCRIBE_HTTP_HEADERS).toEqual([
+      { key: 'Referrer-Policy', value: 'no-referrer' },
+      { key: 'Cache-Control', value: 'no-store' },
+    ])
+    const headers = new Headers()
+    applyUnsubscribeHeaders(headers)
+    expect(headers.get('Referrer-Policy')).toBe('no-referrer')
+    expect(headers.get('Cache-Control')).toBe('no-store')
+
+    expect(UNSUBSCRIBE_HEADER_SOURCES).toEqual(
+      expect.arrayContaining([
+        '/:locale(nl|en)/afmelden',
+        '/:locale(nl|en)/afmelden/one-click',
+      ]),
+    )
+
+    const middleware = readFileSync('src/middleware.ts', 'utf8')
+    expect(middleware).toContain('applyUnsubscribeHeaders')
+    expect(middleware).toContain('/nl/afmelden/:path*')
+    expect(middleware).toContain('/en/afmelden/:path*')
+
+    const nextCfg = readFileSync('next.config.ts', 'utf8')
+    expect(nextCfg).toContain('UNSUBSCRIBE_HTTP_HEADERS')
+    expect(nextCfg).toContain('UNSUBSCRIBE_HEADER_SOURCES')
+
+    const oneClick = readFileSync(
+      'src/app/(frontend)/[locale]/afmelden/one-click/route.ts',
+      'utf8',
+    )
+    expect(oneClick).toContain('applyUnsubscribeHeaders')
   })
 })
 

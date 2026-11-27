@@ -7,6 +7,7 @@ import type { NextRequest } from 'next/server'
 
 import { getBindings } from '@/lib/bindings'
 import { readWorkerSecrets } from '@/lib/env'
+import { applyUnsubscribeHeaders } from '@/lib/unsubscribeHeaders'
 import { handleUnsubscribeRequest } from '@/lib/unsubscribeRequest'
 import { UnavailableUnsubscribeStore } from '@/lib/unsubscribeStore'
 
@@ -15,15 +16,12 @@ export const dynamic = 'force-dynamic'
 type Ctx = { params: Promise<{ locale: string }> }
 
 function html(body: string, status: number): Response {
-  return new Response(body, {
-    status,
-    headers: {
-      'content-type': 'text/html; charset=utf-8',
-      'cache-control': 'no-store',
-      'x-robots-tag': 'noindex, nofollow',
-      'referrer-policy': 'no-referrer',
-    },
+  const headers = new Headers({
+    'content-type': 'text/html; charset=utf-8',
+    'x-robots-tag': 'noindex, nofollow',
   })
+  applyUnsubscribeHeaders(headers)
+  return new Response(body, { status, headers })
 }
 
 export async function POST(req: NextRequest, ctx: Ctx) {

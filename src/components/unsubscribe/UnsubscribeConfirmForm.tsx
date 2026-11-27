@@ -1,14 +1,15 @@
-'use client'
-
-import { useState } from 'react'
-
-import { confirmUnsubscribeAction } from '@/lib/unsubscribeAction'
 import { unsubscribeCopy } from '@/lib/unsubscribeCopy'
-import type { UnsubscribeView } from '@/lib/unsubscribePage'
 import type { UnsubscribeLocale } from '@/lib/unsubscribeToken'
 
 import { UnsubscribeCard } from './UnsubscribeCard'
 
+/**
+ * Human confirm form. A native POST to the public /{locale}/afmelden URL,
+ * so it records the opt-out without JavaScript (AVG 7(3)). Middleware
+ * rewrites the POST to ./one-click; one-click already accepts confirm=1
+ * plus the token. Do not wrap this in a client server-action callback:
+ * without JS that becomes a GET and never writes.
+ */
 export function UnsubscribeConfirmForm({
   locale,
   token,
@@ -17,22 +18,12 @@ export function UnsubscribeConfirmForm({
   token: string
 }) {
   const copy = unsubscribeCopy(locale)
-  const [view, setView] = useState<UnsubscribeView>('confirm')
-
-  if (view !== 'confirm') {
-    return <UnsubscribeCard locale={locale} view={view} />
-  }
+  const action = `/${locale}/afmelden?token=${encodeURIComponent(token)}`
 
   return (
     <UnsubscribeCard locale={locale} view="confirm">
-      <form
-        className="flex flex-wrap items-center gap-3"
-        action={async (formData) => {
-          setView(await confirmUnsubscribeAction(formData))
-        }}
-      >
+      <form className="flex flex-wrap items-center gap-3" method="post" action={action}>
         <input type="hidden" name="token" value={token} />
-        <input type="hidden" name="locale" value={locale} />
         <input type="hidden" name="confirm" value="1" />
         <button
           type="submit"

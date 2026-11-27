@@ -1,8 +1,10 @@
 /**
- * RFC 8058 posts to the public /{locale}/afmelden URL. The human page lives
- * at that path as a Next.js page (for the site header and footer), so POST
- * is rewritten to /{locale}/afmelden/one-click. Next.js server actions on
- * the confirm form also POST here; they are left alone.
+ * RFC 8058 and the human confirm form both POST to the public
+ * /{locale}/afmelden URL. The human page lives at that path as a Next.js
+ * page (for the site header and footer), so POST is rewritten to
+ * /{locale}/afmelden/one-click. A Next.js server-action POST (Next-Action
+ * header) is left alone if one ever appears; the confirm form itself is a
+ * native method="post" form and must go through this rewrite.
  */
 export function unsubscribePostRewrite(options: {
   method: string
