@@ -5,6 +5,7 @@ import { EditLog, sameValue, setField } from '@/lib/contentRefactor/edit'
 import { type FooterDoc, type HeaderDoc, transformFooter, transformHeader } from '@/lib/contentRefactor/globals'
 import { type Locale, PAGE_SLUGS, type PageDoc, type PageSlug, transformPage } from '@/lib/contentRefactor/pages'
 import { fromSlugRefs, toSlugRefs } from '@/lib/contentRefactor/refs'
+import { indexPages } from '@/lib/contentRefactor/run'
 
 type Snapshot = {
   pages: Record<PageSlug, Record<Locale, PageDoc>>
@@ -168,5 +169,10 @@ describe('content refactor: helpers', () => {
     const refs = toSlugRefs(doc, slugs)
     expect(refs).toEqual({ a: [{ page: '@contact' }, { page: '@partnerprogramma' }] })
     expect(fromSlugRefs(refs, new Map([['contact', 2], ['partnerprogramma', 3]]))).toEqual({ a: [{ page: 2 }, { page: 3 }] })
+  })
+
+  it('page lookup fails closed on a duplicate slug', () => {
+    expect(() => indexPages([{ id: 1, slug: 'home' }, { id: 2, slug: 'home' }])).toThrow(/more than one page with slug "home"/)
+    expect(indexPages([{ id: 1, slug: 'home' }, { id: 2, slug: null }]).idBySlug.get('home')).toBe(1)
   })
 })

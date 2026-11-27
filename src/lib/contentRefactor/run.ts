@@ -11,8 +11,12 @@
  *  - Pages are saved as a new **draft** (PUBLISH_PAGES = false). The published
  *    pages on accp, and therefore the static prod build, do not change until
  *    someone publishes them in the admin. The globals have no drafts.
- *  - Down restores the snapshot only where the document still equals what up
- *    wrote; anything edited since is left alone and logged.
+ *  - Down restores the snapshot only where the document is still exactly what
+ *    up left: for pages the migrated draft is the latest version and the
+ *    snapshot is still the published one. Anything edited or published since
+ *    is left alone and logged.
+ *  - Page lookup fails closed: a duplicate slug, or a tenant field on pages,
+ *    aborts the run before anything is written.
  */
 import type { Payload, PayloadRequest } from 'payload'
 
@@ -22,6 +26,7 @@ import { type FooterDoc, type HeaderDoc, transformFooter, transformHeader } from
 import { type Locale, PAGE_SLUGS, type PageDoc, type PageSlug, transformPage } from './pages'
 import { fromSlugRefs, toSlugRefs } from './refs'
 
+/** Pages are only ever saved as drafts; publishing is a person in the admin. */
 export const PUBLISH_PAGES = false
 /** Global fields that are not localized: written once, with the default locale. */
 const SHARED_GLOBAL_FIELDS = ['address', 'phone']
@@ -37,22 +42,39 @@ export type RunReport = { written: string[]; unchanged: string[]; skipped: strin
 
 type Args = { payload: Payload; req?: PayloadRequest; direction: 'up' | 'down' }
 
-async function pageIds(payload: Payload, req?: PayloadRequest) {
-  const all = await payload.find({ collection: 'pages', limit: 200, depth: 0, pagination: false, draft: true, req, select: { slug: true } })
+/**
+ * Fail closed on page lookup: `slug` must identify exactly one page. The
+ * collection has no tenant field today (one site per database); if one is
+ * ever added, this migration refuses to run rather than guess a tenant.
+ */
+export function indexPages(docs: { id: number; slug?: string | null }[]) {
   const idBySlug = new Map<string, number>()
   const slugById = new Map<number, string>()
-  for (const doc of all.docs as { id: number; slug?: string | null }[]) {
+  for (const doc of docs) {
     if (!doc.slug) continue
+    if (idBySlug.has(doc.slug)) throw new Error(`[content-refactor] more than one page with slug "${doc.slug}", aborting`)
     idBySlug.set(doc.slug, doc.id)
     slugById.set(doc.id, doc.slug)
   }
   return { idBySlug, slugById }
 }
 
+async function pageIds(payload: Payload, req?: PayloadRequest) {
+  const fields = payload.collections.pages.config.flattenedFields
+  if (fields.some((field) => field.name === 'tenant')) {
+    throw new Error('[content-refactor] pages has a tenant field; this migration only knows a single-site database, aborting')
+  }
+  const all = await payload.find({ collection: 'pages', depth: 0, pagination: false, draft: true, req, select: { slug: true } })
+  return indexPages(all.docs)
+}
+
 export async function runContentRefactor({ payload, req, direction }: Args): Promise<RunReport> {
   const report: RunReport = { written: [], unchanged: [], skipped: [] }
   const { idBySlug, slugById } = await pageIds(payload, req)
   const say = (line: string) => { payload.logger.info(`[content-refactor ${direction}] ${line}`); }
+  // Every target is computed (and every @slug resolved) before the first
+  // write, so a missing page or a transform error aborts with nothing written.
+  const writes: { where: string; write: () => Promise<unknown> }[] = []
 
   for (const slug of PAGE_SLUGS) {
     const id = idBySlug.get(slug)
@@ -88,19 +110,25 @@ export async function runContentRefactor({ payload, req, direction }: Args): Pro
           report.skipped.push(`${where}: edited after the migration, not reverting`)
           continue
         }
+        // Only revert the exact state up left behind: the migrated copy as the
+        // latest draft and the snapshot still as the published version. If the
+        // migrated draft was published since, a down would put old copy live
+        // again; that is a decision for a person, not a migration.
+        const published = (await payload.findByID({ collection: 'pages', id, locale, fallbackLocale: false, depth: 0, draft: false, req })) as unknown as Obj
+        const live: PageDoc = toSlugRefs({ layout: (published.layout ?? []) as PageDoc['layout'], meta: (published.meta ?? {}) as Obj }, slugById)
+        if (!sameValue(live, pre)) {
+          report.skipped.push(`${where}: published after the migration, not reverting (restore by hand from the version history)`)
+          continue
+        }
         target = { layout: pre.layout, meta: pre.meta }
       }
-      const publish = direction === 'up' ? PUBLISH_PAGES : raw._status === 'published'
-      await payload.update({
-        collection: 'pages',
-        id,
-        locale,
-        depth: 0,
-        draft: !publish,
-        req,
-        data: { ...fromSlugRefs(target, idBySlug), _status: publish ? 'published' : 'draft' } as never,
+      // Down only runs while the snapshot is still the published version, so
+      // both directions write a draft: no live page changes (PUBLISH_PAGES).
+      const data = { ...fromSlugRefs(target, idBySlug), _status: 'draft' }
+      writes.push({
+        where: `${where} (draft)`,
+        write: () => payload.update({ collection: 'pages', id, locale, depth: 0, draft: true, req, data: data as never }),
       })
-      report.written.push(`${where} (${publish ? 'published' : 'draft'})`)
     }
   }
 
@@ -143,12 +171,16 @@ export async function runContentRefactor({ payload, req, direction }: Args): Pro
         }
         target = pre
       }
-      await payload.updateGlobal({ slug, locale, depth: 0, req, data: fromSlugRefs(target, idBySlug) })
-      report.written.push(where)
+      const data = fromSlugRefs(target, idBySlug)
+      writes.push({ where, write: () => payload.updateGlobal({ slug, locale, depth: 0, req, data }) })
     }
   }
 
-  for (const line of report.written) say(`wrote ${line}`)
+  for (const { where, write } of writes) {
+    await write()
+    report.written.push(where)
+    say(`wrote ${where}`)
+  }
   for (const line of report.unchanged) say(`unchanged ${line}`)
   for (const line of report.skipped) payload.logger.warn(`[content-refactor ${direction}] SKIPPED ${line}`)
   return report

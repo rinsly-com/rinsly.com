@@ -30,10 +30,27 @@ old page copy.
 
 ## Undo
 
-`payload migrate:down` (one step) restores the snapshot for every page and
-global that still equals what the migration wrote; anything edited since is
-skipped and logged. Pages keep their publish status: a published migrated
-page is restored as published.
+`payload migrate:down` (one step):
+
+- **Before the drafts are published** it restores the snapshot as a new
+  draft for each page whose latest version is still exactly the migrated
+  copy and whose published version is still the snapshot. Header and footer
+  are restored where they still equal what up wrote. Nothing else is touched;
+  each skip is logged.
+- **After the drafts are published** it skips the pages (`published after
+  the migration, not reverting`): putting old copy live again is a person's
+  call, done from the page's version history in the admin. Header and footer
+  are still restored, so decide first whether that is wanted.
+
+## Partial run
+
+The migration computes every target, and resolves every page reference,
+before its first write, so a missing page or a transform error aborts with
+nothing written. A D1 error halfway through the writes can still leave some
+documents migrated (D1 migrations are not transactional). Recover by running
+`payload migrate` again: every write is idempotent, so documents that were
+written log `unchanged` and the rest are written. Or run `migrate:down`,
+which reverts exactly the documents that were written.
 
 ## Known
 
