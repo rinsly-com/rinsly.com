@@ -1,32 +1,77 @@
-# Runbook: refactor part 2 content migration (PR #121)
+# Runbook: refactor part 2 content migration (#121 / #122) and publish step
 
 Migration `20261127_170000_content_refactor` rewrites home, prijzen,
 partnerprogramma and contact (as **drafts**) and the header and footer
 globals (**live**, globals have no drafts). The calculator on
 /partnerprogramma (ladder v3.3) and the contact wizard text are **code** and
 go live with the deploy. Until the four drafts are published, accp shows the
-v3.3 calculator next to the old ladder text, and the new header/footer next to
-old page copy.
+v3.3 calculator next to the old ladder text, and the new header/footer nex## Publishing is the production go-live
+
+Publishing a page (or saving a global) on accp fires `onContentPublished`,
+which dispatches `deploy-prod.yml` when the accp Worker has its
+`DEPLOY_DISPATCH_*` secrets. prod is a static export of accp's **published**
+content, built from `main`. So once the four pages are published on accp,
+the next prod build (a push to `main`, the admin Deploy button, or any publish
+or global save in the admin) puts them on rinsly.com. Treat the publish as the
+go-live.
+
+The publish step itself (`publish-refactor-accp.yml`) runs the Payload local
+API in GitHub Actions, where no `DEPLOY_DISPATCH_*` secret exists: its hooks
+log `[static-deploy] skipped`, so the prod rebuild comes from step 6 below,
+not from the publish run. The same holds for the migration's header/footer
+writes in `deploy:database`.
 
 ## Order (do not skip a step)
 
-1. Merge #120, then #121, into `develop`. `deploy-accp.yml` runs
+1. #122 (re-land of #121) is merged into `develop`. `deploy-accp.yml` runs
    `deploy:database` (lint:migrations + `payload migrate`) and deploys the
    accp Worker.
 2. Check the migration log in the workflow run: 8 lines
    `[content-refactor up] wrote <page>.<locale> (draft)` and 4 lines for
    header/footer. Any `SKIPPED` line means that page changed on accp after
    the 27 Nov 16:15 snapshot; that page was left alone. Report it, don't
-   force it.
-3. **Right after the accp deploy**, publish the four drafts in the accp admin
-   (Pages → home, prijzen, partnerprogramma, contact → review → Publish, for
-   NL and EN). Until then do not edit these four pages through the content
-   endpoint: a publish of the draft would overwrite that edit.
-4. Check accp: /nl and /en of the four pages, header and footer.
-5. **Hold `develop` → `main` and any prod static rebuild** until step 3 is
-   done. A publish triggers a prod rebuild from accp's published content, so
-   publishing the drafts is also the moment prod gets the new copy, header
-   and footer together.
+   force it. Header and footer are now live on accp.
+3. Read-only check from any machine, no credentials:
+   `pnpm content:publish-refactor:check` must list 8 × `would publish`.
+4. Yaron reviews the drafts on accp (admin preview, NL and EN) and gives his
+   OK. Until then: no publish in the admin, no content-endpoint edits to
+   these four pages (a later publish of the draft would overwrite them).
+5. **Before the first run (once, repo setting, Fleet or Yaron):** create the
+   GitHub environment `accp-publish` with **Yaron as required reviewer**,
+   the environment variable `ACCP_PUBLISH_PROTECTED=yes`, and if possible
+   `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `PAYLOAD_SECRET` as
+   environment secrets. The workflow only runs on `develop`, waits for the
+   reviewer, and stops at its first step if that variable is missing
+   (GitHub would otherwise create the environment unprotected on first use).
+6. **After Yaron's OK**: Actions → "Publish refactor drafts (accp)" on `develop`:
+   first a run with `apply` off (dry run, must show 8 × `would publish`),
+   then with `apply` on and confirm `publish-4-pages-and-go-live`. The
+   script refuses to write anything unless all eight page-locales are
+   exactly in the state `src/lib/contentRefactor/publish-manifest.json`
+   expects (sha256 of the latest draft = the manifest's `draft` hash, the
+   published version = one of its `published` hashes); already published
+   ones are skipped, so a re-run is a no-op. accp is now live with the new
+   copy. Each page-locale is published on its own (`publishSpecificLocale`)
+   and checked right after.
+
+   **If a run stops halfway** (D1 error, timeout): run it again with the
+   same inputs. The page-locales already published log `already published`,
+   the rest are published; nothing is published twice. The dry run shows
+   the split first.
+
+   **The manifest is the contract.** Today it holds the #121 migration
+   output. A PR that changes the drafts before publish (the redesign) runs
+   `pnpm content:publish-refactor:manifest` (or writes its own hashes with
+   `fullHash`) and commits the new manifest in the same PR; the unit test
+   `publishRefactor.unit.spec.ts` "the committed manifest is ..." then needs
+   that PR's expected state too.
+7. Then merge `develop` → `main`: deploy-prod builds the v3.3 calculator, the
+   contact form text and the published copy together. **Hold `develop` →
+   `main`, the admin Deploy button and any admin publish between step 1 and
+   step 7**: a prod build in between would pair old code with new header and
+   footer, or new copy with the old calculator.
+
+nd footer together.
 
 ## Undo
 
@@ -37,7 +82,7 @@ old page copy.
   copy and whose published version is still the snapshot. Header and footer
   are restored where they still equal what up wrote. Nothing else is touched;
   each skip is logged.
-- **After the drafts are published** it skips the pages (`published after
+- **After the drafts are published** (step 5) it skips the pages (`published after
   the migration, not reverting`): putting old copy live again is a person's
   call, done from the page's version history in the admin. Header and footer
   are still restored, so decide first whether that is wanted.

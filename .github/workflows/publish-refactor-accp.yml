@@ -1,0 +1,105 @@
+name: Publish refactor drafts (accp)
+
+# Publishes the four pages written as drafts by migration
+# 20261127_170000_content_refactor (home, prijzen, partnerprogramma, contact;
+# NL + EN), and nothing else. Runbook: docs/runbook-refactor-part2-content.md.
+#
+# Manual only. Run it after Yaron has looked at the drafts on accp and given
+# his OK. Publishing IS the production go-live: the pages go public on accp at
+# once, and the next prod build (develop -> main, the admin Deploy button, or
+# any publish in the admin) puts them on rinsly.com.
+#
+# Dry run by default: leave "apply" off to see the plan in the log. To write,
+# tick "apply" AND type the confirmation phrase from the runbook. The phrase is
+# only a typo guard, not a secret; the real gate is the environment below.
+#
+# Gates (fail closed):
+#  - Only from develop: the job refuses a dispatch on any other ref.
+#  - environment: accp-publish. Fleet/Yaron create it in the repo settings
+#    with Yaron as required reviewer before the first run, ideally with
+#    CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID and PAYLOAD_SECRET as
+#    environment secrets, and the environment variable
+#    ACCP_PUBLISH_PROTECTED=yes. GitHub creates a missing environment
+#    WITHOUT protection on first use, so the first step stops the job unless
+#    that variable exists (only someone who set the environment up on
+#    purpose has set it).
+# The script refuses to write anything unless every page is exactly in the
+# state src/lib/contentRefactor/publish-manifest.json expects (draft hash,
+# allowed pre-publish hashes), or already published.
+#
+# NODE_ENV=production makes the Payload CLI use the remote D1 binding in
+# wrangler.jsonc (accp). Same mechanism and secrets as seed-accp.yml, so no new
+# credential exists for this. The workflow has no DEPLOY_DISPATCH_* secret, so
+# the publish hook logs "skipped" here and does not start deploy-prod itself.
+#
+# Shares deploy-accp.yml's concurrency group so it never races a deploy.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Write (publish). Off = dry run.'
+        type: boolean
+        default: false
+      confirm:
+        description: 'With apply: the confirmation phrase from the runbook (typo guard only)'
+        type: string
+        default: ''
+
+concurrency:
+  group: deploy-rinsly-accp
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/develop'
+    runs-on: ubuntu-latest
+    environment: accp-publish
+    steps:
+      - name: Require the protected accp-publish environment
+        run: |
+          if [ "$PROTECTED" != "yes" ]; then
+            echo "accp-publish is not set up (ACCP_PUBLISH_PROTECTED != yes). See the runbook; nothing was run." >&2
+            exit 1
+          fi
+        env:
+          PROTECTED: ${{ vars.ACCP_PUBLISH_PROTECTED }}
+
+      - name: Checkout
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4
+
+      - name: Set up Node.js + GitHub Packages auth
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@rinsly-com'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
+
+      - name: Publish (dry run unless apply)
+        # Inputs go through env, never into the shell command line.
+        run: |
+          if [ "$APPLY" = "true" ]; then
+            NODE_ENV=production pnpm content:publish-refactor apply
+          else
+            NODE_ENV=production pnpm content:publish-refactor
+          fi
+        env:
+          APPLY: ${{ inputs.apply }}
+          PUBLISH_CONFIRM: ${{ inputs.confirm }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
