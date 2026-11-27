@@ -13,26 +13,16 @@ name: Publish refactor drafts (accp)
 # tick "apply" AND type the confirmation phrase from the runbook. The phrase is
 # only a typo guard, not a secret; the real gate is the environment below.
 #
-# Gates (fail closed):
+# Gates (fail closed), and their limits:
 #  - Only from develop: the job refuses a dispatch on any other ref.
-#  - environment: accp-publish. Fleet/Yaron create it in the repo settings
-#    with Yaron as required reviewer before the first run, ideally with
-#    CLOUDFLARE_API_TOKEN, CLOUDFLARE_ACCOUNT_ID and PAYLOAD_SECRET as
-#    environment secrets, and the environment variable
-#    ACCP_PUBLISH_PROTECTED=yes. GitHub creates a missing environment
-#    WITHOUT protection on first use, so the first step stops the job unless
-#    that variable exists (only someone who set the environment up on
-#    purpose has set it).
-# The script refuses to write anything unless every page is exactly in the
-# state src/lib/contentRefactor/publish-manifest.json expects (draft hash,
-# allowed pre-publish hashes), or already published.
-#
-# NODE_ENV=production makes the Payload CLI use the remote D1 binding in
-# wrangler.jsonc (accp). Same mechanism and secrets as seed-accp.yml, so no new
-# credential exists for this. The workflow has no DEPLOY_DISPATCH_* secret, so
-# the publish hook logs "skipped" here and does not start deploy-prod itself.
-#
-# Shares deploy-accp.yml's concurrency group so it never races a deploy.
+#  - environment: accp-publish, plus a first step that stops unless the
+#    environment variable ACCP_PUBLISH_PROTECTED=yes exists (GitHub creates a
+#    missing environment WITHOUT protection on first use).
+#  These only protect this file as committed. A branch can dispatch a modified
+#  copy without them. The real boundary is the accp-publish environment with
+#  Yaron as required reviewer, deployment branches = develop, and
+#  CLOUDFLARE_API_TOKEN / CLOUDFLARE_ACCOUNT_ID / PAYLOAD_SECRET as environment
+#  secrets that no longer exist at repo level. Runbook step 5.
 
 on:
   workflow_dispatch:

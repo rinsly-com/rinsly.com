@@ -101,3 +101,55 @@ export function checkNotificationText(input: { url: string; naam: string; telefo
     'De aanvraag staat ook in het admin-panel onder Websitecheck-aanvragen.',
   ].join('\n')
 }
+
+/** Subject for the internal partner-application mail. Control characters never reach the header. */
+export function partnerMailSubject(bedrijfsnaam: string): string {
+  return `Partneraanvraag: ${stripControlChars(bedrijfsnaam)}`
+}
+
+/** Free text keeps its line breaks (CR/LF → LF); every other control character goes. */
+function stripControlCharsKeepLines(value: string): string {
+  return value
+    .replace(/\r\n?/gu, '\n')
+    .split('\n')
+    .map(stripControlChars)
+    .join('\n')
+}
+
+/**
+ * Internal mail for a /partner application. Every value the applicant (or
+ * the invite token) supplies is stripped of control characters; single-line
+ * fields stay on one line so they cannot invent another line in the mail.
+ */
+export function partnerNotificationText(input: {
+  bedrijfsnaam: string
+  domein: string
+  contactpersoon: string
+  email: string
+  telefoon: string
+  plaats: string
+  kvk: string
+  chosen: string
+  branches: string
+  talen: string
+  landen: string
+  opmerking: string
+}): string {
+  const one = (value: string, empty = ',') => stripControlChars(value) || empty
+  const opmerking = stripControlCharsKeepLines(input.opmerking)
+  return (
+    `${one(input.bedrijfsnaam)} (${one(input.domein)}) heeft het partnerformulier ingevuld.\n\n` +
+    `Contact:      ${one(input.contactpersoon)}\n` +
+    `E-mail:       ${one(input.email)}\n` +
+    `Telefoon:     ${one(input.telefoon)}\n` +
+    `Plaats:       ${one(input.plaats)}\n` +
+    `KvK:          ${one(input.kvk)}\n\n` +
+    `Wil oppakken: ${input.chosen}\n` +
+    `Branches:     ${one(input.branches, 'alle')}\n` +
+    `Talen:        ${one(input.talen)}\n` +
+    `Landen:       ${one(input.landen)}\n\n` +
+    (opmerking ? `Opmerking:\n${opmerking}\n\n` : '') +
+    "Haal 'm binnen met `ledger partners --pull` en bekijk 'm onder [8] Tenants.\n" +
+    'Let op: dit is een aanvraag, geen afspraak: het tarief staat pas vast als jij het contract maakt.'
+  )
+}

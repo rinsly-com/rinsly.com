@@ -5,7 +5,10 @@ partnerprogramma and contact (as **drafts**) and the header and footer
 globals (**live**, globals have no drafts). The calculator on
 /partnerprogramma (ladder v3.3) and the contact wizard text are **code** and
 go live with the deploy. Until the four drafts are published, accp shows the
-v3.3 calculator next to the old ladder text, and the new header/footer nex## Publishing is the production go-live
+v3.3 calculator next to the old ladder text, and the new header/footer next to
+old page copy.
+
+## Publishing is the production go-live
 
 Publishing a page (or saving a global) on accp fires `onContentPublished`,
 which dispatches `deploy-prod.yml` when the accp Worker has its
@@ -38,11 +41,15 @@ writes in `deploy:database`.
    these four pages (a later publish of the draft would overwrite them).
 5. **Before the first run (once, repo setting, Fleet or Yaron):** create the
    GitHub environment `accp-publish` with **Yaron as required reviewer**,
-   the environment variable `ACCP_PUBLISH_PROTECTED=yes`, and if possible
-   `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `PAYLOAD_SECRET` as
-   environment secrets. The workflow only runs on `develop`, waits for the
-   reviewer, and stops at its first step if that variable is missing
-   (GitHub would otherwise create the environment unprotected on first use).
+   deployment branches **`develop` only**, and the environment variable
+   `ACCP_PUBLISH_PROTECTED=yes`. Put `CLOUDFLARE_API_TOKEN`,
+   `CLOUDFLARE_ACCOUNT_ID` and `PAYLOAD_SECRET` in it as **environment
+   secrets and remove them at repo level** (the deploy workflows then need
+   their own environment). The `if:` on `develop`, the guard step and
+   `environment:` in the workflow file only protect the file as committed:
+   a branch can dispatch a modified copy without them, and as long as the
+   secrets live at repo level that copy can read them. The real boundary is
+   environment secrets behind a required reviewer.
 6. **After Yaron's OK**: Actions → "Publish refactor drafts (accp)" on `develop`:
    first a run with `apply` off (dry run, must show 8 × `would publish`),
    then with `apply` on and confirm `publish-4-pages-and-go-live`. The
@@ -71,7 +78,32 @@ writes in `deploy:database`.
    step 7**: a prod build in between would pair old code with new header and
    footer, or new copy with the old calculator.
 
-nd footer together.
+## Publish manifest (contract for the redesign PR)
+
+`src/lib/contentRefactor/publish-manifest.json` is what the publish step
+checks. Fields:
+
+- `version`: `1`. Any other value is refused (`parseManifest`).
+- `hash`: the hash definition, and it must equal `MANIFEST_HASH` in
+  `publish.ts`. Algorithm sha256, hex. Input:
+  `JSON.stringify(normalise({ layout, meta }))` of one page-locale, with page
+  relations written as `"@slug"` (`refs.ts` `toSlugRefs`). `normalise`
+  (`edit.ts`) sorts object keys, drops `null`, `undefined`, `false`, `''`,
+  empty arrays and empty objects, and drops `blockName`, `createdAt`,
+  `updatedAt`. Only `layout` and `meta` are covered; `title` and `slug` are
+  not. The four slugs are fixed in `PAGE_SLUGS`.
+- `sourceCommit`: the full git sha of HEAD when the file was generated (the
+  manifest commit itself comes after it). Filled in by
+  `pnpm content:publish-refactor:manifest`.
+- `pages`: per `<slug>.<locale>`, `draft` (hash of the draft to publish) and
+  `published` (hashes of the published versions it may replace).
+
+A PR that changes the drafts before publish (the redesign) writes its drafts
+(a new migration or transform), regenerates the manifest, or writes its own
+`fullHash` values, and commits it. The unit test that pins the manifest to
+the #121 migration output changes in that PR too. A change to `normalise`
+changes every hash; the pinned test fails until the manifest is regenerated.
+Check against accp before running: `pnpm content:publish-refactor:check`.
 
 ## Undo
 

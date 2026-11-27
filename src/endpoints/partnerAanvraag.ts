@@ -8,6 +8,7 @@ import { logCaught } from '../lib/logCaught'
 import { verifyPartnerToken } from '../lib/partnerToken'
 import { legacyDutiesFromV33 } from '../lib/partnerLadder'
 import { partnerRowSchema } from '../lib/rows'
+import { partnerMailSubject, partnerNotificationText } from '../lib/submissionLimits'
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -218,21 +219,8 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
     req.payload
       .sendEmail({
         to: 'yaron@rinsly.com',
-        subject: `Partneraanvraag: ${data.bedrijfsnaam}`,
-        text:
-          `${data.bedrijfsnaam} (${data.domein}) heeft het partnerformulier ingevuld.\n\n` +
-          `Contact:      ${data.contactpersoon || ','}\n` +
-          `E-mail:       ${data.email}\n` +
-          `Telefoon:     ${data.telefoon || ','}\n` +
-          `Plaats:       ${data.plaats || ','}\n` +
-          `KvK:          ${data.kvk || ','}\n\n` +
-          `Wil oppakken: ${chosen}\n` +
-          `Branches:     ${data.branches || 'alle'}\n` +
-          `Talen:        ${data.talen}\n` +
-          `Landen:       ${data.landen}\n\n` +
-          (data.opmerking ? `Opmerking:\n${data.opmerking}\n\n` : '') +
-          `Haal 'm binnen met \`ledger partners --pull\` en bekijk 'm onder [8] Tenants.\n` +
-          `Let op: dit is een aanvraag, geen afspraak: het tarief staat pas vast als jij het contract maakt.`,
+        subject: partnerMailSubject(data.bedrijfsnaam),
+        text: partnerNotificationText({ ...data, chosen }),
       })
       .catch((err: unknown) => {
         req.payload.logger.error({
