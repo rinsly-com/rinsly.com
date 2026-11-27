@@ -9,6 +9,7 @@ import { cloudflareEmailAdapter } from './email/cloudflareEmailAdapter'
 import { CheckRuns } from './collections/CheckRuns'
 import { Offertes } from './collections/Offertes'
 import { PartnerAanvragen } from './collections/PartnerAanvragen'
+import { contentAllowlist } from './contentAllowlist'
 import { diagramBlock } from './blocks/Diagram'
 import { revenueCalculatorBlock } from './blocks/RevenueCalculator'
 import { checkAanvraagHandler } from './endpoints/checkAanvraag'
@@ -43,8 +44,12 @@ export default buildSiteConfig({
   // RINSLY_CONTENT_ENABLED is set on the rinsly-accp Worker (never set by
   // `rinsly content setup`), and stays closed without Access
   // (RINSLY_ACCESS_AUD / RINSLY_ACCESS_TEAM_DOMAIN secrets) and the
-  // RINSLY_CONTENT_RATE_LIMITER binding. The allowlist is empty (deny all).
+  // RINSLY_CONTENT_RATE_LIMITER binding. The allowlist is the generated,
+  // reviewable list in src/contentAllowlist.ts (SEO title/description plus two
+  // pinned block headings). RINSLY_CONTENT_ALLOWLIST stays unset: when set it
+  // replaces this list. See docs/content-endpoint.md.
   contentEndpoint: true,
+  contentAllowlist,
   // Accp origin for auth mails (forgot-password links). Not the static public URL.
   serverURL: readServerEnv().PAYLOAD_SERVER_URL || 'https://accp.rinsly.com',
   // Transactional mail (auth mails + submission notifications) as
