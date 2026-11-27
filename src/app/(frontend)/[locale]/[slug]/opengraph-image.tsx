@@ -2,7 +2,9 @@ import { notFound } from 'next/navigation'
 import config from '@payload-config'
 
 import { createOgImage } from '@rinsly-com/site-core/app'
-import { isCasesPageHidden } from '@/lib/casesPageFlag'
+import { getPayload } from 'payload'
+
+import { excludeHiddenCasesParams, isCasesPublicRouteHidden } from '@/lib/casesPagePublicRoute'
 import { siteConfig } from '@/site.config'
 
 // force-dynamic on accp; build-static.mjs strips it for the static export.
@@ -22,11 +24,13 @@ export const alt = og.alt
 
 export const generateStaticParams = async () => {
   const params = await og.generateStaticParams()
-  return params.filter((entry) => !isCasesPageHidden(entry.slug))
+  const payload = await getPayload({ config })
+  return excludeHiddenCasesParams(params, payload)
 }
 
 export default async function Image(props: Parameters<typeof og.Image>[0]) {
   const { slug } = await props.params
-  if (isCasesPageHidden(slug)) notFound()
+  const payload = await getPayload({ config })
+  if (typeof slug === 'string' && (await isCasesPublicRouteHidden(slug, payload))) notFound()
   return og.Image(props)
 }

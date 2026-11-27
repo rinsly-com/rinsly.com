@@ -9,8 +9,11 @@ import {
   casesPageAfterOperation,
   casesPageAnonymousConstraint,
   casesPageReadAccess,
+  casesPageVersionsReadAccess,
+  HIDDEN_CASES_SCAN_OPTIONS,
   isCmsStaffUser,
   isHiddenCasesDocument,
+  resolveHiddenCasesIds,
 } from '../../src/lib/casesPageReadAccess'
 
 const payloadConfigSource = readFileSync(
@@ -62,6 +65,23 @@ describe('isHiddenCasesDocument', () => {
     expect(isHiddenCasesDocument(ordinaryPage)).toBe(false)
     expect(isHiddenCasesDocument({ slug: 'over' })).toBe(false)
     expect(isHiddenCasesDocument(null)).toBe(false)
+  })
+
+  it('matches a locale-all layout when only a non-default locale still has the anchors', () => {
+    const afterNlEdit = {
+      slug: 'cases-renamed',
+      layout: {
+        nl: [{ blockType: 'hero', anchor: 'intro' }],
+        en: [{ blockType: 'services', anchor: 'burojazz' }],
+      },
+    }
+    expect(isHiddenCasesDocument(afterNlEdit)).toBe(true)
+    expect(
+      isHiddenCasesDocument({
+        slug: 'over',
+        layout: { nl: [{ anchor: 'intro' }], en: [{ anchor: 'intro' }] },
+      }),
+    ).toBe(false)
   })
 })
 
@@ -173,47 +193,175 @@ describe('casesPageAfterOperation', () => {
   const req = () => ({ user: anonArgs().req.user })
   const staffReq = () => ({ user: staffArgs(['editor']).req.user })
 
-  it('filters a renamed cases document out of a find result, and 404s findByID', () => {
+  it('filters a renamed cases document out of a find result, and 404s findByID', async () => {
     const listed = {
       docs: [ordinaryPage, renamedCases],
       totalDocs: 2,
     }
-    const filtered = casesPageAfterOperation({
+    const filtered = await casesPageAfterOperation({
       operation: 'find',
       result: listed,
       req: req(),
     })
     expect(filtered).toEqual({ docs: [ordinaryPage], totalDocs: 1 })
     expect(
-      casesPageAfterOperation({
+      await casesPageAfterOperation({
         operation: 'find',
         result: { docs: [ordinaryPage], totalDocs: 1 },
         req: req(),
       }),
     ).toEqual({ docs: [ordinaryPage], totalDocs: 1 })
-    expect(() =>
+    await expect(
       casesPageAfterOperation({ operation: 'findByID', result: renamedCases, req: req() }),
-    ).toThrow()
+    ).rejects.toThrow()
   })
 
   it('returns the cases document for staff, or when the flag is on', async () => {
-    await withFlag(undefined, () => {
+    await withFlag(undefined, async () => {
       expect(
-        casesPageAfterOperation({
+        await casesPageAfterOperation({
           operation: 'findByID',
           result: renamedCases,
           req: staffReq(),
         }),
       ).toEqual(renamedCases)
     })
-    await withFlag('1', () => {
+    await withFlag('1', async () => {
       expect(
-        casesPageAfterOperation({
+        await casesPageAfterOperation({
           operation: 'findByID',
           result: renamedCases,
           req: req(),
         }),
       ).toEqual(renamedCases)
+    })
+  })
+
+  it('recounts so a missed hidden id cannot leak +1 on count', async () => {
+    const find = () => Promise.resolve({ docs: [renamedCases, ordinaryPage] })
+    const count = (opts: { where?: Where; overrideAccess?: boolean; locale?: string }) => {
+      expect(opts.overrideAccess).toBe(true)
+      expect(opts.locale).toBe('all')
+      expect(opts.where).toEqual({
+        and: [
+          { _status: { equals: 'published' } },
+          { and: [{ slug: { not_equals: 'cases' } }, { id: { not_in: [6] } }] },
+        ],
+      })
+      return Promise.resolve({ totalDocs: 10 })
+    }
+    const recounted = await casesPageAfterOperation({
+      operation: 'count',
+      result: { totalDocs: 11 },
+      req: { user: null, payload: { find, count } },
+      args: { where: { _status: { equals: 'published' } } },
+    })
+    expect(recounted).toEqual({ totalDocs: 10 })
+  })
+
+  it('leaves count alone for staff, overrideAccess, or when the flag is on', async () => {
+    const leak = { totalDocs: 11 }
+    expect(
+      await casesPageAfterOperation({
+        operation: 'count',
+        result: leak,
+        req: staffReq(),
+      }),
+    ).toEqual(leak)
+    expect(
+      await casesPageAfterOperation({
+        operation: 'count',
+        result: leak,
+        req: req(),
+        overrideAccess: true,
+      }),
+    ).toEqual(leak)
+    await withFlag('1', async () => {
+      expect(
+        await casesPageAfterOperation({
+          operation: 'count',
+          result: leak,
+          req: req(),
+        }),
+      ).toEqual(leak)
+    })
+  })
+})
+
+describe('resolveHiddenCasesIds', () => {
+  it('scans every locale at depth 0 without a 200-row cap', () => {
+    expect(HIDDEN_CASES_SCAN_OPTIONS).toEqual({
+      collection: 'pages',
+      locale: 'all',
+      depth: 0,
+      pagination: false,
+      overrideAccess: true,
+    })
+  })
+
+  it('keeps a document whose anchors remain only in a non-default locale', async () => {
+    const docs = [
+      {
+        id: 6,
+        slug: 'cases-renamed',
+        layout: {
+          nl: [{ blockType: 'hero', anchor: 'intro' }],
+          en: [{ blockType: 'services', anchor: 'burojazz' }],
+        },
+      },
+      ordinaryPage,
+    ]
+    const find = (opts: Record<string, unknown>) => {
+      expect(opts).toMatchObject({
+        collection: 'pages',
+        locale: 'all',
+        depth: 0,
+        pagination: false,
+        overrideAccess: true,
+      })
+      expect(opts).not.toHaveProperty('limit')
+      return Promise.resolve({ docs })
+    }
+    const ids = await resolveHiddenCasesIds({
+      req: { payload: { find } },
+    } as unknown as AccessArgs)
+    expect(ids).toEqual([6])
+  })
+
+  it('returns an empty list when payload is missing', async () => {
+    expect(await resolveHiddenCasesIds(anonArgs())).toEqual([])
+  })
+})
+
+describe('casesPageVersionsReadAccess', () => {
+  it('denies version reads to anonymous, partners, and non-staff roles', async () => {
+    const access = casesPageVersionsReadAccess()
+    expect(await access({ req: { user: null } } as unknown as AccessArgs)).toBe(false)
+    expect(
+      await access({
+        req: { user: { collection: 'users', roles: ['reviewer'] } },
+      } as unknown as AccessArgs),
+    ).toBe(false)
+    expect(
+      await access({
+        req: { user: { collection: 'users', roles: ['author'] } },
+      } as unknown as AccessArgs),
+    ).toBe(false)
+    expect(
+      await access({
+        req: { user: { collection: 'partners', roles: ['admin'] } },
+      } as unknown as AccessArgs),
+    ).toBe(false)
+  })
+
+  it('allows CMS staff to read versions, and still honours a previous deny', async () => {
+    expect(await casesPageVersionsReadAccess()(staffArgs(['admin']))).toBe(true)
+    expect(await casesPageVersionsReadAccess()(staffArgs(['editor']))).toBe(true)
+    expect(await casesPageVersionsReadAccess(() => false)(staffArgs(['admin']))).toBe(false)
+    await withFlag('1', async () => {
+      expect(
+        await casesPageVersionsReadAccess()({ req: { user: null } } as unknown as AccessArgs),
+      ).toBe(false)
     })
   })
 })
@@ -239,6 +387,12 @@ describe('applyCasesPageReadAccess', () => {
       expect(await wrapped.collections[1]?.access?.read?.(anonArgs())).toBe(true)
     })
     expect(wrapped.collections[1]?.access?.create).toBe(config.collections[1]?.access?.create)
+    const pagesAccess = wrapped.collections[1]?.access as { readVersions?: Access }
+    expect(typeof pagesAccess.readVersions).toBe('function')
+    await withFlag(undefined, async () => {
+      expect(await pagesAccess.readVersions?.(anonArgs())).toBe(false)
+      expect(await pagesAccess.readVersions?.(staffArgs())).toBe(true)
+    })
     const pagesHooks = (wrapped.collections[1] as { hooks?: { afterOperation?: unknown } }).hooks
     expect(pagesHooks?.afterOperation).toEqual([casesPageAfterOperation])
   })

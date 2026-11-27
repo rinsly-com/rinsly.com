@@ -14,10 +14,26 @@ export const CASES_PAGE_BLOCK_ANCHORS = ['burojazz', 'up2brand'] as const
 
 type RoleUser = Parameters<typeof isAdmin>[0]
 
+function isLocalizedLayoutMap(layout: object): boolean {
+  const values = Object.values(layout)
+  return values.length > 0 && values.every((value) => value == null || Array.isArray(value))
+}
+
+function blocksFromLayout(layout: unknown): unknown[] {
+  if (Array.isArray(layout)) return layout
+  if (layout && typeof layout === 'object' && isLocalizedLayoutMap(layout)) {
+    const blocks: unknown[] = []
+    for (const value of Object.values(layout)) {
+      if (!Array.isArray(value)) continue
+      for (const block of value) blocks.push(block)
+    }
+    return blocks
+  }
+  return []
+}
+
 export function documentHasCasesBlockAnchor(doc: { layout?: unknown } | null | undefined): boolean {
-  const layout = doc?.layout
-  if (!Array.isArray(layout)) return false
-  return layout.some((block) => {
+  return blocksFromLayout(doc?.layout).some((block) => {
     if (!block || typeof block !== 'object') return false
     const anchor = (block as { anchor?: unknown }).anchor
     return (
@@ -61,6 +77,17 @@ export function isCmsStaffUser(user: unknown): boolean {
   return isAdmin(staff) || hasRole(staff, 'editor')
 }
 
+/**
+ * Version history on `pages` is staff-only, including when the public cases
+ * flag is on. Drafts and old copy in `/api/pages/versions` must not be public.
+ */
+export function casesPageVersionsReadAccess(previous?: Access): Access {
+  return async (args: AccessArgs) => {
+    if (!isCmsStaffUser(args.req.user)) return false
+    return previous ? await previous(args) : true
+  }
+}
+
 export type ResolveHiddenCasesIds = (
   args: AccessArgs,
 ) => Promise<Array<string | number>> | Array<string | number>
@@ -71,12 +98,23 @@ function hiddenIdsFrom(
   return docs.map((doc) => doc.id)
 }
 
+/** Options for the hidden-cases id scan. `locale: 'all'` is required because layout is localized. */
+export const HIDDEN_CASES_SCAN_OPTIONS = {
+  collection: 'pages' as const,
+  locale: 'all' as const,
+  depth: 0 as const,
+  pagination: false as const,
+  overrideAccess: true as const,
+}
+
 type PayloadFinder = {
   find: (args: {
     collection: 'pages'
     where?: Where
     limit?: number
     depth?: number
+    locale?: string
+    pagination?: boolean
     overrideAccess?: boolean
   }) => Promise<{ docs: Array<{ id: string | number; slug?: string | null; layout?: unknown }> }>
 }
@@ -89,19 +127,14 @@ function payloadFinder(req: AccessArgs['req']): PayloadFinder | null {
   return payload as PayloadFinder
 }
 
-async function defaultResolveHiddenIds(args: AccessArgs): Promise<Array<string | number>> {
+export async function resolveHiddenCasesIds(args: AccessArgs): Promise<Array<string | number>> {
   const payload = payloadFinder(args.req)
   if (!payload) return []
 
   // `layout.anchor` is not queryable as a where path on this Payload/D1
-  // adapter (it returns an empty set). Scan the small pages collection
-  // instead and keep ids whose slug or seeded anchors mark them as cases.
-  const { docs } = await payload.find({
-    collection: 'pages',
-    limit: 200,
-    depth: 1,
-    overrideAccess: true,
-  })
+  // adapter (it returns an empty set). Scan every locale of the pages
+  // collection and keep ids whose slug or seeded anchors mark them as cases.
+  const { docs } = await payload.find(HIDDEN_CASES_SCAN_OPTIONS)
   return hiddenIdsFrom(docs.filter((doc) => isHiddenCasesDocument(doc)))
 }
 
@@ -120,7 +153,7 @@ export function casesPageReadAccess(
   previous?: Access,
   options?: { resolveHiddenIds?: ResolveHiddenCasesIds },
 ): Access {
-  const resolveHiddenIds = options?.resolveHiddenIds ?? defaultResolveHiddenIds
+  const resolveHiddenIds = options?.resolveHiddenIds ?? resolveHiddenCasesIds
   return async (args: AccessArgs) => {
     const previousResult = previous ? await previous(args) : true
     if (previousResult === false) return false
@@ -140,21 +173,41 @@ type HiddenPage = { slug?: string | null; layout?: unknown }
 type AfterOperationArg = {
   operation: string
   result: unknown
-  req: { user?: unknown }
+  req: { user?: unknown; payload?: unknown }
   overrideAccess?: boolean
+  args?: { where?: Where; locale?: string }
+}
+
+type PayloadCounter = PayloadFinder & {
+  count: (args: {
+    collection: 'pages'
+    where?: Where
+    locale?: string
+    overrideAccess?: boolean
+  }) => Promise<{ totalDocs: number }>
+}
+
+function payloadCounter(req: AfterOperationArg['req']): PayloadCounter | null {
+  const payload = payloadFinder(req as AccessArgs['req'])
+  if (!payload) return null
+  const count = (payload as { count?: unknown }).count
+  if (typeof count !== 'function') return null
+  return payload as PayloadCounter
 }
 
 /**
  * Defence in depth for a renamed cases row that a where clause missed.
  * Payload's collection `afterRead` ignores a null return (`hook() || doc`),
  * so this uses `afterOperation`, which keeps any result other than undefined.
+ * `count` is covered too: a missed id resolution would otherwise leak +1.
  */
-export function casesPageAfterOperation({
+export async function casesPageAfterOperation({
   operation,
   result,
   req,
   overrideAccess,
-}: AfterOperationArg): unknown {
+  args,
+}: AfterOperationArg): Promise<unknown> {
   if (overrideAccess) return result
   if (isCmsStaffUser(req.user) || isCasesPageEnabled()) return result
   if (
@@ -174,6 +227,27 @@ export function casesPageAfterOperation({
   if (operation === 'findByID' && isHiddenCasesDocument(result as HiddenPage)) {
     throw new NotFound()
   }
+  if (
+    operation === 'count' &&
+    result &&
+    typeof result === 'object' &&
+    typeof (result as { totalDocs?: unknown }).totalDocs === 'number'
+  ) {
+    const payload = payloadCounter(req)
+    if (!payload) return result
+    // Recount with the hide constraint under overrideAccess so a missed
+    // id resolution on the original where cannot leak +1. The hook
+    // short-circuits when overrideAccess is true, so this does not recurse.
+    const hiddenIds = await resolveHiddenCasesIds({ req } as AccessArgs)
+    const hide = casesPageAnonymousConstraint(hiddenIds)
+    const where = args?.where ? { and: [args.where, hide] } : hide
+    return payload.count({
+      collection: 'pages',
+      where,
+      locale: args?.locale ?? 'all',
+      overrideAccess: true,
+    })
+  }
   return result
 }
 
@@ -181,6 +255,7 @@ type CollectionLike = {
   slug?: string
   access?: {
     read?: Access
+    readVersions?: Access
     [key: string]: unknown
   }
   hooks?: object
@@ -192,8 +267,8 @@ type ConfigLike = {
 
 /**
  * Replace the pages collection `access.read` with {@link casesPageReadAccess},
- * composing with whatever site-core already set, and append
- * {@link casesPageAfterOperation}. Throws if `pages` is missing so a silent miss
+ * composing with whatever site-core already set, append {@link casesPageAfterOperation}, and restrict
+ * version reads with {@link casesPageVersionsReadAccess}. Throws if `pages` is missing so a silent miss
  * cannot reopen the public leak.
  */
 export function applyCasesPageReadAccess<T extends ConfigLike>(config: T): T {
@@ -208,6 +283,7 @@ export function applyCasesPageReadAccess<T extends ConfigLike>(config: T): T {
   pages.access = {
     ...pages.access,
     read: casesPageReadAccess(pages.access?.read),
+    readVersions: casesPageVersionsReadAccess(pages.access?.readVersions),
   }
   const currentHooks = (pages.hooks ?? {}) as { afterOperation?: unknown[] }
   const previousHooks = currentHooks.afterOperation ?? []
