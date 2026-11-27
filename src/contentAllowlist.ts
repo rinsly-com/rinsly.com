@@ -20,6 +20,40 @@ export const contentAllowlist = {
       'layout.6b087175bb5dd40a0f68b0c8.header.title', // en /website H1
       'layout.6b087194bb5dd40a0f68b10a.header.title', // nl /contact form section heading
       'layout.6b087195bb5dd40a0f68b10f.header.title', // en /contact form section heading
+      'layout.6b087147bb5dd40a0f68aff0.text', // nl /partnerprogramma check-CTA text
+      'layout.6b08714bbb5dd40a0f68b02a.text', // en /partnerprogramma check-CTA text
+      'layout.6b08719cbb5dd40a0f68b111.header.eyebrow', // nl /woerden hero eyebrow
+      'layout.6b08719fbb5dd40a0f68b11c.header.eyebrow', // en /woerden hero eyebrow
+      'layout.6b08719cbb5dd40a0f68b111.header.title', // nl /woerden hero title
+      'layout.6b08719fbb5dd40a0f68b11c.header.title', // en /woerden hero title
+      'layout.6b08719cbb5dd40a0f68b111.header.intro', // nl /woerden hero intro
+      'layout.6b08719fbb5dd40a0f68b11c.header.intro', // en /woerden hero intro
+      'layout.6b08719cbb5dd40a0f68b115.header.eyebrow', // nl /woerden services eyebrow
+      'layout.6b08719fbb5dd40a0f68b120.header.eyebrow', // en /woerden services eyebrow
+      'layout.6b08719cbb5dd40a0f68b115.header.title', // nl /woerden services title
+      'layout.6b08719fbb5dd40a0f68b120.header.title', // en /woerden services title
+      'layout.6b08719cbb5dd40a0f68b115.header.intro', // nl /woerden services intro
+      'layout.6b08719fbb5dd40a0f68b120.header.intro', // en /woerden services intro
+      'layout.6b08719cbb5dd40a0f68b115.cards.6b08719cbb5dd40a0f68b112.title', // nl /woerden services card title 1
+      'layout.6b08719cbb5dd40a0f68b115.cards.6b08719cbb5dd40a0f68b113.title', // nl /woerden services card title 2
+      'layout.6b08719cbb5dd40a0f68b115.cards.6b08719cbb5dd40a0f68b114.title', // nl /woerden services card title 3
+      'layout.6b08719fbb5dd40a0f68b120.cards.6b08719fbb5dd40a0f68b11d.title', // en /woerden services card title 1
+      'layout.6b08719fbb5dd40a0f68b120.cards.6b08719fbb5dd40a0f68b11e.title', // en /woerden services card title 2
+      'layout.6b08719fbb5dd40a0f68b120.cards.6b08719fbb5dd40a0f68b11f.title', // en /woerden services card title 3
+      'layout.6b08719cbb5dd40a0f68b115.cards.6b08719cbb5dd40a0f68b112.description', // nl /woerden services card text 1
+      'layout.6b08719cbb5dd40a0f68b115.cards.6b08719cbb5dd40a0f68b113.description', // nl /woerden services card text 2
+      'layout.6b08719cbb5dd40a0f68b115.cards.6b08719cbb5dd40a0f68b114.description', // nl /woerden services card text 3
+      'layout.6b08719fbb5dd40a0f68b120.cards.6b08719fbb5dd40a0f68b11d.description', // en /woerden services card text 1
+      'layout.6b08719fbb5dd40a0f68b120.cards.6b08719fbb5dd40a0f68b11e.description', // en /woerden services card text 2
+      'layout.6b08719fbb5dd40a0f68b120.cards.6b08719fbb5dd40a0f68b11f.description', // en /woerden services card text 3
+      'layout.6b08719cbb5dd40a0f68b119.header.eyebrow', // nl /woerden FAQ eyebrow
+      'layout.6b08719fbb5dd40a0f68b124.header.eyebrow', // en /woerden FAQ eyebrow
+      'layout.6b08719cbb5dd40a0f68b119.header.title', // nl /woerden FAQ title
+      'layout.6b08719fbb5dd40a0f68b124.header.title', // en /woerden FAQ title
+      'layout.6b08719cbb5dd40a0f68b119.items.6b08719cbb5dd40a0f68b117.title', // nl /woerden FAQ question 1
+      'layout.6b08719cbb5dd40a0f68b119.items.6b08719cbb5dd40a0f68b118.title', // nl /woerden FAQ question 2
+      'layout.6b08719fbb5dd40a0f68b124.items.6b08719fbb5dd40a0f68b122.title', // en /woerden FAQ question 1
+      'layout.6b08719fbb5dd40a0f68b124.items.6b08719fbb5dd40a0f68b123.title', // en /woerden FAQ question 2
     ],
   },
 } as const satisfies ContentAllowlist

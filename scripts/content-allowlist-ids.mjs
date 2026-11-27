@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Generates src/contentAllowlist.ts: the content-endpoint allowlist for
- * rinsly.com, with every block id pinned.
+ * rinsly.com, with every block (and array row) id pinned.
  *
  *   node scripts/content-allowlist-ids.mjs                 print the module (accp public API)
  *   node scripts/content-allowlist-ids.mjs --write         rewrite src/contentAllowlist.ts
@@ -39,9 +39,24 @@ export const LOCALES = ['nl', 'en']
  */
 export const PAGE_SCALARS = ['meta.title', 'meta.description']
 
+/** Legal pages: never add these slugs to PINNED_BLOCKS. */
+export const LEGAL_SLUGS = ['privacy', 'voorwaarden']
+
+/** Array fields that a spec may expand into per-row pins. */
+const ROW_FIELDS = new Set(['cards', 'items'])
+
+/** Leaf names that are rich text in the pages schema. Never pin them. */
+const RICH_TEXT_LEAVES = new Set(['content', 'body'])
+
 /**
  * Block fields pinned to one block row on one page, per locale. Exactly one
- * block of `blockType` must exist on the page, or the script stops.
+ * block of `blockType` must exist on the page (after `match`, if any), or the
+ * script stops.
+ *
+ * `field` is a dotted path on the block (`header.title`, `text`) or, when
+ * `rows` is set, on each array row (`title`, `description`).
+ * `match` disambiguates when a page has more than one block of that type
+ * (`{ path, equals }`, compared as strings).
  */
 export const PINNED_BLOCKS = [
   { page: 'website', blockType: 'hero', field: 'header.title', label: '/website H1' },
@@ -51,6 +66,89 @@ export const PINNED_BLOCKS = [
     field: 'header.title',
     label: '/contact form section heading',
   },
+  // #107: partner check-CTA body text. Two CTA blocks live on this page; the
+  // button URL is not itself allowlisted, so it is a stable discriminator.
+  {
+    page: 'partnerprogramma',
+    blockType: 'cta',
+    field: 'text',
+    match: { path: 'button.url', equals: '/check' },
+    label: '/partnerprogramma check-CTA text',
+  },
+  // #107: Woerden hero, services and FAQ plain-text fields. Rich-text leaves
+  // (regio body, FAQ answers) stay out; they wait for Part C. The regio
+  // eyebrow and the page CTA eyebrow are also #107 plain text, but they are
+  // outside this PR's stated scope (hero, services, FAQ, plus the partner
+  // check-CTA).
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'hero',
+    field: 'header.eyebrow',
+    label: '/woerden hero eyebrow',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'hero',
+    field: 'header.title',
+    label: '/woerden hero title',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'hero',
+    field: 'header.intro',
+    label: '/woerden hero intro',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'services',
+    field: 'header.eyebrow',
+    label: '/woerden services eyebrow',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'services',
+    field: 'header.title',
+    label: '/woerden services title',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'services',
+    field: 'header.intro',
+    label: '/woerden services intro',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'services',
+    rows: 'cards',
+    field: 'title',
+    label: '/woerden services card title',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'services',
+    rows: 'cards',
+    field: 'description',
+    label: '/woerden services card text',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'accordion',
+    field: 'header.eyebrow',
+    label: '/woerden FAQ eyebrow',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'accordion',
+    field: 'header.title',
+    label: '/woerden FAQ title',
+  },
+  {
+    page: 'website-laten-maken-woerden',
+    blockType: 'accordion',
+    rows: 'items',
+    field: 'title',
+    label: '/woerden FAQ question',
+  },
 ]
 
 // Payload row ids on D1 are 24-char lowercase hex (ObjectId-style). Anything else is refused.
@@ -59,31 +157,113 @@ const FETCH_TIMEOUT_MS = 15_000
 const DEFAULT_URL = 'https://accp.rinsly.com'
 const OUTPUT = resolve(dirname(fileURLToPath(import.meta.url)), '../src/contentAllowlist.ts')
 
+/** Read a dotted path on a plain object. Missing segments yield undefined. */
+export function readField(value, path) {
+  if (typeof path !== 'string' || path === '') return undefined
+  let current = value
+  for (const segment of path.split('.')) {
+    if (current == null || typeof current !== 'object' || !Object.hasOwn(current, segment)) {
+      return undefined
+    }
+    current = current[segment]
+  }
+  return current
+}
+
+function leafName(field) {
+  const parts = typeof field === 'string' ? field.split('.') : []
+  return parts[parts.length - 1] ?? ''
+}
+
+function assertSpec(spec) {
+  if (LEGAL_SLUGS.includes(spec.page)) {
+    throw new Error(`refusing to pin a field on legal page "${spec.page}"`)
+  }
+  if (RICH_TEXT_LEAVES.has(leafName(spec.field))) {
+    throw new Error(`refusing to pin rich-text field "${spec.field}" on "${spec.page}"`)
+  }
+  if (spec.rows && !ROW_FIELDS.has(spec.rows)) {
+    throw new Error(`unsupported rows field "${spec.rows}" on "${spec.page}"`)
+  }
+}
+
+function describeMatch(spec) {
+  if (!spec.match) return ''
+  return ` matching ${spec.match.path}=${JSON.stringify(spec.match.equals)}`
+}
+
+function assertText(value, locale, label) {
+  if (typeof value !== 'string' || value.trim() === '') {
+    throw new Error(`${locale}: ${label} is empty or not text; refusing to pin it`)
+  }
+}
+
+function assertId(id, locale, label) {
+  if (typeof id !== 'string' || !ID_RE.test(id)) {
+    throw new Error(`${locale}: ${label} has no usable row id`)
+  }
+}
+
 /** The block row of a page that a spec entry points at. Throws unless there is exactly one. */
 export function findBlock(docs, spec, locale) {
+  assertSpec(spec)
   const pages = docs.filter((doc) => doc && doc.slug === spec.page)
   if (pages.length !== 1) {
     throw new Error(`${locale}: expected one page with slug "${spec.page}", found ${pages.length}`)
   }
   const layout = Array.isArray(pages[0].layout) ? pages[0].layout : []
-  const blocks = layout.filter((block) => block && block.blockType === spec.blockType)
+  let blocks = layout.filter((block) => block && block.blockType === spec.blockType)
+  if (spec.match) {
+    const { path, equals } = spec.match
+    if (typeof path !== 'string' || path === '' || typeof equals !== 'string') {
+      throw new Error(`${locale}: "${spec.blockType}" on "${spec.page}" has an unusable match`)
+    }
+    blocks = blocks.filter((block) => readField(block, path) === equals)
+  }
   if (blocks.length !== 1) {
     throw new Error(
-      `${locale}: expected one "${spec.blockType}" block on "${spec.page}", found ${blocks.length}`,
+      `${locale}: expected one "${spec.blockType}" block on "${spec.page}"${describeMatch(spec)}, found ${blocks.length}`,
     )
   }
   const block = blocks[0]
-  if (typeof block.id !== 'string' || !ID_RE.test(block.id)) {
-    throw new Error(`${locale}: "${spec.blockType}" block on "${spec.page}" has no usable row id`)
-  }
-  const [group, leaf] = spec.field.split('.')
-  const value = block[group]?.[leaf]
-  if (typeof value !== 'string' || value.trim() === '') {
-    throw new Error(
-      `${locale}: ${spec.page} ${spec.blockType} ${spec.field} is empty or not text; refusing to pin it`,
-    )
+  assertId(block.id, locale, `"${spec.blockType}" block on "${spec.page}"`)
+  if (!spec.rows) {
+    assertText(readField(block, spec.field), locale, `${spec.page} ${spec.blockType} ${spec.field}`)
   }
   return block
+}
+
+/** Pins for one spec on one already-located block, including array rows. */
+export function pinsForBlock(block, spec, locale) {
+  assertSpec(spec)
+  if (!spec.rows) {
+    return [
+      {
+        path: `layout.${block.id}.${spec.field}`,
+        comment: `${locale} ${spec.label}`,
+      },
+    ]
+  }
+  const rows = Array.isArray(block[spec.rows]) ? block[spec.rows].slice() : []
+  if (rows.length === 0) {
+    throw new Error(
+      `${locale}: expected ${spec.rows} on "${spec.page}" ${spec.blockType}, found ${rows.length}`,
+    )
+  }
+  // Sort by id so the module does not depend on the API's array order.
+  rows.sort((a, b) => String(a?.id ?? '').localeCompare(String(b?.id ?? '')))
+  return rows.map((row, index) => {
+    assertId(row.id, locale, `${spec.page} ${spec.blockType} ${spec.rows} row`)
+    assertText(
+      readField(row, spec.field),
+      locale,
+      `${spec.page} ${spec.blockType} ${spec.rows}.${spec.field}`,
+    )
+    return {
+      path: `layout.${block.id}.${spec.rows}.${row.id}.${spec.field}`,
+      comment: `${locale} ${spec.label} ${index + 1}`,
+    }
+  })
 }
 
 /** Pure: REST responses (`{ docs }` per locale) to the ordered pin list. */
@@ -94,10 +274,7 @@ export function collectPins(responses) {
       const docs = responses[locale]?.docs
       if (!Array.isArray(docs)) throw new Error(`${locale}: response has no docs array`)
       const block = findBlock(docs, spec, locale)
-      pins.push({
-        path: `layout.${block.id}.${spec.field}`,
-        comment: `${locale} ${spec.label}`,
-      })
+      pins.push(...pinsForBlock(block, spec, locale))
     }
   }
   return pins
