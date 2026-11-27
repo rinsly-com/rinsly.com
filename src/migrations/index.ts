@@ -10,6 +10,7 @@ import * as migration_20261103_013000_drop_figma_seat from './20261103_013000_dr
 import * as migration_20261126_140500_email_consent from './20261126_140500_email_consent';
 import * as migration_20261126_160500_b2b_kvk from './20261126_160500_b2b_kvk';
 import * as migration_20261126_232114_content_endpoint from './20261126_232114_content_endpoint';
+import * as migration_20261127_170000_content_refactor from './20261127_170000_content_refactor';
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20261126_232114_content_endpoint.up,
     down: migration_20261126_232114_content_endpoint.down,
     name: '20261126_232114_content_endpoint'
+  },
+  {
+    up: migration_20261127_170000_content_refactor.up,
+    down: migration_20261127_170000_content_refactor.down,
+    name: '20261127_170000_content_refactor',
   },
 ];

@@ -1,0 +1,3983 @@
+{
+ "capturedAt": "2026-11-27T16:15+01:00 (accp public API, published, depth 0)",
+ "pages": {
+  "home": {
+   "nl": {
+    "title": "Rinsly",
+    "meta": {
+     "title": "Websites bouwen en hosten voor ontwerpstudio’s · Rinsly",
+     "description": "Rinsly bouwt en host websites voor ontwerpstudio’s en bedrijven. Het ontwerp komt van jullie, wij bouwen het als een echte applicatie en houden het draaiend.",
+     "image": null,
+     "noindex": false
+    },
+    "layout": [
+     {
+      "id": "6b08713abb5dd40a0f68af9e",
+      "variant": "spotlight",
+      "anchor": null,
+      "blockName": null,
+      "buttons": [
+       {
+        "id": "6b08713abb5dd40a0f68af9c",
+        "label": "Word partner",
+        "variant": "primary",
+        "type": "internal",
+        "page": "@partnerprogramma",
+        "url": null,
+        "anchor": null,
+        "newTab": false
+       },
+       {
+        "id": "6b08713abb5dd40a0f68af9d",
+        "label": "Website laten bouwen",
+        "variant": "secondary",
+        "type": "internal",
+        "page": "@website",
+        "url": null,
+        "anchor": null,
+        "newTab": false
+       }
+      ],
+      "blockType": "hero",
+      "header": {
+       "eyebrow": "Bouw & hosting voor ontwerpstudio’s",
+       "title": "Jullie ontwerpen. Wij bouwen het en houden het draaiend.",
+       "intro": "Rinsly is de bouw- en beheerafdeling die ontwerpstudio’s niet hebben. Jullie leveren het design system aan, wij bouwen het als een echte applicatie en draaien het daarna: hosting, updates en dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up). Elke keer dat de klant betaalt, gaat er een deel naar jullie."
+      }
+     },
+     {
+      "id": "6b08713abb5dd40a0f68afa8",
+      "anchor": "platform",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b08713abb5dd40a0f68afa1",
+        "icon": "IconBrush",
+        "title": "Van design system naar productie",
+        "description": "Wij bouwen vanuit het design system. Type-scale, spacing, responsive gedrag en motion zitten in de engine, dus het ontwerp overleeft de bouw.",
+        "features": [
+         {
+          "id": "6b08713abb5dd40a0f68af9f",
+          "text": "Next.js met Rinsly CMS"
+         },
+         {
+          "id": "6b08713abb5dd40a0f68afa0",
+          "text": "Meertalig, toegankelijk, gecontroleerd voordat het live gaat"
+         }
+        ]
+       },
+       {
+        "id": "6b08713abb5dd40a0f68afa4",
+        "icon": "IconPackages",
+        "title": "Eén geversioneerde engine",
+        "description": "Een beveiligingsfix maken we één keer en rollen we uit over al onze sites. Geen plugin-sprawl, geen WordPress.",
+        "features": [
+         {
+          "id": "6b08713abb5dd40a0f68afa2",
+          "text": "Fix in één release"
+         },
+         {
+          "id": "6b08713abb5dd40a0f68afa3",
+          "text": "Elke site houdt zijn eigen ontwerp"
+         }
+        ]
+       },
+       {
+        "id": "6b08713abb5dd40a0f68afa7",
+        "icon": "IconServer2",
+        "title": "Draaien aan de edge",
+        "description": "Eén omgeving per site, aan de edge, met limieten die we gewoon opschrijven.",
+        "features": [
+         {
+          "id": "6b08713abb5dd40a0f68afa5",
+          "text": "Edge-hosting & SSL"
+         },
+         {
+          "id": "6b08713abb5dd40a0f68afa6",
+          "text": "Dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up)"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "Het platform",
+       "title": "Eén engine, al onze sites",
+       "intro": "Geen thema en geen pagebuilder. Elke site is een applicatie op één gedeelde, geversioneerde engine. Daarom kan een beveiligingsfix één keer gemaakt worden en over alle sites tegelijk uitgerold."
+      }
+     },
+     {
+      "id": "6b08713abb5dd40a0f68afa9",
+      "eyebrow": "Meten",
+      "title": "Vijf rapportcijfers in een halve minuut",
+      "text": "Vijf rapportcijfers voor elke site in een halve minuut. Probeer het op elke URL, gratis en zonder account.",
+      "anchor": "websitecheck",
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Gratis websitecheck",
+       "variant": "secondary",
+       "type": "external",
+       "page": null,
+       "url": "/check",
+       "anchor": null,
+       "newTab": false
+      }
+     },
+     {
+      "id": "6b08713abb5dd40a0f68afaa",
+      "eyebrow": "De techniek",
+      "title": "Hoe de engine werkt",
+      "text": "Hoe de engine werkt, wat er in een release gebeurt en waar de data staat, in gewone taal.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Zo werkt het platform",
+       "variant": "primary",
+       "type": "internal",
+       "page": "@platform",
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     },
+     {
+      "id": "6b08713abb5dd40a0f68afab",
+      "content": {
+       "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 1,
+            "mode": "normal",
+            "style": "",
+            "text": "Ontwerpstudio’s en freelance ontwerpers.",
+            "version": 1
+           },
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Jullie ontwerpen, wij bouwen en hosten, en van de doorlopende hostingomzet gaat een deel naar jullie, zolang die klant blijft. Eén ontwerp dat blijft betalen, in plaats van één keer factureren en klaar. Dit is waar onze aandacht naartoe gaat.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 1,
+            "mode": "normal",
+            "style": "",
+            "text": "Bedrijven die zelf een site willen.",
+            "version": 1
+           },
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " Dat kan gewoon, op precies dezelfde voorwaarden en voor dezelfde prijs. Zoekt u nog een ontwerper, dan brengen we u in contact met een van onze partners. Wij verkopen zelf geen ontwerp.",
+            "version": 1
+           }
+          ]
+         }
+        ]
+       }
+      },
+      "width": "wide",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "richText",
+      "header": {
+       "eyebrow": "Twee deuren",
+       "title": "Voor wie is Rinsly?",
+       "intro": null
+      }
+     },
+     {
+      "id": "6b08713abb5dd40a0f68afac",
+      "eyebrow": "Aan de slag",
+      "title": "Klaar om samen te werken?",
+      "text": "Vertel wat je maakt en hoe je het nu oplevert, dan zeggen we eerlijk of dit iets voor je is.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Neem contact op",
+       "variant": "primary",
+       "type": "internal",
+       "page": "@contact",
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     }
+    ]
+   },
+   "en": {
+    "title": "Rinsly",
+    "meta": {
+     "title": "Websites built and hosted for design studios · Rinsly",
+     "description": "Rinsly builds and hosts websites for design studios and businesses. The design comes from you; we build it as a real application and keep it running.",
+     "image": null,
+     "noindex": false
+    },
+    "layout": [
+     {
+      "id": "6b08713dbb5dd40a0f68afaf",
+      "variant": "spotlight",
+      "anchor": null,
+      "blockName": null,
+      "buttons": [
+       {
+        "id": "6b08713dbb5dd40a0f68afad",
+        "label": "Become a partner",
+        "variant": "primary",
+        "type": "internal",
+        "page": "@partnerprogramma",
+        "url": null,
+        "anchor": null,
+        "newTab": false
+       },
+       {
+        "id": "6b08713dbb5dd40a0f68afae",
+        "label": "Get a website built",
+        "variant": "secondary",
+        "type": "internal",
+        "page": "@website",
+        "url": null,
+        "anchor": null,
+        "newTab": false
+       }
+      ],
+      "blockType": "hero",
+      "header": {
+       "eyebrow": "Build & hosting for design studios",
+       "title": "You design. We build it and keep it running.",
+       "intro": "Rinsly is the build-and-run department design studios don’t have. You deliver the design system, we build it as a real application and run it from there: hosting, updates and daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup). Every time the client pays, a share of it comes to you."
+      }
+     },
+     {
+      "id": "6b08713dbb5dd40a0f68afb9",
+      "anchor": "platform",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b08713dbb5dd40a0f68afb2",
+        "icon": "IconBrush",
+        "title": "From design system to production",
+        "description": "We build from the design system. Type scale, spacing, responsive behaviour and motion live in the engine, so the design survives the build.",
+        "features": [
+         {
+          "id": "6b08713dbb5dd40a0f68afb0",
+          "text": "Next.js with Rinsly CMS"
+         },
+         {
+          "id": "6b08713dbb5dd40a0f68afb1",
+          "text": "Multilingual, accessible, checked before it goes live"
+         }
+        ]
+       },
+       {
+        "id": "6b08713dbb5dd40a0f68afb5",
+        "icon": "IconPackages",
+        "title": "One versioned engine",
+        "description": "A security fix is made once and rolled out to every site. No plugin sprawl, no WordPress.",
+        "features": [
+         {
+          "id": "6b08713dbb5dd40a0f68afb3",
+          "text": "Fixed in one release"
+         },
+         {
+          "id": "6b08713dbb5dd40a0f68afb4",
+          "text": "Every site keeps its own design"
+         }
+        ]
+       },
+       {
+        "id": "6b08713dbb5dd40a0f68afb8",
+        "icon": "IconServer2",
+        "title": "Running at the edge",
+        "description": "One environment per site, at the edge, with limits we simply write down.",
+        "features": [
+         {
+          "id": "6b08713dbb5dd40a0f68afb6",
+          "text": "Edge hosting & SSL"
+         },
+         {
+          "id": "6b08713dbb5dd40a0f68afb7",
+          "text": "Daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup)"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "The platform",
+       "title": "One engine, every site",
+       "intro": "No theme, no page builder. Every site is an application on one shared, versioned engine, which is why a security fix can be made once and rolled out across every site at the same time."
+      }
+     },
+     {
+      "id": "6b08713dbb5dd40a0f68afba",
+      "eyebrow": "Measure",
+      "title": "Five grades in half a minute",
+      "text": "Five grades for any site in half a minute. Try it on any URL, free and without an account.",
+      "anchor": "websitecheck",
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Free website check",
+       "variant": "secondary",
+       "type": "external",
+       "page": null,
+       "url": "/check",
+       "anchor": null,
+       "newTab": false
+      }
+     },
+     {
+      "id": "6b08713dbb5dd40a0f68afbb",
+      "eyebrow": "The technical part",
+      "title": "How the engine works",
+      "text": "How the engine works, what happens in a release, and where the data lives, in plain language.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "How the platform works",
+       "variant": "primary",
+       "type": "internal",
+       "page": "@platform",
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     },
+     {
+      "id": "6b08713dbb5dd40a0f68afbc",
+      "content": {
+       "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 1,
+            "mode": "normal",
+            "style": "",
+            "text": "Design studios and freelance designers.",
+            "version": 1
+           },
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " You design, we build and host, and a share of the recurring hosting revenue comes to you for as long as that client stays. One design that keeps paying, instead of invoicing once and moving on. This is where our attention goes.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 1,
+            "mode": "normal",
+            "style": "",
+            "text": "Businesses that want a site of their own.",
+            "version": 1
+           },
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": " That works too, on exactly the same terms and for the same price. Still looking for a designer? We’ll introduce you to one of our partners: we don’t sell design ourselves.",
+            "version": 1
+           }
+          ]
+         }
+        ]
+       }
+      },
+      "width": "wide",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "richText",
+      "header": {
+       "eyebrow": "Two doors",
+       "title": "Who is Rinsly for?",
+       "intro": null
+      }
+     },
+     {
+      "id": "6b08713dbb5dd40a0f68afbd",
+      "eyebrow": "Get started",
+      "title": "Ready to work together?",
+      "text": "Tell us what you make and how you deliver it today: we’ll tell you honestly whether this is for you.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Get in touch",
+       "variant": "primary",
+       "type": "internal",
+       "page": "@contact",
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     }
+    ]
+   }
+  },
+  "prijzen": {
+   "nl": {
+    "title": "Prijzen",
+    "meta": {
+     "title": "Prijzen · Rinsly",
+     "description": "Hosting vanaf €49 per maand. Bouwen vanaf €2.500, of gratis bij drie jaar hosting. Limieten in gigabytes en requests, niet in bijvoeglijke naamwoorden.",
+     "image": null,
+     "noindex": false
+    },
+    "layout": [
+     {
+      "id": "6b087164bb5dd40a0f68b060",
+      "variant": "centered",
+      "anchor": null,
+      "blockName": null,
+      "buttons": [],
+      "blockType": "hero",
+      "header": {
+       "eyebrow": "Prijzen",
+       "title": "Gratis bouw",
+       "intro": "De bouw is €0 bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is."
+      }
+     },
+     {
+      "id": "6b087164bb5dd40a0f68b061",
+      "content": null,
+      "width": "wide",
+      "anchor": "bouw",
+      "blockName": null,
+      "blockType": "richText",
+      "header": {
+       "eyebrow": "De bouw",
+       "title": "Twee routes",
+       "intro": "Gratis bouw. €0 bij een normale bedrijfs- of brochurewebsite. 36 maanden minimum, daarna maandelijks opzegbaar."
+      }
+     },
+     {
+      "id": "6b087164bb5dd40a0f68b062",
+      "text": "Of betaal de bouw: vanaf €2.500, daarna doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar. Alle prijzen exclusief 21% btw. Een betaalde bouw schaalt met de complexiteit.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "note"
+     },
+     {
+      "id": "6b087164bb5dd40a0f68b081",
+      "anchor": "pakketten",
+      "blockName": null,
+      "tiers": [
+       {
+        "id": "6b087164bb5dd40a0f68b06c",
+        "name": "Care",
+        "for": "Voor sites die wij bouwden",
+        "price": "€49",
+        "per": "/ mnd",
+        "priceNote": "of €539 per jaar (1 maand gratis)",
+        "recommended": false,
+        "badge": null,
+        "features": [
+         {
+          "id": "6b087164bb5dd40a0f68b063",
+          "text": "Tot 5 GB media",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b064",
+          "text": "Tot 250 MB database",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b065",
+          "text": "Tot 1 miljoen requests per maand",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b066",
+          "text": "Edge-hosting & SSL",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b067",
+          "text": "Beveiligings- & CMS-updates",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b068",
+          "text": "Dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up)",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b069",
+          "text": "E-mailondersteuning bij vragen",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b06a",
+          "text": "Staging-omgeving",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b06b",
+          "text": "Wijzigingen niet inbegrepen",
+          "included": false
+         }
+        ]
+       },
+       {
+        "id": "6b087164bb5dd40a0f68b073",
+        "name": "Managed",
+        "for": "Volledig ontzorgd",
+        "price": "€99",
+        "per": "/ mnd",
+        "priceNote": "of €1.089 per jaar (1 maand gratis)",
+        "recommended": true,
+        "badge": "Aanbevolen",
+        "features": [
+         {
+          "id": "6b087164bb5dd40a0f68b06d",
+          "text": "Tot 25 GB media",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b06e",
+          "text": "Tot 1 GB database",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b06f",
+          "text": "Tot 5 miljoen requests per maand",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b070",
+          "text": "Alles uit Care",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b071",
+          "text": "Tot 1 uur/mnd wijzigingen",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b072",
+          "text": "Eén vast aanspreekpunt",
+          "included": true
+         }
+        ]
+       },
+       {
+        "id": "6b087164bb5dd40a0f68b07b",
+        "name": "Growth",
+        "for": "Voor sites die moeten groeien",
+        "price": "€249",
+        "per": "/ mnd",
+        "priceNote": "of €2.490 per jaar (2 maanden gratis)",
+        "recommended": false,
+        "badge": null,
+        "features": [
+         {
+          "id": "6b087164bb5dd40a0f68b074",
+          "text": "Tot 100 GB media",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b075",
+          "text": "Tot 5 GB database",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b076",
+          "text": "Tot 25 miljoen requests per maand",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b077",
+          "text": "Alles uit Managed",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b078",
+          "text": "Tot 4 uur/mnd doorontwikkeling",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b079",
+          "text": "SEO- & performance-optimalisatie",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b07a",
+          "text": "Kwartaalreview & roadmap",
+          "included": true
+         }
+        ]
+       },
+       {
+        "id": "6b087164bb5dd40a0f68b080",
+        "name": "Op maat",
+        "for": "Grotere organisaties",
+        "price": "vanaf €499",
+        "per": "/ mnd",
+        "priceNote": "opslag en verkeer naar volume",
+        "recommended": false,
+        "badge": null,
+        "features": [
+         {
+          "id": "6b087164bb5dd40a0f68b07c",
+          "text": "Opslag, database en verkeer op maat",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b07d",
+          "text": "Alles uit Growth",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b07e",
+          "text": "SLA met vastgelegde reactietijden, indien overeengekomen",
+          "included": true
+         },
+         {
+          "id": "6b087164bb5dd40a0f68b07f",
+          "text": "Verwerkersovereenkomst (AVG)",
+          "included": true
+         }
+        ]
+       }
+      ],
+      "blockType": "pricing",
+      "header": {
+       "eyebrow": "Wat de klant betaalt",
+       "title": "Vier pakketten",
+       "intro": "Dit is het abonnement dat de eindklant bij Rinsly afsluit: ook als een partner de site heeft ontworpen. De klant is altijd eigenaar van site en data. Facturatie gaat vooraf, per maand of per jaar; bij jaarbetaling krijgt u een maand korting, bij Growth twee. Alle prijzen exclusief 21% btw. Dit is de prijs die u bij Rinsly betaalt; factureert een ontwerpstudio u zelf, dan geldt haar prijs. Welk pakket past? Care is hosting met beveiligings- en CMS-updates voor sites die wij bouwden. Managed voegt tot 1 uur wijzigingen per maand en één vast aanspreekpunt toe. Growth voegt tot 4 uur doorontwikkeling per maand en een kwartaalreview toe. Op maat is voor grotere organisaties."
+      }
+     },
+     {
+      "id": "6b087164bb5dd40a0f68b082",
+      "text": "Over een limiet? Dan melden we dat en kiest u: bijbetalen per eenheid (€1 per extra GB media, €5 per extra GB database, €2 per extra miljoen requests per maand) of een pakket omhoog. We knijpen uw site nooit stilletjes af.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "note"
+     },
+     {
+      "id": "6b087164bb5dd40a0f68b089",
+      "anchor": "faq",
+      "blockName": null,
+      "items": [
+       {
+        "id": "6b087164bb5dd40a0f68b083",
+        "title": "Wat kost het bouwen van de website?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Gratis bouw:",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " €0 bouwkosten bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Betaal de bouw:",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " vanaf €2.500 (excl. btw). De prijs schaalt met de complexiteit. Het hostingabonnement is doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand. Een betaalde bouw kan desgewenst in overleg gespreid worden over het eerste jaar.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Beide routes bestaan echt. De minimumlooptijd van drie jaar is wat de gratis bouw betaalt. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website. Daarna loopt het abonnement door en is het net zo goed maandelijks opzegbaar.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087164bb5dd40a0f68b084",
+        "title": "Zit ik ergens aan vast?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Dat hangt af van welke route u kiest. Kiest u de gratis bouw, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website; daarna is het maandelijks opzegbaar. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087164bb5dd40a0f68b085",
+        "title": "Van wie krijgen we de factuur?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Van Rinsly, of van de ontwerpstudio die uw site maakte. Dat kiest de studio. Factureert de studio zelf, dan spreekt u de prijs met haar af. Uw overeenkomst over de website loopt in beide gevallen via Rinsly, en dat is precies wat u beschermt: stopt de studio ermee, dan gaat uw site zonder onderbreking bij ons verder.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087164bb5dd40a0f68b086",
+        "title": "Wat valt onder de inbegrepen wijzigingen?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Bij ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Managed",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " en ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Growth",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " zit een vast aantal uren per maand voor klein layout- en bugfixwerk door ons. Teksten, foto’s en pagina’s beheert u zelf in het CMS; dat is de bedoeling. Wilt u dat wij content aanpassen, dan kan dat binnen die uren, maar het komt uit dezelfde pot. Ongebruikte uren vervallen aan het eind van de maand. Bij ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Care",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " zit geen inbegrepen tijd: u doet content zelf, en technisch werk offreren we apart.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087164bb5dd40a0f68b087",
+        "title": "Wat kost werk buiten het abonnement?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Alles buiten de inbegrepen uren, en al het werk op ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Care",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": ", is ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "meerwerk",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " tegen ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "€95 per uur",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " (excl. btw), vooraf afgestemd. Grote uitbreidingen of nieuwe functionaliteit offreren we apart, met een heldere scope.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087164bb5dd40a0f68b088",
+        "title": "Gaat de week ook over storingen?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Op Care is de week de reactietijd voor gewone vragen. Storingen lopen niet op die termijn.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       }
+      ],
+      "blockType": "accordion",
+      "header": {
+       "eyebrow": "Veelgestelde vragen",
+       "title": "Over prijs en looptijd",
+       "subtitle": null,
+       "intro": null
+      }
+     },
+     {
+      "id": "6b087164bb5dd40a0f68b08a",
+      "eyebrow": "Aan de slag",
+      "title": "Een heldere offerte, geen verrassingen achteraf",
+      "text": "Vertel wat u nodig hebt, dan komen we terug met een offerte waarin alles staat.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Neem contact op",
+       "variant": "primary",
+       "type": "internal",
+       "page": "@contact",
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     }
+    ]
+   },
+   "en": {
+    "title": "Pricing",
+    "meta": {
+     "title": "Pricing · Rinsly",
+     "description": "Hosting from €49 per month. Build from €2.500, or free with three years of hosting. Limits in gigabytes and requests, not in adjectives.",
+     "image": null,
+     "noindex": false
+    },
+    "layout": [
+     {
+      "id": "6b087167bb5dd40a0f68b08b",
+      "variant": "centered",
+      "anchor": null,
+      "blockName": null,
+      "buttons": [],
+      "blockType": "hero",
+      "header": {
+       "eyebrow": "Pricing",
+       "title": "Free build",
+       "intro": "The build is €0 for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed."
+      }
+     },
+     {
+      "id": "6b087167bb5dd40a0f68b08c",
+      "content": null,
+      "width": "wide",
+      "anchor": "bouw",
+      "blockName": null,
+      "blockType": "richText",
+      "header": {
+       "eyebrow": "The build",
+       "title": "Two routes",
+       "intro": "Free build. €0 for a typical business or brochure site. 36 months minimum, then monthly cancellable."
+      }
+     },
+     {
+      "id": "6b087167bb5dd40a0f68b08d",
+      "text": "Or pay for the build: from €2,500, then ongoing and cancellable monthly with one month’s notice. A paid build can, by arrangement, be spread over the first year. All prices exclude 21% VAT. A paid build scales with complexity.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "note"
+     },
+     {
+      "id": "6b087167bb5dd40a0f68b0ac",
+      "anchor": "pakketten",
+      "blockName": null,
+      "tiers": [
+       {
+        "id": "6b087167bb5dd40a0f68b097",
+        "name": "Care",
+        "for": "For sites we built",
+        "price": "€49",
+        "per": "/ mo",
+        "priceNote": "or €539 per year (1 month free)",
+        "recommended": false,
+        "badge": null,
+        "features": [
+         {
+          "id": "6b087167bb5dd40a0f68b08e",
+          "text": "Up to 5 GB media",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b08f",
+          "text": "Up to 250 MB database",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b090",
+          "text": "Up to 1 million requests a month",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b091",
+          "text": "Edge hosting & SSL",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b092",
+          "text": "Security & CMS updates",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b093",
+          "text": "Daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup)",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b094",
+          "text": "Email support for questions",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b095",
+          "text": "Staging environment",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b096",
+          "text": "Changes not included",
+          "included": false
+         }
+        ]
+       },
+       {
+        "id": "6b087167bb5dd40a0f68b09e",
+        "name": "Managed",
+        "for": "Everything taken care of",
+        "price": "€99",
+        "per": "/ mo",
+        "priceNote": "or €1,089 per year (1 month free)",
+        "recommended": true,
+        "badge": "Recommended",
+        "features": [
+         {
+          "id": "6b087167bb5dd40a0f68b098",
+          "text": "Up to 25 GB media",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b099",
+          "text": "Up to 1 GB database",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b09a",
+          "text": "Up to 5 million requests a month",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b09b",
+          "text": "Everything in Care",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b09c",
+          "text": "Up to 1 hr/mo changes",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b09d",
+          "text": "One dedicated point of contact",
+          "included": true
+         }
+        ]
+       },
+       {
+        "id": "6b087167bb5dd40a0f68b0a6",
+        "name": "Growth",
+        "for": "For sites that need to grow",
+        "price": "€249",
+        "per": "/ mo",
+        "priceNote": "or €2,490 per year (2 months free)",
+        "recommended": false,
+        "badge": null,
+        "features": [
+         {
+          "id": "6b087167bb5dd40a0f68b09f",
+          "text": "Up to 100 GB media",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b0a0",
+          "text": "Up to 5 GB database",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b0a1",
+          "text": "Up to 25 million requests a month",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b0a2",
+          "text": "Everything in Managed",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b0a3",
+          "text": "Up to 4 hrs/mo development",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b0a4",
+          "text": "SEO & performance optimisation",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b0a5",
+          "text": "Quarterly review & roadmap",
+          "included": true
+         }
+        ]
+       },
+       {
+        "id": "6b087167bb5dd40a0f68b0ab",
+        "name": "Custom",
+        "for": "Larger organisations",
+        "price": "from €499",
+        "per": "/ mo",
+        "priceNote": "storage and traffic to volume",
+        "recommended": false,
+        "badge": null,
+        "features": [
+         {
+          "id": "6b087167bb5dd40a0f68b0a7",
+          "text": "Storage, database and traffic to measure",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b0a8",
+          "text": "Everything in Growth",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b0a9",
+          "text": "SLA with specified response times, if agreed",
+          "included": true
+         },
+         {
+          "id": "6b087167bb5dd40a0f68b0aa",
+          "text": "Data-processing agreement (GDPR)",
+          "included": true
+         }
+        ]
+       }
+      ],
+      "blockType": "pricing",
+      "header": {
+       "eyebrow": "What the client pays",
+       "title": "Four plans",
+       "intro": "This is the subscription the end client takes with Rinsly: including when a partner designed the site. The client always owns the site and the data. We invoice in advance, monthly or yearly; paying yearly gets you a month free, two on Growth. All prices exclude 21% VAT. This is what you pay Rinsly; if a design studio invoices you themselves, their price applies. Which plan fits? Care is hosting with security and CMS updates for sites we built. Managed adds up to 1 hour of changes a month and one dedicated point of contact. Growth adds up to 4 hours of development a month and a quarterly review. Custom is for larger organisations."
+      }
+     },
+     {
+      "id": "6b087167bb5dd40a0f68b0ad",
+      "text": "Over a limit? We tell you, and you choose: pay per unit (€1 per extra GB of media, €5 per extra GB of database, €2 per extra million requests a month) or move up a plan. We never throttle your site quietly.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "note"
+     },
+     {
+      "id": "6b087167bb5dd40a0f68b0b4",
+      "anchor": "faq",
+      "blockName": null,
+      "items": [
+       {
+        "id": "6b087167bb5dd40a0f68b0ae",
+        "title": "What does building the website cost?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Free build:",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " a €0 build fee for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Pay the build:",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " from €2,500 (excl. VAT). The price scales with complexity. The hosting subscription is ongoing and cancellable monthly with one month’s notice. A paid build can, by arrangement, be spread over the first year.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Both routes are real. The three-year minimum term is what pays for the free build. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website. After that the subscription continues and is just as monthly-cancellable.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087167bb5dd40a0f68b0af",
+        "title": "Am I locked in?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "That depends on the route you choose. If you choose the free build, a minimum term of 36 months applies to the subscription. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website; after that it is monthly cancellable. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087167bb5dd40a0f68b0b0",
+        "title": "Who sends us the invoice?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "From Rinsly, or from the design studio that made your site: the studio chooses. Where the studio invoices you, you agree the price with them. Your agreement about the website runs through Rinsly either way, which is what protects you: if the studio stops, your site carries on with us without interruption.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087167bb5dd40a0f68b0b1",
+        "title": "What counts as included changes?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "On ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Managed",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " and ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Growth",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": ", a fixed number of hours each month covers small layout and bugfix work by us. Words, pictures and pages you manage yourself in the CMS; that is the design. If you want us to change content, we can do that within those hours, but it draws from the same pool. Unused hours expire at the end of the month. ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Care",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " has no included time: you handle content yourself, and we quote technical work separately.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087167bb5dd40a0f68b0b2",
+        "title": "What does work outside the plan cost?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Anything beyond the included hours, and all work on ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Care",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": ", is ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "additional work",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " at ",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "€95 an hour",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " (excl. VAT), agreed up front. Larger extensions or new functionality we quote separately, with a clear scope.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087167bb5dd40a0f68b0b3",
+        "title": "Does the week cover outages too?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "On Care, the week is the reply time for normal questions. Outages are not handled on that timeline.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       }
+      ],
+      "blockType": "accordion",
+      "header": {
+       "eyebrow": "FAQ",
+       "title": "On price and term",
+       "subtitle": null,
+       "intro": null
+      }
+     },
+     {
+      "id": "6b087167bb5dd40a0f68b0b5",
+      "eyebrow": "Get started",
+      "title": "A clear quote, no surprises later",
+      "text": "Tell us what you need and we will come back with a quote that spells everything out.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Get in touch",
+       "variant": "primary",
+       "type": "internal",
+       "page": "@contact",
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     }
+    ]
+   }
+  },
+  "partnerprogramma": {
+   "nl": {
+    "title": "Partnerprogramma",
+    "meta": {
+     "title": "Partnerprogramma voor ontwerpstudio’s: wij bouwen en hosten · Rinsly",
+     "description": "Jullie ontwerpen. Wij bouwen en hosten. Een aandeel in de doorlopende omzet zolang de klant blijft, tot 35%, samengesteld uit wat jullie oppakken.",
+     "image": null,
+     "noindex": false
+    },
+    "layout": [
+     {
+      "id": "6b087147bb5dd40a0f68afc0",
+      "variant": "offset",
+      "anchor": null,
+      "blockName": null,
+      "buttons": [
+       {
+        "id": "6b087147bb5dd40a0f68afbe",
+        "label": "Vraag een partnergesprek aan",
+        "variant": "primary",
+        "type": "internal",
+        "page": "@contact",
+        "url": null,
+        "anchor": null,
+        "newTab": false
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afbf",
+        "label": "Bekijk de ladder",
+        "variant": "secondary",
+        "type": "internal",
+        "page": "@partnerprogramma",
+        "url": null,
+        "anchor": "ladder",
+        "newTab": false
+       }
+      ],
+      "blockType": "hero",
+      "header": {
+       "eyebrow": "Partnerprogramma",
+       "title": "Jullie factuur, jullie prijs, jullie merk",
+       "intro": "Doorverkoop en eigen branding zijn toegestaan. Factureer je de eindklant zelf, dan koop je bij Rinsly in tegen de lijstprijs min jouw percentage, zet je ontwerp en hosting op één factuur, en bepaal je zelf de prijs en desgewenst de abonnementsvorm. Rinsly noem je zoals je Cloudflare noemt: hosting bij Rinsly. Het percentage is in beide factuurroutes hetzelfde getal, van 0% tot 35% van de doorlopende abonnementsomzet exclusief btw, per betaalde factuur."
+      }
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afcd",
+      "anchor": "ladder",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b087147bb5dd40a0f68afc2",
+        "icon": "IconTargetArrow",
+        "title": "+10% Exclusiviteit",
+        "description": "Nieuw klantwerk en updates gaan naar Rinsly. Klanten die al elders gehost worden, blijven daar. Een grote update (herbouw, migratie, redesign, substantiële uitbreiding) leidt tot een gesprek over migratie.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afc1",
+          "text": "Keuze"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afc4",
+        "icon": "IconRefresh",
+        "title": "+5% Relatiebeheer",
+        "description": "De partner is de eerste lijn. De klant belt de partner; de partner maakt een ticket. Rinsly heeft geen direct contact met de klant.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afc3",
+          "text": "Keuze"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afc6",
+        "icon": "IconBolt",
+        "title": "+5% Marketing",
+        "description": "De partner noemt en verkoopt Rinsly als hostingpartner.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afc5",
+          "text": "Keuze"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afc8",
+        "icon": "IconPackages",
+        "title": "+5% Portfolio boven €1.000 per maand",
+        "description": "Doorlopende abonnementsomzet boven €1.000 per maand.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afc7",
+          "text": "Gemeten"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afca",
+        "icon": "IconRocket",
+        "title": "+5% Portfolio boven €5.000 per maand",
+        "description": "Doorlopende abonnementsomzet boven €5.000 per maand.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afc9",
+          "text": "Gemeten"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afcc",
+        "icon": "IconSeeding",
+        "title": "+5% Portfolio boven €25.000 per maand",
+        "description": "Doorlopende abonnementsomzet boven €25.000 per maand.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afcb",
+          "text": "Gemeten"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "Omzetaandeel",
+       "title": "De ladder, van 0% tot 35%",
+       "intro": "Het aandeel wordt niet per partner onderhandeld: het is opgebouwd uit deze vaste ladder. De basis is 0%. De omzetniveaus zijn cumulatief, dus de ladder eindigt op 35%."
+      }
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afce",
+      "content": {
+       "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "De basis is 0%. Een partner die geen verantwoordelijkheden draagt, verdient niets. Dat is bewust: het percentage betaalt voor werk dat elke maand doorgaat, niet voor een introductie die één keer gedaan wordt. Het wordt daarom per factuur betaald: elke factuur die de klant betaalt, zolang die klant blijft en de partner de plicht draagt.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "De basis is de doorlopende abonnementsomzet exclusief btw, per factuur die betaald is. Eenmalige bouwkosten en meerwerk worden niet gedeeld.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Gemeten per maand op actieve abonnementen. Een jaarplan telt als een twaalfde. Een niveau dat bereikt is, geldt meteen. Een niveau gaat pas verloren na twee metingen achter elkaar onder de drempel: één maand respijt.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Partners leveren een design system aan; de tool is aan jullie. Dat verandert het percentage niet.",
+            "version": 1
+           }
+          ]
+         }
+        ]
+       }
+      },
+      "width": "wide",
+      "anchor": "basis",
+      "blockName": null,
+      "blockType": "richText",
+      "header": {
+       "eyebrow": "De basis",
+       "title": "Doorlopende abonnementsomzet, per betaalde factuur",
+       "intro": null
+      }
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afdb",
+      "anchor": "waarom",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b087147bb5dd40a0f68afd1",
+        "icon": "IconPackages",
+        "title": "Eén engine, al onze sites",
+        "description": "Elke site deelt één engine en houdt zijn eigen ontwerp. Een beveiligingsfix maken we één keer en rollen uit over alle klanten tegelijk.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afcf",
+          "text": "Geen plugin-sprawl"
+         },
+         {
+          "id": "6b087147bb5dd40a0f68afd0",
+          "text": "Fix in één release"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afd4",
+        "icon": "IconBrush",
+        "title": "Van design system naar productie",
+        "description": "We bouwen vanuit het design system: type-scale, spacing en motion zitten in de engine, dus het ontwerp overleeft de bouw.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afd2",
+          "text": "Next.js met Rinsly CMS"
+         },
+         {
+          "id": "6b087147bb5dd40a0f68afd3",
+          "text": "Gecontroleerd voordat het live gaat"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afd7",
+        "icon": "IconBolt",
+        "title": "Gemeten snelheid",
+        "description": "Performance is geen marketingwoord maar een meting. Vijf rapportcijfers op elke URL, gratis via onze websitecheck.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afd5",
+          "text": "Edge-hosting, geen WordPress-bloat"
+         },
+         {
+          "id": "6b087147bb5dd40a0f68afd6",
+          "text": "Gratis websitecheck op /check"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afda",
+        "icon": "IconServer2",
+        "title": "Operatie met harde cijfers",
+        "description": "Limieten in gigabytes en requests, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up). Geen \"ruime opslag\", geen kleine letters.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afd8",
+          "text": "Staging bij elke site"
+         },
+         {
+          "id": "6b087147bb5dd40a0f68afd9",
+          "text": "Klant is eigenaar van site en data"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "Waarom Rinsly",
+       "title": "Niet nog een websitebouwer",
+       "intro": "Geen thema, geen pagebuilder, geen tien losse WordPress-installaties. Eén geversioneerde engine voor al onze sites, en cijfers in plaats van bijvoeglijke naamwoorden."
+      }
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afe2",
+      "anchor": "framer",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b087147bb5dd40a0f68afde",
+        "icon": "IconBrush",
+        "title": "Framer past bij een portfolio of campagne",
+        "description": "Bouw je het ontwerp zelf in Framer? Dan heb je een goed gereedschap voor een portfolio of een campagnepagina. Je bent dan zelf verantwoordelijk voor bouw, beheer en support.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afdc",
+          "text": "Portfolio of showcase"
+         },
+         {
+          "id": "6b087147bb5dd40a0f68afdd",
+          "text": "Campagnepagina"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afe1",
+        "icon": "IconPackages",
+        "title": "Rinsly past bij een studio die niet zelf bouwt en beheert",
+        "description": "Jij ontwerpt en levert het design system. Wij bouwen het als applicatie, hosten en onderhouden het, en jij verdient mee aan het abonnement, afhankelijk van wat je oppakt (zie de ladder).",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afdf",
+          "text": "Bouw en hosting door Rinsly"
+         },
+         {
+          "id": "6b087147bb5dd40a0f68afe0",
+          "text": "Beheer en updates door Rinsly"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "Eerlijk vergelijken",
+       "title": "Framer of Rinsly?",
+       "intro": "Het hangt af van wat je klant nodig heeft. Een goed gesprek begint met de vraag welke van de twee past."
+      }
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afe3",
+      "text": "Framer is een merk van de eigenaar. Rinsly is niet verbonden aan Framer. Informatie over Framer gecontroleerd op framer.com, 26 november 2026.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "note"
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afeb",
+      "anchor": "hoe",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b087147bb5dd40a0f68afe5",
+        "icon": "IconBrush",
+        "title": "1. Jullie ontwerpen",
+        "description": "Wat jullie al doen: het design system. Partners leveren een design system aan; de tool is aan jullie, en het verandert het percentage niet.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afe4",
+          "text": "Jullie leveren het design system aan"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afe7",
+        "icon": "IconCode",
+        "title": "2. Wij bouwen en zetten live",
+        "description": "Wij maken er een echte applicatie van op onze engine en zetten die live. De klant sluit de overeenkomst bij Rinsly.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afe6",
+          "text": "Gratis bouw voor de klant bij 36 maanden hosting"
+         }
+        ]
+       },
+       {
+        "id": "6b087147bb5dd40a0f68afea",
+        "icon": "IconRefresh",
+        "title": "3. Wij draaien het",
+        "description": "Edge-hosting, SSL, uptime-monitoring, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up), beveiliging en CMS-updates, en uitrol over alle sites.",
+        "features": [
+         {
+          "id": "6b087147bb5dd40a0f68afe8",
+          "text": "Aandeel van de doorlopende abonnementsomzet"
+         },
+         {
+          "id": "6b087147bb5dd40a0f68afe9",
+          "text": "Bouwkosten en meerwerk worden niet gedeeld"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "Hoe het werkt",
+       "title": "Jullie ontwerpen, wij doen de rest",
+       "intro": null
+      }
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afec",
+      "kind": "figmaToProduction",
+      "eyebrow": "Van ontwerp naar live",
+      "title": "Drie stappen, en maar één ervan is van jou",
+      "caption": "Jullie leveren het design system aan. Rinsly bouwt het als een echte applicatie op de gedeelde engine en zet het live, en draait daarna edge-hosting, SSL, uptime-monitoring, dagelijkse back-ups (doorlopend puntherstel van de database via Cloudflare D1 Time Travel en een nachtelijke mediaback-up), beveiliging en CMS-updates.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "diagram"
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afed",
+      "eyebrow": "Rekenen",
+      "title": "Wat zou jij eraan verdienen?",
+      "intro": "Kies een pakket, schuif het aantal klanten en vink aan wat je zou oppakken. Het tarief en je aandeel rekenen mee.",
+      "footnote": "Elk omzetniveau is +5% en de niveaus zijn cumulatief, dus de ladder eindigt op 35% van de doorlopende abonnementsomzet exclusief btw, per betaalde factuur. Eenmalige bouwkosten en meerwerk vallen erbuiten. Commissie ontstaat als de factuur betaald is, niet als die verstuurd is, en wordt uitbetaald op het factuurritme van die klant. Dit is een indicatie, geen aanbod.",
+      "anchor": "rekenen",
+      "blockName": null,
+      "blockType": "revenueCalculator"
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afee",
+      "content": {
+       "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "De partner kiest wie factureert. Niet afleiden uit de grootte van de studio. De eindklant sluit de overeenkomst met Rinsly. Dat is de standaard, en daarop staan de voorwaarden, de SLA, de verwerkersovereenkomst en het eigendom van site en data.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "list",
+          "listType": "bullet",
+          "tag": "ul",
+          "start": 1,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "listitem",
+            "value": 1,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Opzet A, Rinsly factureert (standaard).",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " Rinsly factureert de eindklant tegen de lijstprijs. De partner factureert niets. Het percentage komt als commissie, zodra de klant betaald heeft, op het factuurritme van die klant. De prijs van de klant is de lijstprijs, vastgesteld door Rinsly. Het betalingsrisico ligt bij Rinsly.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "listitem",
+            "value": 2,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Opzet B, de partner factureert.",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " Rinsly factureert de partner tegen de lijstprijs min het ladderpercentage. De partner factureert de klant: ontwerp en hosting op één factuur. Het percentage zit dan als korting in de inkoop. De prijs van de klant is de prijs van de partner: doorverkoop tegen een prijs die de partner zelf bepaalt, met desgewenst een eigen abonnementsvorm. Het betalingsrisico ligt bij de partner: die is Rinsly hoe dan ook verschuldigd.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Eén getal geldt voor beide. Een partner op 20% krijgt 20% terug of koopt met 20% korting. In beide gevallen houdt Rinsly €199,20 over van een Growth-abonnement van €249. Er is geen aparte groothandelsprijslijst.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "list",
+          "listType": "bullet",
+          "tag": "ul",
+          "start": 1,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "listitem",
+            "value": 1,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "De ladder wordt in beide opzetten gemeten op de lijstprijs, dus de factuurroute verandert niet hoe snel een portfolio de omzetniveaus beklimt.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "listitem",
+            "value": 2,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "In opzet B wordt geen commissie geboekt. Het percentage is al van het gefactureerde bedrag af. Beide betalen zou twee keer betalen zijn.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "listitem",
+            "value": 3,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Overschrijdingen van de quota krijgen dezelfde korting. De bouwkosten niet: eenmalige bouwkosten en meerwerk worden nooit gedeeld, dus een bouw die de partner factureert wordt tegen de lijstprijs ingekocht.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Uitbetaling volgt het geld van de klant. Commissie ontstaat als de factuur van de klant betaald is, niet als die verstuurd is: Rinsly schiet niet voor. Uitbetaling gaat op het factuurritme van die klant. Een klant per maand betekent een uitbetaling per maand. Een klant die een jaar vooruit betaalt, keert het jaar in één keer uit. Per partner per periode opgeteld: elf maandklanten geven één afrekening, niet elf. In opzet B valt er niets uit te betalen. Rinsly factureert de partner op datzelfde ritme, al na aftrek van het percentage.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Doorverkoop en eigen branding zijn toegestaan. Wie zelf factureert, verkoopt door: eigen prijs, eigen abonnementsvorm als de partner dat wil, en Rinsly genoemd zoals iemand Cloudflare noemt: hosting bij Rinsly.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Wat niet meebeweegt is de overeenkomst. De eindklant contracteert in beide routes met Rinsly. Een partner kan een klant teruggeven zonder dat de klant iets verliest: dezelfde site, dezelfde voorwaarden, dezelfde prijs. Rinsly neemt dan de facturatie en de supportlijn over. Rinsly verliest een klant niet omdat een partner vertrekt.",
+            "version": 1
+           }
+          ]
+         }
+        ]
+       }
+      },
+      "width": "wide",
+      "anchor": "facturatie",
+      "blockName": null,
+      "blockType": "richText",
+      "header": {
+       "eyebrow": "Facturatie",
+       "title": "Jij kiest wie de klant factureert",
+       "intro": null
+      }
+     },
+     {
+      "id": "6b087147bb5dd40a0f68afef",
+      "kind": "invoicingRoutes",
+      "eyebrow": "Twee routes",
+      "title": "Wie stuurt welke factuur",
+      "caption": "Opzet A: Rinsly factureert de eindklant de lijstprijs en betaalt de commissie uit zodra die factuur betaald is. Opzet B: de partner factureert de eigen klant en koopt in tegen de lijstprijs min het ladderpercentage. De overeenkomst loopt in beide gevallen tussen Rinsly en de eindklant.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "diagram"
+     },
+     {
+      "id": "6b087147bb5dd40a0f68aff0",
+      "eyebrow": "Proef onze meting",
+      "title": "Meet een site in een halve minuut",
+      "text": "Probeer de meting zelf op elke URL. Vijf rapportcijfers, gratis en zonder account.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Gratis websitecheck",
+       "variant": "secondary",
+       "type": "external",
+       "page": null,
+       "url": "/check",
+       "anchor": null,
+       "newTab": false
+      }
+     },
+     {
+      "id": "6b087147bb5dd40a0f68aff6",
+      "anchor": "faq",
+      "blockName": null,
+      "items": [
+       {
+        "id": "6b087147bb5dd40a0f68aff1",
+        "title": "Zijn jullie dan niet mijn concurrent?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Nee. Wij verkopen geen ontwerp. Komt er een klant bij ons die een ontwerper zoekt, dan verwijzen we door naar een partner. We hebben jullie nodig: een hostingbedrijf zonder iets om te hosten is niets.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087147bb5dd40a0f68aff2",
+        "title": "Ik bouw zelf websites. Is dit dan iets voor mij?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Eerlijk gezegd minder. Dit werkt als bouwen niet is wat je wilt doen: als het het deel is dat je week opeet en niet betaalt zoals ontwerpen betaalt. Bouw je graag, blijf dan bouwen.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087147bb5dd40a0f68aff3",
+        "title": "Wat als jullie omvallen?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "De klant is eigenaar van de site en de data. Dat is contractueel, geen belofte.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087147bb5dd40a0f68aff4",
+        "title": "Mag ik het als mijn eigen dienst verkopen?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Ja. Doorverkoop en eigen branding zijn toegestaan. Factureer je zelf, dan bepaal je je eigen prijs en desgewenst je eigen abonnementsvorm, en je mag Rinsly noemen zoals je Cloudflare noemt: hosting bij Rinsly. De overeenkomst blijft tussen Rinsly en de eindklant.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b087147bb5dd40a0f68aff5",
+        "title": "Wat kost het mij?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "De basis van het aandeel is 0%. Partners leveren een design system aan; de tool is aan jullie, en dat verandert het percentage niet. Eenmalige bouwkosten en meerwerk worden niet gedeeld.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       }
+      ],
+      "blockType": "accordion",
+      "header": {
+       "eyebrow": "Veelgestelde vragen",
+       "title": "Eerlijk antwoord",
+       "subtitle": null,
+       "intro": null
+      }
+     },
+     {
+      "id": "6b087147bb5dd40a0f68aff7",
+      "eyebrow": "Aan de slag",
+      "title": "Zullen we het gewoon bespreken?",
+      "text": "Vertel wat je maakt en hoe je het nu oplevert. Past het niet, dan zeggen we dat.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Neem contact op",
+       "variant": "primary",
+       "type": "internal",
+       "page": "@contact",
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     }
+    ]
+   },
+   "en": {
+    "title": "Partner programme",
+    "meta": {
+     "title": "Partner programme for design studios: we build and host · Rinsly",
+     "description": "You design. We build and host. A share of the recurring revenue for as long as the client stays, up to 35%, composed from what you take on.",
+     "image": null,
+     "noindex": false
+    },
+    "layout": [
+     {
+      "id": "6b08714bbb5dd40a0f68affa",
+      "variant": "offset",
+      "anchor": null,
+      "blockName": null,
+      "buttons": [
+       {
+        "id": "6b08714bbb5dd40a0f68aff8",
+        "label": "Request a partner call",
+        "variant": "primary",
+        "type": "internal",
+        "page": "@contact",
+        "url": null,
+        "anchor": null,
+        "newTab": false
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68aff9",
+        "label": "See the ladder",
+        "variant": "secondary",
+        "type": "internal",
+        "page": "@partnerprogramma",
+        "url": null,
+        "anchor": "ladder",
+        "newTab": false
+       }
+      ],
+      "blockType": "hero",
+      "header": {
+       "eyebrow": "Partner programme",
+       "title": "Your invoice, your price, your brand",
+       "intro": "Reselling and your own branding are allowed. If you invoice the end client yourself, you buy from Rinsly at list minus your percentage, put design and hosting on one invoice, and set the price and your own tiers if you want. You may name Rinsly the way anyone names Cloudflare: hosting at Rinsly. The percentage is the same number on both invoice routes, from 0% to 35% of the recurring subscription revenue excluding VAT, per settled invoice."
+      }
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b007",
+      "anchor": "ladder",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b08714bbb5dd40a0f68affc",
+        "icon": "IconTargetArrow",
+        "title": "+10% Exclusivity",
+        "description": "New client work and updates go to Rinsly. Clients already hosted elsewhere stay where they are. A big update (rebuild, migration, redesign, substantial expansion) triggers a migration conversation.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68affb",
+          "text": "Choice"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68affe",
+        "icon": "IconRefresh",
+        "title": "+5% Relationship management",
+        "description": "The partner is the first line. The client calls the partner; the partner files a ticket. Rinsly does no direct client contact.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68affd",
+          "text": "Choice"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b000",
+        "icon": "IconBolt",
+        "title": "+5% Marketing",
+        "description": "The partner names and sells Rinsly as their hosting partner.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68afff",
+          "text": "Choice"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b002",
+        "icon": "IconPackages",
+        "title": "+5% Portfolio above €1.000 a month",
+        "description": "Recurring subscription revenue above €1.000 a month.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b001",
+          "text": "Measured"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b004",
+        "icon": "IconRocket",
+        "title": "+5% Portfolio above €5.000 a month",
+        "description": "Recurring subscription revenue above €5.000 a month.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b003",
+          "text": "Measured"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b006",
+        "icon": "IconSeeding",
+        "title": "+5% Portfolio above €25.000 a month",
+        "description": "Recurring subscription revenue above €25.000 a month.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b005",
+          "text": "Measured"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "Revenue share",
+       "title": "The ladder, from 0% to 35%",
+       "intro": "The share is not negotiated per partner: it is composed from this fixed ladder. The base is 0%. The volume levels are cumulative, so the ladder tops out at 35%."
+      }
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b008",
+      "content": {
+       "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The base is 0%. A partner who carries no responsibilities earns nothing. That is deliberate: the percentage pays for work that continues every month, not for an introduction made once. It is therefore paid per invoice: every invoice the client settles, for as long as they stay and the partner carries the duty.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The base is the recurring subscription revenue excluding VAT, per invoice settled. One-off build fees and meerwerk are not shared.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Measured monthly on active subscriptions. A yearly plan counts as a twelfth. A level reached applies at once. A level is lost only after two consecutive measurements below the threshold: one grace month.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Partners deliver a design system; the tool is up to you. It does not change the percentage.",
+            "version": 1
+           }
+          ]
+         }
+        ]
+       }
+      },
+      "width": "wide",
+      "anchor": "basis",
+      "blockName": null,
+      "blockType": "richText",
+      "header": {
+       "eyebrow": "The base",
+       "title": "Recurring subscription revenue, per settled invoice",
+       "intro": null
+      }
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b015",
+      "anchor": "waarom",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b08714bbb5dd40a0f68b00b",
+        "icon": "IconPackages",
+        "title": "One engine, every site",
+        "description": "Every site shares one engine and keeps its own design. A security fix is made once and rolled out to every client at once.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b009",
+          "text": "No plugin sprawl"
+         },
+         {
+          "id": "6b08714bbb5dd40a0f68b00a",
+          "text": "Fixed in one release"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b00e",
+        "icon": "IconBrush",
+        "title": "From design system to production",
+        "description": "We build from the design system: type scale, spacing and motion live in the engine, so the design survives the build.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b00c",
+          "text": "Next.js with Rinsly CMS"
+         },
+         {
+          "id": "6b08714bbb5dd40a0f68b00d",
+          "text": "Checked before it goes live"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b011",
+        "icon": "IconBolt",
+        "title": "Measured speed",
+        "description": "Performance is not a marketing word but a measurement. Five grades on any URL, free through our website check.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b00f",
+          "text": "Edge hosting, no WordPress bloat"
+         },
+         {
+          "id": "6b08714bbb5dd40a0f68b010",
+          "text": "Free website check at /check"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b014",
+        "icon": "IconServer2",
+        "title": "Operations in hard numbers",
+        "description": "Limits in gigabytes and requests, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup). No \"generous storage\", no fine print.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b012",
+          "text": "Staging on every site"
+         },
+         {
+          "id": "6b08714bbb5dd40a0f68b013",
+          "text": "Client owns site and data"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "Why Rinsly",
+       "title": "Not another website builder",
+       "intro": "No theme, no page builder, no ten separate WordPress installs. One versioned engine for every site, and numbers instead of adjectives."
+      }
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b01c",
+      "anchor": "framer",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b08714bbb5dd40a0f68b018",
+        "icon": "IconBrush",
+        "title": "Framer fits a portfolio or a campaign",
+        "description": "Do you build the design yourself in Framer? Then you have a good tool for a portfolio or a campaign page. You are then responsible for build, management and support yourself.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b016",
+          "text": "Portfolio or showcase"
+         },
+         {
+          "id": "6b08714bbb5dd40a0f68b017",
+          "text": "Campaign page"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b01b",
+        "icon": "IconPackages",
+        "title": "Rinsly fits a studio that does not itself build and manage sites",
+        "description": "You design and deliver the design system. We build it as an application, host and maintain it, and you earn a share of the subscription, depending on what you take on (see the ladder).",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b019",
+          "text": "Build and hosting by Rinsly"
+         },
+         {
+          "id": "6b08714bbb5dd40a0f68b01a",
+          "text": "Management and updates by Rinsly"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "An honest comparison",
+       "title": "Framer or Rinsly?",
+       "intro": "It depends on what your client needs. A good conversation starts with which of the two fits."
+      }
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b01d",
+      "text": "Framer is a brand of its owner. Rinsly is not affiliated with Framer. Information about Framer checked on framer.com, 26 November 2026.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "note"
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b025",
+      "anchor": "hoe",
+      "blockName": null,
+      "cards": [
+       {
+        "id": "6b08714bbb5dd40a0f68b01f",
+        "icon": "IconBrush",
+        "title": "1. You design",
+        "description": "What you already do: the design system. Partners deliver a design system; the tool is up to you, and it does not change the percentage.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b01e",
+          "text": "You deliver the design system"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b021",
+        "icon": "IconCode",
+        "title": "2. We build and launch",
+        "description": "We turn it into a real application on our engine and take it live. The client’s agreement is with Rinsly.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b020",
+          "text": "Free client build on 36 months of hosting"
+         }
+        ]
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b024",
+        "icon": "IconRefresh",
+        "title": "3. We run it",
+        "description": "Edge hosting, SSL, uptime monitoring, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup), security and CMS updates, and rollout across every site.",
+        "features": [
+         {
+          "id": "6b08714bbb5dd40a0f68b022",
+          "text": "A share of the recurring subscription revenue"
+         },
+         {
+          "id": "6b08714bbb5dd40a0f68b023",
+          "text": "Build fees and meerwerk are not shared"
+         }
+        ]
+       }
+      ],
+      "blockType": "services",
+      "header": {
+       "eyebrow": "How it works",
+       "title": "You design, we do the rest",
+       "intro": null
+      }
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b026",
+      "kind": "figmaToProduction",
+      "eyebrow": "From design to live",
+      "title": "Three steps, and only one of them is yours",
+      "caption": "You deliver the design system. Rinsly builds it as a real application on the shared engine and takes it live, then runs edge hosting, SSL, uptime monitoring, daily backups (continuous point-in-time database restore via Cloudflare D1 Time Travel and a nightly media backup), security and CMS updates.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "diagram"
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b027",
+      "eyebrow": "Do the maths",
+      "title": "What would you earn from it?",
+      "intro": "Pick a plan, drag the number of clients and tick what you would take on. The rate and your share follow along.",
+      "footnote": "Each volume level is +5% and the levels are cumulative, so the ladder tops out at 35% of the recurring subscription revenue excluding VAT, per settled invoice. One-off build fees and meerwerk are not shared. Commission accrues when the invoice is settled, not when it is issued, and is paid on that client’s billing interval. This is an indication, not an offer.",
+      "anchor": "rekenen",
+      "blockName": null,
+      "blockType": "revenueCalculator"
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b028",
+      "content": {
+       "root": {
+        "type": "root",
+        "format": "",
+        "indent": 0,
+        "version": 1,
+        "direction": "ltr",
+        "children": [
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "The partner chooses who invoices. Do not infer it from the size of the studio. The end client’s agreement is with Rinsly. That is the default, and it carries the terms, the SLA, the processor agreement and the client’s ownership of the site and the data.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "list",
+          "listType": "bullet",
+          "tag": "ul",
+          "start": 1,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "listitem",
+            "value": 1,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Setup A, Rinsly-billed (default).",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " Rinsly invoices the end client at list. The partner invoices nothing. The percentage arrives as a commission, once the client has paid, on that client’s billing interval. The client’s price is list, set by Rinsly. The payment risk is Rinsly’s.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "listitem",
+            "value": 2,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 1,
+              "mode": "normal",
+              "style": "",
+              "text": "Setup B, partner-billed.",
+              "version": 1
+             },
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": " Rinsly invoices the partner at list minus their ladder percentage. The partner invoices their client: design and hosting on one invoice. The percentage is then a discount on the purchase. The client’s price is the partner’s own: they resell at a price they set, and at their own tiers if they want. The payment risk is the partner’s: they owe Rinsly either way.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "One number governs both. A 20% partner either receives 20% back or buys at 20% off. Either way Rinsly keeps €199,20 of a €249 Growth subscription. There is no separate wholesale price list.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "list",
+          "listType": "bullet",
+          "tag": "ul",
+          "start": 1,
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "listitem",
+            "value": 1,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Ladder progression is measured at list in both setups, so the invoice route never changes how fast a portfolio climbs the volume levels.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "listitem",
+            "value": 2,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "In setup B no commission is booked. The percentage was already taken off what the partner was charged. Paying both would be paying twice.",
+              "version": 1
+             }
+            ]
+           },
+           {
+            "type": "listitem",
+            "value": 3,
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Quota overages follow the same discount. The build fee does not: one-off build fees and meerwerk are never shared, so a partner-billed build is bought at list.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Payout follows the client’s money. Commission accrues when the client’s invoice is settled, not when it is issued: Rinsly never fronts a payment. It is paid on that client’s own billing interval. A monthly client means a monthly payout. A client paying a year up front pays the partner out for the year at once. Aggregated per partner per period: a partner with eleven monthly clients gets one statement, not eleven. In setup B there is nothing to pay out. Rinsly invoices the partner on that same interval, already net of their percentage.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "Reselling and own branding are allowed. A partner who invoices their own client is reselling: their own price, their own tiers if they want, and they may name Rinsly the way anyone names Cloudflare: hosting at Rinsly.",
+            "version": 1
+           }
+          ]
+         },
+         {
+          "type": "paragraph",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "textFormat": 0,
+          "textStyle": "",
+          "children": [
+           {
+            "type": "text",
+            "detail": 0,
+            "format": 0,
+            "mode": "normal",
+            "style": "",
+            "text": "What does not move is the agreement. The end client contracts with Rinsly on both routes. A partner can hand a client back without the client losing anything: same site, same terms, same price. Rinsly then picks up the invoicing and the support line. Rinsly never loses a client because a partner left.",
+            "version": 1
+           }
+          ]
+         }
+        ]
+       }
+      },
+      "width": "wide",
+      "anchor": "facturatie",
+      "blockName": null,
+      "blockType": "richText",
+      "header": {
+       "eyebrow": "Invoicing",
+       "title": "You choose who invoices the client",
+       "intro": null
+      }
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b029",
+      "kind": "invoicingRoutes",
+      "eyebrow": "Two routes",
+      "title": "Who sends which invoice",
+      "caption": "Setup A: Rinsly invoices the end client at list and pays the commission once that invoice is settled. Setup B: the partner invoices their own client and buys at list minus their ladder percentage. Either way the agreement runs between Rinsly and the end client.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "diagram"
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b02a",
+      "eyebrow": "Try our measurement",
+      "title": "Measure a site in half a minute",
+      "text": "Try the measurement yourself on any URL. Five grades, free and without an account.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Free website check",
+       "variant": "secondary",
+       "type": "external",
+       "page": null,
+       "url": "/check",
+       "anchor": null,
+       "newTab": false
+      }
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b030",
+      "anchor": "faq",
+      "blockName": null,
+      "items": [
+       {
+        "id": "6b08714bbb5dd40a0f68b02b",
+        "title": "Aren’t you my competitor?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "No: we don’t sell design. If a client comes to us needing a designer, we refer them to a partner. We need you to exist: a hosting company with nothing to host is nothing.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b02c",
+        "title": "I build websites myself. Is this for me?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Honestly, less so. This works when building isn’t what you want to be doing: when it’s the part that eats your week and doesn’t pay like design does. If you like building, keep building.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b02d",
+        "title": "What if you disappear?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "The client owns the site and the data. That is contractual, not a promise.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b02e",
+        "title": "Can I sell it as my own service?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "Yes. Reselling and your own branding are allowed. If you invoice, you set your own price and your own tiers if you want, and you may name Rinsly the way anyone names Cloudflare: hosting at Rinsly. The agreement stays between Rinsly and the end client.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       },
+       {
+        "id": "6b08714bbb5dd40a0f68b02f",
+        "title": "What does it cost me?",
+        "body": {
+         "root": {
+          "type": "root",
+          "format": "",
+          "indent": 0,
+          "version": 1,
+          "direction": "ltr",
+          "children": [
+           {
+            "type": "paragraph",
+            "format": "",
+            "indent": 0,
+            "version": 1,
+            "direction": "ltr",
+            "textFormat": 0,
+            "textStyle": "",
+            "children": [
+             {
+              "type": "text",
+              "detail": 0,
+              "format": 0,
+              "mode": "normal",
+              "style": "",
+              "text": "The base of the share is 0%. Partners deliver a design system; the tool is up to you, and it does not change the percentage. One-off build fees and meerwerk are not shared.",
+              "version": 1
+             }
+            ]
+           }
+          ]
+         }
+        }
+       }
+      ],
+      "blockType": "accordion",
+      "header": {
+       "eyebrow": "FAQ",
+       "title": "Straight answers",
+       "subtitle": null,
+       "intro": null
+      }
+     },
+     {
+      "id": "6b08714bbb5dd40a0f68b031",
+      "eyebrow": "Get started",
+      "title": "Shall we just talk it through?",
+      "text": "Tell us what you make and how you deliver it today. If it doesn’t fit, we’ll say so.",
+      "anchor": null,
+      "blockName": null,
+      "blockType": "cta",
+      "button": {
+       "label": "Get in touch",
+       "variant": "primary",
+       "type": "internal",
+       "page": "@contact",
+       "url": null,
+       "anchor": null,
+       "newTab": false
+      }
+     }
+    ]
+   }
+  },
+  "contact": {
+   "nl": {
+    "title": "Contact",
+    "meta": {
+     "title": "Contact opnemen · Rinsly in Woerden",
+     "description": "Neem contact op met Rinsly in Woerden: contact@rinsly.com. Vragen over partnerprogramma, hosting of een nieuwe website.",
+     "image": null,
+     "noindex": false
+    },
+    "layout": [
+     {
+      "id": "6b087194bb5dd40a0f68b106",
+      "variant": "quiet",
+      "anchor": null,
+      "blockName": null,
+      "buttons": [],
+      "blockType": "hero",
+      "header": {
+       "eyebrow": "Contact",
+       "title": "Waar kunnen we mee helpen?",
+       "intro": "Ontwerpstudio en nieuwsgierig naar het partnerprogramma, of ondernemer met een site in gedachten? Kies hieronder wie u bent, dan stellen we de juiste vragen en geen enkele overbodige."
+      }
+     },
+     {
+      "id": "6b087194bb5dd40a0f68b10a",
+      "showForm": true,
+      "anchor": "formulier",
+      "blockName": null,
+      "items": [
+       {
+        "id": "6b087194bb5dd40a0f68b107",
+        "kind": "email",
+        "label": "E-mail",
+        "value": "contact@rinsly.com"
+       },
+       {
+        "id": "6b087194bb5dd40a0f68b108",
+        "kind": "phone",
+        "label": "Telefoon",
+        "value": "+31 6 24118912"
+       }
+      ],
+      "buttons": [
+       {
+        "id": "6b087194bb5dd40a0f68b109",
+        "label": "Mail ons direct",
+        "variant": "secondary",
+        "type": "external",
+        "page": null,
+        "url": "mailto:contact@rinsly.com",
+        "anchor": null,
+        "newTab": false
+       }
+      ],
+      "blockType": "contact",
+      "header": {
+       "eyebrow": "Stuur een bericht",
+       "title": "Vertel wat u nodig heeft",
+       "intro": null
+      }
+     }
+    ]
+   },
+   "en": {
+    "title": "Contact",
+    "meta": {
+     "title": "Get in touch · Rinsly in Woerden",
+     "description": "Get in touch with Rinsly in Woerden, the Netherlands: contact@rinsly.com. Questions about the partner programme, hosting or a new website.",
+     "image": null,
+     "noindex": false
+    },
+    "layout": [
+     {
+      "id": "6b087195bb5dd40a0f68b10b",
+      "variant": "quiet",
+      "anchor": null,
+      "blockName": null,
+      "buttons": [],
+      "blockType": "hero",
+      "header": {
+       "eyebrow": "Contact",
+       "title": "What can we help with?",
+       "intro": "A design studio curious about the partner programme, or a business with a site in mind? Choose below who you are, then we ask the right questions and none of the pointless ones."
+      }
+     },
+     {
+      "id": "6b087195bb5dd40a0f68b10f",
+      "showForm": true,
+      "anchor": "formulier",
+      "blockName": null,
+      "items": [
+       {
+        "id": "6b087195bb5dd40a0f68b10c",
+        "kind": "email",
+        "label": "E-mail",
+        "value": "contact@rinsly.com"
+       },
+       {
+        "id": "6b087195bb5dd40a0f68b10d",
+        "kind": "phone",
+        "label": "Phone",
+        "value": "+31 6 24118912"
+       }
+      ],
+      "buttons": [
+       {
+        "id": "6b087195bb5dd40a0f68b10e",
+        "label": "Email us directly",
+        "variant": "secondary",
+        "type": "external",
+        "page": null,
+        "url": "mailto:contact@rinsly.com",
+        "anchor": null,
+        "newTab": false
+       }
+      ],
+      "blockType": "contact",
+      "header": {
+       "eyebrow": "Send a message",
+       "title": "Tell us what you need",
+       "intro": null
+      }
+     }
+    ]
+   }
+  }
+ },
+ "globals": {
+  "header": {
+   "nl": {
+    "navItems": [
+     {
+      "label": "Platform",
+      "type": "internal",
+      "page": "@platform",
+      "url": null,
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b5bb5dd40a0f68b12a"
+     },
+     {
+      "label": "Partnerprogramma",
+      "type": "internal",
+      "page": "@partnerprogramma",
+      "url": null,
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b5bb5dd40a0f68b12b"
+     },
+     {
+      "label": "Prijzen",
+      "type": "internal",
+      "page": "@prijzen",
+      "url": null,
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b5bb5dd40a0f68b12c"
+     },
+     {
+      "label": "Over ons",
+      "type": "internal",
+      "page": "@over",
+      "url": null,
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b5bb5dd40a0f68b12d"
+     },
+     {
+      "label": "Websitecheck",
+      "type": "external",
+      "page": null,
+      "url": "/check",
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b5bb5dd40a0f68b12e"
+     }
+    ],
+    "cta": {
+     "label": "Contact",
+     "type": "internal",
+     "page": "@contact",
+     "url": null,
+     "anchor": "contact",
+     "newTab": false
+    }
+   },
+   "en": {
+    "navItems": [
+     {
+      "label": "Platform",
+      "type": "internal",
+      "page": "@platform",
+      "url": null,
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b7bb5dd40a0f68b12f"
+     },
+     {
+      "label": "Partner programme",
+      "type": "internal",
+      "page": "@partnerprogramma",
+      "url": null,
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b7bb5dd40a0f68b130"
+     },
+     {
+      "label": "Pricing",
+      "type": "internal",
+      "page": "@prijzen",
+      "url": null,
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b7bb5dd40a0f68b131"
+     },
+     {
+      "label": "About",
+      "type": "internal",
+      "page": "@over",
+      "url": null,
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b7bb5dd40a0f68b132"
+     },
+     {
+      "label": "Website check",
+      "type": "external",
+      "page": null,
+      "url": "/check",
+      "anchor": null,
+      "newTab": false,
+      "id": "6b0871b7bb5dd40a0f68b133"
+     }
+    ],
+    "cta": {
+     "label": "Contact",
+     "type": "internal",
+     "page": "@contact",
+     "url": null,
+     "anchor": "contact",
+     "newTab": false
+    }
+   }
+  },
+  "footer": {
+   "nl": {
+    "tagline": "Bouw & hosting voor ontwerpstudio’s. Uit Woerden.",
+    "address": null,
+    "phone": null,
+    "menuItems": [
+     {
+      "label": "Platform",
+      "url": "/nl/platform",
+      "id": "6b0871b9bb5dd40a0f68b134"
+     },
+     {
+      "label": "Partnerprogramma",
+      "url": "/nl/partnerprogramma",
+      "id": "6b0871b9bb5dd40a0f68b135"
+     },
+     {
+      "label": "Prijzen",
+      "url": "/nl/prijzen",
+      "id": "6b0871b9bb5dd40a0f68b136"
+     },
+     {
+      "label": "Website laten bouwen",
+      "url": "/nl/website",
+      "id": "6b0871b9bb5dd40a0f68b137"
+     },
+     {
+      "label": "Over ons",
+      "url": "/nl/over",
+      "id": "6b0871b9bb5dd40a0f68b138"
+     },
+     {
+      "label": "Websitecheck",
+      "url": "/check",
+      "id": "6b0871b9bb5dd40a0f68b139"
+     },
+     {
+      "label": "Contact",
+      "url": "/nl/contact",
+      "id": "6b0871b9bb5dd40a0f68b13a"
+     }
+    ]
+   },
+   "en": {
+    "tagline": "Build & hosting for design studios. From Woerden.",
+    "address": null,
+    "phone": null,
+    "menuItems": [
+     {
+      "label": "Platform",
+      "url": "/en/platform",
+      "id": "6b0871bbbb5dd40a0f68b13d"
+     },
+     {
+      "label": "Partner programme",
+      "url": "/en/partnerprogramma",
+      "id": "6b0871bbbb5dd40a0f68b13e"
+     },
+     {
+      "label": "Pricing",
+      "url": "/en/prijzen",
+      "id": "6b0871bbbb5dd40a0f68b13f"
+     },
+     {
+      "label": "Get a website built",
+      "url": "/en/website",
+      "id": "6b0871bbbb5dd40a0f68b140"
+     },
+     {
+      "label": "About",
+      "url": "/en/over",
+      "id": "6b0871bbbb5dd40a0f68b141"
+     },
+     {
+      "label": "Website check",
+      "url": "/check",
+      "id": "6b0871bbbb5dd40a0f68b142"
+     },
+     {
+      "label": "Contact",
+      "url": "/en/contact",
+      "id": "6b0871bbbb5dd40a0f68b143"
+     }
+    ]
+   }
+  }
+ }
+}

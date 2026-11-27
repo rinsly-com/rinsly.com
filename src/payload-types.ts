@@ -692,7 +692,7 @@ export interface Offerte {
   bedrijf: string;
   naam: string;
   email: string;
-  subscription?: ('care' | 'beheerd' | 'partner' | 'opmaat') | null;
+  subscription?: ('care' | 'beheerd' | 'partner' | 'opmaat' | 'onbekend') | null;
   additions?: ('localization' | 'email' | 'design' | 'seo' | 'content' | 'other')[] | null;
   additionsOther?: string | null;
   bericht?: string | null;

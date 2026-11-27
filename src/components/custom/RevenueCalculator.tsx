@@ -5,79 +5,61 @@ import { useState } from 'react'
 import type { Locale } from '@rinsly-com/site-core'
 import { Section, SectionHeading } from '@rinsly-com/site-core/ui'
 
-import {
-  DUTY_PCT,
-  PARTNER_MAX_PCT,
-  VOLUME_STEP_PCT,
-  VOLUME_THRESHOLDS_EUR,
-  volumeLevels,
-} from '@/lib/partnerLadder'
+import { LADDER_V33, partnerRateV33, type RungsV33 } from '@/lib/partnerLadder'
 
 /**
- * What a partner would earn, worked out live.
+ * What a partner would earn, worked out live, on the terms v3.3 ladder
+ * (art. 5): Basis 10% · Eerste lijn +10% · Verkoop +10% · Volume +5% from
+ * five paying attributed end clients, maximum 35%.
  *
- * The percentages come from `src/lib/partnerLadder.ts`, which mirrors
- * Ledger's tenantRate.ts and the contract generator. If the model changes,
- * all three change together: a calculator that promises a rate the
- * administration will not pay is the worst bug this page could have.
- *
- * Two details that are easy to get wrong and are deliberate:
- *  - the volume thresholds are exclusive ("above €1.000 a month"), so a
- *    portfolio sitting exactly on €1.000 has not levelled up;
- *  - each measured level is +5% and the levels stack, so three levels add
- *    15 points of volume. Together with the choices the cap is 35%.
+ * The percentages come from `LADDER_V33` in `src/lib/partnerLadder.ts`, which
+ * must match Ledger's tenantRate.ts and the contract generator. A calculator
+ * that promises a rate the administration will not pay is the worst bug this
+ * page could have.
  */
 
-type Duty = keyof typeof DUTY_PCT
+type Rung = keyof RungsV33
 
-const DUTY_KEYS = Object.keys(DUTY_PCT) as Duty[]
-
-/** Plan prices ex VAT per month. Care/Managed/Growth/Op maat. */
+/** Plan prices ex VAT per month. Care/Managed/Growth/Op maat (Op maat shown as "vanaf", PA-14). */
 const PLANS = [
-  { key: 'care', label: 'Care', monthly: 49 },
-  { key: 'managed', label: 'Managed', monthly: 99 },
-  { key: 'growth', label: 'Growth', monthly: 249 },
-  { key: 'opmaat', label: 'Op maat', monthly: 499 },
+  { key: 'care', label: { nl: 'Care', en: 'Care' }, monthly: 49, from: false },
+  { key: 'managed', label: { nl: 'Managed', en: 'Managed' }, monthly: 99, from: false },
+  { key: 'growth', label: { nl: 'Growth', en: 'Growth' }, monthly: 249, from: false },
+  { key: 'opmaat', label: { nl: 'Op maat', en: 'Custom' }, monthly: 499, from: true },
 ] as const
 
 const COPY = {
   nl: {
     plan: 'Pakket',
+    from: 'vanaf',
     clients: 'Klanten die je bij ons onderbrengt',
     duties: 'Wat je op je neemt',
-    exclusive: 'Exclusiviteit: nieuw klantwerk gaat naar Rinsly',
-    relation: 'Relatiebeheer: jij bent de eerste lijn',
-    marketing: 'Marketing: je noemt ons als hostingpartner',
+    firstLine: 'Eerste lijn',
+    sales: 'Verkoop',
     rate: 'Jouw tarief',
-    fromDuties: 'uit verantwoordelijkheden',
-    fromVolume: 'uit omzetniveau',
+    base: 'Basis',
+    volume: 'Volume',
     portfolio: 'Portfolio-omzet',
     perMonth: 'per maand',
     perYear: 'per jaar',
     yours: 'Jouw deel',
-    max: 'maximum bereikt',
-    nextLevel: (amount: string) => `Nog ${amount} per maand tot het volgende niveau (+5%).`,
-    zero:
-      'Zonder verantwoordelijkheden is het tarief 0%. Dat is geen truc: de vergoeding betaalt niet voor een introductie die je één keer doet, maar voor werk dat elke maand doorgaat. Vink hierboven aan wat je oppakt.',
+    volumeRule: 'Volume telt vanaf vijf betalende toegeschreven eindklanten.',
   },
   en: {
     plan: 'Plan',
+    from: 'from',
     clients: 'Clients you bring to us',
     duties: 'What you take on',
-    exclusive: 'Exclusivity: new client work comes to Rinsly',
-    relation: 'Relationship management: you are the first line',
-    marketing: 'Marketing: you name us as your hosting partner',
+    firstLine: 'First line',
+    sales: 'Sales',
     rate: 'Your rate',
-    fromDuties: 'from responsibilities',
-    fromVolume: 'from volume level',
+    base: 'Base',
+    volume: 'Volume',
     portfolio: 'Portfolio revenue',
     perMonth: 'per month',
     perYear: 'per year',
     yours: 'Your share',
-    max: 'maximum reached',
-    nextLevel: (amount: string) => `${amount} more per month to the next level (+5%).`,
-    zero:
-      'With no responsibilities the rate is 0%. That is not a trick: the fee does not pay for an introduction you make once, it pays for work that continues every month. Tick what you would take on above.',
+    volumeRule: 'Volume counts from five paying attributed end clients.',
   },
 } as const
 
@@ -105,33 +87,26 @@ type Props = {
 }
 
 export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: Props) {
-  const c = COPY[locale === 'en' ? 'en' : 'nl']
+  const lang = locale === 'en' ? 'en' : 'nl'
+  const c = COPY[lang]
   const [planKey, setPlanKey] = useState<string>('managed')
-  const [clients, setClients] = useState(10)
-  const [duties, setDuties] = useState<Record<Duty, boolean>>({
-    exclusive: true,
-    relation: true,
-    marketing: false,
-  })
+  const [clients, setClients] = useState(3)
+  const [rungs, setRungs] = useState<RungsV33>({ firstLine: true, sales: false })
 
   const plan = PLANS.find((p) => p.key === planKey) ?? PLANS[1]
   const portfolio = plan.monthly * clients
-
-  const dutyPct = DUTY_KEYS.reduce(
-    (sum, key) => sum + (duties[key] ? DUTY_PCT[key] : 0),
-    0,
-  )
-  const tier = volumeLevels(portfolio)
-  const volumePct = tier * VOLUME_STEP_PCT
-  const ratePct = Math.min(dutyPct + volumePct, PARTNER_MAX_PCT)
-
+  const rate = partnerRateV33(rungs, clients)
+  const ratePct = rate.total
   const perMonth = (portfolio * ratePct) / 100
-  const atMax = ratePct >= PARTNER_MAX_PCT
-  // tier 3 is past the last threshold, so the lookup is absent even though the tuple type is not.
-  const nextThreshold = VOLUME_THRESHOLDS_EUR[tier] as number | undefined
-  const toNext = nextThreshold ? nextThreshold - portfolio + 1 : null
 
-  const toggle = (key: Duty) => { setDuties((d) => ({ ...d, [key]: !d[key] })); }
+  const toggle = (key: Rung) => { setRungs((r) => ({ ...r, [key]: !r[key] })); }
+  const rungPct: Record<Rung, number> = { firstLine: LADDER_V33.firstLinePct, sales: LADDER_V33.salesPct }
+  const breakdown = [
+    [c.base, rate.base],
+    [c.firstLine, rate.firstLine],
+    [c.sales, rate.sales],
+    [c.volume, rate.volume],
+  ] as const
 
   return (
     <Section className="py-14 sm:py-20">
@@ -158,8 +133,9 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
                         : 'border-hair text-ink hover:border-accent/50',
                     ].join(' ')}
                   >
-                    {p.label}
+                    {p.label[lang]}
                     <span className={selected ? 'ml-2 opacity-80' : 'ml-2 text-muted'}>
+                      {p.from ? `${c.from} ` : ''}
                       {euro(p.monthly, locale)}
                     </span>
                   </button>
@@ -194,21 +170,20 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
             <div className="flex flex-col gap-2">
               {(
                 [
-                  ['exclusive', c.exclusive],
-                  ['relation', c.relation],
-                  ['marketing', c.marketing],
+                  ['firstLine', c.firstLine],
+                  ['sales', c.sales],
                 ] as const
               ).map(([key, label]) => (
                 <label
                   key={key}
                   className={[
                     'flex cursor-pointer items-center gap-3 rounded-xl border px-4 py-2.5 text-sm transition-colors',
-                    duties[key] ? 'border-accent bg-accent/8' : 'border-hair hover:border-accent/50',
+                    rungs[key] ? 'border-accent bg-accent/8' : 'border-hair hover:border-accent/50',
                   ].join(' ')}
                 >
                   <input
                     type="checkbox"
-                    checked={duties[key]}
+                    checked={rungs[key]}
                     onChange={() => { toggle(key); }}
                     className="sr-only"
                   />
@@ -216,7 +191,7 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
                     aria-hidden
                     className={[
                       'flex size-5 shrink-0 items-center justify-center rounded-md border transition-all',
-                      duties[key]
+                      rungs[key]
                         ? 'border-accent bg-accent text-white'
                         : 'border-hair bg-paper text-transparent',
                     ].join(' ')}
@@ -233,7 +208,7 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
                   </span>
                   <span className="min-w-0 flex-1 text-ink">{label}</span>
                   <span className="flex-none text-xs font-bold tabular-nums text-accent">
-                    +{DUTY_PCT[key]}%
+                    +{rungPct[key]}%
                   </span>
                 </label>
               ))}
@@ -249,14 +224,9 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
               <span className="text-[52px] font-extrabold leading-none tabular-nums tracking-[-0.03em] text-accent">
                 {ratePct}%
               </span>
-              {atMax && (
-                <span className="rounded-pill bg-accent/12 px-2 py-0.5 text-[10.5px] font-bold uppercase tracking-wider text-accent ring-1 ring-inset ring-accent/25">
-                  {c.max}
-                </span>
-              )}
             </div>
             <p className="mt-1.5 text-xs text-muted tabular-nums">
-              {dutyPct}% {c.fromDuties} · {volumePct}% {c.fromVolume}
+              {breakdown.map(([label, pct]) => `${label} ${pct}%`).join(' · ')}
             </p>
           </div>
 
@@ -281,15 +251,7 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
             </div>
           </dl>
 
-          {ratePct === 0 ? (
-            <p className="text-xs leading-relaxed text-muted">{c.zero}</p>
-          ) : (
-            toNext !== null && (
-              <p className="text-xs leading-relaxed text-muted">
-                {c.nextLevel(euro(toNext, locale))}
-              </p>
-            )
-          )}
+          <p className="text-xs leading-relaxed text-muted">{c.volumeRule}</p>
         </div>
       </div>
 

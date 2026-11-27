@@ -3,6 +3,8 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 
 import {
+  LADDER_V33,
+  partnerRateV33,
   DUTY_PCT,
   EXAMPLE_PARTNER_PCT,
   EXAMPLE_RINSLY_KEEPS,
@@ -110,5 +112,33 @@ describe('partner programme copy', () => {
     expect(seed).not.toContain('partnerportaal')
     expect(seed).not.toContain('ongeveer €149')
     expect(seed).not.toContain('hostingcontract')
+  })
+})
+
+describe('terms v3.3 art. 5 ladder (public calculator)', () => {
+  it('has the v3.3 numbers: base 10, first line +10, sales +10, volume +5 from 5 clients, max 35', () => {
+    expect(LADDER_V33).toEqual({ basePct: 10, firstLinePct: 10, salesPct: 10, volumePct: 5, volumeMinClients: 5, maxPct: 35 })
+  })
+
+  it('pays the 10% base on every attributed, paying site, with no rung ticked', () => {
+    expect(partnerRateV33({ firstLine: false, sales: false }, 1).total).toBe(10)
+  })
+
+  it('adds first line and sales only while ticked', () => {
+    expect(partnerRateV33({ firstLine: true, sales: false }, 2).total).toBe(20)
+    expect(partnerRateV33({ firstLine: true, sales: true }, 2).total).toBe(30)
+  })
+
+  it('adds volume from five paying attributed clients, not four', () => {
+    expect(partnerRateV33({ firstLine: false, sales: false }, 4).volume).toBe(0)
+    expect(partnerRateV33({ firstLine: false, sales: false }, 5).volume).toBe(5)
+  })
+
+  it('tops out at 35% with every rung', () => {
+    expect(partnerRateV33({ firstLine: true, sales: true }, 60)).toEqual({ base: 10, firstLine: 10, sales: 10, volume: 5, total: 35 })
+  })
+
+  it('pays nothing without a paying client', () => {
+    expect(partnerRateV33({ firstLine: true, sales: true }, 0).total).toBe(0)
   })
 })

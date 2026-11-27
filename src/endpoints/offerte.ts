@@ -9,7 +9,7 @@ import { asJsonObject, asText, readRequestJson } from '../lib/json'
 import { offerteFieldsTooLong, offerteMailSubject, offerteNotificationText } from '../lib/submissionLimits'
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-const SUBSCRIPTIONS = ['care', 'beheerd', 'partner', 'opmaat'] as const
+const SUBSCRIPTIONS = ['care', 'beheerd', 'partner', 'opmaat', 'onbekend'] as const
 const ADDITIONS = ['localization', 'email', 'design', 'seo', 'content', 'other'] as const
 
 const text = z.unknown().optional().transform((value) => asText(value))
