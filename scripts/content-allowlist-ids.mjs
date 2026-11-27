@@ -53,7 +53,9 @@ export const PINNED_BLOCKS = [
   },
 ]
 
-const ID_RE = /^[A-Za-z0-9][A-Za-z0-9_-]{0,63}$/
+// Payload row ids on D1 are 24-char lowercase hex (ObjectId-style). Anything else is refused.
+const ID_RE = /^[0-9a-f]{24}$/
+const FETCH_TIMEOUT_MS = 15_000
 const DEFAULT_URL = 'https://accp.rinsly.com'
 const OUTPUT = resolve(dirname(fileURLToPath(import.meta.url)), '../src/contentAllowlist.ts')
 
@@ -141,7 +143,10 @@ async function fetchResponses(origin) {
       draft: 'false',
       locale,
     }).toString()
-    const res = await fetch(url, { headers: { accept: 'application/json' } })
+    const res = await fetch(url, {
+      headers: { accept: 'application/json' },
+      signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+    })
     if (!res.ok)
       throw new Error(`GET ${url.origin}${url.pathname} (${locale}) -> HTTP ${res.status}`)
     out[locale] = await res.json()

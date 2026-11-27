@@ -208,8 +208,8 @@ function response(locale: 'nl' | 'en', ids: { website: string; contact: string }
 }
 
 const fixture = (): Responses => ({
-  nl: response('nl', { website: 'nlweb01', contact: 'nlcon02' }),
-  en: response('en', { website: 'enweb01', contact: 'encon02' }),
+  nl: response('nl', { website: 'aaaaaaaaaaaaaaaaaaaa0001', contact: 'bbbbbbbbbbbbbbbbbbbb0001' }),
+  en: response('en', { website: 'aaaaaaaaaaaaaaaaaaaa0002', contact: 'bbbbbbbbbbbbbbbbbbbb0002' }),
 })
 
 function pageOf(res: Responses, locale: 'nl' | 'en', slug: string): Doc {
@@ -229,10 +229,10 @@ function blockOf(res: Responses, locale: 'nl' | 'en', slug: string, blockType: s
 describe('scripts/content-allowlist-ids.mjs', () => {
   it('pins the website hero and the contact block heading, per locale, in a fixed order', () => {
     expect(collectPins(fixture()).map((pin) => pin.path)).toEqual([
-      'layout.nlweb01.header.title',
-      'layout.enweb01.header.title',
-      'layout.nlcon02.header.title',
-      'layout.encon02.header.title',
+      'layout.aaaaaaaaaaaaaaaaaaaa0001.header.title',
+      'layout.aaaaaaaaaaaaaaaaaaaa0002.header.title',
+      'layout.bbbbbbbbbbbbbbbbbbbb0001.header.title',
+      'layout.bbbbbbbbbbbbbbbbbbbb0002.header.title',
     ])
   })
 
@@ -256,17 +256,17 @@ describe('scripts/content-allowlist-ids.mjs', () => {
     expect(paths).toEqual([
       'meta.title',
       'meta.description',
-      'layout.nlweb01.header.title',
-      'layout.enweb01.header.title',
-      'layout.nlcon02.header.title',
-      'layout.encon02.header.title',
+      'layout.aaaaaaaaaaaaaaaaaaaa0001.header.title',
+      'layout.aaaaaaaaaaaaaaaaaaaa0002.header.title',
+      'layout.bbbbbbbbbbbbbbbbbbbb0001.header.title',
+      'layout.bbbbbbbbbbbbbbbbbbbb0002.header.title',
     ])
     const list = parseAllowlist({ collections: { pages: paths } })
     expect(list).not.toBeNull()
     const ok = (path: string) => isAllowlisted(list as never, target(path))
     for (const path of paths) expect(ok(path)).toBe(true)
     expect(ok('layout.b2.header.title')).toBe(false)
-    expect(ok('layout.nlweb01.header.intro')).toBe(false)
+    expect(ok('layout.aaaaaaaaaaaaaaaaaaaa0001.header.intro')).toBe(false)
   })
 
   it('stops instead of guessing when a page or block is missing or ambiguous', () => {
@@ -298,6 +298,12 @@ describe('scripts/content-allowlist-ids.mjs', () => {
     const badId = fixture()
     blockOf(badId, 'nl', 'website', 'hero').id = '../x'
     expect(() => collectPins(badId)).toThrow(/no usable row id/)
+
+    for (const bad of ['42', 'AAAAAAAAAAAAAAAAAAAA0001', 'aaaaaaaaaaaaaaaaaaaa001']) {
+      const res = fixture()
+      blockOf(res, 'nl', 'website', 'hero').id = bad
+      expect(() => collectPins(res)).toThrow(/no usable row id/)
+    }
 
     const noId = fixture()
     delete blockOf(noId, 'nl', 'website', 'hero').id
