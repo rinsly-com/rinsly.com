@@ -39,10 +39,19 @@ writes in `deploy:database`.
 5. **After Yaron's OK**: Actions → "Publish refactor drafts (accp)":
    first a run with `apply` off (dry run, must show 8 × `would publish`),
    then with `apply` on and confirm `publish-4-pages-and-go-live`. The
-   script refuses to write anything unless all eight page-locales are still
-   exactly in the state the migration left (latest draft = migrated copy by
-   content hash, published = snapshot); already published ones are skipped,
-   so a re-run is a no-op. accp is now live with the new copy.
+   script refuses to write anything unless all eight page-locales are
+   exactly in the state `src/lib/contentRefactor/publish-manifest.json`
+   expects (sha256 of the latest draft = the manifest's `draft` hash, the
+   published version = one of its `published` hashes); already published
+   ones are skipped, so a re-run is a no-op. accp is now live with the new
+   copy.
+
+   **The manifest is the contract.** Today it holds the #121 migration
+   output. A PR that changes the drafts before publish (the redesign) runs
+   `pnpm content:publish-refactor:manifest` (or writes its own hashes with
+   `fullHash`) and commits the new manifest in the same PR; the unit test
+   `publishRefactor.unit.spec.ts` "the committed manifest is ..." then needs
+   that PR's expected state too.
 6. Then merge `develop` → `main`: deploy-prod builds the v3.3 calculator, the
    contact form text and the published copy together. **Hold `develop` →
    `main`, the admin Deploy button and any admin publish between step 1 and

@@ -4,7 +4,10 @@ import type { Obj } from '@/lib/contentRefactor/edit'
 import type { Locale, PageDoc, PageSlug } from '@/lib/contentRefactor/pages'
 import {
   contentHash,
+  fullHash,
   migratedPage,
+  migrationManifest,
+  PUBLISH_MANIFEST,
   planPublish,
   PUBLISH_CONFIRM,
   runPublish,
@@ -66,14 +69,14 @@ describe('publish-refactor guard (planPublish)', () => {
     const plan = planPublish([{ slug: 'contact', locale: 'nl', latestDraft: edited, published: snapshotPage('contact', 'nl') }])
     expect(plan.blocked[0]).toContain(contentHash(edited))
     expect(plan.blocked[0]).toContain(contentHash(migratedPage('contact', 'nl')))
-    expect(plan.blocked[0]).toMatch(/edited since the migration/)
+    expect(plan.blocked[0]).toMatch(/not the expected draft/)
   })
 
   it('published version changed by someone else: blocked', () => {
     const live = clone(snapshotPage('home', 'en'))
     live.meta = { ...live.meta, description: 'changed live' }
     const plan = planPublish([{ slug: 'home', locale: 'en', latestDraft: migratedPage('home', 'en'), published: live }])
-    expect(plan.blocked[0]).toMatch(/neither the snapshot nor the migrated copy/)
+    expect(plan.blocked[0]).toMatch(/not one the manifest allows replacing/)
   })
 
   it('already published: counted as done, not republished', () => {
@@ -84,6 +87,32 @@ describe('publish-refactor guard (planPublish)', () => {
 
   it('the hash ignores key order and D1 nulls, like sameValue', () => {
     expect(contentHash({ b: 1, a: [{ x: 'y', blockName: null }] })).toBe(contentHash({ a: [{ x: 'y' }], b: 1, c: null }))
+  })
+})
+
+describe('publish-refactor manifest', () => {
+  it('the committed manifest is the #121 migration output (regenerate with content:publish-refactor:manifest)', () => {
+    expect(PUBLISH_MANIFEST.pages).toEqual(migrationManifest().pages)
+    expect(Object.keys(PUBLISH_MANIFEST.pages).sort()).toEqual(SLUGS.flatMap((slug) => LOCALES.map((locale) => key(slug, locale))).sort())
+  })
+
+  it('a different manifest (e.g. a redesign) publishes its own drafts and refuses the #121 ones', async () => {
+    const db = migratedDb()
+    const redesigned = clone(migratedPage('home', 'nl'))
+    redesigned.meta = { ...redesigned.meta, title: 'Redesign' }
+    db[key('home', 'nl')].draft = redesigned
+    const manifest = clone(PUBLISH_MANIFEST)
+    expect(planPublish([{ slug: 'home', locale: 'nl', latestDraft: redesigned, published: snapshotPage('home', 'nl') }]).blocked).toHaveLength(1)
+    manifest.pages['home.nl'].draft = fullHash(redesigned)
+    const publisher = fakePublisher(db)
+    const result = await runPublish({ source: fakeSource(db), publisher, apply: true, confirm: PUBLISH_CONFIRM, manifest, log: silent })
+    expect(result.published).toHaveLength(8)
+    expect(fullHash(db[key('home', 'nl')].published)).toBe(fullHash(redesigned))
+  })
+
+  it('a page-locale missing from the manifest blocks the run', () => {
+    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: migratedPage('home', 'nl'), published: snapshotPage('home', 'nl') }], { pages: {} })
+    expect(plan.blocked[0]).toMatch(/not in the publish manifest/)
   })
 })
 

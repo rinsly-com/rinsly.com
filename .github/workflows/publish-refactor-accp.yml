@@ -11,9 +11,9 @@ name: Publish refactor drafts (accp)
 #
 # Dry run by default: leave "apply" off to see the plan in the log. To write,
 # tick "apply" AND type the confirmation phrase publish-4-pages-and-go-live.
-# The script refuses to write anything unless every page is still exactly in
-# the state the migration left (latest draft = migrated copy, published =
-# snapshot, or already published).
+# The script refuses to write anything unless every page is exactly in the
+# state src/lib/contentRefactor/publish-manifest.json expects (draft hash,
+# allowed pre-publish hashes), or already published.
 #
 # NODE_ENV=production makes the Payload CLI use the remote D1 binding in
 # wrangler.jsonc (accp). Same mechanism and secrets as seed-accp.yml, so no new

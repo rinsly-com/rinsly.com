@@ -30,7 +30,8 @@
     "test:unit": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.unit.config.mts",
     "lint:content": "node scripts/lint-content.mjs",
     "content:publish-refactor": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/publish-refactor.ts",
-    "content:publish-refactor:check": "tsx scripts/publish-refactor.ts --from-public-api=https://accp.rinsly.com"
+    "content:publish-refactor:check": "tsx scripts/publish-refactor.ts --from-public-api=https://accp.rinsly.com",
+    "content:publish-refactor:manifest": "tsx scripts/publish-refactor-manifest.ts"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
