@@ -5,6 +5,7 @@ import {
   emailHash,
   mintUnsubscribeToken,
   normalizeEmail,
+  UNSUBSCRIBE_MAC_LENGTH,
   verifyUnsubscribeToken,
 } from '../../src/lib/unsubscribeToken'
 
@@ -63,6 +64,8 @@ describe('unsubscribe token', () => {
     })
     const hash = 'Ov1dVkRaLQ8uiXkYwiYIIoAwmbtZJ-_41d3vKIFFnhk'
     const signature = 'iC9WvieAXU-8K-M0Nih7VL0-99IxbE0iuBryptDIc28'
+    expect(hash).toHaveLength(UNSUBSCRIBE_MAC_LENGTH)
+    expect(signature).toHaveLength(UNSUBSCRIBE_MAC_LENGTH)
     const tampered = `v1.${hash.slice(0, -1)}A.${signature}`
     expect(await verifyUnsubscribeToken(tampered, VECTOR.secret)).toEqual({
       ok: false,
@@ -72,6 +75,23 @@ describe('unsubscribe token', () => {
       ok: false,
       reason: 'invalid',
     })
+  })
+
+  it('rejects a bad charset, the wrong length, an extra segment, or an empty part as invalid', async () => {
+    const hash = 'Ov1dVkRaLQ8uiXkYwiYIIoAwmbtZJ-_41d3vKIFFnhk'
+    const signature = 'iC9WvieAXU-8K-M0Nih7VL0-99IxbE0iuBryptDIc28'
+    const malformed = {
+      'bad charset': `v1.${hash.slice(0, -1)}+.${signature}`,
+      'wrong length': `v1.${hash.slice(0, -1)}.${signature}`,
+      'extra segment': `v1.${hash}.${signature}.extra`,
+      'empty part': `v1..${signature}`,
+    }
+    for (const [label, token] of Object.entries(malformed)) {
+      expect(await verifyUnsubscribeToken(token, VECTOR.secret), label).toEqual({
+        ok: false,
+        reason: 'invalid',
+      })
+    }
   })
 
   it('fails closed when the secret is missing', async () => {

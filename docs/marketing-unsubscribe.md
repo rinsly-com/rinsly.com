@@ -41,6 +41,11 @@ Both values are HMAC-SHA256, base64url without padding, keyed by
 - `emailHash = HMAC-SHA256(secret, "unsub-id:v1:" || normalized_email)`
 - `signature = HMAC-SHA256(secret, "unsub-sig:v1:" || emailHash)`
 
+Each part is 43 characters of unpadded base64url (`[A-Za-z0-9_-]` only).
+Verify rejects a bad charset, the wrong length, an extra segment, or an
+empty part before any HMAC work. A well-formed signature is still compared
+in constant time.
+
 Normalized email: trim, lowercase, exactly one `@`, non-empty local and
 domain parts, no spaces. The mail script should normalize the same way
 (`send_smtp.normalize_recipient` already lowercases after parseaddr).
