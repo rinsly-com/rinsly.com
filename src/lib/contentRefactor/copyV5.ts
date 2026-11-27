@@ -119,7 +119,7 @@ export const V5 = {
     chipSuffix: s('Care, per maand, excl. btw', 'Care, a month, excl. VAT', ['en']),
     url: s('voorbeeld.uwbedrijf.nl', 'example.yourbusiness.com', ['en']),
     badge: s('Managed · Aanbevolen €99', 'Managed · Recommended €99', ['en']),
-    invoiceUrl: s('rinsly.com/prijzen', 'rinsly.com/en/pricing', ['nl', 'en']),
+    invoiceUrl: s('rinsly.com/prijzen', 'rinsly.com/en/prijzen', ['nl', 'en']),
     invoiceTitle: s('Maandelijks, excl. 21% btw', 'Monthly, excl. 21% VAT', ['nl', 'en']),
     indexationFaqTitle: s('Worden de prijzen geïndexeerd?', 'Are prices indexed?', ['en']),
   },

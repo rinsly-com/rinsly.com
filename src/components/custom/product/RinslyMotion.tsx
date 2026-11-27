@@ -11,7 +11,8 @@ import { usePathname } from 'next/navigation'
  *    <html>: return before GSAP is imported. Nothing is hidden in those
  *    cases (the hidden start states are CSS under `.anim` only).
  *  - transform and opacity only, inside one gsap.context that is reverted on
- *    every route change; `clearProps` after one-shot moves.
+ *    every route change. The end state stays inline (y 0, opacity 1): the CSS
+ *    start state under `.anim` would otherwise come back after the tween.
  *  - Every animated node sits in a box whose size is fixed in normal flow, so
  *    nothing here can shift layout (no CLS).
  *
@@ -55,7 +56,7 @@ export function RinslyMotion() {
 
         requestAnimationFrame(() => {
           if (frames.length) {
-            gsap.fromTo(frames, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out', clearProps: 'transform' })
+            gsap.fromTo(frames, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' })
           }
           if (phones.length) {
             gsap.fromTo(
@@ -68,7 +69,6 @@ export function RinslyMotion() {
                 duration: 0.8,
                 delay: 0.14,
                 ease: 'power3.out',
-                clearProps: 'transform',
                 onComplete: () => {
                   if (!float) return
                   float.play()

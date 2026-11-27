@@ -16,7 +16,7 @@ type Props = Omit<PricingCardsBlock, 'blockType'> & { locale: Locale }
 export function PricingCards({ eyebrow, title, plans, sharedLine, limitsNote, locale }: Props) {
   if (!plans?.length) return null
   return (
-    <Section className="pt-2 pb-12 sm:pb-16">
+    <Section className="pt-0 pb-12 sm:pb-16">
       {(eyebrow || title) && (
         <div data-reveal className="mb-6 flex flex-col gap-2">
           {eyebrow && <p className="text-xs font-bold tracking-[0.14em] text-accent uppercase">{eyebrow}</p>}
@@ -39,19 +39,19 @@ export function PricingCards({ eyebrow, title, plans, sharedLine, limitsNote, lo
             )}
             <h3 className="text-[17px] font-bold tracking-[-0.01em] text-ink">{plan.title}</h3>
             {plan.tagline && <p className="mt-0.5 text-[13px] leading-snug text-muted">{plan.tagline}</p>}
-            <p className="mt-3 flex flex-wrap items-baseline gap-x-1">
-              <span data-count className="text-[26px] font-extrabold tracking-[-0.03em] text-ink tabular-nums">
+            <p className="mt-2 flex flex-wrap items-baseline gap-x-1">
+              <span data-count className="text-[24px] font-extrabold tracking-[-0.03em] text-ink tabular-nums">
                 {plan.price}
               </span>
               {plan.period && <span className="text-[13px] font-medium text-muted">{plan.period}</span>}
             </p>
             {plan.priceNote && <p className="text-[12.5px] text-muted">{plan.priceNote}</p>}
             {plan.features?.length ? (
-              <ul className="mt-3 flex flex-col gap-1.5 border-t border-hair pt-3">
+              <ul className="mt-2.5 flex flex-col gap-1 border-t border-hair pt-2.5">
                 {plan.features.map((feature, j) => {
                   const included = feature.included !== false
                   return (
-                    <li key={feature.id ?? j} className={['flex items-start gap-2 text-[13px] leading-snug', included ? 'text-ink' : 'text-muted'].join(' ')}>
+                    <li key={feature.id ?? j} className={['flex items-start gap-2 text-[12.5px] leading-snug', included ? 'text-ink' : 'text-muted'].join(' ')}>
                       <span
                         aria-hidden
                         className={['mt-[3px] block size-2.5 shrink-0 rounded-full border-2', included ? 'border-accent' : 'border-hair'].join(' ')}
@@ -65,13 +65,13 @@ export function PricingCards({ eyebrow, title, plans, sharedLine, limitsNote, lo
                 })}
               </ul>
             ) : null}
-            <div className="mt-auto pt-4">
+            <div className="mt-auto pt-3">
               <ProductLink link={plan.button} locale={locale} look={plan.featured ? 'primary' : 'outline'} className="w-full" />
             </div>
           </article>
         ))}
       </div>
-      {sharedLine && <p className="mt-4 text-sm font-semibold text-ink">{sharedLine}</p>}
+      {sharedLine && <p className="mt-3 text-sm font-semibold text-ink">{sharedLine}</p>}
       {limitsNote && <p className="mt-1.5 max-w-[80ch] text-[13px] leading-relaxed text-muted">{limitsNote}</p>}
     </Section>
   )

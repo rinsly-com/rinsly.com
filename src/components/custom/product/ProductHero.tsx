@@ -30,8 +30,8 @@ export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, 
   const rest = buttons?.slice(1) ?? []
   return (
     <div data-hero className="relative">
-      <Section className="pt-24 pb-6 sm:pt-28 lg:pb-10">
-        <div className={split ? 'grid items-center gap-10 lg:grid-cols-[1fr_1.05fr]' : 'max-w-3xl'}>
+      <Section className="pt-8 pb-6 sm:pt-10">
+        <div className={split ? 'grid items-center gap-10 lg:grid-cols-[1.15fr_1fr]' : 'max-w-3xl'}>
           <div className="flex flex-col items-start">
             {eyebrow && (
               <span data-hero-el style={{ animationDelay: '0.05s' }}>
@@ -40,7 +40,7 @@ export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, 
             )}
             <h1
               data-hero-title
-              className="mt-3 text-[clamp(32px,5.2vw,48px)] font-extrabold leading-[1.06] tracking-[-0.025em] text-ink"
+              className="mt-3 text-[clamp(32px,4.4vw,46px)] font-extrabold leading-[1.06] tracking-[-0.025em] text-ink"
             >
               {title}
             </h1>
@@ -67,7 +67,7 @@ export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, 
               >
                 <ProductLink link={first} locale={locale} look={first.variant === 'secondary' ? 'text' : 'primary'} />
                 {rest.map((button, i) => (
-                  <ProductLink key={button.id ?? i} link={button} locale={locale} look="text" className="justify-center sm:justify-start" />
+                  <ProductLink key={button.id ?? i} link={button} locale={locale} look="text" className="self-start sm:self-center" />
                 ))}
               </div>
             )}
