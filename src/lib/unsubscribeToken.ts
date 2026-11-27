@@ -87,24 +87,49 @@ export async function mintUnsubscribeToken(email: string, secret: string): Promi
   return `v1.${hash}.${signature}`
 }
 
+/**
+ * Unpadded base64url length of an HMAC-SHA256 digest (32 bytes).
+ * Both emailHash and signature must be exactly this long.
+ */
+export const UNSUBSCRIBE_MAC_LENGTH = 43
+
+/** Allowed alphabet for each MAC part: unpadded base64url, no `=` `+` `/`. */
+const MAC_PART = /^[A-Za-z0-9_-]{43}$/
+
+function isMacPart(value: string): boolean {
+  return MAC_PART.test(value)
+}
+
+/**
+ * Split and shape-check a token before any HMAC work. Rejects a bad
+ * charset, the wrong length, an extra segment, or an empty part.
+ */
+function parseUnsubscribeToken(
+  token: string,
+): { hash: string; signature: string } | null {
+  const parts = token.split('.')
+  if (parts.length !== 3 || parts[0] !== 'v1') return null
+  const hash = parts[1] ?? ''
+  const signature = parts[2] ?? ''
+  if (!isMacPart(hash) || !isMacPart(signature)) return null
+  return { hash, signature }
+}
+
 export async function verifyUnsubscribeToken(
   token: string,
   secret: string,
 ): Promise<UnsubscribeVerifyResult> {
   if (!secret) return { ok: false, reason: 'missing_secret' }
-  const parts = token.split('.')
-  if (parts.length !== 3 || parts[0] !== 'v1' || !parts[1] || !parts[2]) {
-    return { ok: false, reason: 'invalid' }
-  }
-  const [, hash, provided] = parts
+  const parsed = parseUnsubscribeToken(token)
+  if (!parsed) return { ok: false, reason: 'invalid' }
   let expected: string
   try {
-    expected = await hmac(secret, `${SIG_PREFIX}${hash}`)
+    expected = await hmac(secret, `${SIG_PREFIX}${parsed.hash}`)
   } catch {
     return { ok: false, reason: 'invalid' }
   }
-  if (!safeEqual(provided, expected)) return { ok: false, reason: 'invalid' }
-  return { ok: true, emailHash: hash, version: UNSUBSCRIBE_TOKEN_VERSION }
+  if (!safeEqual(parsed.signature, expected)) return { ok: false, reason: 'invalid' }
+  return { ok: true, emailHash: parsed.hash, version: UNSUBSCRIBE_TOKEN_VERSION }
 }
 
 /** Public URL for a minted token. origin has no trailing slash. */
