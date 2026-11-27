@@ -6,7 +6,8 @@ import { anchor, linkFields, linkGroup, t, text, textarea, textList } from './fi
  * Product-led blocks (redesign direction B v5, spec
  * marketing/redesign-spec-2026-11-27.md §4). App-side `extraBlocks`: they
  * encode Rinsly's own offer pages, not engine features. Renderers live in
- * src/components/custom/product/ and are registered in blockRenderers.tsx.
+ * src/components/custom/product/renderers.tsx and are spread into both the
+ * server map (`@/blockRenderers`) and the live-preview map (`PreviewShell`).
  * Schema: migration 20261127_200000_redesign_v5_blocks.
  */
 

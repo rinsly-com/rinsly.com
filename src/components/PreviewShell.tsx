@@ -19,15 +19,17 @@ const as = <T,>(block: unknown): T => block as T
 /**
  * This site's block renderers, on the client, for live preview.
  *
- * It mirrors `@/blockRenderers` deliberately rather than importing it. That
- * module is passed to the engine's route factories as `extraRenderers` and is
- * therefore called during the SERVER render; marking it `'use client'` would
- * turn its exports into client references the server cannot invoke. Functions do
- * not cross the boundary in either direction, so the preview needs its own copy
- * of the map, built in a module the client bundle has imported for itself.
+ * This module cannot import `@/blockRenderers`. That map is passed to the
+ * engine's route factories as `extraRenderers` and is called during the SERVER
+ * render; marking it `'use client'` would turn its exports into client
+ * references the server cannot invoke. Functions do not cross the boundary in
+ * either direction, so the preview builds its own map in a module the client
+ * bundle has imported for itself.
  *
- * Keep the two in step: a block registered in one and not the other either does
- * not render on the public site, or does not update as the editor types.
+ * Product-led blocks come from the shared `@/components/custom/product/renderers`
+ * map, which both this module and `@/blockRenderers` spread. The remaining
+ * entries (`contact`, `revenueCalculator`, `diagram`) are still listed in both
+ * maps and must stay aligned.
  */
 export function PreviewContact(props: BlockOf<'contact'> & { locale: Locale }) {
   return <Contact {...props} kvkCollectionEnabled={useKvkCollectionFlag()} />
@@ -39,7 +41,6 @@ export const PreviewShell = createPreviewShell({
     <RevenueCalculator {...as<BlockOf<'revenueCalculator'>>(block)} locale={locale} />
   ),
   diagram: (block, locale) => <Diagram {...as<BlockOf<'diagram'>>(block)} locale={locale} />,
-  // The product-led blocks (redesign v5). Missing here, live preview rendered
-  // them as nothing: only the core blocks of a v5 draft showed.
+  // Shared with the server map via `@/components/custom/product/renderers`.
   ...productRenderers,
 })
