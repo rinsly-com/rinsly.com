@@ -46,6 +46,8 @@ const EXCLUDED = [
   // Request-time HMAC + opt-out write; the static worker has no runtime.
   // Zone-route /{nl,en}/afmelden* to rinsly-accp (see docs/marketing-unsubscribe.md).
   { live: 'src/app/(frontend)/[locale]/afmelden', stashed: 'app__frontend_locale_afmelden' },
+  // output: export forbids middleware. The rewrite only runs on rinsly-accp.
+  { live: 'src/middleware.ts', stashed: 'src__middleware' },
 ]
 
 const stash = () => {

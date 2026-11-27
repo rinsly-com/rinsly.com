@@ -11,11 +11,15 @@ this PR cannot do.
 
 ## Behaviour
 
-- `GET` or `HEAD /{nl|en}/afmelden?token=…` shows a confirm page. It never
-  records an opt-out (prefetch-safe).
+- `GET` or `HEAD /{nl|en}/afmelden?token=…` shows a confirm page in the
+  normal site header and footer, with the existing card pattern, roughly
+  vertically centred. It never records an opt-out (prefetch-safe).
 - `POST` to the same URL records the opt-out when the token is valid:
-  - body `List-Unsubscribe=One-Click` (RFC 8058), or
-  - the confirm form (`confirm=1` and `token`).
+  - body `List-Unsubscribe=One-Click` (RFC 8058) is rewritten to
+    `/{locale}/afmelden/one-click` and returns success HTML directly (no
+    confirm page);
+  - the confirm form on the GET page (a server action) is for humans who
+    opened the body link.
 - A second POST is still a success. Invalid tokens do not write. Missing
   secret or missing store fails closed (503) and points the visitor to
   contact@rinsly.com.
@@ -140,23 +144,30 @@ Do not do these from this PR.
 6. Do not create a CMS page with slug `afmelden`. The static export would
    shadow the worker route.
 
-## Copy pending confirmation
+## Copy (approved)
 
-All user-facing strings live in `src/lib/unsubscribeCopy.ts` and are marked
-`pending-lawyer-marketeer`. Draft only:
+Approved by Lawyer + Marketeer on 27 Nov 2026, 23:36 (Europe/Amsterdam).
+Strings live in `src/lib/unsubscribeCopy.ts` (`approved-lawyer-marketeer`).
+Dutch uses je, not u.
 
 | Key | NL | EN |
 |---|---|---|
 | title | Afmelden | Unsubscribe |
-| confirm | Wilt u geen marketingberichten van Rinsly meer ontvangen? | Do you want to stop receiving marketing messages from Rinsly? |
+| confirm | Wil je geen marketingberichten van Rinsly meer ontvangen? | Do you want to stop receiving marketing messages from Rinsly? |
 | button | Ja, meld mij af | Yes, unsubscribe me |
 | cancel | Annuleren | Cancel |
-| success | U bent afgemeld voor marketingberichten van Rinsly. | You have been unsubscribed from Rinsly marketing messages. |
-| invalid | Deze link is niet geldig. U kunt zich ook afmelden via contact@rinsly.com. | This link is not valid. You can also unsubscribe by emailing contact@rinsly.com. |
+| success | Je bent afgemeld voor marketingberichten van Rinsly. | You have been unsubscribed from Rinsly marketing messages. |
+| success follow-up | Je ontvangt alleen nog berichten die nodig zijn voor een lopende opdracht, zoals facturen. Meer informatie: rinsly.com/nl/privacy (sectie 8). | You will only receive messages needed for an ongoing assignment, such as invoices. More information: rinsly.com/en/privacy (section 8). |
+| home link | Terug naar rinsly.com | Back to rinsly.com |
+| invalid | Deze link is niet geldig. Je kunt je ook afmelden via contact@rinsly.com. | This link is not valid. You can also unsubscribe by emailing contact@rinsly.com. |
 | unavailable | Afmelden is nu niet mogelijk. Mail naar contact@rinsly.com. We lossen dit zo snel mogelijk op. | Unsubscribe is not available just now. Email contact@rinsly.com and we will fix this as soon as we can. |
 
-The success line does not say "all channels". Honouring an opt-out across
-channels is still the DNC rule; the wording is left for Lawyer.
+The follow-up's "rinsly.com/nl/privacy" / "rinsly.com/en/privacy" is a link
+to `/nl/privacy` or `/en/privacy`. The wording is otherwise unchanged.
+
+Do not add an "all channels" / LinkedIn / phone line until DNC sync is
+automatic (Lawyer). The pending sentences are documented as a comment on
+`UNSUBSCRIBE_ALL_CHANNELS_LINE_PENDING`.
 
 ## Rollback
 
