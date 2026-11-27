@@ -77,6 +77,17 @@ writes in `deploy:database`.
    ..." then needs that PR's expected state too. Until the v5 migration has
    run on accp, the dry run blocks home, prijzen and partnerprogramma (their
    drafts are still the #121 ones): that is expected, do not publish then.
+
+   **Migration order on an old local database.** `20261127_170000` reads
+   pages through the Local API with the current config, which includes the
+   redesign blocks. On a database that has pages but has not run 170000 yet,
+   it fails with `no such table: pages_blocks_product_hero` (nothing is
+   written, the migration is not recorded), and `20261127_200000` cannot run
+   first because it sorts after it. accp (ran 170000), prod (static, no D1)
+   and an empty database are not affected. Fix for an old local copy: check
+   out `develop` from before the redesign PR (e.g. `f66b208`), run
+   `pnpm payload migrate` there (170000 and 190000), then switch back to this
+   branch and run `pnpm payload migrate` again.
 7. Then merge `develop` → `main`: deploy-prod builds the v3.3 calculator, the
    contact form text and the published copy together. **Hold `develop` →
    `main`, the admin Deploy button and any admin publish between step 1 and

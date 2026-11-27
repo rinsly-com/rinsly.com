@@ -3,6 +3,8 @@
 import { useEffect } from 'react'
 import { usePathname } from 'next/navigation'
 
+import { loadMotionOrShowFinal } from './motionLoad'
+
 /**
  * Product motion for the redesign blocks (spec §5.3). Mounted once in the
  * locale layout, next to site-core's SiteAnimator, with the same rules:
@@ -25,6 +27,9 @@ import { usePathname } from 'next/navigation'
  *  - [data-frame-morph] [data-morph-overlay]  stepsShowcase: once on enter
  *    (top 82%), the wireframe overlays on steps 2 and 3 fade out (0.55s
  *    power2.out, delays 0.15s / 0.3s).
+ *
+ * If the GSAP chunk fails to load, `.anim` is removed from <html> so the CSS
+ * start states drop and the final picture shows (motionLoad.ts).
  */
 export function RinslyMotion() {
   const pathname = usePathname()
@@ -41,10 +46,12 @@ export function RinslyMotion() {
     let assembleFrame: number | undefined
 
     void (async () => {
-      const [{ gsap }, { ScrollTrigger }] = await Promise.all([import('gsap'), import('gsap/ScrollTrigger')])
+      // A failed chunk load drops `.anim`, so nothing stays at its start state.
+      const mods = await loadMotionOrShowFinal(() => Promise.all([import('gsap'), import('gsap/ScrollTrigger')]))
       // `cancelled` flips in the cleanup while the import is in flight.
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      if (cancelled) return
+      if (!mods || cancelled) return
+      const [{ gsap }, { ScrollTrigger }] = mods
       gsap.registerPlugin(ScrollTrigger)
 
       ctx = gsap.context((self) => {
@@ -104,9 +111,12 @@ export function RinslyMotion() {
             trigger: group,
             start: 'top 82%',
             once: true,
+            // onEnter fires after the context callback returned: re-enter it so revert() kills these too.
             onEnter: () => {
-              overlays.forEach((overlay, i) => {
-                gsap.to(overlay, { opacity: 0, duration: 0.55, ease: 'power2.out', delay: 0.15 * (i + 1) })
+              self.add(() => {
+                overlays.forEach((overlay, i) => {
+                  gsap.to(overlay, { opacity: 0, duration: 0.55, ease: 'power2.out', delay: 0.15 * (i + 1) })
+                })
               })
             },
           })
