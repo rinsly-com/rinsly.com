@@ -7,7 +7,7 @@
  * "Open menu" aria-label (G-03, T-02): those are rendered by site-core.
  */
 import { NAV } from './copy'
-import { byId, EditLog, insertAfter, type Json, type Obj, removeById, reorder, setField } from './edit'
+import { byId, EditLog, must, insertAfter, type Json, type Obj, removeById, reorder, setField } from './edit'
 import { newId, type Locale } from './pages'
 
 export type HeaderDoc = { navItems: Json[]; cta: Obj | null }
@@ -28,7 +28,7 @@ export function transformHeader(l: Locale, doc: HeaderDoc, pre: HeaderDoc): { do
   const ids = NAV_IDS[l]
   const w = `header.${l}`
   // G-01: Websitecheck moves to the footer (it is already there).
-  next.navItems = removeById(log, `${w}.navItems`, next.navItems, ids.check, byId(pre.navItems, ids.check)!)
+  next.navItems = removeById(log, `${w}.navItems`, next.navItems, ids.check, must(byId(pre.navItems, ids.check)))
   next.navItems = insertAfter(log, `${w}.navItems`, next.navItems, null, {
     id: newId(l, 'nav-website'),
     label: NAV.website[l],
@@ -38,7 +38,7 @@ export function transformHeader(l: Locale, doc: HeaderDoc, pre: HeaderDoc): { do
     anchor: null,
     newTab: false,
   })
-  setField(log, `${w}.partner`, byId(next.navItems, ids.partner), 'label', byId(pre.navItems, ids.partner)!.label, NAV.studios[l])
+  setField(log, `${w}.partner`, byId(next.navItems, ids.partner), 'label', must(byId(pre.navItems, ids.partner)).label, NAV.studios[l])
   next.navItems = reorder(log, `${w}.navItems`, next.navItems, [newId(l, 'nav-website'), ids.partner, ids.prijzen, ids.platform, ids.over])
   return { doc: next, log }
 }
@@ -53,6 +53,6 @@ export function transformFooter(l: Locale, doc: FooterDoc, pre: FooterDoc): { do
   if ('address' in pre) setField(log, w, holder, 'address', pre.address, NAV.address)
   // Brief §2: one label for the business door.
   const item = byId(next.menuItems, FOOTER_WEBSITE_ITEM[l])
-  setField(log, `${w}.menu.website`, item, 'label', byId(pre.menuItems, FOOTER_WEBSITE_ITEM[l])!.label, NAV.website[l])
+  setField(log, `${w}.menu.website`, item, 'label', must(byId(pre.menuItems, FOOTER_WEBSITE_ITEM[l])).label, NAV.website[l])
   return { doc: next, log }
 }

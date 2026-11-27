@@ -52,7 +52,7 @@ async function pageIds(payload: Payload, req?: PayloadRequest) {
 export async function runContentRefactor({ payload, req, direction }: Args): Promise<RunReport> {
   const report: RunReport = { written: [], unchanged: [], skipped: [] }
   const { idBySlug, slugById } = await pageIds(payload, req)
-  const say = (line: string) => payload.logger.info(`[content-refactor ${direction}] ${line}`)
+  const say = (line: string) => { payload.logger.info(`[content-refactor ${direction}] ${line}`); }
 
   for (const slug of PAGE_SLUGS) {
     const id = idBySlug.get(slug)
@@ -110,15 +110,15 @@ export async function runContentRefactor({ payload, req, direction }: Args): Pro
       const raw = (await payload.findGlobal({ slug, locale, fallbackLocale: false, depth: 0, req })) as unknown as Obj
       // Non-localized fields (footer address/phone) are handled in the default locale only.
       const keys = Object.keys(SNAPSHOT.globals[slug][locale]).filter((key) => locale === 'nl' || !SHARED_GLOBAL_FIELDS.includes(key))
-      const pick = (source: Obj) => Object.fromEntries(keys.map((key) => [key, source[key] ?? null])) as Obj
-      const pre = pick(SNAPSHOT.globals[slug][locale] as unknown as Obj)
+      const pick = (source: Obj) => Object.fromEntries(keys.map((key) => [key, source[key] ?? null]))
+      const pre = pick(SNAPSHOT.globals[slug][locale])
       const current = toSlugRefs(pick(raw), slugById)
       const run = (doc: Obj, base: Obj) => {
         const result =
           slug === 'header'
             ? transformHeader(locale, doc as unknown as HeaderDoc, base as unknown as HeaderDoc)
             : transformFooter(locale, doc as unknown as FooterDoc, base as unknown as FooterDoc)
-        return { doc: pick(result.doc as unknown as Obj), log: result.log }
+        return { doc: pick(result.doc), log: result.log }
       }
       let target: Obj
       if (direction === 'up') {
@@ -143,7 +143,7 @@ export async function runContentRefactor({ payload, req, direction }: Args): Pro
         }
         target = pre
       }
-      await payload.updateGlobal({ slug, locale, depth: 0, req, data: fromSlugRefs(target, idBySlug) as never })
+      await payload.updateGlobal({ slug, locale, depth: 0, req, data: fromSlugRefs(target, idBySlug) })
       report.written.push(where)
     }
   }

@@ -52,6 +52,11 @@ export function normalise(value: unknown): unknown {
 export const sameValue = (a: unknown, b: unknown): boolean =>
   JSON.stringify(normalise(a)) === JSON.stringify(normalise(b))
 
+function preview(value: unknown): string {
+  const text: unknown = JSON.stringify(value)
+  return typeof text === 'string' ? text.slice(0, 80) : 'undefined'
+}
+
 /** Set `obj[key]` from `expected` to `next`. */
 export function setField(log: EditLog, where: string, obj: Obj | undefined, key: string, expected: Json, next: Json): void {
   if (!obj) {
@@ -65,8 +70,17 @@ export function setField(log: EditLog, where: string, obj: Obj | undefined, key:
     log.apply(`${where}.${key}`)
     return
   }
-  log.conflict(`${where}.${key}`, `expected ${JSON.stringify(expected)?.slice(0, 80)}, found ${JSON.stringify(current)?.slice(0, 80)}`)
+  log.conflict(`${where}.${key}`, `expected ${preview(expected)}, found ${preview(current)}`)
 }
+
+/** The snapshot always holds the value; a miss means the transform names a wrong id. */
+export function must<T>(value: T | undefined | null, what = 'value'): T {
+  if (value === undefined || value === null) throw new Error(`content refactor: missing ${what} in the accp snapshot`)
+  return value
+}
+
+/** Text of a scalar field, '' for anything that is not a string. */
+export const str = (value: Json | undefined): string => (typeof value === 'string' ? value : '')
 
 export const byId = (list: Json | undefined, id: string): Obj | undefined =>
   Array.isArray(list) ? (list.find((item) => isObj(item) && item.id === id) as Obj | undefined) : undefined
@@ -88,10 +102,10 @@ export function insertAfter(log: EditLog, where: string, list: Json[], afterId: 
   if (list.some((existing) => isObj(existing) && existing.id === item.id)) return list
   const index = afterId === null ? -1 : list.findIndex((existing) => isObj(existing) && existing.id === afterId)
   if (afterId !== null && index === -1) {
-    log.conflict(`${where}`, `anchor ${afterId} missing for ${String(item.id)}`)
+    log.conflict(where, `anchor ${afterId} missing for ${str(item.id)}`)
     return list
   }
-  log.apply(`${where}[${String(item.id)}] inserted`)
+  log.apply(`${where}[${str(item.id)}] inserted`)
   return [...list.slice(0, index + 1), item, ...list.slice(index + 1)]
 }
 
@@ -161,24 +175,23 @@ export function replaceInLexical(log: EditLog, where: string, holder: Obj | unde
     log.conflict(where, 'rich text missing')
     return
   }
-  let found = false
-  let done = false
+  const state = { found: false, done: false }
   const walk = (node: Json): void => {
     if (!isObj(node)) return
     if (node.type === 'text' && typeof node.text === 'string') {
       if (node.text.includes(old)) {
         node.text = node.text.replace(old, next)
-        found = true
+        state.found = true
       } else if (next !== '' && node.text.includes(next)) {
-        done = true
+        state.done = true
       }
     }
     if (Array.isArray(node.children)) node.children.forEach(walk)
     if (isObj(node.root)) walk(node.root)
   }
   walk(root)
-  if (found) log.apply(where)
-  else if (!done && next !== '') log.conflict(where, `text not found: ${old.slice(0, 60)}`)
+  if (state.found) log.apply(where)
+  else if (!state.done && next !== '') log.conflict(where, `text not found: ${old.slice(0, 60)}`)
 }
 
 /**
@@ -191,13 +204,13 @@ export function removeLexicalNode(log: EditLog, where: string, holder: Obj | und
     log.conflict(where, 'rich text missing')
     return
   }
-  let removed = false
+  const state = { removed: false }
   const prune = (node: Obj): void => {
     if (!Array.isArray(node.children)) return
     node.children = node.children.filter((child) => {
       if (!isObj(child)) return true
       if (child.type !== 'text' && plainText(child) === text) {
-        removed = true
+        state.removed = true
         return false
       }
       prune(child)
@@ -205,7 +218,7 @@ export function removeLexicalNode(log: EditLog, where: string, holder: Obj | und
     })
   }
   prune(root.root)
-  if (removed) log.apply(`${where} node removed`)
+  if (state.removed) log.apply(`${where} node removed`)
 }
 
 /** Concatenated text of a Lexical node (text nodes joined without separators). */

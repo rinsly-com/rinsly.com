@@ -64,7 +64,7 @@ const COPY = {
     naam: 'Contactpersoon',
     email: 'E-mail',
     telefoon: 'Telefoon (optioneel)',
-    domein: 'Uw eigen website',
+    domein: 'Je eigen website',
     additionsHint: 'Wat wilt u nog meer? (optioneel)',
     other: 'Anders, namelijk…',
     bericht: 'Aanvullende toelichting (optioneel)',

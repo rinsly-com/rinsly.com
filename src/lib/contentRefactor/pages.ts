@@ -12,6 +12,8 @@ import {
   byId,
   EditLog,
   insertAfter,
+  must,
+  str,
   lexicalParagraphs,
   type Json,
   type Obj,
@@ -82,13 +84,13 @@ function home(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   const hero = block(doc, id.hero)
   const preHero = snap(pre, id.hero)
   const header = obj(hero?.header)
-  const preHeader = obj(preHero.header)!
+  const preHeader = must(obj(preHero.header))
   setField(log, `${w}.hero.header`, header, 'eyebrow', preHeader.eyebrow, HOME.eyebrow[l])
   setField(log, `${w}.hero.header`, header, 'intro', preHeader.intro, HOME.intro[l])
   const b1 = byId(hero?.buttons, id.b1)
   const b2 = byId(hero?.buttons, id.b2)
-  const preB1 = byId(preHero.buttons, id.b1)!
-  const preB2 = byId(preHero.buttons, id.b2)!
+  const preB1 = must(byId(preHero.buttons, id.b1))
+  const preB2 = must(byId(preHero.buttons, id.b2))
   setField(log, `${w}.hero.b1`, b1, 'label', preB1.label, HOME.partnerButton[l])
   setField(log, `${w}.hero.b2`, b2, 'label', preB2.label, HOME.businessButton[l])
   // H-03: two equal buttons.
@@ -96,7 +98,7 @@ function home(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
 
   // H-04: the two doors as cards, directly under the hero; the old rich-text block goes.
   const doorsPre = snap(pre, id.doors)
-  const doorsHeader = obj(doorsPre.header)!
+  const doorsHeader = must(obj(doorsPre.header))
   doc.layout = removeById(log, `${w}.layout`, doc.layout, id.doors, doorsPre)
   doc.layout = insertAfter(log, `${w}.layout`, doc.layout, id.hero, {
     id: newId(l, 'home-doors'),
@@ -131,16 +133,16 @@ function home(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   const platform = block(doc, id.platform)
   const prePlatform = snap(pre, id.platform)
   const pHeader = obj(platform?.header)
-  const prePHeader = obj(prePlatform.header)!
+  const prePHeader = must(obj(prePlatform.header))
   setField(log, `${w}.platform.header`, pHeader, 'title', prePHeader.title, HOME.platformTitle[l])
-  const preIntro = String(prePHeader.intro ?? '')
+  const preIntro = str(prePHeader.intro)
   if (!preIntro.includes(HOME.platformIntroOld[l])) throw new Error(`${w}: snapshot platform intro lacks the X2 sentence`)
   setField(log, `${w}.platform.header`, pHeader, 'intro', preIntro, preIntro.replace(HOME.platformIntroOld[l], HOME.platformIntroNew[l]))
   const engine = byId(platform?.cards, id.engineCard)
-  setField(log, `${w}.platform.engine`, engine, 'description', byId(prePlatform.cards, id.engineCard)!.description, HOME.engineCard[l])
+  setField(log, `${w}.platform.engine`, engine, 'description', must(byId(prePlatform.cards, id.engineCard)).description, HOME.engineCard[l])
   const edge = byId(platform?.cards, id.edgeCard)
   const backup = byId(edge?.features, id.backupFeature)
-  const preBackup = byId(byId(prePlatform.cards, id.edgeCard)!.features, id.backupFeature)!
+  const preBackup = must(byId(must(byId(prePlatform.cards, id.edgeCard)).features, id.backupFeature))
   setField(log, `${w}.platform.edge.feature`, backup, 'text', preBackup.text, HOME.limitsFeature[l])
 
   // H-07
@@ -187,7 +189,7 @@ function prijzen(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   setField(log, `${w}.meta`, doc.meta, 'description', pre.meta.description, PRICING.metaDescription[l])
 
   const hero = block(doc, id.hero)
-  const preHeader = obj(snap(pre, id.hero).header)!
+  const preHeader = must(obj(snap(pre, id.hero).header))
   setField(log, `${w}.hero.header`, obj(hero?.header), 'title', preHeader.title, PRICING.h1[l])
   setField(log, `${w}.hero.header`, obj(hero?.header), 'intro', preHeader.intro, PRICING.heroIntro[l])
 
@@ -198,16 +200,16 @@ function prijzen(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   const pricing = block(doc, id.pricing)
   const prePricing = snap(pre, id.pricing)
   const care = byId(pricing?.tiers, id.care)
-  const preCare = byId(prePricing.tiers, id.care)!
-  const backupPre = (preCare.features as Obj[]).find((f) => String(f.text).includes('back-up') || String(f.text).includes('backup'))!
-  setField(log, `${w}.care.feature`, byId(care?.features, String(backupPre.id)), 'text', backupPre.text, PRICING.careEdge[l])
+  const preCare = must(byId(prePricing.tiers, id.care))
+  const backupPre = must((preCare.features as Obj[]).find((f) => /back-?ups?/i.test(str(f.text))), 'Care backup feature')
+  setField(log, `${w}.care.feature`, byId(care?.features, str(backupPre.id)), 'text', backupPre.text, PRICING.careEdge[l])
   const managed = byId(pricing?.tiers, id.managed)
-  setField(log, `${w}.managed`, managed, 'for', byId(prePricing.tiers, id.managed)!.for, PRICING.managedFor[l])
+  setField(log, `${w}.managed`, managed, 'for', must(byId(prePricing.tiers, id.managed)).for, PRICING.managedFor[l])
   const custom = byId(pricing?.tiers, id.custom)
-  const preCustom = byId(prePricing.tiers, id.custom)!
-  const dpaPre = (preCustom.features as Obj[]).find((f) => /AVG|GDPR/.test(String(f.text)))!
+  const preCustom = must(byId(prePricing.tiers, id.custom))
+  const dpaPre = must((preCustom.features as Obj[]).find((f) => /AVG|GDPR/.test(str(f.text))), 'Op maat DPA feature')
   if (custom && Array.isArray(custom.features)) {
-    custom.features = removeById(log, `${w}.custom.features`, custom.features, String(dpaPre.id), dpaPre)
+    custom.features = removeById(log, `${w}.custom.features`, custom.features, str(dpaPre.id), dpaPre)
   } else log.conflict(`${w}.custom`, 'tier missing')
 
   doc.layout = insertAfter(log, `${w}.layout`, doc.layout, id.pricing, {
@@ -234,11 +236,11 @@ function prijzen(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   const faq = block(doc, id.faq)
   const preFaq = snap(pre, id.faq)
   if (faq && Array.isArray(faq.items)) {
-    faq.items = removeById(log, `${w}.faq`, faq.items, id.faqCost, byId(preFaq.items, id.faqCost)!)
-    faq.items = removeById(log, `${w}.faq`, faq.items, id.faqLock, byId(preFaq.items, id.faqLock)!)
+    faq.items = removeById(log, `${w}.faq`, faq.items, id.faqCost, must(byId(preFaq.items, id.faqCost)))
+    faq.items = removeById(log, `${w}.faq`, faq.items, id.faqLock, must(byId(preFaq.items, id.faqLock)))
     replaceInLexical(log, `${w}.faq.invoice`, byId(faq.items, id.faqInvoice), 'body', PRICING.invoiceOld[l], PRICING.invoiceNew[l])
     const careItem = byId(faq.items, id.faqCare)
-    const preCareItem = byId(preFaq.items, id.faqCare)!
+    const preCareItem = must(byId(preFaq.items, id.faqCare))
     setField(log, `${w}.faq.care`, careItem, 'title', preCareItem.title, PRICING.careSupportTitle[l])
     setField(log, `${w}.faq.care`, careItem, 'body', preCareItem.body, lexicalParagraphs(PRICING.careSupportBody[l]))
     faq.items = insertAfter(log, `${w}.faq`, faq.items, id.faqCare, {
@@ -271,13 +273,13 @@ function partner(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   const w = `partnerprogramma.${l}`
   setField(log, `${w}.meta`, doc.meta, 'description', pre.meta.description, PARTNER.metaDescription[l])
   const hero = obj(block(doc, id.hero)?.header)
-  const preHero = obj(snap(pre, id.hero).header)!
+  const preHero = must(obj(snap(pre, id.hero).header))
   setField(log, `${w}.hero.header`, hero, 'title', preHero.title, PARTNER.h1[l])
   setField(log, `${w}.hero.header`, hero, 'intro', preHero.intro, PARTNER.intro[l])
 
   const ladder = block(doc, id.ladder)
   const preLadder = snap(pre, id.ladder)
-  const preLadderHeader = obj(preLadder.header)!
+  const preLadderHeader = must(obj(preLadder.header))
   setField(log, `${w}.ladder.header`, obj(ladder?.header), 'title', preLadderHeader.title, PARTNER.ladderTitle[l])
   setField(log, `${w}.ladder.header`, obj(ladder?.header), 'intro', preLadderHeader.intro, PARTNER.ladderIntro[l])
   setField(log, `${w}.ladder`, ladder, 'cards', preLadder.cards, [
@@ -315,21 +317,21 @@ function partner(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   replaceInLexical(log, `${w}.invoicing`, invoicing, 'content', PARTNER.defaultOld[l], PARTNER.defaultNew[l])
 
   // PA-15: FAQ "Wat kost het mij?"
-  const preFaqCost = byId(snap(pre, id.faq).items, id.faqCost)!
+  const preFaqCost = must(byId(snap(pre, id.faq).items, id.faqCost))
   setField(log, `${w}.faq.cost`, byId(block(doc, id.faq)?.items, id.faqCost), 'body', preFaqCost.body, lexicalParagraphs(PARTNER.costFaq[l]))
 
   // "Waarom Rinsly": engine card (H-09 title, X1), speed card out and operations card R3 (PA-11).
   const why = block(doc, id.why)
   const preWhy = snap(pre, id.why)
-  const preWhyIntro = String(obj(preWhy.header)?.intro ?? '')
+  const preWhyIntro = str(obj(preWhy.header)?.intro)
   setField(log, `${w}.why.header`, obj(why?.header), 'intro', preWhyIntro, preWhyIntro.replace(PARTNER.whyOld[l], PARTNER.whyNew[l]))
   const engine = byId(why?.cards, id.engine)
-  const preEngine = byId(preWhy.cards, id.engine)!
+  const preEngine = must(byId(preWhy.cards, id.engine))
   setField(log, `${w}.why.engine`, engine, 'title', preEngine.title, PARTNER.engineTitle[l])
-  const preEngineText = String(preEngine.description ?? '')
+  const preEngineText = str(preEngine.description)
   setField(log, `${w}.why.engine`, engine, 'description', preEngineText, preEngineText.replace(PARTNER.engineFixOld[l], PARTNER.engineFixNew[l]))
-  if (why && Array.isArray(why.cards)) why.cards = removeById(log, `${w}.why.cards`, why.cards, id.speed, byId(preWhy.cards, id.speed)!)
-  setField(log, `${w}.why.operations`, byId(why?.cards, id.operations), 'description', byId(preWhy.cards, id.operations)!.description, PARTNER.operationsCard[l])
+  if (why && Array.isArray(why.cards)) why.cards = removeById(log, `${w}.why.cards`, why.cards, id.speed, must(byId(preWhy.cards, id.speed)))
+  setField(log, `${w}.why.operations`, byId(why?.cards, id.operations), 'description', must(byId(preWhy.cards, id.operations)).description, PARTNER.operationsCard[l])
 
   // Brief §1 / WP6: no "Framer" on the site; the comparison section and its trademark note go.
   doc.layout = removeById(log, `${w}.layout`, doc.layout, id.framer, snap(pre, id.framer))
@@ -340,9 +342,9 @@ function partner(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   const preHow = snap(pre, id.how)
   const buildStep = byId(how?.cards, id.buildStep)
   if (buildStep && Array.isArray(buildStep.features)) {
-    buildStep.features = removeById(log, `${w}.how.build`, buildStep.features, id.freeBuild, byId(byId(preHow.cards, id.buildStep)!.features, id.freeBuild)!)
+    buildStep.features = removeById(log, `${w}.how.build`, buildStep.features, id.freeBuild, must(byId(must(byId(preHow.cards, id.buildStep)).features, id.freeBuild)))
   } else log.conflict(`${w}.how.build`, 'step missing')
-  setField(log, `${w}.how.run`, byId(how?.cards, id.runStep), 'description', byId(preHow.cards, id.runStep)!.description, PARTNER.runStep[l])
+  setField(log, `${w}.how.run`, byId(how?.cards, id.runStep), 'description', must(byId(preHow.cards, id.runStep)).description, PARTNER.runStep[l])
   setField(log, `${w}.diagram`, block(doc, id.diagram), 'caption', snap(pre, id.diagram).caption, PARTNER.diagramCaption[l])
 
   const measure = block(doc, id.measure)
@@ -376,7 +378,7 @@ function replaceEverywhere(log: EditLog, where: string, value: Json, pairs: [str
 
 function contact(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   const id = IDS.contact[l]
-  const preIntro = String(obj(snap(pre, id.hero).header)?.intro ?? '')
+  const preIntro = str(obj(snap(pre, id.hero).header)?.intro)
   if (!preIntro.includes(CONTACT.introOld[l])) throw new Error(`contact.${l}: snapshot intro lacks the C-01 sentence`)
   setField(log, `contact.${l}.hero.header`, obj(block(doc, id.hero)?.header), 'intro', preIntro, preIntro.replace(CONTACT.introOld[l], CONTACT.introNew[l]))
 }
