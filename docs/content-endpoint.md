@@ -34,12 +34,20 @@ Who does what:
 Collection `pages` only. No globals, no other collection, no `title`, `slug`, `meta.noindex`,
 `meta.image`, no rich text.
 
-| Path                                            | Meaning                        | Scope                                                                        |
-| ----------------------------------------------- | ------------------------------ | ---------------------------------------------------------------------------- |
-| `meta.title`                                    | SEO title                      | **Every page, both locales.** A top-level path cannot be scoped to one page. |
-| `meta.description`                              | SEO description                | Same.                                                                        |
-| `layout.<blockId>.header.title` (website hero)  | `/website` H1                  | That one block, per locale                                                   |
-| `layout.<blockId>.header.title` (contact block) | Heading above the contact form | That one block, per locale                                                   |
+| Path | Meaning | Scope |
+| --- | --- | --- |
+| `meta.title` | SEO title | **Every page, both locales.** A top-level path cannot be scoped to one page. |
+| `meta.description` | SEO description | Same. |
+| `layout.<blockId>.header.title` (website hero) | `/website` H1 | That one block, per locale |
+| `layout.<blockId>.header.title` (contact block) | Heading above the contact form | That one block, per locale |
+| `layout.<blockId>.text` (partner check-CTA) | `/partnerprogramma` check-button body text | That one CTA (the block whose button URL is `/check`), per locale. The closing CTA on the same page is not pinned. |
+| `layout.<blockId>.header.eyebrow` / `.title` / `.intro` (Woerden hero) | `/website-laten-maken-woerden` hero plain text | That one hero, per locale |
+| `layout.<blockId>.header.eyebrow` / `.title` / `.intro` (Woerden services) | Woerden “how we work” heading and intro | That one services block, per locale |
+| `layout.<blockId>.cards.<cardId>.title` / `.description` (Woerden services) | Woerden service card title and text | Each of the three cards, per locale, pinned by row id |
+| `layout.<blockId>.header.eyebrow` / `.title` (Woerden FAQ) | Woerden FAQ section eyebrow and title | That one accordion, per locale |
+| `layout.<blockId>.items.<itemId>.title` (Woerden FAQ) | Woerden FAQ question | Each of the two questions, per locale, pinned by row id. Answers (`body`) are rich text and are not pinned. |
+| `layout.<blockId>.header.eyebrow` / `.title` (Woerden regio) | Woerden regio section eyebrow and title | That one richText block, per locale. The body (`content`) is rich text and is not pinned. |
+| `layout.<blockId>.eyebrow` / `.title` / `.text` (Woerden page CTA) | Woerden closing CTA plain text | That one CTA, per locale |
 
 Marketeer's four SEO pages are /website (id 7), /prijzen (id 6), /over (id 8) and
 /partnerprogramma (id 4). Because `meta.*` is allowed everywhere, it also reaches the noindex
@@ -50,17 +58,19 @@ plan (`PLAN.md` step 2); the audit table records every write.
 
 Not covered, on purpose:
 
-- Rich text (page body paragraphs, FAQ answers). A write is refused unless the stored value is
-  one plain paragraph. Needs the rich-text codec (plan Part C).
+- Rich text (page body paragraphs, the Woerden regio section body, FAQ answers). A write is
+  refused unless the stored value is one plain paragraph. Needs the rich-text codec (plan Part C).
+- Privacy and voorwaarden body text, and any other field on those legal pages besides the
+  already-global `meta.title` / `meta.description`. No legal-page block is pinned.
 - The first step of the quote wizard ("Wie ben je?") is hard-coded in `OfferteForm.tsx`, not in
   the CMS. The pinned "contact" heading is the section heading above the form ("Vertel wat u
   nodig heeft" / "Tell us what you need").
 - Adding, removing or reordering blocks and FAQ rows.
 
-The generator pins `layout.<blockId>.header.title` by Payload row id. The id of a row is stable
-since the seed lock (#100: the seed never rewrites a published page that has a layout). If a
-layout is ever rebuilt, its blocks get new ids, the pins match nothing, and the endpoint denies
-the write (fail closed). Regenerate (below).
+The generator pins each path by Payload row id (the block id, and for cards and FAQ questions
+the array row id too). The id of a row is stable since the seed lock (#100: the seed never
+rewrites a published page that has a layout). If a layout is ever rebuilt, its blocks get new
+ids, the pins match nothing, and the endpoint denies the write (fail closed). Regenerate (below).
 
 ## Enable on accp (in this order)
 
@@ -158,8 +168,12 @@ stops instead of guessing.
 - **Ids went stale** (someone rebuilt a layout, or a page was deleted and re-created): run
   `--write`, review the diff, open a PR. Until then the pinned writes are denied.
 - **Add another pinned block field:** add an entry to `PINNED_BLOCKS` (page slug, block type,
-  field path), run `--write`, extend `tests/unit/contentAllowlist.unit.spec.ts`, open a PR.
-  Only text and textarea leaves work. Note the path in the table above.
+  field path). When the page has more than one block of that type, add a `match` (`path` +
+  `equals`) so the script can pick exactly one. To pin a field on every row of a `cards` or
+  `items` array, set `rows` to that field name and put the leaf on `field`. Never add a
+  `privacy` or `voorwaarden` slug, and never pin a rich-text leaf (`content`, `body`). Run
+  `--write`, extend `tests/unit/contentAllowlist.unit.spec.ts`, open a PR. Only text and
+  textarea leaves work. Note the path in the table above.
 - **Add a top-level field** (for example another `meta.*` text field): add it to `PAGE_SCALARS`.
   It then applies to every page.
 - Every allowlist change is a content-endpoint change: Code Review and Security review it and
@@ -171,6 +185,6 @@ stops instead of guessing.
 
 `pnpm test:unit` runs `tests/unit/contentAllowlist.unit.spec.ts`: the list is accepted by
 site-core's own parser and matcher, only the pinned ids and fields pass (other ids, indexes,
-wildcards, fields, collections and globals are rejected), the paths exist as writable text
-leaves in the real pages schema, the generated file has no hand edits, and the generator's output
-is deterministic.
+wildcards, fields, collections and globals are rejected, as are rich-text leaves and privacy or
+voorwaarden block paths), the paths exist as writable text leaves in the real pages schema, the
+generated file has no hand edits, and the generator's output is deterministic.

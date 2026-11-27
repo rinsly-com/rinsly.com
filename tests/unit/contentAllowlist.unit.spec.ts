@@ -17,12 +17,13 @@ import type { ConfigField } from '../../node_modules/@rinsly-com/site-core/src/c
 
 import { contentAllowlist } from '@/contentAllowlist'
 import {
-  LOCALES,
+  LEGAL_SLUGS,
   PAGE_SCALARS,
   PINNED_BLOCKS,
   collectPins,
   findBlock,
   parseArgs,
+  pinsForBlock,
   renderModule,
 } from '../../scripts/content-allowlist-ids.mjs'
 
@@ -57,6 +58,9 @@ function findField(
   return undefined
 }
 
+const PINNED_PATH_RE =
+  /^layout\.[0-9a-f]{24}\.(header\.(title|eyebrow|intro)|text|eyebrow|title|cards\.[0-9a-f]{24}\.(title|description)|items\.[0-9a-f]{24}\.title)$/
+
 describe('src/contentAllowlist.ts', () => {
   it('parses as an allowlist and loses no entry to the endpoint parser', () => {
     const parsed = parseAllowlist(contentAllowlist)
@@ -65,20 +69,40 @@ describe('src/contentAllowlist.ts', () => {
     expect(parsed?.globals).toEqual({})
   })
 
-  it('covers only pages, with SEO title/description plus one pinned heading per page and locale', () => {
+  it('covers only pages, with SEO title/description plus the pinned block and row paths', () => {
     expect(Object.keys(contentAllowlist)).toEqual(['collections'])
     expect(Object.keys(contentAllowlist.collections)).toEqual(['pages'])
     expect(pagePaths.slice(0, 2)).toEqual(['meta.title', 'meta.description'])
-    expect(pinnedPaths).toHaveLength(PINNED_BLOCKS.length * LOCALES.length)
     expect(pagePaths).toHaveLength(PAGE_SCALARS.length + pinnedPaths.length)
     expect(new Set(pagePaths).size).toBe(pagePaths.length)
+    // Locales plus array rows (Woerden cards and FAQ questions) expand the spec.
+    expect(pinnedPaths.length).toBeGreaterThan(PINNED_BLOCKS.length)
   })
 
   it('has no wildcard, index or env-style entry, only exact row ids', () => {
     for (const path of pinnedPaths) {
-      expect(path).toMatch(/^layout\.[0-9a-f]{24}\.header\.title$/)
+      expect(path).toMatch(PINNED_PATH_RE)
     }
     expect(pagePaths.some((path) => path.includes('*'))).toBe(false)
+    expect(pagePaths.some((path) => /layout\.\d+\./.test(path))).toBe(false)
+  })
+
+  it('does not pin legal-page blocks or any rich-text leaf', () => {
+    const pages = new Set(PINNED_BLOCKS.map((spec) => spec.page))
+    for (const slug of LEGAL_SLUGS) expect(pages.has(slug)).toBe(false)
+    expect(pages).toEqual(
+      new Set(['website', 'contact', 'partnerprogramma', 'website-laten-maken-woerden']),
+    )
+    for (const spec of PINNED_BLOCKS) {
+      expect(spec.field === 'content' || spec.field === 'body' || /\.(content|body)$/.test(spec.field)).toBe(
+        false,
+      )
+    }
+    for (const path of pinnedPaths) {
+      expect(path.endsWith('.content') || path.endsWith('.body')).toBe(false)
+    }
+    const text = read('src/contentAllowlist.ts')
+    expect(text).not.toMatch(/privacy|voorwaarden/i)
   })
 
   it('accepts exactly the listed paths', () => {
@@ -102,6 +126,7 @@ describe('src/contentAllowlist.ts', () => {
       `layout.0.header.title`,
       `layout.0@${id}.header.title`,
       `layout.*.header.title`,
+      `layout.*.text`,
       'layout.000000000000000000000000.header.title',
       'layout.ffffffffffffffffffffffff.header.title',
       `layout.${id}.header.title `,
@@ -110,6 +135,50 @@ describe('src/contentAllowlist.ts', () => {
       'meta.token',
     ]
     for (const path of rejected) expect(allowed(path), path).toBe(false)
+  })
+
+  it('rejects rich-text and privacy/legal paths that #107 must not unlock', () => {
+    const privacyNl = '6b0871a7bb5dd40a0f68b126'
+    const privacyEn = '6b0871a9bb5dd40a0f68b127'
+    const faqItem = pinnedPaths.find((path) => path.includes('.items.'))?.split('.') ?? []
+    const accordionId = faqItem[1]
+    const itemId = faqItem[3]
+    const rejected = [
+      `layout.${privacyNl}.content`,
+      `layout.${privacyEn}.content`,
+      `layout.${privacyNl}.header.title`,
+      `layout.${privacyEn}.header.title`,
+      `layout.${privacyNl}.header.eyebrow`,
+      'layout.6b0871aabb5dd40a0f68b128.content', // voorwaarden-shaped id, not pinned
+      `layout.*.content`,
+      `layout.*.items.*.body`,
+    ]
+    if (accordionId && itemId) {
+      rejected.push(`layout.${accordionId}.items.${itemId}.body`)
+      rejected.push(`layout.${accordionId}.content`)
+    }
+    for (const path of rejected) expect(allowed(path), path).toBe(false)
+  })
+
+  it('rejects the other partner CTA and Woerden rich-text body', () => {
+    // Pins mention the check-CTA in comments; any other 24-hex CTA id is denied.
+    const checkCta = pinnedPaths.find((path) => path.endsWith('.text'))
+    expect(checkCta).toBeTruthy()
+    const otherCta = '6b087147bb5dd40a0f68aff7' // partner closing CTA (nl), not the check button
+    expect(allowed(`layout.${otherCta}.text`), 'other partner CTA').toBe(false)
+    expect(allowed(`layout.${otherCta}.title`)).toBe(false)
+    const woerdenRichTextNl = '6b08719cbb5dd40a0f68b116'
+    const woerdenRichTextEn = '6b08719fbb5dd40a0f68b121'
+    expect(allowed(`layout.${woerdenRichTextNl}.content`)).toBe(false)
+    expect(allowed(`layout.${woerdenRichTextEn}.content`)).toBe(false)
+    expect(allowed(`layout.${woerdenRichTextNl}.header.eyebrow`)).toBe(true)
+    expect(allowed(`layout.${woerdenRichTextNl}.header.title`)).toBe(true)
+    const woerdenCtaNl = '6b08719cbb5dd40a0f68b11a'
+    expect(allowed(`layout.${woerdenCtaNl}.eyebrow`)).toBe(true)
+    expect(allowed(`layout.${woerdenCtaNl}.title`)).toBe(true)
+    expect(allowed(`layout.${woerdenCtaNl}.text`)).toBe(true)
+    expect(allowed(`layout.${woerdenCtaNl}.button`)).toBe(false)
+    expect(allowed(`layout.${woerdenCtaNl}.button.label`)).toBe(false)
   })
 
   it('rejects every other collection and every global', () => {
@@ -145,8 +214,28 @@ describe('src/contentAllowlist.ts', () => {
       const block = layout?.blocks?.find((candidate) => candidate.slug === spec.blockType)
       expect(block, spec.blockType).toBeTruthy()
       const alone: ConfigField[] = [{ name: 'layout', type: 'blocks', blocks: [block as never] }]
-      expect(isWritableLeafPath(alone, `layout.row1.${spec.field}`), spec.blockType).toBe(true)
+      const leaf = spec.rows
+        ? `layout.row1.${spec.rows}.row2.${spec.field}`
+        : `layout.row1.${spec.field}`
+      expect(isWritableLeafPath(alone, leaf), `${spec.blockType} ${spec.field}`).toBe(true)
     }
+    // Nested rich text is a schema-writable leaf (the walk still refuses a
+    // value that is not one plain paragraph). The allowlist is what keeps
+    // these paths closed until Part C; they must not be pinned.
+    const accordion = layout?.blocks?.find((candidate) => candidate.slug === 'accordion')
+    const richText = layout?.blocks?.find((candidate) => candidate.slug === 'richText')
+    expect(
+      isWritableLeafPath(
+        [{ name: 'layout', type: 'blocks', blocks: [accordion as never] }],
+        'layout.row1.items.row2.body',
+      ),
+    ).toBe(true)
+    expect(
+      isWritableLeafPath(
+        [{ name: 'layout', type: 'blocks', blocks: [richText as never] }],
+        'layout.row1.content',
+      ),
+    ).toBe(true)
     // Not writable even if somebody allowlisted them: non-text leaves.
     expect(isWritableLeafPath(fields, 'meta.noindex')).toBe(false)
     expect(isWritableLeafPath(fields, 'meta.image')).toBe(false)
@@ -174,18 +263,142 @@ describe('src/contentAllowlist.ts', () => {
   })
 })
 
-type Block = { blockType: string; id?: string; header: { title: string } }
+type Locale = 'nl' | 'en'
+type Pin = { path: string; comment: string }
+type Button = { url?: string }
+type Card = { id?: string; title: string; description: string }
+type FaqItem = { id?: string; title: string; body: unknown }
+type Block = {
+  blockType: string
+  id?: string
+  header?: { eyebrow?: string; title?: string; intro?: string }
+  eyebrow?: string
+  title?: string
+  text?: string
+  button?: Button
+  cards?: Card[]
+  items?: FaqItem[]
+  content?: unknown
+}
 type Doc = { id: number; slug: string; layout: Block[] }
 type Responses = { nl: { docs: Doc[] }; en: { docs: Doc[] } }
 
+const IDS = {
+  website: { nl: 'aaaaaaaaaaaaaaaaaaaa0001', en: 'aaaaaaaaaaaaaaaaaaaa0002' },
+  contact: { nl: 'bbbbbbbbbbbbbbbbbbbb0001', en: 'bbbbbbbbbbbbbbbbbbbb0002' },
+  checkCta: { nl: 'cccccccccccccccccccc0001', en: 'cccccccccccccccccccc0002' },
+  otherCta: { nl: 'cccccccccccccccccccc0003', en: 'cccccccccccccccccccc0004' },
+  woerdenHero: { nl: 'dddddddddddddddddddd0001', en: 'dddddddddddddddddddd0002' },
+  woerdenServices: { nl: 'dddddddddddddddddddd0010', en: 'dddddddddddddddddddd0011' },
+  woerdenCards: {
+    nl: ['dddddddddddddddddddd0020', 'dddddddddddddddddddd0021', 'dddddddddddddddddddd0022'],
+    en: ['dddddddddddddddddddd0023', 'dddddddddddddddddddd0024', 'dddddddddddddddddddd0025'],
+  },
+  woerdenFaq: { nl: 'dddddddddddddddddddd0030', en: 'dddddddddddddddddddd0031' },
+  woerdenFaqItems: {
+    nl: ['dddddddddddddddddddd0040', 'dddddddddddddddddddd0041'],
+    en: ['dddddddddddddddddddd0042', 'dddddddddddddddddddd0043'],
+  },
+  woerdenRichText: { nl: 'dddddddddddddddddddd0050', en: 'dddddddddddddddddddd0051' },
+  woerdenCta: { nl: 'dddddddddddddddddddd0060', en: 'dddddddddddddddddddd0061' },
+  privacy: { nl: 'eeeeeeeeeeeeeeeeeeee0001', en: 'eeeeeeeeeeeeeeeeeeee0002' },
+}
+
+function woerden(locale: 'nl' | 'en'): Doc {
+  const cards = IDS.woerdenCards[locale].map((id, index) => ({
+    id,
+    title: `card ${index + 1} ${locale}`,
+    description: `desc ${index + 1} ${locale}`,
+  }))
+  const items = IDS.woerdenFaqItems[locale].map((id, index) => ({
+    id,
+    title: `question ${index + 1} ${locale}`,
+    body: { root: { type: 'root', children: [] } },
+  }))
+  return {
+    id: 11,
+    slug: 'website-laten-maken-woerden',
+    layout: [
+      {
+        blockType: 'hero',
+        id: IDS.woerdenHero[locale],
+        header: { eyebrow: `eyebrow ${locale}`, title: `hero ${locale}`, intro: `intro ${locale}` },
+      },
+      {
+        blockType: 'services',
+        id: IDS.woerdenServices[locale],
+        header: { eyebrow: `svc-eye ${locale}`, title: `svc ${locale}`, intro: `svc-intro ${locale}` },
+        cards,
+      },
+      {
+        blockType: 'richText',
+        id: IDS.woerdenRichText[locale],
+        header: { eyebrow: `regio ${locale}`, title: `regio title ${locale}` },
+        content: { root: { type: 'root', children: [] } },
+      },
+      {
+        blockType: 'accordion',
+        id: IDS.woerdenFaq[locale],
+        header: { eyebrow: `faq-eye ${locale}`, title: `faq ${locale}` },
+        items,
+      },
+      {
+        blockType: 'cta',
+        id: IDS.woerdenCta[locale],
+        eyebrow: `cta-eye ${locale}`,
+        title: `cta ${locale}`,
+        text: `cta text ${locale}`,
+      },
+    ],
+  }
+}
+
+function partner(locale: 'nl' | 'en'): Doc {
+  return {
+    id: 4,
+    slug: 'partnerprogramma',
+    layout: [
+      {
+        blockType: 'cta',
+        id: IDS.otherCta[locale],
+        title: `closing ${locale}`,
+        text: `closing text ${locale}`,
+        button: { url: '/contact' },
+      },
+      {
+        blockType: 'cta',
+        id: IDS.checkCta[locale],
+        title: `check ${locale}`,
+        text: `check text ${locale}`,
+        button: { url: '/check' },
+      },
+    ],
+  }
+}
+
 /** A trimmed copy of what GET /api/pages?depth=0 returns, per locale. */
-function response(locale: 'nl' | 'en', ids: { website: string; contact: string }): { docs: Doc[] } {
+function response(
+  locale: 'nl' | 'en',
+  ids: { website: string; contact: string },
+): { docs: Doc[] } {
   return {
     docs: [
       {
         id: 1,
         slug: 'home',
         layout: [{ blockType: 'hero', id: 'a1', header: { title: `home ${locale}` } }],
+      },
+      {
+        id: 2,
+        slug: 'privacy',
+        layout: [
+          {
+            blockType: 'richText',
+            id: IDS.privacy[locale],
+            header: { title: `privacy ${locale}` },
+            content: { root: { type: 'root', children: [] } },
+          },
+        ],
       },
       {
         id: 7,
@@ -203,13 +416,15 @@ function response(locale: 'nl' | 'en', ids: { website: string; contact: string }
           { blockType: 'contact', id: ids.contact, header: { title: `form ${locale}` } },
         ],
       },
+      partner(locale),
+      woerden(locale),
     ],
   }
 }
 
 const fixture = (): Responses => ({
-  nl: response('nl', { website: 'aaaaaaaaaaaaaaaaaaaa0001', contact: 'bbbbbbbbbbbbbbbbbbbb0001' }),
-  en: response('en', { website: 'aaaaaaaaaaaaaaaaaaaa0002', contact: 'bbbbbbbbbbbbbbbbbbbb0002' }),
+  nl: response('nl', { website: IDS.website.nl, contact: IDS.contact.nl }),
+  en: response('en', { website: IDS.website.en, contact: IDS.contact.en }),
 })
 
 function pageOf(res: Responses, locale: 'nl' | 'en', slug: string): Doc {
@@ -226,14 +441,74 @@ function blockOf(res: Responses, locale: 'nl' | 'en', slug: string, blockType: s
   return block
 }
 
+function pinsOf(responses: Responses): Pin[] {
+  return collectPins(responses) as Pin[]
+}
+
+function expectedFixturePaths(): string[] {
+  const locales: readonly Locale[] = ['nl', 'en']
+  const paths = [
+    `layout.${IDS.website.nl}.header.title`,
+    `layout.${IDS.website.en}.header.title`,
+    `layout.${IDS.contact.nl}.header.title`,
+    `layout.${IDS.contact.en}.header.title`,
+    `layout.${IDS.checkCta.nl}.text`,
+    `layout.${IDS.checkCta.en}.text`,
+    `layout.${IDS.woerdenHero.nl}.header.eyebrow`,
+    `layout.${IDS.woerdenHero.en}.header.eyebrow`,
+    `layout.${IDS.woerdenHero.nl}.header.title`,
+    `layout.${IDS.woerdenHero.en}.header.title`,
+    `layout.${IDS.woerdenHero.nl}.header.intro`,
+    `layout.${IDS.woerdenHero.en}.header.intro`,
+    `layout.${IDS.woerdenServices.nl}.header.eyebrow`,
+    `layout.${IDS.woerdenServices.en}.header.eyebrow`,
+    `layout.${IDS.woerdenServices.nl}.header.title`,
+    `layout.${IDS.woerdenServices.en}.header.title`,
+    `layout.${IDS.woerdenServices.nl}.header.intro`,
+    `layout.${IDS.woerdenServices.en}.header.intro`,
+  ]
+  for (const locale of locales) {
+    const blockId = IDS.woerdenServices[locale]
+    for (const cardId of [...IDS.woerdenCards[locale]].sort()) {
+      paths.push(`layout.${blockId}.cards.${cardId}.title`)
+    }
+  }
+  for (const locale of locales) {
+    const blockId = IDS.woerdenServices[locale]
+    for (const cardId of [...IDS.woerdenCards[locale]].sort()) {
+      paths.push(`layout.${blockId}.cards.${cardId}.description`)
+    }
+  }
+  paths.push(
+    `layout.${IDS.woerdenFaq.nl}.header.eyebrow`,
+    `layout.${IDS.woerdenFaq.en}.header.eyebrow`,
+    `layout.${IDS.woerdenFaq.nl}.header.title`,
+    `layout.${IDS.woerdenFaq.en}.header.title`,
+  )
+  for (const locale of locales) {
+    const blockId = IDS.woerdenFaq[locale]
+    for (const itemId of [...IDS.woerdenFaqItems[locale]].sort()) {
+      paths.push(`layout.${blockId}.items.${itemId}.title`)
+    }
+  }
+  paths.push(
+    `layout.${IDS.woerdenRichText.nl}.header.eyebrow`,
+    `layout.${IDS.woerdenRichText.en}.header.eyebrow`,
+    `layout.${IDS.woerdenRichText.nl}.header.title`,
+    `layout.${IDS.woerdenRichText.en}.header.title`,
+    `layout.${IDS.woerdenCta.nl}.eyebrow`,
+    `layout.${IDS.woerdenCta.en}.eyebrow`,
+    `layout.${IDS.woerdenCta.nl}.title`,
+    `layout.${IDS.woerdenCta.en}.title`,
+    `layout.${IDS.woerdenCta.nl}.text`,
+    `layout.${IDS.woerdenCta.en}.text`,
+  )
+  return paths
+}
+
 describe('scripts/content-allowlist-ids.mjs', () => {
-  it('pins the website hero and the contact block heading, per locale, in a fixed order', () => {
-    expect(collectPins(fixture()).map((pin) => pin.path)).toEqual([
-      'layout.aaaaaaaaaaaaaaaaaaaa0001.header.title',
-      'layout.aaaaaaaaaaaaaaaaaaaa0002.header.title',
-      'layout.bbbbbbbbbbbbbbbbbbbb0001.header.title',
-      'layout.bbbbbbbbbbbbbbbbbbbb0002.header.title',
-    ])
+  it('pins the website, contact, partner check-CTA and all #107 Woerden plain-text fields in a fixed order', () => {
+    expect(pinsOf(fixture()).map((pin) => pin.path)).toEqual(expectedFixturePaths())
   })
 
   it('is deterministic: same output however the API orders pages and blocks, and on repeat runs', () => {
@@ -241,42 +516,90 @@ describe('scripts/content-allowlist-ids.mjs', () => {
     const b = fixture()
     for (const locale of ['nl', 'en'] as const) {
       b[locale].docs.reverse()
-      for (const doc of b[locale].docs) doc.layout.reverse()
+      for (const doc of b[locale].docs) {
+        doc.layout.reverse()
+        for (const block of doc.layout) {
+          if (block.cards) block.cards.reverse()
+          if (block.items) block.items.reverse()
+        }
+      }
     }
-    const first = renderModule(collectPins(a))
-    expect(renderModule(collectPins(b))).toBe(first)
-    expect(renderModule(collectPins(a))).toBe(first)
+    const first = renderModule(pinsOf(a))
+    expect(renderModule(pinsOf(b))).toBe(first)
+    expect(renderModule(pinsOf(a))).toBe(first)
     expect(first.endsWith('\n')).toBe(true)
     expect(first).not.toMatch(/\d{4}-\d{2}-\d{2}|Date\(|undefined/)
   })
 
   it('renders a module whose entries pass the endpoint matcher and nothing else does', () => {
-    const text = renderModule(collectPins(fixture()))
+    const text = renderModule(pinsOf(fixture()))
     const paths = [...text.matchAll(/^\s+'([^']+)',/gm)].map((match) => match[1])
-    expect(paths).toEqual([
-      'meta.title',
-      'meta.description',
-      'layout.aaaaaaaaaaaaaaaaaaaa0001.header.title',
-      'layout.aaaaaaaaaaaaaaaaaaaa0002.header.title',
-      'layout.bbbbbbbbbbbbbbbbbbbb0001.header.title',
-      'layout.bbbbbbbbbbbbbbbbbbbb0002.header.title',
-    ])
+    expect(paths).toEqual(['meta.title', 'meta.description', ...expectedFixturePaths()])
     const list = parseAllowlist({ collections: { pages: paths } })
     expect(list).not.toBeNull()
     const ok = (path: string) => isAllowlisted(list as never, target(path))
     for (const path of paths) expect(ok(path)).toBe(true)
     expect(ok('layout.b2.header.title')).toBe(false)
-    expect(ok('layout.aaaaaaaaaaaaaaaaaaaa0001.header.intro')).toBe(false)
+    expect(ok(`layout.${IDS.website.nl}.header.intro`)).toBe(false)
+    expect(ok(`layout.${IDS.otherCta.nl}.text`)).toBe(false)
+    expect(ok(`layout.${IDS.otherCta.en}.text`)).toBe(false)
+    expect(ok(`layout.${IDS.woerdenFaq.nl}.items.${IDS.woerdenFaqItems.nl[0]}.body`)).toBe(false)
+    expect(ok(`layout.${IDS.woerdenRichText.nl}.content`)).toBe(false)
+    expect(ok(`layout.${IDS.woerdenRichText.nl}.header.eyebrow`)).toBe(true)
+    expect(ok(`layout.${IDS.woerdenCta.nl}.text`)).toBe(true)
+    expect(ok(`layout.${IDS.woerdenCta.nl}.button`)).toBe(false)
+    expect(ok(`layout.${IDS.privacy.nl}.content`)).toBe(false)
+    expect(ok(`layout.${IDS.privacy.nl}.header.title`)).toBe(false)
+    expect(ok(`layout.${IDS.privacy.en}.content`)).toBe(false)
+  })
+
+  it('picks the partner check-CTA by button URL and stops when that match is ambiguous or missing', () => {
+    const check = PINNED_BLOCKS.find((spec) => spec.page === 'partnerprogramma')
+    expect(check?.match).toEqual({ path: 'button.url', equals: '/check' })
+    expect(pinsOf(fixture()).some((pin) => pin.path === `layout.${IDS.checkCta.nl}.text`)).toBe(
+      true,
+    )
+    expect(pinsOf(fixture()).some((pin) => pin.path === `layout.${IDS.otherCta.nl}.text`)).toBe(
+      false,
+    )
+
+    const twoChecks = fixture()
+    pageOf(twoChecks, 'nl', 'partnerprogramma').layout.push({
+      blockType: 'cta',
+      id: 'cccccccccccccccccccc00ff',
+      text: 'also check',
+      button: { url: '/check' },
+    })
+    expect(() => {
+      collectPins(twoChecks)
+    }).toThrow(
+      /expected one "cta" block on "partnerprogramma" matching button.url="\/check", found 2/,
+    )
+
+    const none = fixture()
+    const block = pageOf(none, 'en', 'partnerprogramma').layout.find(
+      (candidate) => candidate.id === IDS.checkCta.en,
+    )
+    if (block?.button) block.button.url = '/elsewhere'
+    expect(() => {
+      collectPins(none)
+    }).toThrow(
+      /expected one "cta" block on "partnerprogramma" matching button.url="\/check", found 0/,
+    )
   })
 
   it('stops instead of guessing when a page or block is missing or ambiguous', () => {
     const missingPage = fixture()
     missingPage.nl.docs = missingPage.nl.docs.filter((doc) => doc.slug !== 'contact')
-    expect(() => collectPins(missingPage)).toThrow(/nl: expected one page with slug "contact"/)
+    expect(() => {
+      collectPins(missingPage)
+    }).toThrow(/nl: expected one page with slug "contact"/)
 
     const twoPages = fixture()
     twoPages.en.docs.push(structuredClone(pageOf(twoPages, 'en', 'website')))
-    expect(() => collectPins(twoPages)).toThrow(
+    expect(() => {
+      collectPins(twoPages)
+    }).toThrow(
       /en: expected one page with slug "website", found 2/,
     )
 
@@ -286,37 +609,113 @@ describe('scripts/content-allowlist-ids.mjs', () => {
       id: 'dup',
       header: { title: 'again' },
     })
-    expect(() => collectPins(twoBlocks)).toThrow(/expected one "hero" block on "website", found 2/)
+    expect(() => {
+      collectPins(twoBlocks)
+    }).toThrow(/expected one "hero" block on "website", found 2/)
 
     const noBlock = fixture()
     const contact = pageOf(noBlock, 'en', 'contact')
     contact.layout = contact.layout.filter((block) => block.blockType !== 'contact')
-    expect(() => collectPins(noBlock)).toThrow(/found 0/)
+    expect(() => {
+      collectPins(noBlock)
+    }).toThrow(/found 0/)
   })
 
   it('refuses a block with no usable id or an empty heading, and a response with no docs', () => {
     const badId = fixture()
     blockOf(badId, 'nl', 'website', 'hero').id = '../x'
-    expect(() => collectPins(badId)).toThrow(/no usable row id/)
+    expect(() => {
+      collectPins(badId)
+    }).toThrow(/no usable row id/)
 
     for (const bad of ['42', 'AAAAAAAAAAAAAAAAAAAA0001', 'aaaaaaaaaaaaaaaaaaaa001']) {
       const res = fixture()
       blockOf(res, 'nl', 'website', 'hero').id = bad
-      expect(() => collectPins(res)).toThrow(/no usable row id/)
+      expect(() => {
+        collectPins(res)
+      }).toThrow(/no usable row id/)
     }
 
     const noId = fixture()
     delete blockOf(noId, 'nl', 'website', 'hero').id
-    expect(() => collectPins(noId)).toThrow(/no usable row id/)
+    expect(() => {
+      collectPins(noId)
+    }).toThrow(/no usable row id/)
 
     const empty = fixture()
-    blockOf(empty, 'en', 'website', 'hero').header.title = '  '
-    expect(() => collectPins(empty)).toThrow(/empty or not text/)
+    const hero = blockOf(empty, 'en', 'website', 'hero')
+    if (hero.header) hero.header.title = '  '
+    expect(() => {
+      collectPins(empty)
+    }).toThrow(/empty or not text/)
 
-    expect(() => collectPins({ nl: {}, en: {} })).toThrow(/no docs array/)
+    const emptyCard = fixture()
+    const services = blockOf(emptyCard, 'nl', 'website-laten-maken-woerden', 'services')
+    if (services.cards?.[0]) services.cards[0].title = '  '
+    expect(() => {
+      collectPins(emptyCard)
+    }).toThrow(/empty or not text/)
+
+    const badRowId = fixture()
+    const services2 = blockOf(badRowId, 'nl', 'website-laten-maken-woerden', 'services')
+    if (services2.cards?.[0]) services2.cards[0].id = '42'
+    expect(() => {
+      collectPins(badRowId)
+    }).toThrow(/no usable row id/)
+
+    const noRows = fixture()
+    const services3 = blockOf(noRows, 'en', 'website-laten-maken-woerden', 'services')
+    services3.cards = []
+    expect(() => {
+      collectPins(noRows)
+    }).toThrow(/expected cards/)
+
+    expect(() => {
+      collectPins({ nl: {}, en: {} })
+    }).toThrow(/no docs array/)
     expect(() => {
       findBlock([], PINNED_BLOCKS[0], 'nl')
     }).toThrow()
+  })
+
+  it('refuses to pin a legal page or a rich-text leaf, even if a caller passes that spec', () => {
+    expect(() => {
+      findBlock(
+        fixture().nl.docs,
+        {
+          page: 'privacy',
+          blockType: 'richText',
+          field: 'header.title',
+          label: 'should not pin',
+        },
+        'nl',
+      )
+    }).toThrow(/legal page "privacy"/)
+    expect(() => {
+      pinsForBlock(
+        { id: IDS.woerdenFaq.nl, blockType: 'accordion', items: [] },
+        {
+          page: 'website-laten-maken-woerden',
+          blockType: 'accordion',
+          rows: 'items',
+          field: 'body',
+          label: 'should not pin',
+        },
+        'nl',
+      )
+    }).toThrow(/rich-text field "body"/)
+    expect(() => {
+      findBlock(
+        fixture().nl.docs,
+        {
+          page: 'voorwaarden',
+          blockType: 'richText',
+          field: 'header.title',
+          label: 'should not pin',
+        },
+        'nl',
+      )
+    }).toThrow(/legal page "voorwaarden"/)
   })
 
   it('has a write-safe CLI: --write only from the real API, both fixture files or none', () => {
@@ -325,9 +724,15 @@ describe('scripts/content-allowlist-ids.mjs', () => {
     expect(parseArgs(['--write', '--url', 'http://localhost:3000']).url).toBe(
       'http://localhost:3000',
     )
-    expect(() => parseArgs(['--write', '--nl', 'a.json', '--en', 'b.json'])).toThrow(/needs --url/)
-    expect(() => parseArgs(['--nl', 'a.json'])).toThrow(/both/)
-    expect(() => parseArgs(['--bogus'])).toThrow(/unknown argument/)
+    expect(() => {
+      parseArgs(['--write', '--nl', 'a.json', '--en', 'b.json'])
+    }).toThrow(/needs --url/)
+    expect(() => {
+      parseArgs(['--nl', 'a.json'])
+    }).toThrow(/both/)
+    expect(() => {
+      parseArgs(['--bogus'])
+    }).toThrow(/unknown argument/)
   })
 
   it('only reads: no write, delete or credential code besides the generated module', () => {
