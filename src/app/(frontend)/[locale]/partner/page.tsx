@@ -4,7 +4,7 @@ import { Suspense } from 'react'
 import { Eyebrow, Section } from '@rinsly-com/site-core/ui'
 
 import { PartnerTokenGate } from '@/components/partner/PartnerTokenGate'
-import { partnerProgrammeCopy } from '@/lib/partnerLadder'
+import { partnerFormCopyV33 } from '@/lib/partnerLadder'
 
 /**
  * /nl/partner and /en/partner — where a recruited studio configures itself.
@@ -76,7 +76,7 @@ export async function generateMetadata({
 export default async function PartnerPage({ params }: { params: Promise<Params> }) {
   const { locale } = await params
   const t = copyFor(locale)
-  const commercial = partnerProgrammeCopy(locale === 'en' ? 'en' : 'nl')
+  const commercial = partnerFormCopyV33(locale === 'en' ? 'en' : 'nl')
 
   return (
     <>
@@ -122,21 +122,23 @@ export default async function PartnerPage({ params }: { params: Promise<Params> 
               wholesale so nothing on a conversion page waits for GSAP. */}
           <aside className="order-1 flex flex-col gap-4 lg:order-2">
             <h2 className="text-lg font-bold tracking-[-0.01em] text-ink">{t.asideTitle}</h2>
-            <p className="text-sm leading-relaxed text-muted">{commercial.asideBase}</p>
+            <p className="text-sm leading-relaxed text-muted">{commercial.base}</p>
             <ul className="flex flex-col divide-y divide-hair rounded-xl border border-hair bg-card">
-              {commercial.ladder.rungs.map((row) => (
+              {commercial.rungs.map((row) => (
                 <li key={row.id} className="flex items-baseline gap-3 px-4 py-2.5 text-sm">
-                  <span className="w-12 flex-none font-bold tabular-nums text-accent">
-                    +{row.pct}%
+                  <span className="min-w-0 flex-1 text-ink">
+                    {row.title}
+                    {row.detail && <span className="mt-0.5 block text-muted">{row.detail}</span>}
                   </span>
-                  <span className="min-w-0 flex-1 text-ink">{row.title}</span>
-                  <span className="flex-none text-[10.5px] font-bold uppercase tracking-wider text-muted">
-                    {commercial.ladder.kindLabel[row.kind]}
-                  </span>
+                  {row.kind !== 'base' && (
+                    <span className="flex-none text-[10.5px] font-bold uppercase tracking-wider text-muted">
+                      {commercial.kindLabel[row.kind]}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
-            <p className="text-sm leading-relaxed text-muted">{commercial.asideCumulative}</p>
+            <p className="text-sm leading-relaxed text-muted">{commercial.caveat}</p>
             <p className="text-sm leading-relaxed text-muted">{commercial.asideFigma}</p>
           </aside>
         </div>

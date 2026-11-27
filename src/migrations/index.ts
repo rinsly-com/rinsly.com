@@ -11,6 +11,7 @@ import * as migration_20261126_140500_email_consent from './20261126_140500_emai
 import * as migration_20261126_160500_b2b_kvk from './20261126_160500_b2b_kvk';
 import * as migration_20261126_232114_content_endpoint from './20261126_232114_content_endpoint';
 import * as migration_20261127_170000_content_refactor from './20261127_170000_content_refactor';
+import * as migration_20261127_190000_partner_v33_rungs from './20261127_190000_partner_v33_rungs';
 
 export const migrations = [
   {
@@ -77,5 +78,10 @@ export const migrations = [
     up: migration_20261127_170000_content_refactor.up,
     down: migration_20261127_170000_content_refactor.down,
     name: '20261127_170000_content_refactor',
+  },
+  {
+    up: migration_20261127_190000_partner_v33_rungs.up,
+    down: migration_20261127_190000_partner_v33_rungs.down,
+    name: '20261127_190000_partner_v33_rungs',
   },
 ];

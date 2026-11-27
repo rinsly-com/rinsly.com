@@ -12,7 +12,7 @@ import { Button } from '@rinsly-com/ui/button'
 import { Field } from '@rinsly-com/ui/field'
 import { Input } from '@rinsly-com/ui/input'
 
-import { partnerProgrammeCopy, type ChoiceField } from '@/lib/partnerLadder'
+import { formRatePctV33, partnerFormCopyV33, type FormRungFieldV33 } from '@/lib/partnerLadder'
 
 // Empty on accp (same origin). The static rinsly.com build inlines the accp API
 // origin (NEXT_PUBLIC_API_URL) and posts cross-origin, same as the check forms.
@@ -131,9 +131,8 @@ type Fields = {
   talen: string
   landen: string
   opmerking: string
-  exclusiviteit: boolean
-  relatiebeheer: boolean
-  marketing: boolean
+  eersteLijn: boolean
+  verkoop: boolean
   /** Honeypot — hidden from people, irresistible to bots. */
   website: string
 }
@@ -196,9 +195,9 @@ function NoteInput({
  */
 export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 'nl' | 'en' }) {
   const t = T[locale]
-  const commercial = partnerProgrammeCopy(locale)
-  const duties = commercial.ladder.rungs.filter(
-    (rung): rung is typeof rung & { field: ChoiceField } => rung.field != null,
+  const commercial = partnerFormCopyV33(locale)
+  const duties = commercial.rungs.filter(
+    (rung): rung is typeof rung & { field: FormRungFieldV33 } => rung.field != null,
   )
   // A missing token is known before the first render, so it is initial state
   // rather than something an effect discovers (the effect-side setState also
@@ -220,9 +219,8 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
     talen: 'nl',
     landen: 'nl',
     opmerking: '',
-    exclusiviteit: false,
-    relatiebeheer: false,
-    marketing: false,
+    eersteLijn: false,
+    verkoop: false,
     website: '',
   })
   const [touched, setTouched] = useState(false)
@@ -270,7 +268,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
     }
   }, [token])
 
-  const pct = duties.reduce((sum, rung) => sum + (f[rung.field] ? rung.pct : 0), 0)
+  const pct = formRatePctV33(f)
   const valid = isEmail(f.email) && f.bedrijfsnaam.trim() !== ''
 
   const set =
@@ -340,7 +338,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
       {/* ── what you take on ─────────────────────────────────────────── */}
       <fieldset className="space-y-3">
         <legend className="text-sm font-semibold text-ink">{t.dutiesLegend}</legend>
-        <p className="text-sm text-muted">{commercial.formIntro}</p>
+        <p className="text-sm text-muted">{commercial.intro}</p>
         {duties.map((d) => {
           const on = f[d.field]
           return (
@@ -362,11 +360,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
                 ✓
               </span>
               <span className="min-w-0">
-                <span className="flex items-baseline gap-2">
-                  <span className="font-semibold text-ink">{d.title}</span>
-                  <span className="text-sm font-bold text-accent">+{d.pct}%</span>
-                </span>
-                <span className="mt-0.5 block text-sm text-muted">{d.detail}</span>
+                <span className="font-semibold text-ink">{d.title}</span>
               </span>
             </Button>
           )
@@ -375,9 +369,7 @@ export function PartnerForm({ token, locale = 'nl' }: { token: string; locale?: 
           <span className="text-sm font-medium text-ink">{t.rateLabel}</span>
           <span className="text-2xl font-extrabold tabular-nums text-accent">{pct}%</span>
         </div>
-        {pct === 0 && (
-          <p className="text-sm text-muted">{commercial.formZero}</p>
-        )}
+        <p className="text-sm text-muted">{commercial.caveat}</p>
       </fieldset>
 
       {/* ── who you are ──────────────────────────────────────────────── */}
