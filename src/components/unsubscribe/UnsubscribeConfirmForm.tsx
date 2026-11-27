@@ -25,10 +25,15 @@ export function UnsubscribeConfirmForm({
 
   return (
     <UnsubscribeCard locale={locale} view="confirm">
+      {/* String action so SSR keeps method=post when JavaScript is off. */}
       <form
         className="flex flex-wrap items-center gap-3"
-        action={async (formData) => {
-          setView(await confirmUnsubscribeAction(formData))
+        method="post"
+        action={`/${locale}/afmelden?token=${encodeURIComponent(token)}`}
+        onSubmit={(event) => {
+          event.preventDefault()
+          const formData = new FormData(event.currentTarget)
+          void confirmUnsubscribeAction(formData).then(setView)
         }}
       >
         <input type="hidden" name="token" value={token} />
