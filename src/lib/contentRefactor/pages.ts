@@ -30,7 +30,7 @@ export type PageDoc = { layout: Json[]; meta: Obj }
 export type PageSlug = 'home' | 'prijzen' | 'partnerprogramma' | 'contact'
 
 /** Block and item ids on accp (from the 27 Nov 16:15 snapshot), per locale. */
-const IDS = {
+export const IDS = {
   home: {
     nl: { hero: '6b08713abb5dd40a0f68af9e', b1: '6b08713abb5dd40a0f68af9c', b2: '6b08713abb5dd40a0f68af9d', platform: '6b08713abb5dd40a0f68afa8', engineCard: '6b08713abb5dd40a0f68afa4', edgeCard: '6b08713abb5dd40a0f68afa7', backupFeature: '6b08713abb5dd40a0f68afa6', measure: '6b08713abb5dd40a0f68afa9', tech: '6b08713abb5dd40a0f68afaa', doors: '6b08713abb5dd40a0f68afab', closing: '6b08713abb5dd40a0f68afac' },
     en: { hero: '6b08713dbb5dd40a0f68afaf', b1: '6b08713dbb5dd40a0f68afad', b2: '6b08713dbb5dd40a0f68afae', platform: '6b08713dbb5dd40a0f68afb9', engineCard: '6b08713dbb5dd40a0f68afb5', edgeCard: '6b08713dbb5dd40a0f68afb8', backupFeature: '6b08713dbb5dd40a0f68afb7', measure: '6b08713dbb5dd40a0f68afba', tech: '6b08713dbb5dd40a0f68afbb', doors: '6b08713dbb5dd40a0f68afbc', closing: '6b08713dbb5dd40a0f68afbd' },

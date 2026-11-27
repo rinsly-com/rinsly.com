@@ -20,6 +20,7 @@
   --color-hair: var(--hair);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-strong: var(--accent-strong);
   --color-accent-ink: var(--accent-ink);
   --color-slate: var(--slate);
   --color-slate-ink: var(--slate-ink);
@@ -44,6 +45,10 @@
    * This ramp is 4.909:1, visually indistinguishable from the original. */
   --accent: #28789f;
   --accent-soft: #e7f1f7;
+  /* Accent for small text (chip and ladder numbers) on --accent-soft or
+   * --card: #28789f on #e7f1f7 is 4.28:1 and fails WCAG 1.4.3; this is
+   * 5.39:1 (redesign UX falsification, 27 Nov 2026). Not a new brand colour. */
+  --accent-strong: #226887;
   /* Text drawn on a solid --accent fill (e.g. the header/pricing Button from
    * @rinsly-com/ui). The dark ramp lightens --accent enough that white drops
    * to ~2.3:1, so dark mode needs its own ink. */
@@ -65,6 +70,7 @@
     --hair: #24384a;
     --accent: #4fa8d4;
     --accent-soft: #12242f;
+    --accent-strong: #6cbbe0;
     --accent-ink: #14212e;
     --slate: #1b2e3d;
     --slate-ink: #eaf2f7;
@@ -83,6 +89,7 @@
   --hair: #dfe6eb;
   --accent: #28789f;
   --accent-soft: #e7f1f7;
+  --accent-strong: #226887;
   --accent-ink: #ffffff;
   --slate: #152b3c;
   --slate-ink: #eaf2f7;
@@ -100,6 +107,7 @@
   --hair: #24384a;
   --accent: #4fa8d4;
   --accent-soft: #12242f;
+  --accent-strong: #6cbbe0;
   --accent-ink: #14212e;
   --slate: #1b2e3d;
   --slate-ink: #eaf2f7;
@@ -291,6 +299,25 @@ h3 {
     opacity: 1;
     transform: translate(-50%, 0) scale(1);
   }
+}
+
+/* ── Product motion (RinslyMotion.tsx) ─────────────────────────────────────
+ * Hidden start states exist only under `.anim` (JS on, motion allowed, not a
+ * preview). Without it the frames are visible and the step overlays are gone,
+ * i.e. the final picture. Transform and opacity only. */
+.anim [data-assemble="frame"] {
+  opacity: 0;
+  transform: translateY(20px);
+}
+.anim [data-assemble="phone"] {
+  opacity: 0;
+  transform: translateY(24px) rotate(3deg);
+}
+[data-morph-overlay] {
+  opacity: 0;
+}
+.anim [data-morph-overlay] {
+  opacity: 1;
 }
 
 /* A magnetic button should glide, not fight GSAP's inline transforms. */
