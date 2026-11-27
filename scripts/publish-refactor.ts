@@ -70,6 +70,10 @@ async function main() {
         locale,
         depth: 0,
         draft: false,
+        // Without this, Payload treats a published update as publish-all
+        // because `_status` is not localized on pages.
+        publishAllLocales: false,
+        publishSpecificLocale: locale,
         data: { layout: draft.layout, meta: draft.meta, _status: 'published' } as never,
       })
     },
