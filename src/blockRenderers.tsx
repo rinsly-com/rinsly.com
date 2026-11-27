@@ -4,6 +4,13 @@ import type { Page } from '@/payload-types'
 import { Contact } from '@/components/custom/Contact'
 import { Diagram } from '@/components/custom/Diagram'
 import { RevenueCalculator } from '@/components/custom/RevenueCalculator'
+import { DoorCards } from '@/components/custom/product/DoorCards'
+import { LadderSteps } from '@/components/custom/product/LadderSteps'
+import { PricingCards } from '@/components/custom/product/PricingCards'
+import { ProductHero } from '@/components/custom/product/ProductHero'
+import { ProductShowcase } from '@/components/custom/product/ProductShowcase'
+import { StepsShowcase } from '@/components/custom/product/StepsShowcase'
+import { TrustBar } from '@/components/custom/product/TrustBar'
 import { isKvkCollectionEnabled } from '@/lib/kvkCollectionFlag'
 
 type BlockOf<T extends string> = Extract<NonNullable<Page['layout']>[number], { blockType: T }>
@@ -21,9 +28,9 @@ const as = <T,>(block: unknown): T => block as T
  * Rinsly's custom block renderers, passed to the engine's route factories.
  *
  * `contact` OVERRIDES the engine's core renderer (app renderers take precedence
- * for the same blockType) to mount the OfferteForm wizard; the other two are
+ * for the same blockType) to mount the OfferteForm wizard; the others are
  * blocks the engine does not have, registered via `extraBlocks` in
- * payload.config.ts.
+ * payload.config.ts (the product-led ones: src/blocks/product).
  */
 export const extraRenderers: Record<string, BlockRenderer> = {
   contact: (block, locale) => (
@@ -33,4 +40,11 @@ export const extraRenderers: Record<string, BlockRenderer> = {
     <RevenueCalculator {...as<BlockOf<'revenueCalculator'>>(block)} locale={locale} />
   ),
   diagram: (block, locale) => <Diagram {...as<BlockOf<'diagram'>>(block)} locale={locale} />,
+  productHero: (block, locale) => <ProductHero {...as<BlockOf<'productHero'>>(block)} locale={locale} />,
+  doorCards: (block, locale) => <DoorCards {...as<BlockOf<'doorCards'>>(block)} locale={locale} />,
+  stepsShowcase: (block) => <StepsShowcase {...as<BlockOf<'stepsShowcase'>>(block)} />,
+  trustBar: (block) => <TrustBar {...as<BlockOf<'trustBar'>>(block)} />,
+  pricingCards: (block, locale) => <PricingCards {...as<BlockOf<'pricingCards'>>(block)} locale={locale} />,
+  productShowcase: (block, locale) => <ProductShowcase {...as<BlockOf<'productShowcase'>>(block)} locale={locale} />,
+  ladderSteps: (block) => <LadderSteps {...as<BlockOf<'ladderSteps'>>(block)} />,
 }

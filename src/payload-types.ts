@@ -236,6 +236,13 @@ export interface Page {
         | NoteBlock
         | RevenueCalculatorBlock
         | DiagramBlock
+        | ProductHeroBlock
+        | DoorCardsBlock
+        | StepsShowcaseBlock
+        | TrustBarBlock
+        | PricingCardsBlock
+        | ProductShowcaseBlock
+        | LadderStepsBlock
       )[]
     | null;
   meta?: {
@@ -685,6 +692,260 @@ export interface DiagramBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductHeroBlock".
+ */
+export interface ProductHeroBlock {
+  eyebrow?: string | null;
+  title: string;
+  /**
+   * One sentence, not a paragraph.
+   */
+  sub: string;
+  priceChip?: {
+    amount?: string | null;
+    suffix?: string | null;
+  };
+  /**
+   * One primary button; a second one as a text link (Secondary).
+   */
+  buttons?:
+    | {
+        label: string;
+        variant?: ('primary' | 'secondary') | null;
+        type?: ('internal' | 'external') | null;
+        page?: (number | null) | Page;
+        url?: string | null;
+        anchor?: string | null;
+        newTab?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  variant?: ('split' | 'compact') | null;
+  /**
+   * Decorative drawing of an example site (hidden on phones). Not a screenshot and not a claim.
+   */
+  showcase?: {
+    kind?: ('business' | 'plans' | 'studio') | null;
+    url?: string | null;
+    badge?: string | null;
+    caption?: string | null;
+    showPhone?: boolean | null;
+  };
+  /**
+   * Optional. Public hash for menu links. Lowercase letters, numbers and dashes.
+   */
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'productHero';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DoorCardsBlock".
+ */
+export interface DoorCardsBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  doors?:
+    | {
+        label?: string | null;
+        title: string;
+        price?: string | null;
+        priceNote?: string | null;
+        howLine?: string | null;
+        bullets?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        finePrint?: string | null;
+        button: {
+          label: string;
+          variant?: ('primary' | 'secondary') | null;
+          type?: ('internal' | 'external') | null;
+          page?: (number | null) | Page;
+          url?: string | null;
+          anchor?: string | null;
+          newTab?: boolean | null;
+        };
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. Public hash for menu links. Lowercase letters, numbers and dashes.
+   */
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'doorCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsShowcaseBlock".
+ */
+export interface StepsShowcaseBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  intro?: string | null;
+  steps?:
+    | {
+        label?: string | null;
+        title: string;
+        text?: string | null;
+        frameKind: 'wireframe' | 'live' | 'cms';
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. Public hash for menu links. Lowercase letters, numbers and dashes.
+   */
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'stepsShowcase';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TrustBarBlock".
+ */
+export interface TrustBarBlock {
+  items?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional. Public hash for menu links. Lowercase letters, numbers and dashes.
+   */
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'trustBar';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingCardsBlock".
+ */
+export interface PricingCardsBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  /**
+   * Live plans and prices only.
+   */
+  plans?:
+    | {
+        title: string;
+        tag?: string | null;
+        tagline?: string | null;
+        price?: string | null;
+        period?: string | null;
+        priceNote?: string | null;
+        features?:
+          | {
+              text: string;
+              included?: boolean | null;
+              id?: string | null;
+            }[]
+          | null;
+        button: {
+          label: string;
+          variant?: ('primary' | 'secondary') | null;
+          type?: ('internal' | 'external') | null;
+          page?: (number | null) | Page;
+          url?: string | null;
+          anchor?: string | null;
+          newTab?: boolean | null;
+        };
+        featured?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  sharedLine?: string | null;
+  limitsNote?: string | null;
+  /**
+   * Optional. Public hash for menu links. Lowercase letters, numbers and dashes.
+   */
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'pricingCards';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductShowcaseBlock".
+ */
+export interface ProductShowcaseBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  sub?: string | null;
+  bullets?:
+    | {
+        text: string;
+        id?: string | null;
+      }[]
+    | null;
+  layout?: ('copyLeft' | 'copyRight') | null;
+  frame?: {
+    kind?: ('invoice' | 'site' | 'cms') | null;
+    url?: string | null;
+    title?: string | null;
+  };
+  /**
+   * Live prices only.
+   */
+  invoiceRows?:
+    | {
+        label: string;
+        amount: string;
+        id?: string | null;
+      }[]
+    | null;
+  button?: {
+    label?: string | null;
+    variant?: ('primary' | 'secondary') | null;
+    type?: ('internal' | 'external') | null;
+    page?: (number | null) | Page;
+    url?: string | null;
+    anchor?: string | null;
+    newTab?: boolean | null;
+  };
+  /**
+   * Optional. Public hash for menu links. Lowercase letters, numbers and dashes.
+   */
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'productShowcase';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LadderStepsBlock".
+ */
+export interface LadderStepsBlock {
+  eyebrow?: string | null;
+  title?: string | null;
+  intro?: string | null;
+  rungs?:
+    | {
+        name: string;
+        percent: string;
+        text?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  footnote?: string | null;
+  /**
+   * Optional. Public hash for menu links. Lowercase letters, numbers and dashes.
+   */
+  anchor?: string | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'ladderSteps';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "offertes".
  */
 export interface Offerte {
@@ -998,6 +1259,13 @@ export interface PagesSelect<T extends boolean = true> {
         note?: T | NoteBlockSelect<T>;
         revenueCalculator?: T | RevenueCalculatorBlockSelect<T>;
         diagram?: T | DiagramBlockSelect<T>;
+        productHero?: T | ProductHeroBlockSelect<T>;
+        doorCards?: T | DoorCardsBlockSelect<T>;
+        stepsShowcase?: T | StepsShowcaseBlockSelect<T>;
+        trustBar?: T | TrustBarBlockSelect<T>;
+        pricingCards?: T | PricingCardsBlockSelect<T>;
+        productShowcase?: T | ProductShowcaseBlockSelect<T>;
+        ladderSteps?: T | LadderStepsBlockSelect<T>;
       };
   meta?:
     | T
@@ -1261,6 +1529,229 @@ export interface DiagramBlockSelect<T extends boolean = true> {
   eyebrow?: T;
   title?: T;
   caption?: T;
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductHeroBlock_select".
+ */
+export interface ProductHeroBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  sub?: T;
+  priceChip?:
+    | T
+    | {
+        amount?: T;
+        suffix?: T;
+      };
+  buttons?:
+    | T
+    | {
+        label?: T;
+        variant?: T;
+        type?: T;
+        page?: T;
+        url?: T;
+        anchor?: T;
+        newTab?: T;
+        id?: T;
+      };
+  variant?: T;
+  showcase?:
+    | T
+    | {
+        kind?: T;
+        url?: T;
+        badge?: T;
+        caption?: T;
+        showPhone?: T;
+      };
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "DoorCardsBlock_select".
+ */
+export interface DoorCardsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  doors?:
+    | T
+    | {
+        label?: T;
+        title?: T;
+        price?: T;
+        priceNote?: T;
+        howLine?: T;
+        bullets?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        finePrint?: T;
+        button?:
+          | T
+          | {
+              label?: T;
+              variant?: T;
+              type?: T;
+              page?: T;
+              url?: T;
+              anchor?: T;
+              newTab?: T;
+            };
+        id?: T;
+      };
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "StepsShowcaseBlock_select".
+ */
+export interface StepsShowcaseBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  steps?:
+    | T
+    | {
+        label?: T;
+        title?: T;
+        text?: T;
+        frameKind?: T;
+        id?: T;
+      };
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "TrustBarBlock_select".
+ */
+export interface TrustBarBlockSelect<T extends boolean = true> {
+  items?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "PricingCardsBlock_select".
+ */
+export interface PricingCardsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  plans?:
+    | T
+    | {
+        title?: T;
+        tag?: T;
+        tagline?: T;
+        price?: T;
+        period?: T;
+        priceNote?: T;
+        features?:
+          | T
+          | {
+              text?: T;
+              included?: T;
+              id?: T;
+            };
+        button?:
+          | T
+          | {
+              label?: T;
+              variant?: T;
+              type?: T;
+              page?: T;
+              url?: T;
+              anchor?: T;
+              newTab?: T;
+            };
+        featured?: T;
+        id?: T;
+      };
+  sharedLine?: T;
+  limitsNote?: T;
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ProductShowcaseBlock_select".
+ */
+export interface ProductShowcaseBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  sub?: T;
+  bullets?:
+    | T
+    | {
+        text?: T;
+        id?: T;
+      };
+  layout?: T;
+  frame?:
+    | T
+    | {
+        kind?: T;
+        url?: T;
+        title?: T;
+      };
+  invoiceRows?:
+    | T
+    | {
+        label?: T;
+        amount?: T;
+        id?: T;
+      };
+  button?:
+    | T
+    | {
+        label?: T;
+        variant?: T;
+        type?: T;
+        page?: T;
+        url?: T;
+        anchor?: T;
+        newTab?: T;
+      };
+  anchor?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "LadderStepsBlock_select".
+ */
+export interface LadderStepsBlockSelect<T extends boolean = true> {
+  eyebrow?: T;
+  title?: T;
+  intro?: T;
+  rungs?:
+    | T
+    | {
+        name?: T;
+        percent?: T;
+        text?: T;
+        id?: T;
+      };
+  footnote?: T;
   anchor?: T;
   id?: T;
   blockName?: T;

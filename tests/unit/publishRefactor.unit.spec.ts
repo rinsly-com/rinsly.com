@@ -1,17 +1,19 @@
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { describe, expect, it, vi } from 'vitest'
 
-import { writeManifest } from '@/lib/contentRefactor/manifestFile'
+import { gitHead, writeManifest } from '@/lib/contentRefactor/manifestFile'
 
 import type { Obj } from '@/lib/contentRefactor/edit'
 import type { Locale, PageDoc, PageSlug } from '@/lib/contentRefactor/pages'
+import { v5Page } from '@/lib/contentRefactor/redesignV5'
 import {
   contentHash,
   fullHash,
+  expectedDraft,
   migratedPage,
   migrationManifest,
   loadPublishManifest,
@@ -35,10 +37,10 @@ const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
 type Db = Record<string, { draft: PageDoc; published: PageDoc }>
 const key = (slug: string, locale: string) => `${slug}.${locale}`
 
-/** Every page-locale as the migration leaves it: draft = migrated, published = snapshot. */
+/** Every page-locale as the migrations leave it: draft = expected (v5 or #121 contact), published = snapshot. */
 function migratedDb(): Db {
   const db: Db = {}
-  for (const slug of SLUGS) for (const locale of LOCALES) db[key(slug, locale)] = { draft: clone(migratedPage(slug, locale)), published: clone(snapshotPage(slug, locale)) }
+  for (const slug of SLUGS) for (const locale of LOCALES) db[key(slug, locale)] = { draft: clone(expectedDraft(slug, locale)), published: clone(snapshotPage(slug, locale)) }
   return db
 }
 
@@ -66,7 +68,7 @@ const silent = () => undefined
 
 describe('publish-refactor guard (planPublish)', () => {
   it('migrated draft over the published snapshot: ready', () => {
-    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: migratedPage('home', 'nl'), published: snapshotPage('home', 'nl') }])
+    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: expectedDraft('home', 'nl'), published: snapshotPage('home', 'nl') }])
     expect(plan.ready).toHaveLength(1)
     expect(plan.blocked).toEqual([])
   })
@@ -77,23 +79,23 @@ describe('publish-refactor guard (planPublish)', () => {
   })
 
   it('draft edited after the migration: blocked, with both hashes', () => {
-    const edited = clone(migratedPage('contact', 'nl'))
+    const edited = clone(expectedDraft('contact', 'nl'))
     edited.meta = { ...edited.meta, title: 'Iets anders' }
     const plan = planPublish([{ slug: 'contact', locale: 'nl', latestDraft: edited, published: snapshotPage('contact', 'nl') }])
     expect(plan.blocked[0]).toContain(contentHash(edited))
-    expect(plan.blocked[0]).toContain(contentHash(migratedPage('contact', 'nl')))
+    expect(plan.blocked[0]).toContain(contentHash(expectedDraft('contact', 'nl')))
     expect(plan.blocked[0]).toMatch(/not the expected draft/)
   })
 
   it('published version changed by someone else: blocked', () => {
     const live = clone(snapshotPage('home', 'en'))
     live.meta = { ...live.meta, description: 'changed live' }
-    const plan = planPublish([{ slug: 'home', locale: 'en', latestDraft: migratedPage('home', 'en'), published: live }])
+    const plan = planPublish([{ slug: 'home', locale: 'en', latestDraft: expectedDraft('home', 'en'), published: live }])
     expect(plan.blocked[0]).toMatch(/not one the manifest allows replacing/)
   })
 
   it('already published: counted as done, not republished', () => {
-    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: migratedPage('home', 'nl'), published: migratedPage('home', 'nl') }])
+    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: expectedDraft('home', 'nl'), published: expectedDraft('home', 'nl') }])
     expect(plan.already).toEqual(['home.nl'])
     expect(plan.ready).toEqual([])
   })
@@ -104,14 +106,30 @@ describe('publish-refactor guard (planPublish)', () => {
 })
 
 describe('publish-refactor manifest', () => {
-  it('the committed manifest is the #121 migration output (regenerate with content:publish-refactor:manifest)', () => {
+  it('the committed manifest is the migration output (regenerate with content:publish-refactor:manifest)', () => {
     expect(loadPublishManifest().pages).toEqual(migrationManifest('0'.repeat(40)).pages)
     expect(Object.keys(loadPublishManifest().pages).sort()).toEqual(SLUGS.flatMap((slug) => LOCALES.map((locale) => key(slug, locale))).sort())
   })
 
-  it('a different manifest (e.g. a redesign) publishes its own drafts and refuses the #121 ones', async () => {
+  it('home, prijzen and partnerprogramma expect the redesign v5 drafts, contact the #121 draft', () => {
+    for (const locale of LOCALES) {
+      for (const slug of ['home', 'prijzen', 'partnerprogramma'] as const) {
+        expect(loadPublishManifest().pages[key(slug, locale)].draft).toBe(fullHash(v5Page(slug, locale)))
+        expect(loadPublishManifest().pages[key(slug, locale)].draft).not.toBe(fullHash(migratedPage(slug, locale)))
+      }
+      expect(loadPublishManifest().pages[key('contact', locale)].draft).toBe(fullHash(migratedPage('contact', locale)))
+    }
+  })
+
+  it('a #121 draft that the v5 migration skipped (edited page) is not publishable', () => {
+    const plan = planPublish([{ slug: 'prijzen', locale: 'nl', latestDraft: migratedPage('prijzen', 'nl'), published: snapshotPage('prijzen', 'nl') }])
+    expect(plan.ready).toHaveLength(0)
+    expect(plan.blocked[0]).toMatch(/not the expected draft/)
+  })
+
+  it('a different manifest publishes its own drafts and refuses the current ones', async () => {
     const db = migratedDb()
-    const redesigned = clone(migratedPage('home', 'nl'))
+    const redesigned = clone(expectedDraft('home', 'nl'))
     redesigned.meta = { ...redesigned.meta, title: 'Redesign' }
     db[key('home', 'nl')].draft = redesigned
     const manifest = clone(loadPublishManifest())
@@ -124,7 +142,7 @@ describe('publish-refactor manifest', () => {
   })
 
   it('a page-locale missing from the manifest blocks the run', () => {
-    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: migratedPage('home', 'nl'), published: snapshotPage('home', 'nl') }], { ...migrationManifest('0'.repeat(40)), pages: {} })
+    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: expectedDraft('home', 'nl'), published: snapshotPage('home', 'nl') }], { ...migrationManifest('0'.repeat(40)), pages: {} })
     expect(plan.blocked[0]).toMatch(/not in the publish manifest/)
   })
 })
@@ -275,12 +293,23 @@ describe('publish manifest contract', () => {
     expect(parseManifest(good).pages).toEqual(good.pages)
   })
 
-  it('the manifest script fills sourceCommit with git HEAD', () => {
+  it('the manifest script fills sourceCommit with git HEAD of a clean tree, and refuses a dirty one', () => {
+    // A throwaway repo, so the test does not depend on the state of this checkout.
+    const repo = mkdtempSync(join(tmpdir(), 'manifest-repo-'))
+    const git = (...args: string[]) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', ...args], { cwd: repo, encoding: 'utf8' }).trim()
+    git('init', '-q')
+    writeFileSync(join(repo, 'a.txt'), 'a')
+    git('add', 'a.txt')
+    git('commit', '-qm', 'a')
+    const repoHead = git('rev-parse', 'HEAD')
+    expect(gitHead(repo)).toBe(repoHead)
     const target = join(mkdtempSync(join(tmpdir(), 'manifest-')), 'publish-manifest.json')
-    writeManifest(target)
+    writeManifest(target, gitHead(repo))
     const written = JSON.parse(readFileSync(target, 'utf8')) as { sourceCommit: string; version: number }
-    expect(written.sourceCommit).toBe(head)
+    expect(written.sourceCommit).toBe(repoHead)
     expect(parseManifest(written).version).toBe(1)
+    writeFileSync(join(repo, 'a.txt'), 'changed')
+    expect(() => gitHead(repo)).toThrow(/uncommitted changes/)
   })
 })
 

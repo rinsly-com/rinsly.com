@@ -59,7 +59,7 @@ export function indexPages(docs: { id: number; slug?: string | null }[]) {
   return { idBySlug, slugById }
 }
 
-async function pageIds(payload: Payload, req?: PayloadRequest) {
+export async function pageIds(payload: Payload, req?: PayloadRequest) {
   const fields = payload.collections.pages.config.flattenedFields
   if (fields.some((field) => field.name === 'tenant')) {
     throw new Error('[content-refactor] pages has a tenant field; this migration only knows a single-site database, aborting')

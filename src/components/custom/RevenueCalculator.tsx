@@ -134,7 +134,8 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
                     ].join(' ')}
                   >
                     {p.label[lang]}
-                    <span className={selected ? 'ml-2 opacity-80' : 'ml-2 text-muted'}>
+                    {/* Full white on the accent pill (4.9:1); weight, not opacity, sets the price apart (axe). */}
+                    <span className={selected ? 'ml-2 font-normal' : 'ml-2 text-muted'}>
                       {p.from ? `${c.from} ` : ''}
                       {euro(p.monthly, locale)}
                     </span>
@@ -207,7 +208,7 @@ export function RevenueCalculator({ eyebrow, title, intro, footnote, locale }: P
                     </svg>
                   </span>
                   <span className="min-w-0 flex-1 text-ink">{label}</span>
-                  <span className="flex-none text-xs font-bold tabular-nums text-accent">
+                  <span className="flex-none text-xs font-bold tabular-nums text-accent-strong">
                     +{rungPct[key]}%
                   </span>
                 </label>

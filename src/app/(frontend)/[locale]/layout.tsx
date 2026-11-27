@@ -5,6 +5,7 @@ import { createLocaleLayout } from '@rinsly-com/site-core/app'
 import { JsonLd } from '@rinsly-com/site-core/components/frontend/JsonLd'
 import { siteConfig } from '@/site.config'
 import { buildProfessionalServiceJsonLd } from '@/lib/siteJsonLd'
+import { RinslyMotion } from '@/components/custom/product/RinslyMotion'
 
 import '../globals.css'
 
@@ -16,7 +17,9 @@ export const generateMetadata = layout.generateMetadata
 
 /**
  * The engine layout, plus Rinsly's ProfessionalService JSON-LD (plan 003
- * T-01) at the top of <main> on every locale page.
+ * T-01) at the top of <main> on every locale page, and RinslyMotion (the
+ * product-block motion next to the engine's SiteAnimator; no-op without
+ * product blocks, under reduced motion and in a preview).
  */
 export default async function LocaleLayout(props: {
   children: React.ReactNode
@@ -27,6 +30,7 @@ export default async function LocaleLayout(props: {
   return (
     <layout.Layout params={props.params}>
       <JsonLd data={buildProfessionalServiceJsonLd(siteConfig.url, jsonLdLocale)} />
+      <RinslyMotion />
       {props.children}
     </layout.Layout>
   )
