@@ -156,6 +156,9 @@ describe('K-03 robots.txt and /check chrome', () => {
     expect(page).toContain('robots: { index: false, follow: false }')
     expect(page).toContain('openGraph: {')
     expect(page).toContain("twitter: { card: 'summary_large_image'")
+    // Live on accp (fresh header/footer), static in the export.
+    expect(page).toMatch(/^export const dynamic = 'force-dynamic'$/m)
+    expect(read('scripts/build-static.mjs')).toContain("'src/app/(frontend)/check/page.tsx',")
     expect(read('src/app/(frontend)/check/opengraph-image.tsx')).not.toMatch(/\d+\s*(seconden|minuut|s\b)/)
   })
 })

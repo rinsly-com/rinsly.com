@@ -9,9 +9,14 @@ import { CheckRunner } from '@/components/check/CheckRunner'
  * Generic /check page — the self-service website check (visitor enters a
  * domain, our pipeline generates a personal /check/<token> scorecard), plus
  * the manual "wij kijken mee" lead form as secondary path and as the landing
- * spot for expired personal links (?link=verlopen). Fully static (part of the
- * rinsly.com export); both forms talk to the accp API cross-origin.
+ * spot for expired personal links (?link=verlopen). Static in the rinsly.com
+ * export, live on accp; both forms talk to the accp API cross-origin.
  */
+
+// force-dynamic on the accp worker: the layout reads the CMS header and footer,
+// so a build-time render would freeze them. build-static.mjs swaps this to
+// force-static for the rinsly.com export (the content snapshot).
+export const dynamic = 'force-dynamic'
 
 const TITLE = 'Gratis websitecheck | Rinsly'
 const DESCRIPTION =

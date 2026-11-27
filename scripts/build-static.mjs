@@ -72,6 +72,8 @@ const DYNAMIC_ROUTES = [
   'src/app/(frontend)/[locale]/opengraph-image.tsx',
   'src/app/(frontend)/[locale]/[slug]/opengraph-image.tsx',
   'src/app/(frontend)/[locale]/partner/page.tsx',
+  // /check renders the site header/footer (CMS globals) since plan 003 K-03.
+  'src/app/(frontend)/check/page.tsx',
   // sitemap.xml is force-dynamic on accp; static export reads the snapshot.
   'src/app/sitemap.ts',
 ]
