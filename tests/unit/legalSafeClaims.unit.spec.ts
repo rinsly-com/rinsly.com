@@ -76,6 +76,9 @@ describe('legal-safe claims', () => {
 
   it('points the /website step at the pricing page and the exit amount', () => {
     expect(seed).toContain('Zie Prijzen voor de voorwaarden en het uitstapbedrag.')
+    expect(seed).toContain('of geen bouwkosten bij 36 maanden hosting. Zie Prijzen voor de voorwaarden en het uitstapbedrag.')
+    expect(seed).toContain('or no build fee with 36 months of hosting. See Pricing for the terms and the exit amount.')
+    expect(seed).not.toContain('bijvoorbeeld Care, €49 per maand')
     expect(seed).toContain('See Pricing for the terms and the exit amount.')
     expect(seed).toContain('de bouw vanaf €2.500 (excl. btw) met maandelijks opzegbare hosting (opzegtermijn van één maand), of geen bouwkosten bij 36 maanden hosting')
   })

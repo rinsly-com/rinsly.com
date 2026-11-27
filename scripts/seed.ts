@@ -1165,7 +1165,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
       locale === 'nl'
         ? [
             { ol: [
-              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: de bouw vanaf €2.500 (excl. btw) met maandelijks opzegbare hosting (opzegtermijn van één maand), of geen bouwkosten bij 36 maanden hosting (bijvoorbeeld Care, €49 per maand excl. btw). Zie Prijzen voor de voorwaarden en het uitstapbedrag.',
+              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: de bouw vanaf €2.500 (excl. btw) met maandelijks opzegbare hosting (opzegtermijn van één maand), of geen bouwkosten bij 36 maanden hosting. Zie Prijzen voor de voorwaarden en het uitstapbedrag.',
               'Er komt een ontwerp: van uw eigen ontwerper, van een partner van ons, of op basis van wat u aanlevert.',
               'Wij bouwen het en zetten het live, inclusief domein en e-mailrouting.',
               'Daarna draaien wij het. U beheert de teksten en foto’s zelf in het CMS; het technische deel hoeft u nooit aan te raken.',
@@ -1173,7 +1173,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
           ]
         : [
             { ol: [
-              'You tell us what you need. We tell you what it costs: the build from €2,500 (excl. VAT) with monthly-cancellable hosting (one month’s notice), or no build fee with 36 months of hosting (for example Care, €49 per month excl. VAT). See Pricing for the terms and the exit amount.',
+              'You tell us what you need. We tell you what it costs: the build from €2,500 (excl. VAT) with monthly-cancellable hosting (one month’s notice), or no build fee with 36 months of hosting. See Pricing for the terms and the exit amount.',
               'A design appears: from your own designer, from one of our partners, or based on what you supply.',
               'We build it and take it live, domain and email routing included.',
               'After that we run it. You manage the words and pictures yourself in the CMS; you never have to touch the technical part.',
