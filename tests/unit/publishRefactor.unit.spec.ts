@@ -1,0 +1,144 @@
+import { describe, expect, it, vi } from 'vitest'
+
+import type { Obj } from '@/lib/contentRefactor/edit'
+import type { Locale, PageDoc, PageSlug } from '@/lib/contentRefactor/pages'
+import {
+  contentHash,
+  migratedPage,
+  planPublish,
+  PUBLISH_CONFIRM,
+  runPublish,
+  snapshotPage,
+  type PageSource,
+} from '@/lib/contentRefactor/publish'
+
+const SLUGS: PageSlug[] = ['home', 'prijzen', 'partnerprogramma', 'contact']
+const LOCALES: Locale[] = ['nl', 'en']
+const clone = <T>(value: T): T => JSON.parse(JSON.stringify(value)) as T
+
+type Db = Record<string, { draft: PageDoc; published: PageDoc }>
+const key = (slug: string, locale: string) => `${slug}.${locale}`
+
+/** Every page-locale as the migration leaves it: draft = migrated, published = snapshot. */
+function migratedDb(): Db {
+  const db: Db = {}
+  for (const slug of SLUGS) for (const locale of LOCALES) db[key(slug, locale)] = { draft: clone(migratedPage(slug, locale)), published: clone(snapshotPage(slug, locale)) }
+  return db
+}
+
+function fakeSource(db: Db, extraPages: { id: number; slug: string }[] = []): PageSource {
+  const ids = SLUGS.map((slug, index) => ({ id: index + 1, slug }))
+  return {
+    pages: () => Promise.resolve([...ids, ...extraPages]),
+    read: (id, locale, draft) => {
+      const slug = ids.find((page) => page.id === id)?.slug ?? ''
+      const row = db[key(slug, locale)]
+      return Promise.resolve(clone(draft ? row.draft : row.published) as unknown as Obj)
+    },
+  }
+}
+
+function fakePublisher(db: Db) {
+  return vi.fn((id: number, locale: Locale, draft: Obj) => {
+    const slug = SLUGS[id - 1]
+    db[key(slug, locale)].published = clone(draft) as unknown as PageDoc
+    return Promise.resolve()
+  })
+}
+
+const silent = () => undefined
+
+describe('publish-refactor guard (planPublish)', () => {
+  it('migrated draft over the published snapshot: ready', () => {
+    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: migratedPage('home', 'nl'), published: snapshotPage('home', 'nl') }])
+    expect(plan.ready).toHaveLength(1)
+    expect(plan.blocked).toEqual([])
+  })
+
+  it('draft still the snapshot (migration not run): blocked', () => {
+    const plan = planPublish([{ slug: 'prijzen', locale: 'en', latestDraft: snapshotPage('prijzen', 'en'), published: snapshotPage('prijzen', 'en') }])
+    expect(plan.blocked[0]).toMatch(/prijzen\.en: .*migration has not run/)
+  })
+
+  it('draft edited after the migration: blocked, with both hashes', () => {
+    const edited = clone(migratedPage('contact', 'nl'))
+    edited.meta = { ...edited.meta, title: 'Iets anders' }
+    const plan = planPublish([{ slug: 'contact', locale: 'nl', latestDraft: edited, published: snapshotPage('contact', 'nl') }])
+    expect(plan.blocked[0]).toContain(contentHash(edited))
+    expect(plan.blocked[0]).toContain(contentHash(migratedPage('contact', 'nl')))
+    expect(plan.blocked[0]).toMatch(/edited since the migration/)
+  })
+
+  it('published version changed by someone else: blocked', () => {
+    const live = clone(snapshotPage('home', 'en'))
+    live.meta = { ...live.meta, description: 'changed live' }
+    const plan = planPublish([{ slug: 'home', locale: 'en', latestDraft: migratedPage('home', 'en'), published: live }])
+    expect(plan.blocked[0]).toMatch(/neither the snapshot nor the migrated copy/)
+  })
+
+  it('already published: counted as done, not republished', () => {
+    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: migratedPage('home', 'nl'), published: migratedPage('home', 'nl') }])
+    expect(plan.already).toEqual(['home.nl'])
+    expect(plan.ready).toEqual([])
+  })
+
+  it('the hash ignores key order and D1 nulls, like sameValue', () => {
+    expect(contentHash({ b: 1, a: [{ x: 'y', blockName: null }] })).toBe(contentHash({ a: [{ x: 'y' }], b: 1, c: null }))
+  })
+})
+
+describe('publish-refactor run', () => {
+  it('dry run is the default: plans 8 and writes nothing', async () => {
+    const db = migratedDb()
+    const publisher = fakePublisher(db)
+    const lines: string[] = []
+    const result = await runPublish({ source: fakeSource(db), publisher, apply: false, log: (line) => lines.push(line) })
+    expect(result.applied).toBe(false)
+    expect(publisher).not.toHaveBeenCalled()
+    expect(lines.filter((line) => line.startsWith('would publish'))).toHaveLength(8)
+  })
+
+  it('apply without the confirmation phrase refuses before reading or writing', async () => {
+    const db = migratedDb()
+    const publisher = fakePublisher(db)
+    await expect(runPublish({ source: fakeSource(db), publisher, apply: true, confirm: 'yes', log: silent })).rejects.toThrow(/confirmation phrase/)
+    expect(publisher).not.toHaveBeenCalled()
+  })
+
+  it('apply on a read-only source refuses', async () => {
+    await expect(runPublish({ source: fakeSource(migratedDb()), apply: true, confirm: PUBLISH_CONFIRM, log: silent })).rejects.toThrow(/read-only/)
+  })
+
+  it('one page out of state aborts the whole run, nothing written, listing it', async () => {
+    const db = migratedDb()
+    db[key('partnerprogramma', 'en')].draft.meta = { ...db[key('partnerprogramma', 'en')].draft.meta, title: 'edited' }
+    const publisher = fakePublisher(db)
+    await expect(runPublish({ source: fakeSource(db), publisher, apply: true, confirm: PUBLISH_CONFIRM, log: silent })).rejects.toThrow(
+      /nothing written[\s\S]*partnerprogramma\.en/,
+    )
+    expect(publisher).not.toHaveBeenCalled()
+  })
+
+  it('apply publishes exactly the 8 page-locales, and a second run is a no-op', async () => {
+    const db = migratedDb()
+    const publisher = fakePublisher(db)
+    const first = await runPublish({ source: fakeSource(db), publisher, apply: true, confirm: PUBLISH_CONFIRM, log: silent })
+    expect(first.published).toHaveLength(8)
+    expect(publisher.mock.calls.map(([id, locale]) => key(SLUGS[id - 1], locale)).sort()).toEqual(Object.keys(db).sort())
+    const second = await runPublish({ source: fakeSource(db), publisher, apply: true, confirm: PUBLISH_CONFIRM, log: silent })
+    expect(second.published).toEqual([])
+    expect(second.already).toHaveLength(8)
+    expect(publisher).toHaveBeenCalledTimes(8)
+  })
+
+  it('a duplicate slug aborts', async () => {
+    await expect(runPublish({ source: fakeSource(migratedDb(), [{ id: 99, slug: 'home' }]), apply: false, log: silent })).rejects.toThrow(/more than one page/)
+  })
+
+  it('a missing page aborts', async () => {
+    const source = fakeSource(migratedDb())
+    const pages = source.pages
+    source.pages = async () => (await pages()).filter((page) => page.slug !== 'contact')
+    await expect(runPublish({ source, apply: false, log: silent })).rejects.toThrow(/contact: page not found/)
+  })
+})

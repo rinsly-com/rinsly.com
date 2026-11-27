@@ -1,0 +1,82 @@
+name: Publish refactor drafts (accp)
+
+# Publishes the four pages written as drafts by migration
+# 20261127_170000_content_refactor (home, prijzen, partnerprogramma, contact;
+# NL + EN), and nothing else. Runbook: docs/runbook-refactor-part2-content.md.
+#
+# Manual only. Run it after Yaron has looked at the drafts on accp and given
+# his OK. Publishing IS the production go-live: the pages go public on accp at
+# once, and the next prod build (develop -> main, the admin Deploy button, or
+# any publish in the admin) puts them on rinsly.com.
+#
+# Dry run by default: leave "apply" off to see the plan in the log. To write,
+# tick "apply" AND type the confirmation phrase publish-4-pages-and-go-live.
+# The script refuses to write anything unless every page is still exactly in
+# the state the migration left (latest draft = migrated copy, published =
+# snapshot, or already published).
+#
+# NODE_ENV=production makes the Payload CLI use the remote D1 binding in
+# wrangler.jsonc (accp). Same mechanism and secrets as seed-accp.yml, so no new
+# credential exists for this. The workflow has no DEPLOY_DISPATCH_* secret, so
+# the publish hook logs "skipped" here and does not start deploy-prod itself.
+#
+# Shares deploy-accp.yml's concurrency group so it never races a deploy.
+
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: 'Write (publish). Off = dry run.'
+        type: boolean
+        default: false
+      confirm:
+        description: 'With apply: type publish-4-pages-and-go-live'
+        type: string
+        default: ''
+
+concurrency:
+  group: deploy-rinsly-accp
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  packages: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Set up Node.js + GitHub Packages auth
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          registry-url: 'https://npm.pkg.github.com'
+          scope: '@rinsly-com'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
+
+      - name: Publish (dry run unless apply)
+        # Inputs go through env, never into the shell command line.
+        run: |
+          if [ "$APPLY" = "true" ]; then
+            NODE_ENV=production pnpm content:publish-refactor apply
+          else
+            NODE_ENV=production pnpm content:publish-refactor
+          fi
+        env:
+          APPLY: ${{ inputs.apply }}
+          PUBLISH_CONFIRM: ${{ inputs.confirm }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          PAYLOAD_SECRET: ${{ secrets.PAYLOAD_SECRET }}
+          NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}
