@@ -38,6 +38,7 @@ export function RinslyMotion() {
     let cancelled = false
     let ctx: { revert: () => void } | undefined
     let observer: IntersectionObserver | undefined
+    let assembleFrame: number | undefined
 
     void (async () => {
       const [{ gsap }, { ScrollTrigger }] = await Promise.all([import('gsap'), import('gsap/ScrollTrigger')])
@@ -46,7 +47,7 @@ export function RinslyMotion() {
       if (cancelled) return
       gsap.registerPlugin(ScrollTrigger)
 
-      ctx = gsap.context(() => {
+      ctx = gsap.context((self) => {
         const frames = gsap.utils.toArray<HTMLElement>('[data-assemble="frame"]')
         const phones = gsap.utils.toArray<HTMLElement>('[data-assemble="phone"]')
         const floaters = gsap.utils.toArray<HTMLElement>('[data-phone-float]')
@@ -54,35 +55,46 @@ export function RinslyMotion() {
           ? gsap.to(floaters, { y: 6, duration: 3.5, ease: 'sine.inOut', yoyo: true, repeat: -1, paused: true })
           : undefined
 
-        requestAnimationFrame(() => {
-          if (frames.length) {
-            gsap.fromTo(frames, { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' })
-          }
-          if (phones.length) {
-            gsap.fromTo(
-              phones,
-              { y: 24, rotate: 3, opacity: 0 },
-              {
-                y: 0,
-                rotate: 0,
-                opacity: 1,
-                duration: 0.8,
-                delay: 0.14,
-                ease: 'power3.out',
-                onComplete: () => {
-                  if (!float) return
-                  float.play()
-                  const hero = floaters[0]?.closest('[data-hero]')
-                  if (!hero) return
-                  observer = new IntersectionObserver(([entry]) => {
-                    if (entry.isIntersecting) float.play()
-                    else float.pause()
-                  })
-                  observer.observe(hero)
+        // gsap.context only records tweens created while its callback runs.
+        // Re-enter it next frame so revert() on route change kills these.
+        assembleFrame = requestAnimationFrame(() => {
+          // `cancelled` flips in the cleanup, which can run before this frame.
+          if (cancelled) return
+          self.add(() => {
+            if (frames.length) {
+              gsap.fromTo(
+                frames,
+                { y: 20, opacity: 0 },
+                { y: 0, opacity: 1, duration: 0.8, ease: 'power3.out' },
+              )
+            }
+            if (phones.length) {
+              gsap.fromTo(
+                phones,
+                { y: 24, rotate: 3, opacity: 0 },
+                {
+                  y: 0,
+                  rotate: 0,
+                  opacity: 1,
+                  duration: 0.8,
+                  delay: 0.14,
+                  ease: 'power3.out',
+                  onComplete: () => {
+                    // Cleanup sets `cancelled` before revert(); don't observe after that.
+                    if (cancelled || !float) return
+                    float.play()
+                    const hero = floaters[0]?.closest('[data-hero]')
+                    if (!hero) return
+                    observer = new IntersectionObserver(([entry]) => {
+                      if (entry.isIntersecting) float.play()
+                      else float.pause()
+                    })
+                    observer.observe(hero)
+                  },
                 },
-              },
-            )
-          }
+              )
+            }
+          })
         })
 
         gsap.utils.toArray<HTMLElement>('[data-frame-morph]').forEach((group) => {
@@ -104,6 +116,7 @@ export function RinslyMotion() {
 
     return () => {
       cancelled = true
+      if (assembleFrame !== undefined) cancelAnimationFrame(assembleFrame)
       observer?.disconnect()
       ctx?.revert()
     }
