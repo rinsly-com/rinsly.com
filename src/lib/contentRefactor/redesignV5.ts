@@ -273,6 +273,8 @@ function prijzen(base: PageDoc, l: Locale): PageDoc {
       },
       {
         ...cta,
+        // No eyebrow (v5 mockup): the core cta eyebrow is accent on the dark band, 2.96:1 (axe color-contrast).
+        eyebrow: null,
         title: quote(l),
         text: tx(p.sub, l),
         button: { ...obj(cta.button), label: quote(l), variant: 'primary' },
@@ -360,7 +362,8 @@ function partner(base: PageDoc, l: Locale): PageDoc {
           ...items.filter((item) => item.id !== id.faqCost),
         ],
       },
-      { ...closing, button: { ...obj(closing.button), label: PARTNER.closingTitle[l] } },
+      // No eyebrow, as on prijzen (v5 mockup; contrast on the dark band).
+      { ...closing, eyebrow: null, button: { ...obj(closing.button), label: PARTNER.closingTitle[l] } },
     ],
   }
 }

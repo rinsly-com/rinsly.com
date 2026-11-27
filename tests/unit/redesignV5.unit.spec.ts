@@ -4,7 +4,7 @@ import preimage from '@/lib/contentRefactor/accpPreimage.json'
 import * as COPY from '@/lib/contentRefactor/copy'
 import { SOURCE_QUOTES, V5, type V5String } from '@/lib/contentRefactor/copyV5'
 import { type Obj, sameValue } from '@/lib/contentRefactor/edit'
-import { type Locale, PAGE_SLUGS, type PageDoc } from '@/lib/contentRefactor/pages'
+import { type Locale, PAGE_SLUGS, type PageDoc, type PageSlug } from '@/lib/contentRefactor/pages'
 import { fromSlugRefs } from '@/lib/contentRefactor/refs'
 import { V5_SLUGS, page122, runRedesignV5, splitRung, v5Page } from '@/lib/contentRefactor/redesignV5'
 import { productBlocks } from '@/blocks/product'
@@ -157,7 +157,7 @@ const REFERENCED = [
 const SLUG_IDS = Object.fromEntries([...PAGE_SLUGS, ...REFERENCED].map((slug, i) => [slug, i + 1])) as Record<string, number>
 const idBySlug = new Map(Object.entries(SLUG_IDS))
 
-function fakePayload(start: (slug: string, l: Locale) => PageDoc, extraDocs: { id: number; slug: string }[] = []) {
+function fakePayload(start: (slug: PageSlug, l: Locale) => PageDoc, extraDocs: { id: number; slug: string }[] = []) {
   const db = new Map<string, Row>()
   for (const slug of PAGE_SLUGS) for (const l of LOCALES) {
     const doc = fromSlugRefs(clone(start(slug, l)), idBySlug) as unknown as Obj
@@ -186,7 +186,7 @@ function fakePayload(start: (slug: string, l: Locale) => PageDoc, extraDocs: { i
   return { payload: payload as never, db, writes, draftOf }
 }
 
-const isV5 = (slug: string): slug is (typeof V5_SLUGS)[number] => (V5_SLUGS as readonly string[]).includes(slug)
+const isV5 = (slug: PageSlug): slug is (typeof V5_SLUGS)[number] => (V5_SLUGS as readonly PageSlug[]).includes(slug)
 
 describe('redesign v5 migration guards', () => {
   it('up from the #122 drafts writes 6 drafts and leaves contact; a second up is a no-op', async () => {
