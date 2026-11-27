@@ -8,6 +8,10 @@ import {
   migratedPage,
   migrationManifest,
   PUBLISH_MANIFEST,
+  assertApplyAllowed,
+  payloadPublisher,
+  payloadSource,
+  type PayloadLike,
   planPublish,
   PUBLISH_CONFIRM,
   runPublish,
@@ -171,3 +175,75 @@ describe('publish-refactor run', () => {
     await expect(runPublish({ source, apply: false, log: silent })).rejects.toThrow(/contact: page not found/)
   })
 })
+
+describe('publish-refactor Payload calls', () => {
+  /** A fake Payload local API over the same in-memory pages; update honours publishSpecificLocale only. */
+  function fakePayload(db: Db) {
+    const update = vi.fn((args: Record<string, unknown>) => {
+      const slug = SLUGS[(args.id as number) - 1]
+      const locales = args.publishAllLocales === false ? [args.publishSpecificLocale as Locale] : LOCALES
+      for (const locale of locales) {
+        const row = db[key(slug, locale)]
+        row.published = clone(locale === args.locale ? (args.data as PageDoc) : row.draft)
+      }
+      return Promise.resolve({})
+    })
+    const payload: PayloadLike = {
+      find: () => Promise.resolve({ docs: SLUGS.map((slug, index) => ({ id: index + 1, slug })) }),
+      findByID: (args) => {
+        const row = db[key(SLUGS[(args.id as number) - 1], args.locale as string)]
+        return Promise.resolve(clone(args.draft ? row.draft : row.published))
+      },
+      update,
+    }
+    return { payload, update }
+  }
+
+  it('the publisher publishes exactly one locale: publishAllLocales false, publishSpecificLocale = locale', async () => {
+    const { payload, update } = fakePayload(migratedDb())
+    await payloadPublisher(payload)(3, 'en', { layout: [], meta: {} })
+    expect(update).toHaveBeenCalledWith(
+      expect.objectContaining({ collection: 'pages', id: 3, locale: 'en', draft: false, publishAllLocales: false, publishSpecificLocale: 'en' }),
+    )
+  })
+
+  it('a full run sends those flags on every call, one per page-locale', async () => {
+    const db = migratedDb()
+    const { payload, update } = fakePayload(db)
+    const result = await runPublish({ source: payloadSource(payload), publisher: payloadPublisher(payload), apply: true, confirm: PUBLISH_CONFIRM, log: silent })
+    expect(result.published).toHaveLength(8)
+    const calls = update.mock.calls.map(([args]) => args)
+    expect(calls).toHaveLength(8)
+    for (const args of calls) {
+      expect(args.publishAllLocales).toBe(false)
+      expect(args.publishSpecificLocale).toBe(args.locale)
+      expect(args.draft).toBe(false)
+    }
+  })
+
+  it('the phrase check runs on its own, before any database is opened', () => {
+    expect(() => { assertApplyAllowed({ apply: true, confirm: undefined, writable: true }) }).toThrow(/confirmation phrase/)
+    expect(() => { assertApplyAllowed({ apply: true, confirm: PUBLISH_CONFIRM, writable: false }) }).toThrow(/read-only/)
+    expect(() => { assertApplyAllowed({ apply: false, confirm: undefined, writable: true }) }).not.toThrow()
+    expect(() => { assertApplyAllowed({ apply: true, confirm: PUBLISH_CONFIRM, writable: true }) }).not.toThrow()
+  })
+
+  it('a run that stopped halfway is finished by running it again', async () => {
+    const db = migratedDb()
+    const { payload, update } = fakePayload(db)
+    let calls = 0
+    const flaky = payloadPublisher({
+      ...payload,
+      update: (args) => {
+        calls += 1
+        if (calls === 4) return Promise.reject(new Error('D1 hiccup'))
+        return update(args)
+      },
+    })
+    await expect(runPublish({ source: payloadSource(payload), publisher: flaky, apply: true, confirm: PUBLISH_CONFIRM, log: silent })).rejects.toThrow(/D1 hiccup/)
+    const rerun = await runPublish({ source: payloadSource(payload), publisher: payloadPublisher(payload), apply: true, confirm: PUBLISH_CONFIRM, log: silent })
+    expect(rerun.already).toHaveLength(3)
+    expect(rerun.published).toHaveLength(5)
+  })
+})
+

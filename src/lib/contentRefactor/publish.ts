@@ -117,11 +117,53 @@ export type PublishResult = { applied: boolean; published: string[]; already: st
 const asPage = (raw: Obj, slugById: Map<number, string>): PageDoc =>
   toSlugRefs({ layout: (raw.layout ?? []) as PageDoc['layout'], meta: (raw.meta ?? {}) as Obj }, slugById)
 
-export async function runPublish({ source, publisher, apply, confirm, manifest = PUBLISH_MANIFEST, log }: PublishArgs): Promise<PublishResult> {
-  if (apply && !publisher) throw new Error('[publish-refactor] this source is read-only; --apply needs the Payload local API')
+/**
+ * The apply/phrase check on its own, so the script can run it before it opens
+ * a database connection (getPayload). runPublish repeats it.
+ */
+export function assertApplyAllowed({ apply, confirm, writable }: { apply: boolean; confirm?: string; writable: boolean }): void {
+  if (apply && !writable) throw new Error('[publish-refactor] this source is read-only; apply needs the Payload local API')
   if (apply && confirm !== PUBLISH_CONFIRM) {
-    throw new Error(`[publish-refactor] --apply needs the confirmation phrase "${PUBLISH_CONFIRM}": publishing these pages is the production go-live`)
+    throw new Error('[publish-refactor] apply needs the confirmation phrase from the runbook: publishing these pages is the production go-live')
   }
+}
+
+/** The slice of the Payload local API the publish step uses. */
+export type PayloadLike = {
+  find: (args: Record<string, unknown>) => Promise<{ docs: { id: number; slug?: string | null }[] }>
+  findByID: (args: Record<string, unknown>) => Promise<unknown>
+  update: (args: Record<string, unknown>) => Promise<unknown>
+}
+
+export function payloadSource(payload: PayloadLike): PageSource {
+  return {
+    pages: async () => (await payload.find({ collection: 'pages', depth: 0, pagination: false, draft: true, select: { slug: true } })).docs,
+    read: async (id, locale, draft) => (await payload.findByID({ collection: 'pages', id, locale, fallbackLocale: false, depth: 0, draft })) as Obj,
+  }
+}
+
+/**
+ * Publishes ONE locale. `_status` is document-level on pages, so without
+ * publishAllLocales: false + publishSpecificLocale Payload treats a published
+ * update as publish-all and promotes the other locale's draft unchecked.
+ */
+export function payloadPublisher(payload: PayloadLike): PagePublisher {
+  return async (id, locale, draft) => {
+    await payload.update({
+      collection: 'pages',
+      id,
+      locale,
+      depth: 0,
+      draft: false,
+      publishAllLocales: false,
+      publishSpecificLocale: locale,
+      data: { layout: draft.layout, meta: draft.meta, _status: 'published' },
+    })
+  }
+}
+
+export async function runPublish({ source, publisher, apply, confirm, manifest = PUBLISH_MANIFEST, log }: PublishArgs): Promise<PublishResult> {
+  assertApplyAllowed({ apply, confirm, writable: Boolean(publisher) })
   const docs = await source.pages()
   const idBySlug = new Map<string, number>()
   const slugById = new Map<number, string>()

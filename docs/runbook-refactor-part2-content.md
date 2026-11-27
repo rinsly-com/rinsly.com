@@ -36,7 +36,14 @@ writes in `deploy:database`.
 4. Yaron reviews the drafts on accp (admin preview, NL and EN) and gives his
    OK. Until then: no publish in the admin, no content-endpoint edits to
    these four pages (a later publish of the draft would overwrite them).
-5. **After Yaron's OK**: Actions → "Publish refactor drafts (accp)":
+5. **Before the first run (once, repo setting, Fleet or Yaron):** create the
+   GitHub environment `accp-publish` with **Yaron as required reviewer**,
+   the environment variable `ACCP_PUBLISH_PROTECTED=yes`, and if possible
+   `CLOUDFLARE_API_TOKEN`, `CLOUDFLARE_ACCOUNT_ID`, `PAYLOAD_SECRET` as
+   environment secrets. The workflow only runs on `develop`, waits for the
+   reviewer, and stops at its first step if that variable is missing
+   (GitHub would otherwise create the environment unprotected on first use).
+6. **After Yaron's OK**: Actions → "Publish refactor drafts (accp)" on `develop`:
    first a run with `apply` off (dry run, must show 8 × `would publish`),
    then with `apply` on and confirm `publish-4-pages-and-go-live`. The
    script refuses to write anything unless all eight page-locales are
@@ -44,7 +51,13 @@ writes in `deploy:database`.
    expects (sha256 of the latest draft = the manifest's `draft` hash, the
    published version = one of its `published` hashes); already published
    ones are skipped, so a re-run is a no-op. accp is now live with the new
-   copy.
+   copy. Each page-locale is published on its own (`publishSpecificLocale`)
+   and checked right after.
+
+   **If a run stops halfway** (D1 error, timeout): run it again with the
+   same inputs. The page-locales already published log `already published`,
+   the rest are published; nothing is published twice. The dry run shows
+   the split first.
 
    **The manifest is the contract.** Today it holds the #121 migration
    output. A PR that changes the drafts before publish (the redesign) runs
@@ -52,10 +65,10 @@ writes in `deploy:database`.
    `fullHash`) and commits the new manifest in the same PR; the unit test
    `publishRefactor.unit.spec.ts` "the committed manifest is ..." then needs
    that PR's expected state too.
-6. Then merge `develop` → `main`: deploy-prod builds the v3.3 calculator, the
+7. Then merge `develop` → `main`: deploy-prod builds the v3.3 calculator, the
    contact form text and the published copy together. **Hold `develop` →
    `main`, the admin Deploy button and any admin publish between step 1 and
-   step 6**: a prod build in between would pair old code with new header and
+   step 7**: a prod build in between would pair old code with new header and
    footer, or new copy with the old calculator.
 
 nd footer together.

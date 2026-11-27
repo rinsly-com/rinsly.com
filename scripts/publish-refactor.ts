@@ -16,7 +16,7 @@
  */
 import type { Obj } from '../src/lib/contentRefactor/edit'
 import type { Locale } from '../src/lib/contentRefactor/pages'
-import { type PageSource, PUBLISH_CONFIRM, runPublish } from '../src/lib/contentRefactor/publish'
+import { assertApplyAllowed, type PageSource, type PayloadLike, payloadPublisher, payloadSource, runPublish } from '../src/lib/contentRefactor/publish'
 
 // `payload run` passes only positional words to the script (it drops --flags),
 // so the write switch is the word `apply`. `--apply` is accepted too (tsx).
@@ -49,34 +49,19 @@ async function main() {
     await runPublish({ source: publicSource(publicApi), apply: false, log })
     return
   }
+  // Refuse a bad apply before anything opens D1.
+  assertApplyAllowed({ apply, confirm, writable: true })
   const { getPayload } = await import('payload')
   const { default: config } = await import('../src/payload.config')
   const payload = await getPayload({ config })
   log(`target: ${process.env.NODE_ENV === 'production' ? 'REMOTE accp D1' : 'local D1'}, ${apply ? 'APPLY' : 'dry run'}`)
-  if (apply) log(`confirmation ${confirm === PUBLISH_CONFIRM ? 'given' : 'missing or wrong'}`)
   if (payload.collections.pages.config.flattenedFields.some((field) => field.name === 'tenant')) {
     throw new Error('pages has a tenant field; this script only knows a single-site database')
   }
+  const api = payload as unknown as PayloadLike
   await runPublish({
-    source: {
-      pages: async () => (await payload.find({ collection: 'pages', depth: 0, pagination: false, draft: true, select: { slug: true } })).docs,
-      read: async (id, locale, draft) =>
-        (await payload.findByID({ collection: 'pages', id, locale, fallbackLocale: false, depth: 0, draft })) as unknown as Obj,
-    },
-    publisher: async (id, locale, draft) => {
-      await payload.update({
-        collection: 'pages',
-        id,
-        locale,
-        depth: 0,
-        draft: false,
-        // Without this, Payload treats a published update as publish-all
-        // because `_status` is not localized on pages.
-        publishAllLocales: false,
-        publishSpecificLocale: locale,
-        data: { layout: draft.layout, meta: draft.meta, _status: 'published' } as never,
-      })
-    },
+    source: payloadSource(api),
+    publisher: payloadPublisher(api),
     apply,
     confirm,
     log,
