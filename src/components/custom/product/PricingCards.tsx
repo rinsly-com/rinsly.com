@@ -48,7 +48,7 @@ export function PricingCards({ eyebrow, title, plans, sharedLine, limitsNote, lo
             </p>
             {plan.priceNote && <p className="text-[12.5px] text-muted">{plan.priceNote}</p>}
             {plan.features?.length ? (
-              <ul className="mt-2 flex flex-col gap-[3px] border-t border-hair pt-2">
+              <ul className="mt-2 flex flex-col gap-0.5 border-t border-hair pt-2">
                 {plan.features.map((feature, j) => {
                   const included = feature.included !== false
                   return (

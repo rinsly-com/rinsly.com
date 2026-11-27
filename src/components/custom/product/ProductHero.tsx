@@ -30,7 +30,7 @@ export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, 
   const rest = buttons?.slice(1) ?? []
   return (
     <div data-hero className="relative">
-      <Section className="pt-8 pb-6 sm:pt-10">
+      <Section className="pt-8 pb-5 sm:pt-8">
         <div className={split ? 'grid items-center gap-10 lg:grid-cols-[1.15fr_1fr]' : 'max-w-3xl'}>
           <div className="flex flex-col items-start">
             {eyebrow && (
@@ -74,10 +74,10 @@ export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, 
           </div>
           {split && (
             <figure className="relative hidden lg:block">
-              <div className="relative h-[292px]">
+              <div className="relative h-[280px]">
                 <div data-assemble="frame" className="relative h-full">
                   <BrowserFrame url={showcase?.url} className="h-full">
-                    <div className="h-[252px]">
+                    <div className="h-[240px]">
                       <Scene />
                     </div>
                   </BrowserFrame>
@@ -95,7 +95,7 @@ export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, 
                   </div>
                 )}
               </div>
-              {showcase?.caption && <figcaption className="mt-3 text-xs text-muted">{showcase.caption}</figcaption>}
+              {showcase?.caption && <figcaption className="mt-2 text-xs text-muted">{showcase.caption}</figcaption>}
             </figure>
           )}
         </div>
