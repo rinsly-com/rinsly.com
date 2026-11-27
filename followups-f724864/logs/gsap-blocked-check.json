@@ -1,0 +1,31 @@
+{
+ "normal": {
+  "blocked": 0,
+  "warns": [],
+  "anim": true,
+  "frameOpacity": [
+   "1",
+   "1"
+  ],
+  "overlayOpacity": [
+   "0",
+   "0"
+  ]
+ },
+ "gsapBlocked": {
+  "blocked": 4,
+  "warns": [
+   "[RinslyMotion] GSAP failed to load; showing the final state ChunkLoadError: Failed to load",
+   "[RinslyMotion] GSAP failed to load; showing the final state ChunkLoadError: Failed to load"
+  ],
+  "anim": false,
+  "frameOpacity": [
+   "1",
+   "1"
+  ],
+  "overlayOpacity": [
+   "0",
+   "0"
+  ]
+ }
+}

@@ -14,3 +14,5 @@ Screenshots and logs for the rinsly.com PR "feat(redesign): direction B v5". Thi
 - `logs/gates-5987c8b.out`: the box gates on the PR head.
 
 Rendering: `next dev` on the box against that local D1, after publishing the v5 drafts in a throwaway copy of the local state (`local-publish-for-shots.log`). Nothing remote was written.
+
+**Follow-up PR (Code Review nits on #126), head f724864:** `followups-f724864/`: gates, local D1 log, checks.json (axe/CLS, all 6 pages), three desktop fold shots, and `logs/gsap-blocked-check.json` + `shots/nl-desktop-gsap-blocked.png` (GSAP chunk requests aborted in the browser: `.anim` dropped, hero frames and step overlays at their final state).
