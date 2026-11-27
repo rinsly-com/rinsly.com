@@ -21,6 +21,7 @@ declare namespace NodeJS {
     PLAYWRIGHT_BASE_URL?: string
     PSI_API_KEY?: string
     RINSLY_KVK_COLLECTION_ENABLED?: string
+    RINSLY_CASES_PAGE_ENABLED?: string
     RESET_EMAIL?: string
     RESET_PASSWORD?: string
     SEED_ADMIN_EMAIL?: string
