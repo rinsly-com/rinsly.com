@@ -59,12 +59,17 @@ writes in `deploy:database`.
    the rest are published; nothing is published twice. The dry run shows
    the split first.
 
-   **The manifest is the contract.** Today it holds the #121 migration
-   output. A PR that changes the drafts before publish (the redesign) runs
-   `pnpm content:publish-refactor:manifest` (or writes its own hashes with
-   `fullHash`) and commits the new manifest in the same PR; the unit test
-   `publishRefactor.unit.spec.ts` "the committed manifest is ..." then needs
-   that PR's expected state too.
+   **The manifest is the contract.** It holds the redesign v5 drafts for
+   home, prijzen and partnerprogramma (migration
+   `20261127_200500_redesign_v5_content`, run on accp by the deploy after
+   the redesign PR merges) and the #121 draft for contact. The redesign PR
+   regenerated it with `pnpm content:publish-refactor:manifest`. Any later
+   PR that changes the drafts before publish does the same (or writes its
+   own hashes with `fullHash`) and commits the new manifest in the same PR;
+   the unit test `publishRefactor.unit.spec.ts` "the committed manifest is
+   ..." then needs that PR's expected state too. Until the v5 migration has
+   run on accp, the dry run blocks home, prijzen and partnerprogramma (their
+   drafts are still the #121 ones): that is expected, do not publish then.
 7. Then merge `develop` → `main`: deploy-prod builds the v3.3 calculator, the
    contact form text and the published copy together. **Hold `develop` →
    `main`, the admin Deploy button and any admin publish between step 1 and
