@@ -78,12 +78,29 @@ export const productHeroBlock: Block = {
             { label: t('Business site', 'Bedrijfssite'), value: 'business' },
             { label: t('Plans / dashboard', 'Pakketten / dashboard'), value: 'plans' },
             { label: t('Studio portfolio', 'Studioportfolio'), value: 'studio' },
+            { label: t('Live and staging environments', 'Live- en stagingomgeving'), value: 'environments' },
           ],
         },
         text('url', 'Address bar label', 'Label in de adresbalk'),
         text('badge', 'Overlay chip', 'Chip op het frame'),
         text('caption', 'Caption', 'Onderschrift'),
         { name: 'showPhone', label: t('Show the CMS phone', 'Toon de CMS-telefoon'), type: 'checkbox', defaultValue: false },
+        // Redesign v8: the few words drawn inside the frames are content too (no copy in components).
+        text('saveLabel', 'Save button in the phone', 'Opslaanknop in de telefoon', {
+          admin: {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            condition: (_data, sibling) => sibling?.['showPhone'] === true,
+            description: t('Empty: the button is drawn without text.', 'Leeg: de knop wordt zonder tekst getekend.'),
+          },
+        }),
+        text('liveLabel', 'Label above the live window', 'Label boven het live-venster', {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          admin: { condition: (_data, sibling) => sibling?.['kind'] === 'environments' },
+        }),
+        text('stagingLabel', 'Label above the staging window', 'Label boven het stagingvenster', {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          admin: { condition: (_data, sibling) => sibling?.['kind'] === 'environments' },
+        }),
       ],
     },
     anchor(),

@@ -10,6 +10,7 @@ import { gitHead, writeManifest } from '@/lib/contentRefactor/manifestFile'
 import type { Obj } from '@/lib/contentRefactor/edit'
 import type { Locale, PageDoc, PageSlug } from '@/lib/contentRefactor/pages'
 import { v5Page } from '@/lib/contentRefactor/redesignV5'
+import { v8Page } from '@/lib/contentRefactor/redesignV8'
 import {
   contentHash,
   fullHash,
@@ -111,10 +112,11 @@ describe('publish-refactor manifest', () => {
     expect(Object.keys(loadPublishManifest().pages).sort()).toEqual(SLUGS.flatMap((slug) => LOCALES.map((locale) => key(slug, locale))).sort())
   })
 
-  it('home, prijzen and partnerprogramma expect the redesign v5 drafts, contact the #121 draft', () => {
+  it('home, prijzen and partnerprogramma expect the redesign v8 drafts, contact the #121 draft', () => {
     for (const locale of LOCALES) {
       for (const slug of ['home', 'prijzen', 'partnerprogramma'] as const) {
-        expect(loadPublishManifest().pages[key(slug, locale)].draft).toBe(fullHash(v5Page(slug, locale)))
+        expect(loadPublishManifest().pages[key(slug, locale)].draft).toBe(fullHash(v8Page(slug, locale)))
+        expect(loadPublishManifest().pages[key(slug, locale)].draft).not.toBe(fullHash(v5Page(slug, locale)))
         expect(loadPublishManifest().pages[key(slug, locale)].draft).not.toBe(fullHash(migratedPage(slug, locale)))
       }
       expect(loadPublishManifest().pages[key('contact', locale)].draft).toBe(fullHash(migratedPage('contact', locale)))

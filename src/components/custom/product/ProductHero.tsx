@@ -1,14 +1,22 @@
+import type { ReactNode } from 'react'
+
 import type { Locale } from '@rinsly-com/site-core'
 import { Eyebrow, Section } from '@rinsly-com/site-core/ui'
 
 import type { ProductHeroBlock } from '@/payload-types'
 
-import { BrowserFrame, CmsPhone, MiniBusinessSite, MiniPlanDashboard, MiniStudioPortfolio } from './Frames'
+import { BrowserFrame, CmsPhone, MiniBusinessSite, MiniEnvironments, MiniPlanDashboard, MiniStudioPortfolio } from './Frames'
 import { ProductLink } from './ProductLink'
 
 type Props = Omit<ProductHeroBlock, 'blockType'> & { locale: Locale }
 
-const SCENES = { business: MiniBusinessSite, plans: MiniPlanDashboard, studio: MiniStudioPortfolio } as const
+type Showcase = NonNullable<ProductHeroBlock['showcase']>
+const SCENES: Record<NonNullable<Showcase['kind']>, (showcase: Showcase) => ReactNode> = {
+  business: () => <MiniBusinessSite />,
+  plans: () => <MiniPlanDashboard />,
+  studio: () => <MiniStudioPortfolio />,
+  environments: (showcase) => <MiniEnvironments liveLabel={showcase.liveLabel} stagingLabel={showcase.stagingLabel} />,
+}
 
 /**
  * `productHero`: the first screen of a conversion page. Copy left (eyebrow,
@@ -25,7 +33,7 @@ const SCENES = { business: MiniBusinessSite, plans: MiniPlanDashboard, studio: M
  */
 export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, showcase, locale }: Props) {
   const split = variant !== 'compact'
-  const Scene = SCENES[showcase?.kind ?? 'business']
+  const scene = SCENES[showcase?.kind ?? 'business'](showcase ?? {})
   const first = buttons?.at(0)
   const rest = buttons?.slice(1) ?? []
   return (
@@ -78,7 +86,7 @@ export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, 
                 <div data-assemble="frame" className="relative h-full">
                   <BrowserFrame url={showcase?.url} className="h-full">
                     <div className="h-[240px]">
-                      <Scene />
+                      {scene}
                     </div>
                   </BrowserFrame>
                   {showcase?.badge && (
@@ -88,9 +96,9 @@ export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, 
                   )}
                 </div>
                 {showcase?.showPhone && (
-                  <div data-assemble="phone" className="absolute -right-3 -bottom-3 z-[3]">
+                  <div data-assemble="phone" className="absolute -right-1 bottom-2 z-[3]">
                     <div data-phone-float>
-                      <CmsPhone />
+                      <CmsPhone saveLabel={showcase.saveLabel} />
                     </div>
                   </div>
                 )}

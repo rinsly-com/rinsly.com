@@ -725,11 +725,17 @@ export interface ProductHeroBlock {
    * Decorative drawing of an example site (hidden on phones). Not a screenshot and not a claim.
    */
   showcase?: {
-    kind?: ('business' | 'plans' | 'studio') | null;
+    kind?: ('business' | 'plans' | 'studio' | 'environments') | null;
     url?: string | null;
     badge?: string | null;
     caption?: string | null;
     showPhone?: boolean | null;
+    /**
+     * Empty: the button is drawn without text.
+     */
+    saveLabel?: string | null;
+    liveLabel?: string | null;
+    stagingLabel?: string | null;
   };
   /**
    * Optional. Public hash for menu links. Lowercase letters, numbers and dashes.
@@ -1568,6 +1574,9 @@ export interface ProductHeroBlockSelect<T extends boolean = true> {
         badge?: T;
         caption?: T;
         showPhone?: T;
+        saveLabel?: T;
+        liveLabel?: T;
+        stagingLabel?: T;
       };
   anchor?: T;
   id?: T;

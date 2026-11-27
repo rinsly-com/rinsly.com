@@ -66,17 +66,18 @@ writes in `deploy:database`.
    the rest are published; nothing is published twice. The dry run shows
    the split first.
 
-   **The manifest is the contract.** It holds the redesign v5 drafts for
+   **The manifest is the contract.** It holds the redesign v8 drafts for
    home, prijzen and partnerprogramma (migration
+   `20261127_225300_redesign_v8_content` on top of the v5 drafts of
    `20261127_200500_redesign_v5_content`, run on accp by the deploy after
-   the redesign PR merges) and the #121 draft for contact. The redesign PR
+   the v8 PR merges) and the #121 draft for contact. The redesign PR
    regenerated it with `pnpm content:publish-refactor:manifest`. Any later
    PR that changes the drafts before publish does the same (or writes its
    own hashes with `fullHash`) and commits the new manifest in the same PR;
    the unit test `publishRefactor.unit.spec.ts` "the committed manifest is
-   ..." then needs that PR's expected state too. Until the v5 migration has
+   ..." then needs that PR's expected state too. Until the v8 migration has
    run on accp, the dry run blocks home, prijzen and partnerprogramma (their
-   drafts are still the #121 ones): that is expected, do not publish then.
+   drafts are still the v5 ones): that is expected, do not publish then.
 
    **Migration order on an old local database.** `20261127_170000` reads
    pages through the Local API with the current config, which includes the
@@ -88,6 +89,11 @@ writes in `deploy:database`.
    out `develop` from before the redesign PR (e.g. `f66b208`), run
    `pnpm payload migrate` there (170000 and 190000), then switch back to this
    branch and run `pnpm payload migrate` again.
+   The same holds one step later for `20261127_200500` (it reads pages with
+   the current config, which includes the v8 frame label columns of
+   `20261127_225200`): on a local copy that has not run 200500 yet, run
+   `pnpm payload migrate` on `develop` from before the v8 PR (e.g.
+   `b424feb`) first. accp has run 200500 already.
 7. Then merge `develop` → `main`: deploy-prod builds the v3.3 calculator, the
    contact form text and the published copy together. **Hold `develop` →
    `main`, the admin Deploy button and any admin publish between step 1 and
