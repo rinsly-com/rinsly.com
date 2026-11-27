@@ -8,7 +8,7 @@ import { V8 } from '@/lib/contentRefactor/copyV8'
 import { type Obj, sameValue } from '@/lib/contentRefactor/edit'
 import { type Locale, PAGE_SLUGS, type PageDoc, type PageSlug } from '@/lib/contentRefactor/pages'
 import { V5_SLUGS, page122, v5Page } from '@/lib/contentRefactor/redesignV5'
-import { V8_SLUGS, buildV8Page, runRedesignV8, v8Page } from '@/lib/contentRefactor/redesignV8'
+import { V8_SHOWCASE_FIELDS, V8_SLUGS, buildV8Page, runRedesignV8, v8Page } from '@/lib/contentRefactor/redesignV8'
 import { fromSlugRefs } from '@/lib/contentRefactor/refs'
 
 const LOCALES: Locale[] = ['nl', 'en']
@@ -164,6 +164,7 @@ function fakePayload(start: (slug: PageSlug, l: Locale) => PageDoc) {
     db.set(`${String(SLUG_IDS[slug])}.${l}`, { draft: doc, published: { layout: [], meta: { title: 'published' } } })
   }
   const writes: string[] = []
+  const sent: Obj[] = []
   const payload = {
     collections: { pages: { config: { flattenedFields: [{ name: 'slug' }] } } },
     logger: { info: () => undefined, warn: () => undefined },
@@ -179,11 +180,12 @@ function fakePayload(start: (slug: PageSlug, l: Locale) => PageDoc) {
       const row = db.get(`${String(id)}.${locale}`)
       if (row) row.draft = { layout: clone(data.layout), meta: clone(data.meta) }
       writes.push(`${String(id)}.${locale}`)
+      sent.push(clone(data))
       return Promise.resolve(data)
     },
   }
   const draftOf = (slug: string, l: Locale) => db.get(`${String(SLUG_IDS[slug])}.${l}`)
-  return { payload: payload as never, writes, draftOf }
+  return { payload: payload as never, writes, sent, draftOf }
 }
 const v5State = (slug: PageSlug, l: Locale) => (isRedesign(slug) ? v5Page(slug, l) : page122(slug, l))
 const v8State = (slug: PageSlug, l: Locale) => (isRedesign(slug) ? v8Page(slug, l) : page122(slug, l))
@@ -223,6 +225,11 @@ describe('redesign v8 migration guards', () => {
     expect(report.written).toHaveLength(4)
     expect(report.skipped.map((s) => s.split(':')[0]).sort()).toEqual(['home.nl', 'partnerprogramma.en'])
     expect(sameValue(fake.draftOf('prijzen', 'nl')?.draft, fromSlugRefs(v5Page('prijzen', 'nl'), idBySlug))).toBe(true)
+    // Payload keeps a stored field the update leaves out: down() sends the v8-only frame fields as explicit nulls.
+    for (const write of fake.sent) {
+      const showcase = (write.layout as Obj[])[0].showcase as Obj
+      for (const key of V8_SHOWCASE_FIELDS) expect(showcase).toHaveProperty(key, null)
+    }
     const again = await runRedesignV8({ payload: fake.payload, direction: 'down' })
     expect(again.written).toEqual([])
     expect(again.unchanged).toHaveLength(4)

@@ -126,6 +126,24 @@ export function v8Page(slug: V8Slug, locale: Locale): PageDoc {
   return buildV8Page(slug, locale, v5Page(slug, locale))
 }
 
+/** The productHero frame fields that are new in v8 (migration 20261127_225200). */
+export const V8_SHOWCASE_FIELDS = ['saveLabel', 'liveLabel', 'stagingLabel'] as const
+
+/**
+ * The v5 draft as down() writes it: the v8-only frame fields set to null
+ * explicitly. Payload keeps the stored value of a field the update leaves
+ * out, so without this a NL label would survive the revert (null and a
+ * missing key compare equal in sameValue, so the guards are not affected).
+ */
+export function withV8FieldsCleared(doc: PageDoc): PageDoc {
+  const out = clone(doc)
+  for (const b of out.layout) {
+    if (!isObj(b) || b.blockType !== 'productHero' || !isObj(b.showcase)) continue
+    for (const key of V8_SHOWCASE_FIELDS) b.showcase[key] ??= null
+  }
+  return out
+}
+
 export type V8Report = { written: string[]; unchanged: string[]; skipped: string[] }
 type Args = { payload: Payload; req?: PayloadRequest; direction: 'up' | 'down' }
 
@@ -178,7 +196,7 @@ export async function runRedesignV8({ payload, req, direction }: Args): Promise<
           report.skipped.push(`${where}: v8 draft was published, not reverting (restore by hand from the version history)`)
           continue
         }
-        target = before
+        target = withV8FieldsCleared(before)
       }
       const data = { ...fromSlugRefs(target, idBySlug), _status: 'draft' }
       writes.push({
