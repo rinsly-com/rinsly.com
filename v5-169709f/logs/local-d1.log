@@ -1,0 +1,69 @@
+== 2026-11-27T21:34:42+01:00 head 169709f, local D1 = accp-like snapshot + #122 migrations (170000, 190000) run on develop f66b208
+== migrate:status (before)
+│    20261127_170000_content_refactor │     2 │ Yes │
+│   20261127_190000_partner_v33_rungs │     2 │ Yes │
+│  20261127_200000_redesign_v5_blocks │       │  No │
+│ 20261127_200500_redesign_v5_content │       │  No │
+== migrate (up)
+$ cross-env NODE_OPTIONS=--no-deprecation payload migrate
+[21:34:49] INFO: Reading migration files from /workspace/builder-redesign-v5/src/migrations
+[21:34:49] INFO: Migrating: 20261127_200000_redesign_v5_blocks
+[21:34:51] INFO: Migrated:  20261127_200000_redesign_v5_blocks (1515ms)
+[21:34:51] INFO: Migrating: 20261127_200500_redesign_v5_content
+[21:34:52] INFO: [redesign-v5 up] wrote home.nl (draft)
+[21:34:52] INFO: [redesign-v5 up] wrote home.en (draft)
+[21:34:52] INFO: [redesign-v5 up] wrote prijzen.nl (draft)
+[21:34:52] INFO: [redesign-v5 up] wrote prijzen.en (draft)
+[21:34:53] INFO: [redesign-v5 up] wrote partnerprogramma.nl (draft)
+[21:34:53] INFO: [redesign-v5 up] wrote partnerprogramma.en (draft)
+[21:34:53] INFO: Migrated:  20261127_200500_redesign_v5_content (1701ms)
+[21:34:53] INFO: Done.
+== re-run up (idempotency)
+REPORT up {"written":[],"unchanged":["home.nl","home.en","prijzen.nl","prijzen.en","partnerprogramma.nl","partnerprogramma.en"],"skipped":[]}
+== re-run down (writes the #122 drafts back)
+REPORT down {"written":["home.nl (draft)","home.en (draft)","prijzen.nl (draft)","prijzen.en (draft)","partnerprogramma.nl (draft)","partnerprogramma.en (draft)"],"unchanged":[],"skipped":[]}
+== re-run down again (idempotency)
+REPORT down {"written":[],"unchanged":["home.nl","home.en","prijzen.nl","prijzen.en","partnerprogramma.nl","partnerprogramma.en"],"skipped":[]}
+== re-run up
+REPORT up {"written":["home.nl (draft)","home.en (draft)","prijzen.nl (draft)","prijzen.en (draft)","partnerprogramma.nl (draft)","partnerprogramma.en (draft)"],"unchanged":[],"skipped":[]}
+== migrate:down (both v5 migrations)
+$ cross-env NODE_OPTIONS=--no-deprecation payload migrate:down
+[21:35:17] INFO: Reading migration files from /workspace/builder-redesign-v5/src/migrations
+[21:35:17] INFO: Rolling back batch 3 consisting of 16 migration(s).
+[21:35:17] INFO: Migrating down: 20261127_200500_redesign_v5_content
+[21:35:17] INFO: [redesign-v5 down] wrote home.nl (draft)
+[21:35:18] INFO: [redesign-v5 down] wrote home.en (draft)
+[21:35:18] INFO: [redesign-v5 down] wrote prijzen.nl (draft)
+[21:35:18] INFO: [redesign-v5 down] wrote prijzen.en (draft)
+[21:35:18] INFO: [redesign-v5 down] wrote partnerprogramma.nl (draft)
+[21:35:19] INFO: [redesign-v5 down] wrote partnerprogramma.en (draft)
+[21:35:19] INFO: Migrated down:  20261127_200500_redesign_v5_content (1921ms)
+[21:35:19] INFO: Migrating down: 20261127_200000_redesign_v5_blocks
+[21:35:19] INFO: Migrated down:  20261127_200000_redesign_v5_blocks (318ms)
+[21:35:19] INFO: Done.
+== migrate (up again)
+$ cross-env NODE_OPTIONS=--no-deprecation payload migrate
+[21:35:23] INFO: Reading migration files from /workspace/builder-redesign-v5/src/migrations
+[21:35:23] INFO: Migrating: 20261127_200000_redesign_v5_blocks
+[21:35:24] INFO: Migrated:  20261127_200000_redesign_v5_blocks (1546ms)
+[21:35:25] INFO: Migrating: 20261127_200500_redesign_v5_content
+[21:35:25] INFO: [redesign-v5 up] wrote home.nl (draft)
+[21:35:25] INFO: [redesign-v5 up] wrote home.en (draft)
+[21:35:25] INFO: [redesign-v5 up] wrote prijzen.nl (draft)
+[21:35:26] INFO: [redesign-v5 up] wrote prijzen.en (draft)
+[21:35:26] INFO: [redesign-v5 up] wrote partnerprogramma.nl (draft)
+[21:35:26] INFO: [redesign-v5 up] wrote partnerprogramma.en (draft)
+[21:35:26] INFO: Migrated:  20261127_200500_redesign_v5_content (1641ms)
+[21:35:26] INFO: Done.
+== publish dry run (local D1, committed manifest)
+$ cross-env NODE_OPTIONS=--no-deprecation payload run scripts/publish-refactor.ts
+[publish-refactor] target: local D1, dry run
+[publish-refactor] would publish home.nl (305f1a8cc9bd)
+[publish-refactor] would publish home.en (72fb0b52c8b4)
+[publish-refactor] would publish prijzen.nl (511bfa7aef8c)
+[publish-refactor] would publish prijzen.en (40cc458ad28f)
+[publish-refactor] would publish partnerprogramma.nl (e4fd591d7d50)
+[publish-refactor] would publish partnerprogramma.en (ecd0f003dcff)
+[publish-refactor] would publish contact.nl (f2f553c2f60a)
+[publish-refactor] would publish contact.en (7213d2da4427)
+[publish-refactor] dry run: 8 to publish, 0 already published. Nothing written.

@@ -1,0 +1,6 @@
+Measured at 169709f, next dev on local D1, Chrome headless, viewport 1440x900, after load + 2.5 s (motion on).
+Bounding rect of the line under the plan cards ("<DPA line> · <business clients only>"):
+/nl/prijzen  "Verwerkersovereenkomst (AVG) bij elk pakket · Alleen voor zakelijke opdrachtgevers"  top 855  bottom 875  (fold 900, 25px to spare)
+/en/prijzen  "Data processing agreement (GDPR) with every plan · Business clients only"           top 838  bottom 858  (42px to spare)
+Plan cards end at y843 (NL) / y826 (EN); hero H1 top y125. Before this round (896bd12) the DPA line sat at y~880-900 (NL).
+Shots: shots/{nl,en}-prijzen-desktop-fold.png (1440x900).
