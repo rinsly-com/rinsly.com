@@ -160,6 +160,8 @@ describe('K-03 robots.txt and /check chrome', () => {
     expect(page).toMatch(/^export const dynamic = 'force-dynamic'$/m)
     expect(read('scripts/build-static.mjs')).toContain("'src/app/(frontend)/check/page.tsx',")
     expect(read('src/app/(frontend)/check/opengraph-image.tsx')).not.toMatch(/\d+\s*(seconden|minuut|s\b)/)
+    // output: export (build:static) needs the OG route to declare itself static.
+    expect(read('src/app/(frontend)/check/opengraph-image.tsx')).toMatch(/^export const dynamic = 'force-static'$/m)
   })
 })
 

@@ -6,6 +6,8 @@ import { ImageResponse } from 'next/og'
  */
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
+// Static in both builds: no data, and `output: export` (build:static) needs an explicit static route.
+export const dynamic = 'force-static'
 export const alt = 'Gratis websitecheck · Rinsly'
 
 export default function Image() {
