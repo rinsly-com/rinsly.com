@@ -164,8 +164,10 @@ describe('src/contentAllowlist.ts', () => {
   })
 
   it('rejects rich-text and privacy/legal paths that #107 must not unlock', () => {
-    const privacyNl = '6b0871a7bb5dd40a0f68b126'
-    const privacyEn = '6b0871a9bb5dd40a0f68b127'
+    const privacyNl = IDS.privacy.nl
+    const privacyEn = IDS.privacy.en
+    const voorwaardenNl = IDS.voorwaarden.nl
+    const voorwaardenEn = IDS.voorwaarden.en
     const faqItem = pinnedPaths.find((path) => path.includes('.items.'))?.split('.') ?? []
     const accordionId = faqItem[1]
     const itemId = faqItem[3]
@@ -175,7 +177,10 @@ describe('src/contentAllowlist.ts', () => {
       `layout.${privacyNl}.header.title`,
       `layout.${privacyEn}.header.title`,
       `layout.${privacyNl}.header.eyebrow`,
-      'layout.6b0871aabb5dd40a0f68b128.content', // voorwaarden-shaped id, not pinned
+      `layout.${voorwaardenNl}.content`,
+      `layout.${voorwaardenEn}.content`,
+      `layout.${voorwaardenNl}.header.title`,
+      `layout.${voorwaardenEn}.header.title`,
       `layout.*.content`,
       `layout.*.items.*.body`,
     ]
@@ -422,8 +427,9 @@ const IDS = {
   },
   woerdenRichText: { nl: 'dddddddddddddddddddd0050', en: 'dddddddddddddddddddd0051' },
   woerdenCta: { nl: 'dddddddddddddddddddd0060', en: 'dddddddddddddddddddd0061' },
-  // The real accp privacy richText block ids (page 2), not made-up ones.
+  // The real accp privacy (page 2) and voorwaarden (page 3) richText block ids, not made-up ones.
   privacy: { nl: '6b0871a7bb5dd40a0f68b126', en: '6b0871a9bb5dd40a0f68b127' },
+  voorwaarden: { nl: '6b0871afbb5dd40a0f68b128', en: '6b0871b0bb5dd40a0f68b129' },
 }
 
 function woerden(locale: 'nl' | 'en'): Doc {
@@ -1368,6 +1374,7 @@ describe('page ownership of the pinned ids (accp snapshot, depth 0)', () => {
       en: { privacy: '6b0871a9bb5dd40a0f68b127', voorwaarden: '6b0871b0bb5dd40a0f68b129' },
     }
     expect(IDS.privacy).toEqual({ nl: real.nl.privacy, en: real.en.privacy })
+    expect(IDS.voorwaarden).toEqual({ nl: real.nl.voorwaarden, en: real.en.voorwaarden })
     for (const locale of locales) {
       for (const slug of LEGAL_SLUGS as readonly ('privacy' | 'voorwaarden')[]) {
         const doc = snaps[locale].docs.find((candidate) => candidate.slug === slug)

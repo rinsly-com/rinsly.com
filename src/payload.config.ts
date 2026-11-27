@@ -50,8 +50,9 @@ export default buildSiteConfig({
   // `rinsly content setup`), and stays closed without Access
   // (RINSLY_ACCESS_AUD / RINSLY_ACCESS_TEAM_DOMAIN secrets) and the
   // RINSLY_CONTENT_RATE_LIMITER binding. The allowlist is the generated,
-  // reviewable list in src/contentAllowlist.ts (SEO title/description plus two
-  // pinned block headings). RINSLY_CONTENT_ALLOWLIST stays unset: when set it
+  // reviewable list in src/contentAllowlist.ts (SEO title/description, the
+  // pinned plain-text block and row paths, and two footer global fields).
+  // RINSLY_CONTENT_ALLOWLIST stays unset: when set it
   // replaces this list. See docs/content-endpoint.md.
   contentEndpoint: true,
   contentAllowlist,
