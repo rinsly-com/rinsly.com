@@ -96,22 +96,10 @@ function home(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   // H-03: two equal buttons.
   setField(log, `${w}.hero.b2`, b2, 'variant', preB2.variant, 'primary')
 
-  // H-04: the two doors as cards, directly under the hero; the old rich-text block goes.
-  const doorsPre = snap(pre, id.doors)
-  const doorsHeader = must(obj(doorsPre.header))
-  doc.layout = removeById(log, `${w}.layout`, doc.layout, id.doors, doorsPre)
-  doc.layout = insertAfter(log, `${w}.layout`, doc.layout, id.hero, {
-    id: newId(l, 'home-doors'),
-    blockType: 'services',
-    header: { eyebrow: doorsHeader.eyebrow, title: doorsHeader.title, intro: null },
-    anchor: 'voor-wie',
-    cards: [
-      { id: newId(l, 'home-door-studio'), icon: 'IconBrush', title: HOME.doors.studioTitle[l], description: HOME.doors.studioText[l], features: [] },
-      { id: newId(l, 'home-door-business'), icon: 'IconBuildingStore', title: HOME.doors.businessTitle[l], description: HOME.doors.businessText[l], features: [] },
-    ],
-  })
+  // H-04: the existing "Twee deuren" block, now both doors verbatim, moves directly under the hero.
+  setField(log, `${w}.doors`, block(doc, id.doors), 'content', snap(pre, id.doors).content, lexicalParagraphs(HOME.doors.studio[l], HOME.doors.business[l]))
   // H-05
-  doc.layout = insertAfter(log, `${w}.layout`, doc.layout, newId(l, 'home-doors'), {
+  doc.layout = insertAfter(log, `${w}.layout`, doc.layout, id.doors, {
     id: newId(l, 'home-steps'),
     blockType: 'services',
     header: { eyebrow: null, title: HOME.steps.title[l], intro: null },
@@ -167,7 +155,7 @@ function home(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   // Brief §3.2 order: hero, doors, steps, trust, platform, measure, tech, closing ×2.
   doc.layout = reorder(log, `${w}.layout`, doc.layout, [
     id.hero,
-    newId(l, 'home-doors'),
+    id.doors,
     newId(l, 'home-steps'),
     newId(l, 'home-trust'),
     id.platform,
@@ -243,11 +231,14 @@ function prijzen(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
     const preCareItem = must(byId(preFaq.items, id.faqCare))
     setField(log, `${w}.faq.care`, careItem, 'title', preCareItem.title, PRICING.careSupportTitle[l])
     setField(log, `${w}.faq.care`, careItem, 'body', preCareItem.body, lexicalParagraphs(PRICING.careSupportBody[l]))
-    faq.items = insertAfter(log, `${w}.faq`, faq.items, id.faqCare, {
-      id: newId(l, 'prijzen-faq-dpa'),
-      title: PRICING.dpaFaqTitle[l],
-      body: lexicalParagraphs(PRICING.dpaFaqBody[l]),
-    })
+    const dpaTitle = PRICING.dpaFaqTitle[l]
+    if (dpaTitle) {
+      faq.items = insertAfter(log, `${w}.faq`, faq.items, id.faqCare, {
+        id: newId(l, 'prijzen-faq-dpa'),
+        title: dpaTitle,
+        body: lexicalParagraphs(PRICING.dpaFaqBody[l]),
+      })
+    }
   } else log.conflict(`${w}.faq`, 'accordion missing')
 
   // Brief §3.3: plans high on the page, right under the hero.
@@ -324,7 +315,7 @@ function partner(doc: PageDoc, pre: PageDoc, l: Locale, log: EditLog): void {
   const why = block(doc, id.why)
   const preWhy = snap(pre, id.why)
   const preWhyIntro = str(obj(preWhy.header)?.intro)
-  setField(log, `${w}.why.header`, obj(why?.header), 'intro', preWhyIntro, preWhyIntro.replace(PARTNER.whyOld[l], PARTNER.whyNew[l]))
+  setField(log, `${w}.why.header`, obj(why?.header), 'intro', preWhyIntro, preWhyIntro.replace(PARTNER.whyRemove[l], ''))
   const engine = byId(why?.cards, id.engine)
   const preEngine = must(byId(preWhy.cards, id.engine))
   setField(log, `${w}.why.engine`, engine, 'title', preEngine.title, PARTNER.engineTitle[l])

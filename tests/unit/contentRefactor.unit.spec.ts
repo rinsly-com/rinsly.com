@@ -86,10 +86,23 @@ describe('content refactor: pages (accp snapshot of 27 Nov 16:15)', () => {
     expect(text(doc)).toContain('Endpoint-tekst die blijft')
   })
 
+  it('home: doors are the verbatim H-04 texts, whole', () => {
+    const out = text(transformPage('home', 'nl', SNAP.pages.home.nl, SNAP.pages.home.nl).doc)
+    expect(out).toContain('Ontwerpstudio’s en freelance ontwerpers: jullie ontwerpen, wij bouwen en hosten.')
+    expect(out).toContain('Bedrijven: een website die wij bouwen en onderhouden.')
+  })
+
+  it('EN gets no untraced strings: no steps title, no DPA FAQ item', () => {
+    const home = transformPage('home', 'en', SNAP.pages.home.en, SNAP.pages.home.en).doc
+    const steps = home.layout.find((b) => (b as { id: string }).id === 'refactor-20261127-en-home-steps') as { header: { title: unknown } }
+    expect(steps.header.title).toBeNull()
+    expect(text(transformPage('prijzen', 'en', SNAP.pages.prijzen.en, SNAP.pages.prijzen.en).doc)).not.toContain('refactor-20261127-en-prijzen-faq-dpa')
+  })
+
   it('home: doors, steps and trust strip sit directly under the hero, business CTA closes', () => {
     const ids = transformPage('home', 'nl', SNAP.pages.home.nl, SNAP.pages.home.nl).doc.layout.map((b) => (b as { id: string }).id)
     expect(ids.slice(1, 4)).toEqual([
-      'refactor-20261127-nl-home-doors',
+      '6b08713abb5dd40a0f68afab',
       'refactor-20261127-nl-home-steps',
       'refactor-20261127-nl-home-trust',
     ])

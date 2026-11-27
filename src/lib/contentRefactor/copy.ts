@@ -31,22 +31,24 @@ export const HOME = {
    * "Website voor mijn bedrijf"; §2 is the later, explicit instruction).
    */
   businessButton: { nl: 'Website laten maken', en: 'Get a website built' },
-  /** H-04: door 1 = Lawyer §16.2 FIX, door 2 = plan row (Lawyer: OK, A2). Split at the colon into card title + text. */
+  /**
+   * H-04, verbatim and whole (no split): door 1 = Lawyer §16.2 H-04 FIX,
+   * door 2 = plan 003 row H-04 (Lawyer §16.2: "keep as proposed", A2).
+   * Shown as two paragraphs in the existing "Twee deuren" rich-text block.
+   */
   doors: {
-    studioTitle: { nl: 'Ontwerpstudio’s en freelance ontwerpers', en: 'Design studios and freelance designers' },
-    studioText: {
-      nl: 'Jullie ontwerpen, wij bouwen en hosten. Jullie krijgen een aandeel in de doorlopende abonnementsomzet, beginnend bij 10% van het bedrag exclusief btw dat Rinsly daadwerkelijk ontvangt per betaalde factuur, volgens de partnervoorwaarden.',
-      en: 'You design, we build and host. You receive a share of the recurring subscription revenue, starting at 10% of the amount excl. VAT that Rinsly actually receives per settled invoice, under the partner terms.',
+    studio: {
+      nl: 'Ontwerpstudio’s en freelance ontwerpers: jullie ontwerpen, wij bouwen en hosten. Jullie krijgen een aandeel in de doorlopende abonnementsomzet, beginnend bij 10% van het bedrag exclusief btw dat Rinsly daadwerkelijk ontvangt per betaalde factuur, volgens de partnervoorwaarden.',
+      en: 'Design studios and freelance designers: you design, we build and host. You receive a share of the recurring subscription revenue, starting at 10% of the amount excl. VAT that Rinsly actually receives per settled invoice, under the partner terms.',
     },
-    businessTitle: { nl: 'Bedrijven', en: 'Businesses' },
-    businessText: {
-      nl: 'Een website die wij bouwen en onderhouden. Hosting vanaf €49 per maand, excl. btw. Alleen voor zakelijke opdrachtgevers. Heeft u nog geen ontwerp, dan kunnen we u in contact brengen met een ontwerpstudio: u kiest zelf.',
-      en: 'A website we build and maintain. Hosting from €49 a month, excl. VAT. Business clients only. No design yet? We can introduce you to a design studio: you choose.',
+    business: {
+      nl: 'Bedrijven: een website die wij bouwen en onderhouden. Hosting vanaf €49 per maand, excl. btw. Alleen voor zakelijke opdrachtgevers. Heeft u nog geen ontwerp, dan kunnen we u in contact brengen met een ontwerpstudio: u kiest zelf.',
+      en: 'Businesses: a website we build and maintain. Hosting from €49 a month, excl. VAT. Business clients only. No design yet? We can introduce you to a design studio: you choose.',
     },
   },
-  /** H-05. The EN section title is the only string here without a plan row (see PR open questions). */
+  /** H-05. The plan row names the NL block "Zo werkt het" only; EN gets no section title until Marketeer gives one. */
   steps: {
-    title: { nl: 'Zo werkt het', en: 'How it works' },
+    title: { nl: 'Zo werkt het', en: null },
     one: { nl: '1. U vertelt wat u nodig heeft.', en: '1. You tell us what you need.' },
     two: { nl: '2. Wij bouwen het en zetten het live.', en: '2. We build it and take it live.' },
     three: {
@@ -55,12 +57,12 @@ export const HOME = {
     },
   },
   /**
-   * H-06, Lawyer §16.2 FIX minus the holder sentences that carry the owner's
-   * name (footerOwnerName is off). Identity = trade name, KvK and address only.
+   * H-06, Lawyer §16.2 FIX: the contiguous part after the holder sentences
+   * (those carry the owner's name; footerOwnerName is off). Nothing added.
    */
   trust: {
-    nl: 'Rinsly · KvK 85578835 · Kazernestraat 6, 3441 BB Woerden. U spreekt de persoon die uw site bouwt en beheert. Uw gegevens krijgt u altijd mee. De website en de broncode krijgt u mee zodra het uitstapbedrag (als dat geldt) en openstaande facturen zijn betaald. Zie de algemene voorwaarden en uw offerte.',
-    en: 'Rinsly · Chamber of Commerce / KvK 85578835 · Kazernestraat 6, 3441 BB Woerden. You speak to the person who builds and runs your site. You always receive your data. You receive the website and the source code once the exit amount (if any) and any outstanding invoices have been paid. See the general terms and your quote.',
+    nl: 'KvK 85578835. Kazernestraat 6, 3441 BB Woerden. U spreekt de persoon die uw site bouwt en beheert. Uw gegevens krijgt u altijd mee. De website en de broncode krijgt u mee zodra het uitstapbedrag (als dat geldt) en openstaande facturen zijn betaald. Zie de algemene voorwaarden en uw offerte.',
+    en: 'Chamber of Commerce / KvK 85578835. Kazernestraat 6, 3441 BB Woerden. You speak to the person who builds and runs your site. You always receive your data. You receive the website and the source code once the exit amount (if any) and any outstanding invoices have been paid. See the general terms and your quote.',
   },
   /** H-09 title; X2 (intro tail); X1 (card) */
   platformTitle: { nl: 'Eén engine achter onze sites', en: 'One engine behind our sites' },
@@ -148,8 +150,8 @@ export const PRICING = {
     nl: 'Bij Care beantwoorden we gewone vragen per e-mail. Voor storingen is geen vaste reactietijd afgesproken. Een SLA met vastgelegde reactietijden is alleen mogelijk bij Op maat, en alleen als die is overeengekomen.',
     en: 'On Care we answer ordinary questions by email. No fixed response time has been agreed for outages. An SLA with specified response times is only possible on Custom, and only if agreed.',
   },
-  /** P-09 (EN question title has no plan row; see PR open questions) */
-  dpaFaqTitle: { nl: 'Is er een verwerkersovereenkomst?', en: 'Is there a data processing agreement?' },
+  /** P-09. The plan row has no EN question title, so the item is added on NL only until Marketeer gives one. */
+  dpaFaqTitle: { nl: 'Is er een verwerkersovereenkomst?', en: null },
   dpaFaqBody: {
     nl: 'Ja. Bij elk pakket sluiten we een verwerkersovereenkomst, zoals de AVG vereist.',
     en: 'Yes. Every plan includes a data processing agreement, as the GDPR requires.',
@@ -167,10 +169,10 @@ export const PARTNER = {
     nl: 'Jullie ontwerpen, wij bouwen en hosten. Jij kiest wie de klant factureert: Rinsly, of jullie zelf. Doorverkoop en eigen branding zijn toegestaan. Factureer je de eindklant zelf, dan koop je bij Rinsly in tegen de lijstprijs min jouw percentage, zet je ontwerp en hosting op één factuur, en bepaal je zelf de prijs en desgewenst de abonnementsvorm. Het aandeel begint bij 10% van de doorlopende abonnementsomzet exclusief btw, over het bedrag dat Rinsly daadwerkelijk ontvangt per betaalde factuur van een toegeschreven, betalende site, en kan in vaste stappen oplopen tot maximaal 35%, volgens de partnervoorwaarden. Eenmalige bouwkosten en meerwerk worden niet gedeeld.',
     en: 'You design, we build and host. You choose who invoices the client: Rinsly, or you. Reselling and your own branding are allowed. If you invoice the end client yourself, you buy from Rinsly at list minus your percentage, put design and hosting on one invoice, and set the price and your own tiers if you want. The share starts at 10% of recurring subscription revenue excl. VAT, on the amount Rinsly actually receives per settled invoice for an attributed, paying site, and can rise in fixed steps to a maximum of 35%, under the partner terms. One-off build fees and extra work are not shared.',
   },
-  /** PA-04, Lawyer §16.2 FIX, with the meta-only shortening Lawyer allows for the 155-character limit */
+  /** PA-04, Lawyer §16.2 FIX, verbatim (over 155 characters; Lawyer's optional shortening is for Marketeer to apply). */
   metaDescription: {
-    nl: 'Jullie ontwerpen, Rinsly bouwt en host. Een aandeel in de doorlopende abonnementsomzet, beginnend bij 10% van het bedrag per betaalde factuur, volgens de partnervoorwaarden.',
-    en: 'You design, Rinsly builds and hosts. A share of the recurring subscription revenue, starting at 10% of the amount per settled invoice, under the partner terms.',
+    nl: 'Jullie ontwerpen, Rinsly bouwt en host. Een aandeel in de doorlopende abonnementsomzet, beginnend bij 10% van het bedrag exclusief btw dat Rinsly daadwerkelijk ontvangt per betaalde factuur, volgens de partnervoorwaarden.',
+    en: 'You design, Rinsly builds and hosts. A share of the recurring subscription revenue, starting at 10% of the amount excl. VAT that Rinsly actually receives per settled invoice, under the partner terms.',
   },
   /** PA-05: H2 and rungs (terms v3.3 art. 5) */
   ladderTitle: { nl: 'Het aandeel: een vaste ladder', en: 'The share: a fixed ladder' },
@@ -183,9 +185,10 @@ export const PARTNER = {
   rungFirstLine: { nl: 'Eerste lijn +10%', en: 'First line +10%' },
   rungSales: { nl: 'Verkoop +10%', en: 'Sales +10%' },
   rungVolume: { nl: 'Volume +5%', en: 'Volume +5%' },
+  /** Third sentence of the PA-05 caveat (Lawyer §16.2), verbatim */
   rungVolumeText: {
-    nl: 'Vanaf vijf betalende toegeschreven eindklanten.',
-    en: 'From five paying attributed clients.',
+    nl: 'Volume telt vanaf vijf betalende toegeschreven eindklanten.',
+    en: 'Volume counts from five paying attributed end clients.',
   },
   /** PA-05 caveat, Lawyer §16.2 */
   caveat: {
@@ -232,9 +235,11 @@ export const PARTNER = {
     nl: 'Een beveiligingsfix maken we één keer en rollen we uit naar alle sites op de engine.',
     en: 'A security fix is made once and rolled out to all sites on the engine.',
   },
-  /** "Waarom" intro: the absolute "voor al onze sites" swapped for the cleared "achter onze sites" (H-09). */
-  whyOld: { nl: 'Eén geversioneerde engine voor al onze sites', en: 'One versioned engine for every site' },
-  whyNew: { nl: 'Eén geversioneerde engine achter onze sites', en: 'One versioned engine behind our sites' },
+  /** "Waarom" intro: the sentence with the absolute "voor al onze sites" is removed (deletion only; no cleared rewrite). */
+  whyRemove: {
+    nl: ' Eén geversioneerde engine voor al onze sites, en cijfers in plaats van bijvoeglijke naamwoorden.',
+    en: ' One versioned engine for every site, and numbers instead of adjectives.',
+  },
   /** PA-11: R3 (= A7) */
   operationsCard: {
     nl: 'Limieten in gigabytes en requests, vooraf bekend.',
