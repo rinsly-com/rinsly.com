@@ -1,5 +1,5 @@
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
@@ -293,7 +293,7 @@ describe('publish manifest contract', () => {
     expect(parseManifest(good).pages).toEqual(good.pages)
   })
 
-  it('the manifest script fills sourceCommit with git HEAD of a clean tree, and refuses a dirty one', () => {
+  it('the manifest script fills sourceCommit with git HEAD of a clean tree, and refuses a dirty one (untracked files too)', () => {
     // A throwaway repo, so the test does not depend on the state of this checkout.
     const repo = mkdtempSync(join(tmpdir(), 'manifest-repo-'))
     const git = (...args: string[]) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', ...args], { cwd: repo, encoding: 'utf8' }).trim()
@@ -308,6 +308,15 @@ describe('publish manifest contract', () => {
     const written = JSON.parse(readFileSync(target, 'utf8')) as { sourceCommit: string; version: number }
     expect(written.sourceCommit).toBe(repoHead)
     expect(parseManifest(written).version).toBe(1)
+    // An untracked file (e.g. a new transform not yet added) makes the tree dirty; an ignored one does not.
+    writeFileSync(join(repo, '.gitignore'), 'ignored.txt\n')
+    git('add', '.gitignore')
+    git('commit', '-qm', 'ignore')
+    writeFileSync(join(repo, 'ignored.txt'), 'x')
+    expect(gitHead(repo)).toBe(git('rev-parse', 'HEAD'))
+    writeFileSync(join(repo, 'new-transform.ts'), 'export {}')
+    expect(() => gitHead(repo)).toThrow(/new-transform\.ts/)
+    rmSync(join(repo, 'new-transform.ts'))
     writeFileSync(join(repo, 'a.txt'), 'changed')
     expect(() => gitHead(repo)).toThrow(/uncommitted changes/)
   })

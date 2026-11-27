@@ -8,11 +8,13 @@ import { writeFileSync } from 'node:fs'
 import { migrationManifest, type PublishManifest } from './publish'
 
 /**
- * HEAD of a clean tree. Refuses uncommitted changes, so `sourceCommit` is the
- * commit the drafts and transforms were really generated from.
+ * HEAD of a clean tree. Refuses uncommitted changes and untracked files (a
+ * new migration or transform that is not committed yet would otherwise feed
+ * the hashes without being in `sourceCommit`). Ignored files (.gitignore)
+ * don't count.
  */
 export function gitHead(cwd?: string): string {
-  const dirty = execFileSync('git', ['status', '--porcelain', '--untracked-files=no'], { cwd, encoding: 'utf8' }).trim()
+  const dirty = execFileSync('git', ['status', '--porcelain', '--untracked-files=normal'], { cwd, encoding: 'utf8' }).trim()
   if (dirty) throw new Error(`[publish-refactor] uncommitted changes, commit first so sourceCommit is the generating commit:\n${dirty}`)
   return execFileSync('git', ['rev-parse', 'HEAD'], { cwd, encoding: 'utf8' }).trim()
 }
