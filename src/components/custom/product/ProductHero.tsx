@@ -18,6 +18,14 @@ const SCENES: Record<NonNullable<Showcase['kind']>, (showcase: Showcase) => Reac
   environments: (showcase) => <MiniEnvironments liveLabel={showcase.liveLabel} stagingLabel={showcase.stagingLabel} />,
 }
 
+/** Where the overlay chip sits on each frame (v8 mockup): over the cards on home, under the staging window on prijzen. */
+const CHIP_POSITION: Record<NonNullable<Showcase['kind']>, string> = {
+  business: 'bottom-[50px] left-5',
+  plans: 'bottom-6 left-5',
+  studio: 'bottom-6 left-5',
+  environments: 'bottom-2.5 left-4',
+}
+
 /**
  * `productHero`: the first screen of a conversion page. Copy left (eyebrow,
  * H1, one-line sub, price chip, one primary button plus an optional text
@@ -90,7 +98,12 @@ export function ProductHero({ eyebrow, title, sub, priceChip, buttons, variant, 
                     </div>
                   </BrowserFrame>
                   {showcase?.badge && (
-                    <p className="absolute bottom-6 left-5 z-[2] max-w-[calc(100%-40px)] rounded-pill bg-slate px-3 py-1.5 text-[12.5px] font-semibold text-slate-ink shadow-card">
+                    <p
+                      className={[
+                        'absolute z-[2] max-w-[calc(100%-40px)] rounded-pill bg-slate px-3 py-1.5 text-[12.5px] font-semibold text-slate-ink shadow-card',
+                        CHIP_POSITION[showcase.kind ?? 'business'],
+                      ].join(' ')}
+                    >
                       {showcase.badge}
                     </p>
                   )}

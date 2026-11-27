@@ -71,7 +71,7 @@ export function MiniBusinessSite() {
  */
 export function MiniEnvironments({ liveLabel, stagingLabel }: { liveLabel?: string | null; stagingLabel?: string | null }) {
   return (
-    <div aria-hidden className="flex h-full flex-col gap-2 bg-paper px-3 pt-2.5">
+    <div aria-hidden className="flex h-full flex-col gap-1.5 bg-paper px-3 pt-2">
       <EnvWindow label={liveLabel} />
       <EnvWindow label={stagingLabel} staging />
     </div>
@@ -89,7 +89,7 @@ function EnvWindow({ label, staging = false }: { label?: string | null; staging?
           <i className="block size-1 rounded-full bg-hair" />
           <span className="ml-1 block h-2 flex-1 rounded-[3px] border border-hair bg-card" />
         </div>
-        <div className={['flex flex-col gap-[5px] px-[7px] pt-1.5 pb-[7px]', staging ? 'opacity-90' : ''].join(' ')}>
+        <div className={['flex flex-col gap-1 px-[7px] pt-1 pb-1.5', staging ? 'opacity-90' : ''].join(' ')}>
           <div className="flex items-center gap-[5px]">
             <span className="block size-[7px] rounded-[2px] bg-accent" />
             {bar('14px', 'bg-hair', 'h-1')}
@@ -97,7 +97,7 @@ function EnvWindow({ label, staging = false }: { label?: string | null; staging?
           </div>
           <div
             className={[
-              'relative h-6 overflow-hidden rounded-[5px]',
+              'relative h-[22px] overflow-hidden rounded-[5px]',
               staging
                 ? 'bg-[repeating-linear-gradient(135deg,var(--accent-soft)_0_5px,color-mix(in_srgb,var(--accent-soft)_60%,var(--card))_5px_8px)]'
                 : 'bg-gradient-to-br from-accent-soft via-accent-soft to-accent/70',
@@ -107,9 +107,9 @@ function EnvWindow({ label, staging = false }: { label?: string | null; staging?
             <span className="absolute bottom-1 left-3 block h-1.5 w-[34%] rounded-full bg-card/80" />
           </div>
           <div className="grid grid-cols-3 gap-1">
-            <span className="block h-3 rounded-[3px] border border-hair bg-card" />
-            <span className={['block h-3 rounded-[3px] border bg-card', staging ? 'border-dashed border-muted/50 bg-transparent' : 'border-hair'].join(' ')} />
-            <span className={['block h-3 rounded-[3px] border bg-card', staging ? 'border-dashed border-muted/50 bg-transparent' : 'border-hair'].join(' ')} />
+            <span className="block h-2.5 rounded-[3px] border border-hair bg-card" />
+            <span className={['block h-2.5 rounded-[3px] border bg-card', staging ? 'border-dashed border-muted/50 bg-transparent' : 'border-hair'].join(' ')} />
+            <span className={['block h-2.5 rounded-[3px] border bg-card', staging ? 'border-dashed border-muted/50 bg-transparent' : 'border-hair'].join(' ')} />
           </div>
         </div>
       </div>
