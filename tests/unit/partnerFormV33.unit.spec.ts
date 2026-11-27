@@ -26,6 +26,7 @@ type Data = Record<string, unknown>
 
 function request(body: unknown, docs: Data[] = []) {
   const create = vi.fn((_input: { data: Data }) => Promise.resolve({ id: 1 }))
+  const sendEmail = vi.fn((_input: { subject: string; text: string }) => Promise.resolve(undefined))
   const req = {
     json: () => Promise.resolve(body),
     headers: new Headers({ authorization: 'Bearer pull-secret' }),
@@ -33,11 +34,11 @@ function request(body: unknown, docs: Data[] = []) {
       find: vi.fn(() => Promise.resolve({ docs })),
       create,
       update: vi.fn(() => Promise.resolve({})),
-      sendEmail: vi.fn(() => Promise.resolve(undefined)),
+      sendEmail,
       logger: { error: vi.fn(), info: vi.fn() },
     },
   } as unknown as PayloadRequest
-  return { req, create }
+  return { req, create, sendEmail }
 }
 
 async function pending(res: Response): Promise<{ applications: Data[] }> {
@@ -119,3 +120,26 @@ describe('GET /api/partner-aanvraag/pending', () => {
     expect(body.applications).toHaveLength(1)
   })
 })
+
+describe('partner notification mail', () => {
+  it('strips control characters from every applicant value; the note keeps its line breaks', async () => {
+    const { req, sendEmail } = request({
+      ...application,
+      bedrijfsnaam: 'Studio\r\nBcc: evil@example.com',
+      contactpersoon: 'Ada\u0000\u2028Lovelace',
+      telefoon: '06\u0085123',
+      branches: 'kapper\u001B[31m',
+      opmerking: 'regel 1\r\nregel 2\u0007',
+    })
+    await partnerAanvraagHandler(req)
+    const mail = sendEmail.mock.calls[0][0]
+    expect(mail.subject).toBe('Partneraanvraag: StudioBcc: evil@example.com')
+    expect(mail.subject).not.toMatch(/[\r\n]/)
+    expect(mail.text).toContain('StudioBcc: evil@example.com (studio.nl) heeft het partnerformulier ingevuld.')
+    expect(mail.text).toContain('Contact:      AdaLovelace\n')
+    expect(mail.text).toContain('Telefoon:     06123\n')
+    expect(mail.text).toContain('Opmerking:\nregel 1\nregel 2\n')
+    expect(mail.text.replace(/\n/g, '')).not.toMatch(/[\u0000-\u001F\u007F\u0085\u2028\u2029]/u)
+  })
+})
+

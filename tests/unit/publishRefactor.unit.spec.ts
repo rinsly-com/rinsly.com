@@ -1,4 +1,11 @@
+import { execFileSync } from 'node:child_process'
+import { mkdtempSync, readFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
+
 import { describe, expect, it, vi } from 'vitest'
+
+import { writeManifest } from '@/lib/contentRefactor/manifestFile'
 
 import type { Obj } from '@/lib/contentRefactor/edit'
 import type { Locale, PageDoc, PageSlug } from '@/lib/contentRefactor/pages'
@@ -7,7 +14,9 @@ import {
   fullHash,
   migratedPage,
   migrationManifest,
-  PUBLISH_MANIFEST,
+  loadPublishManifest,
+  MANIFEST_HASH,
+  parseManifest,
   assertApplyAllowed,
   payloadPublisher,
   payloadSource,
@@ -96,8 +105,8 @@ describe('publish-refactor guard (planPublish)', () => {
 
 describe('publish-refactor manifest', () => {
   it('the committed manifest is the #121 migration output (regenerate with content:publish-refactor:manifest)', () => {
-    expect(PUBLISH_MANIFEST.pages).toEqual(migrationManifest().pages)
-    expect(Object.keys(PUBLISH_MANIFEST.pages).sort()).toEqual(SLUGS.flatMap((slug) => LOCALES.map((locale) => key(slug, locale))).sort())
+    expect(loadPublishManifest().pages).toEqual(migrationManifest('0'.repeat(40)).pages)
+    expect(Object.keys(loadPublishManifest().pages).sort()).toEqual(SLUGS.flatMap((slug) => LOCALES.map((locale) => key(slug, locale))).sort())
   })
 
   it('a different manifest (e.g. a redesign) publishes its own drafts and refuses the #121 ones', async () => {
@@ -105,7 +114,7 @@ describe('publish-refactor manifest', () => {
     const redesigned = clone(migratedPage('home', 'nl'))
     redesigned.meta = { ...redesigned.meta, title: 'Redesign' }
     db[key('home', 'nl')].draft = redesigned
-    const manifest = clone(PUBLISH_MANIFEST)
+    const manifest = clone(loadPublishManifest())
     expect(planPublish([{ slug: 'home', locale: 'nl', latestDraft: redesigned, published: snapshotPage('home', 'nl') }]).blocked).toHaveLength(1)
     manifest.pages['home.nl'].draft = fullHash(redesigned)
     const publisher = fakePublisher(db)
@@ -115,7 +124,7 @@ describe('publish-refactor manifest', () => {
   })
 
   it('a page-locale missing from the manifest blocks the run', () => {
-    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: migratedPage('home', 'nl'), published: snapshotPage('home', 'nl') }], { pages: {} })
+    const plan = planPublish([{ slug: 'home', locale: 'nl', latestDraft: migratedPage('home', 'nl'), published: snapshotPage('home', 'nl') }], { ...migrationManifest('0'.repeat(40)), pages: {} })
     expect(plan.blocked[0]).toMatch(/not in the publish manifest/)
   })
 })
@@ -244,6 +253,45 @@ describe('publish-refactor Payload calls', () => {
     const rerun = await runPublish({ source: payloadSource(payload), publisher: payloadPublisher(payload), apply: true, confirm: PUBLISH_CONFIRM, log: silent })
     expect(rerun.already).toHaveLength(3)
     expect(rerun.published).toHaveLength(5)
+  })
+})
+
+describe('publish manifest contract', () => {
+  const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim()
+
+  it('the committed manifest has version 1, the hash definition and a full sourceCommit', () => {
+    const manifest = loadPublishManifest()
+    expect(manifest.version).toBe(1)
+    expect(manifest.hash).toEqual(MANIFEST_HASH)
+    expect(manifest.sourceCommit).toMatch(/^[0-9a-f]{40}$/)
+  })
+
+  it('refuses another version, another hash definition or a short sourceCommit', () => {
+    const good = migrationManifest(head)
+    expect(() => parseManifest({ ...good, version: 2 })).toThrow(/version 2/)
+    expect(() => parseManifest({ ...good, hash: { ...MANIFEST_HASH, algorithm: 'sha1' } })).toThrow(/hash definition/)
+    expect(() => parseManifest({ ...good, sourceCommit: 'abc123' })).toThrow(/sourceCommit/)
+    expect(() => parseManifest({ ...good, pages: { 'home.nl': { draft: 'xyz', published: [] } } })).toThrow(/sha256/)
+    expect(parseManifest(good).pages).toEqual(good.pages)
+  })
+
+  it('the manifest script fills sourceCommit with git HEAD', () => {
+    const target = join(mkdtempSync(join(tmpdir(), 'manifest-')), 'publish-manifest.json')
+    writeManifest(target)
+    const written = JSON.parse(readFileSync(target, 'utf8')) as { sourceCommit: string; version: number }
+    expect(written.sourceCommit).toBe(head)
+    expect(parseManifest(written).version).toBe(1)
+  })
+})
+
+describe('publish-refactor log', () => {
+  it('a blocked run never logs "will publish"', async () => {
+    const db = migratedDb()
+    db[key('contact', 'en')].draft.meta = { ...db[key('contact', 'en')].draft.meta, title: 'edited' }
+    const lines: string[] = []
+    await expect(runPublish({ source: fakeSource(db), publisher: fakePublisher(db), apply: true, confirm: PUBLISH_CONFIRM, log: (line) => lines.push(line) })).rejects.toThrow(/aborted/)
+    expect(lines.some((line) => /will publish|would publish|^published/.test(line))).toBe(false)
+    expect(lines.filter((line) => line.startsWith('in state, not published'))).toHaveLength(7)
   })
 })
 
