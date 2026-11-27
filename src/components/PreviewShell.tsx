@@ -7,6 +7,7 @@ import type { Page } from '@/payload-types'
 import { Contact } from '@/components/custom/Contact'
 import { Diagram } from '@/components/custom/Diagram'
 import { RevenueCalculator } from '@/components/custom/RevenueCalculator'
+import { productRenderers } from '@/components/custom/product/renderers'
 import { useKvkCollectionFlag } from '@/components/KvkCollectionFlag'
 
 type BlockOf<T extends string> = Extract<NonNullable<Page['layout']>[number], { blockType: T }>
@@ -38,4 +39,7 @@ export const PreviewShell = createPreviewShell({
     <RevenueCalculator {...as<BlockOf<'revenueCalculator'>>(block)} locale={locale} />
   ),
   diagram: (block, locale) => <Diagram {...as<BlockOf<'diagram'>>(block)} locale={locale} />,
+  // The product-led blocks (redesign v5). Missing here, live preview rendered
+  // them as nothing: only the core blocks of a v5 draft showed.
+  ...productRenderers,
 })
