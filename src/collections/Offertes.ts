@@ -41,6 +41,8 @@ export const Offertes: CollectionConfig = {
         // (see FACILITATOR-MIGRATION.md). "Partner" now means a design studio.
         { label: { en: 'Growth', nl: 'Growth' }, value: 'partner' },
         { label: { en: 'Custom', nl: 'Op maat' }, value: 'opmaat' },
+        // C-02 (plan 003): the visitor has not picked a plan yet.
+        { label: { en: 'Not sure yet', nl: 'Weet ik nog niet' }, value: 'onbekend' },
       ],
     },
     {

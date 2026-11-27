@@ -51,8 +51,8 @@ const API_BASE = publicString(process.env.NEXT_PUBLIC_API_URL).replace(/\/+$/, '
 
 const COPY = {
   nl: {
-    who: 'Wie ben je?',
-    whoHint: 'Zo stellen we de juiste vragen, en geen enkele overbodige.',
+    // C-01 (plan 003, Lawyer X8): u-form, no "geen enkele overbodige".
+    who: 'Waarvoor neemt u contact op?',
     clientCard: 'Ik wil een website',
     clientCardSub: 'Een bedrijf dat een site wil laten bouwen en hosten.',
     partnerCard: 'Ik ben een ontwerpstudio',
@@ -64,7 +64,7 @@ const COPY = {
     naam: 'Contactpersoon',
     email: 'E-mail',
     telefoon: 'Telefoon (optioneel)',
-    domein: 'Je eigen website',
+    domein: 'Uw eigen website',
     additionsHint: 'Wat wilt u nog meer? (optioneel)',
     other: 'Anders, namelijk…',
     bericht: 'Aanvullende toelichting (optioneel)',
@@ -80,7 +80,7 @@ const COPY = {
     next: 'Volgende',
     submit: 'Aanvraag versturen',
     sending: 'Versturen…',
-    summary: 'Controleer je aanvraag',
+    summary: 'Controleer uw aanvraag',
     none: 'Geen',
     yes: 'Ja',
     no: 'Nee',
@@ -89,8 +89,7 @@ const COPY = {
     error: 'Er ging iets mis. Probeer het later opnieuw of mail ons direct.',
   },
   en: {
-    who: 'Who are you?',
-    whoHint: 'So we ask the right questions, and none of the pointless ones.',
+    who: 'What are you contacting us about?',
     clientCard: 'I want a website',
     clientCardSub: 'A business looking to have a site built and hosted.',
     partnerCard: 'I’m a design studio',
@@ -118,7 +117,7 @@ const COPY = {
     next: 'Next',
     submit: 'Send request',
     sending: 'Sending…',
-    summary: 'Review your request',
+    summary: 'Check your request',
     none: 'None',
     yes: 'Yes',
     no: 'No',
@@ -136,13 +135,16 @@ const SUBSCRIPTIONS = [
   { value: 'care', nl: 'Care', en: 'Care', price: '€49 / mnd', priceEn: '€49 / mo', recommended: false },
   { value: 'beheerd', nl: 'Managed', en: 'Managed', price: '€99 / mnd', priceEn: '€99 / mo', recommended: true },
   { value: 'partner', nl: 'Growth', en: 'Growth', price: '€249 / mnd', priceEn: '€249 / mo', recommended: false },
-  { value: 'opmaat', nl: 'Op maat', en: 'Custom', price: 'Op aanvraag', priceEn: 'On request', recommended: false },
+  // C-02: Op maat shows its starting price; "Weet ik nog niet" lets a visitor go on without choosing.
+  { value: 'opmaat', nl: 'Op maat', en: 'Custom', price: 'vanaf €499 / mnd', priceEn: 'from €499 / mo', recommended: false },
+  { value: 'onbekend', nl: 'Weet ik nog niet', en: 'Not sure yet', price: '', priceEn: '', recommended: false },
 ] as const
 
 const ADDITIONS = [
   { value: 'localization', nl: 'Meertaligheid', en: 'Localization' },
-  { value: 'email', nl: 'E-mail op eigen domein', en: 'Email on your domain' },
-  { value: 'design', nl: 'Vormgeving & huisstijl', en: 'Design & branding' },
+  // C-02: labels only; the stored values stay. Email routing is offered (Yaron, 27 Nov).
+  { value: 'email', nl: 'E-mailroutering op eigen domein', en: 'Email routing on your own domain' },
+  { value: 'design', nl: 'Ik zoek nog een ontwerper', en: 'I still need a designer' },
   { value: 'seo', nl: 'SEO & vindbaarheid', en: 'SEO' },
   { value: 'content', nl: 'Content & teksten', en: 'Content & copy' },
   { value: 'other', nl: 'Anders', en: 'Other' },
@@ -161,12 +163,15 @@ function TextField({
   value,
   onValue,
   type = 'text',
+  autoComplete,
 }: {
   id: string
   label: string
   value: string
   onValue: (value: string) => void
   type?: string
+  /** C-04: browser autofill hint (`organization`, `name`, `email`, `tel`, `url`). */
+  autoComplete?: string
 }) {
   return (
     <Field.Root>
@@ -174,6 +179,7 @@ function TextField({
       <Input
         id={id}
         type={type}
+        {...(autoComplete ? { autoComplete } : {})}
         value={value}
         onChange={(e) => { onValue(e.target.value); }}
         placeholder={label}
@@ -426,7 +432,6 @@ export function OfferteForm({
       {step === 0 && (
         <div className="flex flex-col gap-3">
           <p className="text-sm font-semibold text-ink">{c.who}</p>
-          <p className="-mt-1 text-sm text-muted">{c.whoHint}</p>
           {(
             [
               { key: 'partner', title: c.partnerCard, sub: c.partnerCardSub },
@@ -450,21 +455,24 @@ export function OfferteForm({
 
       {isPartner && step === 1 && (
         <div className="flex flex-col gap-3">
-          <TextField id="offerte-studio" label={c.studio} value={data.bedrijf} onValue={(v) => { set('bedrijf', v); }} />
-          <TextField id="offerte-domein" label={c.domein} value={data.domein} onValue={(v) => { set('domein', v); }} />
-          <TextField id="offerte-partner-naam" label={c.naam} value={data.naam} onValue={(v) => { set('naam', v); }} />
+          <TextField id="offerte-studio" label={c.studio} value={data.bedrijf} onValue={(v) => { set('bedrijf', v); }} autoComplete="organization" />
+          <TextField id="offerte-domein" label={c.domein} value={data.domein} onValue={(v) => { set('domein', v); }} type="url" autoComplete="url" />
+          <TextField id="offerte-partner-naam" label={c.naam} value={data.naam} onValue={(v) => { set('naam', v); }} autoComplete="name" />
           <TextField
             id="offerte-partner-email"
             label={c.email}
             value={data.email}
             onValue={(v) => { set('email', v); }}
             type="email"
+            autoComplete="email"
           />
           <TextField
             id="offerte-partner-telefoon"
             label={c.telefoon}
             value={data.telefoon}
             onValue={(v) => { set('telefoon', v); }}
+            type="tel"
+            autoComplete="tel"
           />
         </div>
       )}
@@ -495,6 +503,7 @@ export function OfferteForm({
           <dl className="flex flex-col gap-2 rounded-xl border border-hair bg-paper p-4 text-sm">
             <Row label={c.studio} value={data.bedrijf} />
             <Row label={c.domein} value={data.domein} />
+            <Row label={c.naam} value={data.naam} />
             <Row label={c.email} value={data.email} />
             <Row label={c.bouwtZelf} value={yn(data.bouwtZelf)} />
             <Row label={c.verkooptHosting} value={yn(data.verkooptHosting)} />
@@ -513,14 +522,15 @@ export function OfferteForm({
 
       {!isPartner && step === 1 && (
         <div className="flex flex-col gap-3">
-          <TextField id="offerte-bedrijf" label={c.bedrijf} value={data.bedrijf} onValue={(v) => { set('bedrijf', v); }} />
-          <TextField id="offerte-naam" label={c.naam} value={data.naam} onValue={(v) => { set('naam', v); }} />
+          <TextField id="offerte-bedrijf" label={c.bedrijf} value={data.bedrijf} onValue={(v) => { set('bedrijf', v); }} autoComplete="organization" />
+          <TextField id="offerte-naam" label={c.naam} value={data.naam} onValue={(v) => { set('naam', v); }} autoComplete="name" />
           <TextField
             id="offerte-email"
             label={c.email}
             value={data.email}
             onValue={(v) => { set('email', v); }}
             type="email"
+            autoComplete="email"
           />
         </div>
       )}
