@@ -50,25 +50,40 @@ export const PartnerAanvragen: CollectionConfig = {
     { name: 'kvk', label: 'KvK', type: 'text' },
     { name: 'btwNummer', label: { en: 'VAT number', nl: 'Btw-nummer' }, type: 'text' },
 
-    // ── what they want to take on ─────────────────────────────────────────
-    // These three set the rate. Stored as booleans rather than a computed
-    // percentage on purpose: the percentages live in Ledger's tenantRate.ts and
-    // the contract generator, and a third copy here would be one too many.
+    // ── what they want to take on (terms v3.3 art. 5) ─────────────────────
+    // Stored as booleans rather than a computed percentage on purpose: the
+    // percentages live in Ledger's tenantRate.ts and the contract generator.
+    {
+      name: 'eersteLijn',
+      label: { en: 'First line (+10%)', nl: 'Eerste lijn (+10%)' },
+      type: 'checkbox',
+      defaultValue: false,
+    },
+    {
+      name: 'verkoop',
+      label: { en: 'Sales (+10%)', nl: 'Verkoop (+10%)' },
+      type: 'checkbox',
+      defaultValue: false,
+    },
+    // Old ladder (before v3.3). Rows filed before 27 Nov 2026 hold the real
+    // answers; newer rows get values derived from eersteLijn / verkoop
+    // (legacyDutiesFromV33) so Ledger's current pull keeps working.
+    // TODO(ledger-v33): stop writing these once Ledger reads eersteLijn / verkoop.
     {
       name: 'exclusiviteit',
-      label: { en: 'Exclusivity (+10%)', nl: 'Exclusiviteit (+10%)' },
+      label: { en: 'Old ladder: exclusivity', nl: 'Oude ladder: exclusiviteit' },
       type: 'checkbox',
       defaultValue: false,
     },
     {
       name: 'relatiebeheer',
-      label: { en: 'Relation & first-line support (+5%)', nl: 'Relatiebeheer (+5%)' },
+      label: { en: 'Old ladder: relation & first line', nl: 'Oude ladder: relatiebeheer' },
       type: 'checkbox',
       defaultValue: false,
     },
     {
       name: 'marketing',
-      label: { en: 'Marketing (+5%)', nl: 'Marketing (+5%)' },
+      label: { en: 'Old ladder: marketing', nl: 'Oude ladder: marketing' },
       type: 'checkbox',
       defaultValue: false,
     },

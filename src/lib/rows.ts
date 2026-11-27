@@ -35,6 +35,8 @@ export const partnerRowSchema = z
     exclusiviteit: nullableBool,
     relatiebeheer: nullableBool,
     marketing: nullableBool,
+    eersteLijn: nullableBool,
+    verkoop: nullableBool,
     branches: nullableText,
     talen: nullableText,
     landen: nullableText,

@@ -747,6 +747,8 @@ export interface PartnerAanvragen {
   plaats?: string | null;
   kvk?: string | null;
   btwNummer?: string | null;
+  eersteLijn?: boolean | null;
+  verkoop?: boolean | null;
   exclusiviteit?: boolean | null;
   relatiebeheer?: boolean | null;
   marketing?: boolean | null;
@@ -1320,6 +1322,8 @@ export interface PartnerAanvragenSelect<T extends boolean = true> {
   plaats?: T;
   kvk?: T;
   btwNummer?: T;
+  eersteLijn?: T;
+  verkoop?: T;
   exclusiviteit?: T;
   relatiebeheer?: T;
   marketing?: T;

@@ -11,14 +11,17 @@
  *     invoice; build fees and extra work are not shared. The public calculator
  *     on /partnerprogramma uses this model.
  *
+ *     The invite-only /partner form asks for the two choice rungs (Eerste lijn,
+ *     Verkoop), stored as `eersteLijn` / `verkoop` on PartnerAanvragen.
+ *
  *  2. **Legacy (summary of Aug 2026)**: base 0%, choices +10/+5/+5, measured
- *     revenue levels. Still used by the invite-only /partner application form,
- *     whose answers (exclusiviteit / relatiebeheer / marketing) are stored in
- *     PartnerAanvragen and pulled by Ledger. Ledger's src/types.ts (DUTY_PCT)
- *     and src/domain/tenantRate.ts (base 0, revenue tiers) and the contract
- *     generator script still compute this model, so the form and the pull move
- *     together with Ledger, not in this file alone.
+ *     revenue levels. No page shows it any more. It stays only because
+ *     Ledger's src/types.ts (DUTY_PCT), src/domain/tenantRate.ts and the
+ *     contract generator still compute it, and the /pending pull still carries
+ *     the old exclusiviteit / relatiebeheer / marketing answers for Ledger
+ *     (see legacyDutiesFromV33). TODO(ledger-v33): remove with them.
  */
+import { PARTNER } from './contentRefactor/copy'
 
 /** Terms v3.3 art. 5. Keep in step with Ledger tenantRate.ts and the contract generator. */
 export const LADDER_V33 = {
@@ -44,8 +47,57 @@ export function partnerRateV33(rungs: RungsV33, payingClients: number): RateV33 
   return { base, firstLine, sales, volume, total: Math.min(base + firstLine + sales + volume, LADDER_V33.maxPct) }
 }
 
+/** The two rungs a studio chooses on the /partner form (the others are base or measured). */
+export type FormRungFieldV33 = 'eersteLijn' | 'verkoop'
+export type FormRungV33 = { id: 'base' | 'firstLine' | 'sales' | 'volume'; kind: 'base' | LadderKind; title: string; detail?: string; field?: FormRungFieldV33 }
+
+/** /partner form and aside copy for v3.3. Every string is the cleared text in contentRefactor/copy.ts (PA-05, PA-06). */
+export function partnerFormCopyV33(locale: LadderLocale) {
+  const l = locale
+  const rungs: FormRungV33[] = [
+    { id: 'base', kind: 'base', title: PARTNER.rungBase[l] },
+    { id: 'firstLine', kind: 'choice', title: PARTNER.rungFirstLine[l], field: 'eersteLijn' },
+    { id: 'sales', kind: 'choice', title: PARTNER.rungSales[l], field: 'verkoop' },
+    { id: 'volume', kind: 'measured', title: PARTNER.rungVolume[l], detail: PARTNER.rungVolumeText[l] },
+  ]
+  return {
+    intro: PARTNER.ladderIntro[l],
+    base: PARTNER.base[l],
+    caveat: PARTNER.caveat[l],
+    /** Unchanged from the existing /partner page. */
+    asideFigma: partnerProgrammeCopy(l).asideFigma,
+    kindLabel: l === 'nl' ? { choice: 'Keuze', measured: 'Gemeten' } : { choice: 'Choice', measured: 'Measured' },
+    rungs,
+  }
+}
+
+/** The rate a new partner starts on: base plus the chosen rungs (volume is measured later). */
+export function formRatePctV33(choice: { eersteLijn: boolean; verkoop: boolean }): number {
+  return partnerRateV33({ firstLine: choice.eersteLijn, sales: choice.verkoop }, 1).total
+}
+
+/**
+ * The old duty answers derived from the v3.3 choice, so Ledger's current
+ * partnerApplications.ts (which reads exclusiviteit / relatiebeheer /
+ * marketing from /api/partner-aanvraag/pending) keeps working until Ledger
+ * reads eersteLijn / verkoop itself.
+ *
+ *  - eersteLijn → relatiebeheer: the old rung was "Relation & first-line
+ *    support", the same work.
+ *  - verkoop → marketing: the old rung for bringing in clients.
+ *  - exclusiviteit → false: v3.3 has no exclusivity rung.
+ *
+ * These are answers, not rates: Ledger's old 10/5/5 arithmetic on them is not
+ * the v3.3 share, and no v3.3 payout runs before Ledger has switched.
+ * TODO(ledger-v33): drop this and the three old columns from new rows once
+ * Ledger reads eersteLijn / verkoop (board: partner-form-v33-legacy-fields).
+ */
+export function legacyDutiesFromV33(choice: { eersteLijn: boolean; verkoop: boolean }) {
+  return { exclusiviteit: false, relatiebeheer: choice.eersteLijn, marketing: choice.verkoop }
+}
+
 // ---------------------------------------------------------------------------
-// Legacy model (invite-only /partner form; see the header comment)
+// Legacy model (Ledger compatibility only; see the header comment)
 // ---------------------------------------------------------------------------
 
 export type LadderLocale = 'nl' | 'en'

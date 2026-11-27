@@ -6,6 +6,7 @@ import { readWorkerSecrets } from '../lib/env'
 import { asJsonObject, asText, readRequestJson } from '../lib/json'
 import { logCaught } from '../lib/logCaught'
 import { verifyPartnerToken } from '../lib/partnerToken'
+import { legacyDutiesFromV33 } from '../lib/partnerLadder'
 import { partnerRowSchema } from '../lib/rows'
 
 function json(body: unknown, status = 200): Response {
@@ -33,9 +34,11 @@ const partnerBodySchema = z.object({
   plaats: text(80),
   kvk: text(40),
   btwNummer: text(40),
-  exclusiviteit: flag,
-  relatiebeheer: flag,
-  marketing: flag,
+  // Terms v3.3: the two rungs a studio chooses. The old duty keys
+  // (exclusiviteit / relatiebeheer / marketing) are no longer read from the
+  // body; a cached old client's values are stripped like figmaSeat.
+  eersteLijn: flag,
+  verkoop: flag,
   branches: text(400),
   talen: text(100),
   landen: text(100),
@@ -157,9 +160,10 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
     plaats: body.plaats || (verified.payload.c ?? ''),
     kvk: body.kvk,
     btwNummer: body.btwNummer,
-    exclusiviteit: body.exclusiviteit,
-    relatiebeheer: body.relatiebeheer,
-    marketing: body.marketing,
+    eersteLijn: body.eersteLijn,
+    verkoop: body.verkoop,
+    // TODO(ledger-v33): Ledger compatibility, see legacyDutiesFromV33.
+    ...legacyDutiesFromV33(body),
     branches: slugList(body.branches),
     talen: slugList(body.talen, 8) || (verified.payload.l ?? 'nl'),
     landen: slugList(body.landen, 8) || (verified.payload.l ?? 'nl'),
@@ -202,12 +206,11 @@ export const partnerAanvraagHandler: PayloadHandler = async (req: PayloadRequest
 
   const chosen =
     [
-      data.exclusiviteit && 'exclusiviteit',
-      data.relatiebeheer && 'relatiebeheer',
-      data.marketing && 'marketing',
+      data.eersteLijn && 'eerste lijn',
+      data.verkoop && 'verkoop',
     ]
       .filter(Boolean)
-      .join(', ') || 'geen: alleen aangemeld'
+      .join(', ') || 'alleen de basis'
 
   // Tell Rinsly in the background; a mail failure never costs the application.
   const { waitUntil } = await getRuntime()
