@@ -24,6 +24,7 @@ import {
 } from './endpoints/partnerAanvraag'
 import { deployHandler } from './endpoints/deploy'
 import { triggerDeploy } from './hooks/triggerStaticDeploy'
+import { applyCasesPageReadAccess } from './lib/casesPageReadAccess'
 import { readServerEnv } from './lib/env'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -34,6 +35,10 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
  * here we add Rinsly's quote-request feature (Offertes collection + /offerte
  * endpoint) and the accp→prod static Deploy button, and pass the two path
  * anchors that must resolve app-side.
+ *
+ * `applyCasesPageReadAccess` hides the cases document from the public Payload
+ * API while RINSLY_CASES_PAGE_ENABLED is off (Lawyer §13 P2-01). site-core's
+ * pages collection is otherwise world-readable.
  */
 export default buildSiteConfig({
   siteConfig,
@@ -83,7 +88,13 @@ export default buildSiteConfig({
   // TURNSTILE_HOSTNAMES (vars) + NEXT_PUBLIC_TURNSTILE_SITEKEY (build). Widget
   // create is human-only (turnstile-spin). Keep honeypots.
   turnstile: {
-    protect: ['/offerte', '/check-aanvraag', '/check-run', '/partner-aanvraag', '/partner-interesse'],
+    protect: [
+      '/offerte',
+      '/check-aanvraag',
+      '/check-run',
+      '/partner-aanvraag',
+      '/partner-interesse',
+    ],
   },
   // Sidebar link + custom view for the manual production static deploy.
   adminComponents: {
@@ -110,4 +121,4 @@ export default buildSiteConfig({
   // TOTP enrolment for admins (steered in, never locked out). This is what
   // makes the DPA's "tweefactorauthenticatie voor beheertoegang" true.
   totp: { require: 'admin' },
-})
+}).then(applyCasesPageReadAccess)
