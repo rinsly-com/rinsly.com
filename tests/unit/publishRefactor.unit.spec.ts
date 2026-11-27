@@ -1,11 +1,11 @@
 import { execFileSync } from 'node:child_process'
-import { mkdtempSync, readFileSync } from 'node:fs'
+import { mkdtempSync, readFileSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
 import { describe, expect, it, vi } from 'vitest'
 
-import { writeManifest } from '@/lib/contentRefactor/manifestFile'
+import { gitHead, writeManifest } from '@/lib/contentRefactor/manifestFile'
 
 import type { Obj } from '@/lib/contentRefactor/edit'
 import type { Locale, PageDoc, PageSlug } from '@/lib/contentRefactor/pages'
@@ -293,12 +293,23 @@ describe('publish manifest contract', () => {
     expect(parseManifest(good).pages).toEqual(good.pages)
   })
 
-  it('the manifest script fills sourceCommit with git HEAD', () => {
+  it('the manifest script fills sourceCommit with git HEAD of a clean tree, and refuses a dirty one', () => {
+    // A throwaway repo, so the test does not depend on the state of this checkout.
+    const repo = mkdtempSync(join(tmpdir(), 'manifest-repo-'))
+    const git = (...args: string[]) => execFileSync('git', ['-c', 'user.name=t', '-c', 'user.email=t@t', '-c', 'commit.gpgsign=false', ...args], { cwd: repo, encoding: 'utf8' }).trim()
+    git('init', '-q')
+    writeFileSync(join(repo, 'a.txt'), 'a')
+    git('add', 'a.txt')
+    git('commit', '-qm', 'a')
+    const repoHead = git('rev-parse', 'HEAD')
+    expect(gitHead(repo)).toBe(repoHead)
     const target = join(mkdtempSync(join(tmpdir(), 'manifest-')), 'publish-manifest.json')
-    writeManifest(target)
+    writeManifest(target, gitHead(repo))
     const written = JSON.parse(readFileSync(target, 'utf8')) as { sourceCommit: string; version: number }
-    expect(written.sourceCommit).toBe(head)
+    expect(written.sourceCommit).toBe(repoHead)
     expect(parseManifest(written).version).toBe(1)
+    writeFileSync(join(repo, 'a.txt'), 'changed')
+    expect(() => gitHead(repo)).toThrow(/uncommitted changes/)
   })
 })
 

@@ -99,7 +99,11 @@ checks. Fields:
   not. The four slugs are fixed in `PAGE_SLUGS`.
 - `sourceCommit`: the full git sha of HEAD when the file was generated (the
   manifest commit itself comes after it). Filled in by
-  `pnpm content:publish-refactor:manifest`.
+  `pnpm content:publish-refactor:manifest`, which refuses to run on a dirty
+  tree. The publish step checks it for format only (40 hex characters), not
+  that the commit exists or matches the drafts; the hashes are the guard.
+  The redesign PR regenerates the manifest (new `draft` hashes and
+  `sourceCommit`) for the drafts it writes.
 - `pages`: per `<slug>.<locale>`, `draft` (hash of the draft to publish) and
   `published` (hashes of the published versions it may replace).
 
