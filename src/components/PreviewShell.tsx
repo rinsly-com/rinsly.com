@@ -1,11 +1,13 @@
 'use client'
 
+import type { Locale } from '@rinsly-com/site-core'
 import { createPreviewShell } from '@rinsly-com/site-core/preview'
 
 import type { Page } from '@/payload-types'
 import { Contact } from '@/components/custom/Contact'
 import { Diagram } from '@/components/custom/Diagram'
 import { RevenueCalculator } from '@/components/custom/RevenueCalculator'
+import { useKvkCollectionFlag } from '@/components/KvkCollectionFlag'
 
 type BlockOf<T extends string> = Extract<NonNullable<Page['layout']>[number], { blockType: T }>
 
@@ -26,8 +28,12 @@ const as = <T,>(block: unknown): T => block as T
  * Keep the two in step: a block registered in one and not the other either does
  * not render on the public site, or does not update as the editor types.
  */
+export function PreviewContact(props: BlockOf<'contact'> & { locale: Locale }) {
+  return <Contact {...props} kvkCollectionEnabled={useKvkCollectionFlag()} />
+}
+
 export const PreviewShell = createPreviewShell({
-  contact: (block, locale) => <Contact {...as<BlockOf<'contact'>>(block)} locale={locale} />,
+  contact: (block, locale) => <PreviewContact {...as<BlockOf<'contact'>>(block)} locale={locale} />,
   revenueCalculator: (block, locale) => (
     <RevenueCalculator {...as<BlockOf<'revenueCalculator'>>(block)} locale={locale} />
   ),

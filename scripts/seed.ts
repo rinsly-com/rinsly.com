@@ -16,10 +16,35 @@
  *
  * Run with:  pnpm seed        (= payload run scripts/seed.ts)
  *
- * Idempotent: re-running rebuilds the home page + globals, deletes any stray
- * non-home pages, and re-publishes. On a fresh DB an admin is created from
- * SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD, falling back to the dev credentials
- * dev@rinsly.local / rinsly-dev — set the env vars when seeding a remote DB.
+ * Bootstrap only (DF1, 26 Nov 2026). accp D1 is the source of truth for the copy:
+ * Marketeer edits it through the content endpoint and the editor. This seed
+ * creates pages that do not exist yet, finishes an incomplete stub (a title-only
+ * draft, a published locale with no layout blocks and no editor draft, a
+ * header/footer locale that was never saved), and never rewrites a locale that
+ * already has content (see scripts/seedLock.ts). A never-published draft that
+ * already has layout is treated as editor-owned: it is kept, not published or
+ * overwritten. Finishing a missing locale on an already-published page writes
+ * that locale onto the published version (locale + _status) and does not
+ * publish the document, so another locale's unpublished draft stays
+ * unpublished and onContentPublished does not fire for that draft. Changing
+ * copy below therefore does NOT change an existing finished page. A
+ * seed-accp, SEED_TARGET=accp, or NODE_ENV=production run is refused once
+ * RINSLY_HANDED_OVER is 1/true/yes. The flag is default-open by design
+ * (unset/empty/0/false/no); any other value fails closed before any database
+ * access, including on a local seed. In production the seed also skips
+ * orphan-version repair and oldest-user admin promotion.
+ *
+ * noindex: the placeholder-noindex helper is applied only to a page row created
+ * by this run. A seed rerun never flips meta.noindex on an existing page; for
+ * /cases and the Woerden page, dropping noindex goes through the content
+ * endpoint or the admin.
+ *
+ * Known limit: a deleted page is recreated with a new id; kept pages' header
+ * and in-page links to it are not relinked (see seedLock.ts).
+ *
+ * On a fresh DB an admin is created from SEED_ADMIN_EMAIL / SEED_ADMIN_PASSWORD,
+ * falling back to the dev credentials dev@rinsly.local / rinsly-dev. To rebuild
+ * a LOCAL database from this file, delete it and seed again.
  */
 import { getPayload } from 'payload'
 import { sql } from '@payloadcms/db-d1-sqlite'
@@ -27,12 +52,38 @@ import { sql } from '@payloadcms/db-d1-sqlite'
 import config from '../src/payload.config'
 import { readServerEnv } from '../src/lib/env'
 import { logCaught } from '../src/lib/logCaught'
+import { LOCAL_PAGE_SLUG } from '../src/lib/localPageJsonLd'
 import { partnerProgrammeCopy } from '../src/lib/partnerLadder'
 import { idRowSchema, userRowSchema } from '../src/lib/rows'
+import {
+  beginSeed,
+  globalIsUnseeded,
+  pageSeedPlan,
+  recreateLinkWarning,
+  unrelinkedPaths,
+  type GlobalLinks,
+  type PageSeedAction,
+} from './seedLock'
+import { PLACEHOLDER_NOINDEX_SLUGS, SITEMAP_EXCLUDED_SLUGS } from '../src/lib/sitemapSlugs'
 
 type PayloadInstance = Awaited<ReturnType<typeof getPayload>>
 type Block = Record<string, unknown>
 type Locale = 'nl' | 'en'
+
+/**
+ * Placeholder pages are noindex. Every other indexable slug writes false:
+ * Payload updates deep-merge, so omitting the field leaves a former placeholder
+ * noindexed after it leaves PLACEHOLDER_NOINDEX_SLUGS and the sitemap lists it.
+ * Privacy and voorwaarden stay excluded and keep the noindex stored in admin.
+ */
+const placeholderNoindexMeta = (
+  slug: string,
+): { meta: { noindex: boolean } } | Record<string, never> => {
+  if (PLACEHOLDER_NOINDEX_SLUGS.has(slug)) return { meta: { noindex: true } }
+  if (SITEMAP_EXCLUDED_SLUGS.has(slug)) return {}
+  return { meta: { noindex: false } }
+}
+
 
 const t = <T,>(locale: Locale, nl: T, en: T): T => (locale === 'nl' ? nl : en)
 
@@ -89,9 +140,11 @@ const SLUG = {
   partner: 'partnerprogramma',
   platform: 'platform',
   prijzen: 'prijzen',
+  cases: 'cases',
   website: 'website',
   over: 'over',
   contact: 'contact',
+  woerden: LOCAL_PAGE_SLUG,
 } as const
 
 /** Link to another page, optionally to an anchor inside it. */
@@ -139,8 +192,8 @@ const partnerCheckCta = (locale: Locale): Block => ({
   title: t(locale, 'Meet een site in een halve minuut', 'Measure a site in half a minute'),
   text: t(
     locale,
-    'Elke lead die wij aanleveren komt met vijf rapportcijfers en een screenshot. Probeer de meting zelf op elke URL.',
-    'Every lead we supply comes with five grades and a screenshot. Try the measurement yourself on any URL.',
+    'Probeer de meting zelf op elke URL. Vijf rapportcijfers, gratis en zonder account.',
+    'Try the measurement yourself on any URL. Five grades, free and without an account.',
   ),
   button: externalLink(t(locale, 'Gratis websitecheck', 'Free website check'), '/check', { variant: 'secondary' }),
 })
@@ -421,10 +474,59 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         ),
         features: [
           feature(t(locale, 'Staging bij elke site', 'Staging on every site')),
-          feature(t(locale, 'Klant is eigenaar van site en data', 'Client owns site and data')),
+          feature(t(locale, 'Klant krijgt site, gegevens en broncode mee bij beëindiging', 'Client receives the site, data and source code on termination')),
         ],
       },
     ],
+  },
+  {
+    blockType: 'services',
+    anchor: 'framer',
+    header: {
+      eyebrow: t(locale, 'Eerlijk vergelijken', 'An honest comparison'),
+      title: t(locale, 'Framer of Rinsly?', 'Framer or Rinsly?'),
+      intro: t(
+        locale,
+        'Het hangt af van wat je klant nodig heeft. Een goed gesprek begint met de vraag welke van de twee past.',
+        'It depends on what your client needs. A good conversation starts with which of the two fits.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconBrush',
+        title: t(locale, 'Framer past bij een portfolio of campagne', 'Framer fits a portfolio or a campaign'),
+        description: t(
+          locale,
+          'Bouw je het ontwerp zelf in Framer? Dan heb je een goed gereedschap voor een portfolio of een campagnepagina. Je bent dan zelf verantwoordelijk voor bouw, beheer en support.',
+          'Do you build the design yourself in Framer? Then you have a good tool for a portfolio or a campaign page. You are then responsible for build, management and support yourself.',
+        ),
+        features: [
+          feature(t(locale, 'Portfolio of showcase', 'Portfolio or showcase')),
+          feature(t(locale, 'Campagnepagina', 'Campaign page')),
+        ],
+      },
+      {
+        icon: 'IconPackages',
+        title: t(locale, 'Rinsly past bij een studio die niet zelf bouwt en beheert', 'Rinsly fits a studio that does not itself build and manage sites'),
+        description: t(
+          locale,
+          'Jij ontwerpt en levert het design system. Wij bouwen het als applicatie, hosten en onderhouden het, en jij verdient mee aan het abonnement, afhankelijk van wat je oppakt (zie de ladder).',
+          'You design and deliver the design system. We build it as an application, host and maintain it, and you earn a share of the subscription, depending on what you take on (see the ladder).',
+        ),
+        features: [
+          feature(t(locale, 'Bouw en hosting door Rinsly', 'Build and hosting by Rinsly')),
+          feature(t(locale, 'Beheer en updates door Rinsly', 'Management and updates by Rinsly')),
+        ],
+      },
+    ],
+  },
+  {
+    blockType: 'note',
+    text: t(
+      locale,
+      'Framer is een merk van de eigenaar. Rinsly is niet verbonden aan Framer. Informatie over Framer gecontroleerd op framer.com, 26 november 2026.',
+      'Framer is a brand of its owner. Rinsly is not affiliated with Framer. Information about Framer checked on framer.com, 26 November 2026.',
+    ),
   },
   {
     blockType: 'services',
@@ -452,7 +554,13 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
           'Wij maken er een echte applicatie van op onze engine en zetten die live. De klant sluit de overeenkomst bij Rinsly.',
           'We turn it into a real application on our engine and take it live. The client’s agreement is with Rinsly.',
         ),
-        features: [feature(t(locale, 'Gratis bouw voor de klant bij 36 maanden hosting', 'Free client build on 36 months of hosting'))],
+        features: [feature(
+            t(
+              locale,
+              'Geen bouwkosten voor de klant bij 36 maanden hosting (zie voorwaarden en het uitstapbedrag op /prijzen)',
+              'No build fee for the client on 36 months of hosting (see the terms and the exit amount on the pricing page)',
+            ),
+          ),],
       },
       {
         icon: 'IconRefresh',
@@ -513,63 +621,6 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
   ),
   partnerCheckCta(locale),
   {
-    blockType: 'services',
-    anchor: 'leads',
-    header: {
-      eyebrow: t(locale, 'Leads voor partners', 'Leads for partners'),
-      title: t(locale, 'Sneller groeien dan je eigen boek toelaat', 'Grow faster than your own book allows'),
-      intro: t(
-        locale,
-        'Wij meten websites op grote schaal: we sporen bedrijven op, scoren hun site op moderniteit, snelheid, mobiel, vindbaarheid en veiligheid, en selecteren de beste kandidaten. Als partner krijg je daar elke maand een deel van, zonder dat het je iets kost; heb je er meer nodig, dan maken we ze op aanvraag aan.',
-        'We measure websites at scale: we find businesses, score their site on modernity, speed, mobile, findability and security, and pick the best candidates. As a partner you get a share of that every month at no cost; if you need more, we generate them on request.',
-      ),
-    },
-    cards: [
-      {
-        icon: 'IconSeeding',
-        title: t(locale, 'Elke maand inbegrepen', 'Included every month'),
-        description: t(
-          locale,
-          'Bij je partnerschap hoort een maandelijkse portie leads. Kost je niets, hoef je niet af te nemen, en je zit er niet aan vast.',
-          'A monthly allocation of leads comes with your partnership. Costs you nothing, nothing to sign up for, nothing to cancel.',
-        ),
-        features: [
-          feature(t(locale, 'Vijf rapportcijfers per site', 'Five grades per site')),
-          feature(t(locale, 'Bevindingen, screenshot & contactgegevens', 'Findings, screenshot & contact details')),
-          feature(t(locale, '30 dagen exclusief voor jou', 'Exclusive to you for 30 days')),
-        ],
-      },
-      {
-        icon: 'IconTargetArrow',
-        title: t(locale, 'Meer op aanvraag', 'More on request'),
-        description: t(
-          locale,
-          'Wil je een specifieke regio of branche uitkammen, of een campagne draaien? Dan maken we ze op aanvraag aan: per stuk, per tien of per honderd.',
-          'Want to comb through a specific region or branch, or run a campaign? We generate them on request: one, ten or a hundred at a time.',
-        ),
-        features: [
-          feature(t(locale, 'Filteren op branche en regio', 'Filter by branch and region')),
-          feature(t(locale, 'Geen abonnement, geen verplichting', 'No subscription, no commitment')),
-          feature(t(locale, 'Prijs op aanvraag', 'Price on request')),
-        ],
-      },
-      {
-        icon: 'IconRocket',
-        title: t(locale, 'Wordt het een klant?', 'Does one become a client?'),
-        description: t(
-          locale,
-          'Dan telt die klant mee in je portfolio, en tilt dus je tarief op de ladder mee omhoog. Een lead die niets blijkt te zijn vervangen we.',
-          'Then that client counts toward your portfolio, and lifts your rate on the ladder with it. A lead that turns out to be nothing gets replaced.',
-        ),
-        features: [
-          feature(t(locale, 'Telt mee voor je omzetniveau', 'Counts toward your revenue level')),
-          feature(t(locale, 'Waardeloze leads worden vervangen', 'Worthless leads are replaced')),
-          feature(t(locale, 'Jij bepaalt wie je belt', 'You decide who you call')),
-        ],
-      },
-    ],
-  },
-  {
     blockType: 'accordion',
     anchor: 'faq',
     header: {
@@ -602,8 +653,8 @@ const partnerLayout = (locale: Locale, ids: PageIds): Block[] => {
         body: richBody(
           t(
             locale,
-            'De klant is eigenaar van de site en de data. Dat is contractueel, geen belofte.',
-            'The client owns the site and the data. That is contractual, not a promise.',
+            'In de overeenkomst staat dat de klant bij beëindiging de gegevens, de website en de broncode meekrijgt (art. 10 algemene voorwaarden). Wat er gebeurt bij een faillissement van Rinsly leggen we op aanvraag uit.',
+            'The agreement states that on termination the client receives the data, the website and the source code (article 10 of the general terms). What happens if Rinsly goes bankrupt we explain on request.',
           ),
         ),
       },
@@ -757,12 +808,12 @@ const platformLayout = (locale: Locale, _ids: PageIds): Block[] => [
         ),
       },
       {
-        title: t(locale, 'Van wie is de website?', 'Who owns the website?'),
+        title: t(locale, 'Wat krijgt de klant mee bij beëindiging?', 'What does the client get on termination?'),
         body: richBody(
           t(
             locale,
-            'Van de eindklant: het bedrijf waarvan de website is. De website en alle data zijn en blijven hun eigendom, en dat staat in de overeenkomst tussen Rinsly en die klant.',
-            'The end client’s: the business whose website it is. The website and all its data are and remain their property, and that is in the agreement between Rinsly and that client.',
+            'De klant houdt zijn gegevens en krijgt bij beëindiging de website en de broncode mee (art. 10 algemene voorwaarden).',
+            'The client keeps their data and, on termination, receives the website and the source code (article 10 of the general terms).',
           ),
           t(
             locale,
@@ -812,14 +863,14 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
   pageHero(
     'centered',
     t(locale, 'Prijzen', 'Pricing'),
-    t(locale, 'Gratis bouw', 'Free build'),
+    t(locale, 'Geen bouwkosten bij 36 maanden hosting', 'No build fee on 36 months of hosting'),
     t(
       locale,
-      'De bouw is €0 bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
-      'The build is €0 for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
+      'Kiest u een hostingabonnement met een minimumlooptijd van 36 maanden (bijvoorbeeld Care: 36 × €49 = €1.764 aan hostingkosten, excl. btw, bij het huidige tarief), dan rekenen we geen bouwkosten voor een bedrijfs- of brochuresite binnen de pakketgrenzen.¹ Daarna is het abonnement maandelijks opzegbaar, met een opzegtermijn van één maand. Alleen voor zakelijke opdrachtgevers. Het pakket volgt niet het aantal pagina’s, maar hoeveel de site opslaat en hoeveel verkeer die trekt: pagina’s kosten niets, een mediabibliotheek en een database wel. Bij elk pakket ziet u precies waar de grens ligt voordat een upgrade nodig is.',
+      'If you choose a hosting plan with a minimum term of 36 months (for example Care: 36 × €49 = €1,764 in hosting fees, excl. VAT, at the current rate), we charge no build fee for a business or brochure site within the plan limits.¹ After that the subscription can be cancelled monthly, with one month’s notice. For business clients only. The plan does not follow the number of pages but how much the site stores and how much traffic it takes: pages cost nothing, a media library and a database do. Every plan states exactly where the limit sits before an upgrade is needed.',
     ),
   ),
-  // Free build stays in the hero, the loudest block. The paid route is a
+  // The 36-month route stays in the hero, the loudest block. The paid route is a
   // `note`, the quieter block this page already uses under the plans.
   // Not a second `pricing` block: the four tiers below are the one table D1
   // can seed (see FACILITATOR-MIGRATION.md). `services` cards have no
@@ -833,8 +884,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
       title: t(locale, 'Twee routes', 'Two routes'),
       intro: t(
         locale,
-        'Gratis bouw. €0 bij een normale bedrijfs- of brochurewebsite. 36 maanden minimum, daarna maandelijks opzegbaar.',
-        'Free build. €0 for a typical business or brochure site. 36 months minimum, then monthly cancellable.',
+        'Route 1: geen bouwkosten bij 36 maanden hosting¹. Route 2: betaal de bouw, vanaf €2.500 excl. btw; het abonnement is dan maandelijks opzegbaar met een opzegtermijn van één maand.',
+        'Route 1: no build fee on 36 months of hosting¹. Route 2: pay for the build, from €2,500 excl. VAT; the subscription is then cancellable monthly with one month’s notice.',
       ),
     },
   },
@@ -847,6 +898,14 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
     ),
   },
   {
+    blockType: 'note',
+    text: t(
+      locale,
+      '¹ Stopt u binnen de 36 maanden (gerekend vanaf de startdatum in uw offerte), dan betaalt u een uitstapbedrag: de bouwwaarde uit uw offerte × het aantal resterende maanden ÷ 36, ten hoogste de hostingkosten voor de resterende maanden. Het bedrag staat in uw offerte. Uw gegevens krijgt u altijd mee; de website en de broncode zodra het uitstapbedrag en openstaande facturen zijn betaald. Zie de algemene voorwaarden en uw offerte.',
+      '¹ If you stop within the 36 months (counted from the start date in your quote), you pay an exit amount: the build value in your quote × the number of remaining months ÷ 36, at most the hosting fees for the remaining months. The amount is in your quote. You always receive your data; the website and source code once the exit amount and any open invoices are paid. See the general terms and your quote.',
+    ),
+  },
+  {
     blockType: 'pricing',
     anchor: 'pakketten',
     header: {
@@ -854,8 +913,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
       title: t(locale, 'Vier pakketten', 'Four plans'),
       intro: t(
         locale,
-        'Dit is het abonnement dat de eindklant bij Rinsly afsluit: ook als een partner de site heeft ontworpen. De klant is altijd eigenaar van site en data. Facturatie gaat vooraf, per maand of per jaar; bij jaarbetaling krijgt u een maand korting, bij Growth twee. Alle prijzen exclusief 21% btw. Dit is de prijs die u bij Rinsly betaalt; factureert een ontwerpstudio u zelf, dan geldt haar prijs.',
-        'This is the subscription the end client takes with Rinsly: including when a partner designed the site. The client always owns the site and the data. We invoice in advance, monthly or yearly; paying yearly gets you a month free, two on Growth. All prices exclude 21% VAT. This is what you pay Rinsly; if a design studio invoices you themselves, their price applies.',
+        'Dit is het abonnement dat de eindklant bij Rinsly afsluit: ook als een partner de site heeft ontworpen. Bij beëindiging krijgt de klant de gegevens, de website en de broncode mee, mits openstaande facturen zijn betaald (art. 10 algemene voorwaarden). Facturatie gaat vooraf, per maand of per jaar; bij jaarbetaling krijgt u een maand korting, bij Growth twee. Alle prijzen exclusief 21% btw. Dit is de prijs die u bij Rinsly betaalt; factureert een ontwerpstudio u zelf, dan geldt haar prijs.',
+        'This is the subscription the end client takes with Rinsly: including when a partner designed the site. On termination the client receives the data, the website and the source code, provided outstanding invoices have been paid (article 10 of the general terms). We invoice in advance, monthly or yearly; paying yearly gets you a month free, two on Growth. All prices exclude 21% VAT. This is what you pay Rinsly; if a design studio invoices you themselves, their price applies.',
       ),
     },
     tiers: [
@@ -949,8 +1008,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            '**Gratis bouw:** €0 bouwkosten bij een normale bedrijfs- of brochurewebsite, met een minimumlooptijd van 36 maanden op het hostingabonnement. Daarna is het maandelijks opzegbaar.',
-            '**Free build:** a €0 build fee for a typical business or brochure site, with a minimum term of 36 months on the hosting subscription. After that it is monthly cancellable.',
+            '**Geen bouwkosten bij 36 maanden hosting:** kiest u een hostingabonnement met een minimumlooptijd van 36 maanden, dan rekenen we geen bouwkosten voor een bedrijfs- of brochuresite binnen de pakketgrenzen.¹ Daarna is het abonnement maandelijks opzegbaar, met een opzegtermijn van één maand. Alleen voor zakelijke opdrachtgevers.',
+            '**No build fee on 36 months of hosting:** if you choose a hosting plan with a minimum term of 36 months, we charge no build fee for a business or brochure site within the plan limits.¹ After that the subscription can be cancelled monthly, with one month’s notice. For business clients only.',
           ),
           t(
             locale,
@@ -959,8 +1018,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
           ),
           t(
             locale,
-            'Beide routes bestaan echt. De minimumlooptijd van drie jaar is wat de gratis bouw betaalt. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website. Daarna loopt het abonnement door en is het net zo goed maandelijks opzegbaar.',
-            'Both routes are real. The three-year minimum term is what pays for the free build. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website. After that the subscription continues and is just as monthly-cancellable.',
+            'Beide routes bestaan echt. Na de minimumlooptijd van 36 maanden loopt het abonnement door en is het net zo goed maandelijks opzegbaar, met een opzegtermijn van één maand. Stopt u binnen de 36 maanden (gerekend vanaf de startdatum in uw offerte), dan betaalt u een uitstapbedrag: de bouwwaarde uit uw offerte × het aantal resterende maanden ÷ 36, ten hoogste de hostingkosten voor de resterende maanden. Het bedrag staat in uw offerte. Uw gegevens krijgt u altijd mee; de website en de broncode zodra het uitstapbedrag en openstaande facturen zijn betaald. Zie de algemene voorwaarden en uw offerte.',
+            'Both routes are real. After the 36-month minimum term the subscription continues and is just as monthly-cancellable, with one month’s notice. If you stop within the 36 months (counted from the start date in your quote), you pay an exit amount: the build value in your quote × the number of remaining months ÷ 36, at most the hosting fees for the remaining months. The amount is in your quote. You always receive your data; the website and source code once the exit amount and any open invoices are paid. See the general terms and your quote.',
           ),
         ),
       },
@@ -969,8 +1028,8 @@ const prijzenLayout = (locale: Locale, ids: PageIds): Block[] => [
         body: richBody(
           t(
             locale,
-            'Dat hangt af van welke route u kiest. Kiest u de gratis bouw, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Eerder stoppen kan via een afkoop, of u betaalt de resterende maanden van die 36 maanden en houdt de website; daarna is het maandelijks opzegbaar. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
-            'That depends on the route you choose. If you choose the free build, a minimum term of 36 months applies to the subscription. You can leave earlier through a buy-out, or you pay the remaining months of those 36 months and keep the website; after that it is monthly cancellable. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
+            'Dat hangt af van welke route u kiest. Kiest u de route zonder bouwkosten bij 36 maanden hosting, dan geldt een minimumlooptijd van 36 maanden op het abonnement. Na die 36 maanden is het maandelijks opzegbaar, met een opzegtermijn van één maand. Stopt u binnen de 36 maanden (gerekend vanaf de startdatum in uw offerte), dan betaalt u een uitstapbedrag: de bouwwaarde uit uw offerte × het aantal resterende maanden ÷ 36, ten hoogste de hostingkosten voor de resterende maanden. Het bedrag staat in uw offerte. Uw gegevens krijgt u altijd mee; de website en de broncode zodra het uitstapbedrag en openstaande facturen zijn betaald. Zie de algemene voorwaarden en uw offerte. Betaalt u de bouw, dan is de overeenkomst doorlopend en maandelijks opzegbaar met een opzegtermijn van één maand.',
+            'That depends on the route you choose. If you choose the route with no build fee on 36 months of hosting, a minimum term of 36 months applies to the subscription. After those 36 months it is monthly cancellable, with one month’s notice. If you stop within the 36 months (counted from the start date in your quote), you pay an exit amount: the build value in your quote × the number of remaining months ÷ 36, at most the hosting fees for the remaining months. The amount is in your quote. You always receive your data; the website and source code once the exit amount and any open invoices are paid. See the general terms and your quote. If you pay for the build, the agreement is ongoing and cancellable monthly with one month’s notice.',
           ),
         ),
       },
@@ -1106,7 +1165,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
       locale === 'nl'
         ? [
             { ol: [
-              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: vanaf €2.500 (excl. btw) voor de bouw, met maandelijks opzegbaar hosting, of gratis bouw als u zich drie jaar vastlegt.',
+              'U vertelt wat u nodig heeft. Wij zeggen wat het kost: de bouw vanaf €2.500 (excl. btw) met maandelijks opzegbare hosting (opzegtermijn van één maand), of geen bouwkosten bij 36 maanden hosting. Zie Prijzen voor de voorwaarden en het uitstapbedrag.',
               'Er komt een ontwerp: van uw eigen ontwerper, van een partner van ons, of op basis van wat u aanlevert.',
               'Wij bouwen het en zetten het live, inclusief domein en e-mailrouting.',
               'Daarna draaien wij het. U beheert de teksten en foto’s zelf in het CMS; het technische deel hoeft u nooit aan te raken.',
@@ -1114,7 +1173,7 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
           ]
         : [
             { ol: [
-              'You tell us what you need. We tell you what it costs: from €2,500 (excl. VAT) for the build with monthly-cancellable hosting, or a free build if you commit to three years.',
+              'You tell us what you need. We tell you what it costs: the build from €2,500 (excl. VAT) with monthly-cancellable hosting (one month’s notice), or no build fee with 36 months of hosting. See Pricing for the terms and the exit amount.',
               'A design appears: from your own designer, from one of our partners, or based on what you supply.',
               'We build it and take it live, domain and email routing included.',
               'After that we run it. You manage the words and pictures yourself in the CMS; you never have to touch the technical part.',
@@ -1139,6 +1198,108 @@ const websiteLayout = (locale: Locale, ids: PageIds): Block[] => [
       locale,
       'Vertel ons over uw project: u krijgt snel een helder antwoord.',
       'Tell us about your project: you’ll get a clear answer quickly.',
+    ),
+  ),
+]
+
+/* ------------------------------- /cases ------------------------------------ */
+/* Yaron 26 Nov 15:59: a cases page is OK for burojazz.nl and Up2Brand. Before */
+/* this page existed /nl/cases answered 404. Structure by Builder. ALL COPY    */
+/* BELOW IS PLACEHOLDER: Marketeer writes the final text (then Lawyer). No     */
+/* quotes, numbers or results are attributed to a client. Slots:               */
+/* ~/Rinsly/marketing/copy-slots-cases.md                                      */
+/* IMAGE SLOT: no block in the CMS takes a picture yet (needs a new block +    */
+/* migration, so Yaron decides). Until then each case has a "Beeld" card with  */
+/* a placeholder line where the screenshot goes.                               */
+
+const caseBlocks = (
+  locale: Locale,
+  c: { anchor: string; client: string; url: string; host: string },
+): Block[] => [
+  {
+    blockType: 'services',
+    anchor: c.anchor,
+    header: {
+      eyebrow: t(locale, `[Concept] Case ${c.client}`, `[Draft] Case ${c.client}`),
+      title: t(
+        locale,
+        `${c.client}: titel volgt van Marketeer`,
+        `${c.client}: title to follow from Marketeer`,
+      ),
+      intro: t(
+        locale,
+        'Korte inleiding op deze case volgt van Marketeer.',
+        'A short introduction to this case follows from Marketeer.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconUsers',
+        title: t(locale, 'Klant', 'Client'),
+        description: t(
+          locale,
+          `${c.client}. Omschrijving van de klant volgt.`,
+          `${c.client}. Description of the client follows.`,
+        ),
+      },
+      {
+        icon: 'IconCode',
+        title: t(locale, 'Wat we bouwden', 'What we built'),
+        description: t(
+          locale,
+          'Omschrijving van wat Rinsly voor deze klant bouwde volgt van Marketeer.',
+          'A description of what Rinsly built for this client follows from Marketeer.',
+        ),
+      },
+      {
+        icon: 'IconBrush',
+        title: t(locale, 'Beeld', 'Image'),
+        description: t(
+          locale,
+          'IMAGE SLOT: hier komt een screenshot van de website.',
+          'IMAGE SLOT: a screenshot of the website goes here.',
+        ),
+      },
+    ],
+  },
+  {
+    blockType: 'cta',
+    eyebrow: t(locale, '[Concept] Bekijk de site', '[Draft] See the site'),
+    title: t(locale, `Bekijk ${c.host}`, `Visit ${c.host}`),
+    text: t(
+      locale,
+      'Tekst bij de link volgt van Marketeer.',
+      'Text for the link follows from Marketeer.',
+    ),
+    button: externalLink(t(locale, `Naar ${c.host}`, `Go to ${c.host}`), c.url, {
+      variant: 'primary',
+      newTab: true,
+    }),
+  },
+]
+
+const casesLayout = (locale: Locale, ids: PageIds): Block[] => [
+  pageHero(
+    'quiet',
+    t(locale, '[Concept] Cases', '[Draft] Cases'),
+    t(locale, 'Websites die we bouwden en hosten', 'Websites we built and host'),
+    t(
+      locale,
+      'Twee voorbeelden van een ontwerp dat als website live ging. Introductie volgt van Marketeer.',
+      'Two examples of a design that went live as a website. Introduction follows from Marketeer.',
+    ),
+  ),
+  ...caseBlocks(locale, { anchor: 'burojazz', client: 'Burojazz', url: 'https://burojazz.nl', host: 'burojazz.nl' }),
+  ...caseBlocks(locale, { anchor: 'up2brand', client: 'Up2Brand', url: 'https://up2brand.com', host: 'up2brand.com' }),
+  cta(
+    locale,
+    ids,
+    t(locale, '[Concept] Contact', '[Draft] Contact'),
+    t(locale, 'Een ontwerp dat live moet?', 'A design that needs to go live?'),
+    t(
+      locale,
+      'Stuur een bericht en we kijken samen naar jouw ontwerp.',
+      'Send a message and we look at your design together.',
     ),
   ),
 ]
@@ -1241,6 +1402,148 @@ const contactLayout = (locale: Locale): Block[] => [
       { label: t(locale, 'Mail ons direct', 'Email us directly'), variant: 'secondary', type: 'external', url: 'mailto:contact@rinsly.com' },
     ],
   },
+]
+
+/* ----------------- /website-laten-maken-woerden (local page) ---------------- */
+/* Yaron 26 Nov 15:59: remote only from Woerden, no in-person Utrecht service. */
+/* Structure by Builder. Copy: Marketeer's final text (LW-01..LW-30), checked by  */
+/* Lawyer (marketing-copy-check §12). Source: copy-local-woerden-final.md.        */
+/* Word for word; do not edit copy here without the same change in that file.     */
+
+const localWoerdenMeta = (locale: Locale) => ({
+  title: t(
+    locale,
+    'Website laten bouwen, op afstand vanuit Woerden · Rinsly',
+    'Website building, remotely from Woerden · Rinsly',
+  ),
+  description: t(
+    locale,
+    'Rinsly bouwt en host websites voor ontwerpstudio’s in de provincie Utrecht, op afstand vanuit Woerden. Alleen voor zakelijke opdrachtgevers.',
+    'Rinsly builds and hosts websites for design studios in the province of Utrecht, remotely from Woerden. For business clients only.',
+  ),
+})
+
+const localWoerdenLayout = (locale: Locale, ids: PageIds): Block[] => [
+  pageHero(
+    'quiet',
+    t(locale, 'Vanuit Woerden', 'From Woerden'),
+    t(
+      locale,
+      'Websites bouwen en hosten, op afstand vanuit Woerden',
+      'Building and hosting websites, remotely from Woerden',
+    ),
+    t(
+      locale,
+      'Rinsly zit in Woerden. Voor ontwerpstudio’s in de provincie Utrecht werken we op afstand: kennismaken per telefoon of video, bouwen en beheren zonder dat iemand hoeft te reizen.',
+      'Rinsly is based in Woerden. For design studios in the province of Utrecht we work remotely: an intro by phone or video, building and managing without anyone having to travel.',
+    ),
+    [pageLink(t(locale, 'Neem contact op', 'Get in touch'), ids, SLUG.contact, { variant: 'primary' })],
+  ),
+  {
+    blockType: 'services',
+    anchor: 'werkwijze',
+    header: {
+      eyebrow: t(locale, 'Op afstand', 'Remote'),
+      title: t(locale, 'Zo werken we samen', 'How we work together'),
+      intro: t(
+        locale,
+        'We werken op afstand. Dat houdt het eenvoudig, ook als je studio in de stad Utrecht of elders in de provincie zit.',
+        'We work remotely. That keeps it simple, whether your studio is in the city of Utrecht or elsewhere in the province.',
+      ),
+    },
+    cards: [
+      {
+        icon: 'IconUsers',
+        title: t(locale, 'Kennismaken op afstand', 'An intro, remotely'),
+        description: t(
+          locale,
+          'We plannen een gesprek per telefoon of video om te horen wat je studio nodig heeft.',
+          'We schedule a call by phone or video to hear what your studio needs.',
+        ),
+      },
+      {
+        icon: 'IconCode',
+        title: t(locale, 'Bouwen op afstand', 'Building, remotely'),
+        description: t(
+          locale,
+          'Je levert het ontwerp aan, wij bouwen het als website en delen de voortgang online.',
+          'You deliver the design, we build it as a website and share progress online.',
+        ),
+      },
+      {
+        icon: 'IconRefresh',
+        title: t(locale, 'Hosting en beheer op afstand', 'Hosting and management, remotely'),
+        description: t(
+          locale,
+          'Na livegang hosten en onderhouden we de website en passen we aan waar nodig, via e-mail of een kort gesprek.',
+          'After launch we host and maintain the website and adjust where needed, by email or a short call.',
+        ),
+      },
+    ],
+  },
+  {
+    blockType: 'richText',
+    anchor: 'regio',
+    width: 'narrow',
+    header: {
+      eyebrow: t(locale, 'Regio', 'Region'),
+      title: t(locale, 'Voor ontwerpstudio’s in de provincie Utrecht', 'For design studios in the province of Utrecht'),
+    },
+    content: richBody(
+      ...t(
+        locale,
+        [
+          'Rinsly is gevestigd in Woerden. We werken voor ontwerpstudio’s in de provincie Utrecht, op afstand: per telefoon, video en e-mail. Er is geen dienstverlening op locatie.',
+          'Wil je liever eerst praten? Plan een telefoongesprek of een videogesprek via het contactformulier.',
+        ],
+        [
+          'Rinsly is based in Woerden. We work for design studios in the province of Utrecht, remotely: by phone, video and email. There is no on-site service.',
+          'Prefer to talk first? Schedule a phone call or a video call through the contact form.',
+        ],
+      ),
+    ),
+  },
+  {
+    blockType: 'accordion',
+    anchor: 'faq',
+    header: {
+      eyebrow: t(locale, 'Veelgestelde vragen', 'FAQ'),
+      title: t(locale, 'Praktisch', 'Practicalities'),
+    },
+    items: [
+      {
+        title: t(locale, 'Komen jullie langs in Utrecht?', 'Do you visit us in Utrecht?'),
+        body: richBody(
+          t(
+            locale,
+            'Nee. Wij werken op afstand vanuit Woerden: per telefoon, video en e-mail. Er is geen dienstverlening op locatie.',
+            'No. We work remotely from Woerden: by phone, video and email. There is no on-site service.',
+          ),
+        ),
+      },
+      {
+        title: t(locale, 'Voor wie werkt Rinsly?', 'Who does Rinsly work for?'),
+        body: richBody(
+          t(
+            locale,
+            'Voor ontwerpstudio’s die hun ontwerp als website willen laten bouwen en hosten. Ook een zakelijke opdrachtgever die zelf een website wil, zonder studio, kan contact opnemen. Alleen voor zakelijke opdrachtgevers.',
+            'For design studios that want their design built and hosted as a website. A business or professional that wants a website without a studio can also get in touch. For business clients only.',
+          ),
+        ),
+      },
+    ],
+  },
+  cta(
+    locale,
+    ids,
+    t(locale, 'Contact', 'Contact'),
+    t(locale, 'Laten we praten', 'Let’s talk'),
+    t(
+      locale,
+      'Stuur een bericht, dan plannen we een gesprek op afstand.',
+      'Send a message and we schedule a remote call.',
+    ),
+  ),
 ]
 
 /* ------------------------------ header / footer ---------------------------- */
@@ -1358,10 +1661,10 @@ const legalLayout = (eyebrow: string, title: string, nodes: ProseNode[]): Block[
 
 const privacyNodes: Record<Locale, ProseNode[]> = {
   nl: [
-    { p: 'Laatst bijgewerkt: 29 oktober 2026.' },
-    { p: 'Rinsly hecht veel waarde aan de bescherming van uw persoonsgegevens. In deze privacyverklaring leggen we uit welke gegevens we verwerken wanneer u onze website bezoekt of contact met ons opneemt, en ook wanneer wij de website van uw bedrijf hebben gemeten zonder dat u zich bij ons had gemeld (zie artikel 7), met welk doel en op welke grondslag, en welke rechten u heeft.' },
+    { p: 'Laatst bijgewerkt: 26 november 2026.' },
+    { p: 'Rinsly hecht veel waarde aan de bescherming van uw persoonsgegevens. In deze privacyverklaring leggen we uit welke gegevens we verwerken wanneer u onze website bezoekt of contact met ons opneemt, en ook wanneer wij de website van uw bedrijf hebben gemeten zonder dat u zich bij ons had gemeld (zie artikel 7), en ook wanneer wij uw bedrijf zakelijk benaderen (zie artikel 8), met welk doel en op welke grondslag, en welke rechten u heeft.' },
     { h: '1. Verwerkingsverantwoordelijke' },
-    { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden. KvK 85578835. E-mail: contact@rinsly.com. Rinsly is de verwerkingsverantwoordelijke voor de verwerking van persoonsgegevens via deze website.' },
+    { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden. KvK 85578835. E-mail: contact@rinsly.com. Rinsly is de verwerkingsverantwoordelijke voor de in deze verklaring beschreven verwerkingen van persoonsgegevens.' },
     { h: '2. Welke gegevens we verwerken' },
     { ul: [
       '**Contactgegevens** die u zelf verstrekt via het contactformulier of per e-mail: uw naam, e-mailadres en de inhoud van uw bericht.',
@@ -1380,7 +1683,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '5. Bewaartermijnen' },
     { p: 'We bewaren uw gegevens niet langer dan nodig is voor de genoemde doeleinden. Contactgegevens bewaren we zolang dat nodig is om uw vraag af te handelen en gedurende een redelijke periode daarna; gegevens die onder een wettelijke bewaarplicht vallen, bewaren we gedurende de wettelijke termijn. Technische logbestanden bewaren we voor een beperkte periode.' },
     { h: '6. Verwerkers en derden' },
-    { p: 'Voor de hosting en werking van de website maken we gebruik van Cloudflare, Inc., dat als verwerker in onze opdracht persoonsgegevens verwerkt. Voor de beoordelingen die we bij het meten van bedrijfswebsites opstellen (zie artikel 7) maken we daarnaast gebruik van Anthropic, PBC, dat als verwerker de gemeten gegevens en schermafbeeldingen verwerkt om die beoordeling te genereren. We verkopen de gegevens van websitebezoekers en contactpersonen niet en delen deze niet met derden, behalve wanneer dat noodzakelijk is voor de genoemde doeleinden of wanneer we daartoe wettelijk verplicht zijn. Voor bedrijfsgegevens die wij zelf verzamelen door websites te meten geldt een eigen regeling: die kunnen wij delen met onze partners, onder de voorwaarden in artikel 7.' },
+    { p: 'Voor de hosting en werking van de website maken we gebruik van Cloudflare, Inc., dat als verwerker in onze opdracht persoonsgegevens verwerkt. Voor de beoordelingen die we bij het meten van bedrijfswebsites opstellen (zie artikel 7) maken we daarnaast gebruik van Anthropic, PBC, dat als verwerker de gemeten gegevens en schermafbeeldingen verwerkt om die beoordeling te genereren. We verkopen de gegevens van websitebezoekers en contactpersonen niet en delen deze niet met derden, behalve wanneer dat noodzakelijk is voor de genoemde doeleinden of wanneer we daartoe wettelijk verplicht zijn. Voor bedrijfsgegevens die wij zelf verzamelen door websites te meten geldt een eigen regeling: die kunnen wij delen met onze partners, onder de voorwaarden in artikel 7. Voor de verwerkers die wij inzetten bij zakelijke benadering, zie artikel 8.' },
     { h: '7. Bedrijven waarvan wij de website hebben gemeten' },
     { p: 'Rinsly meet websites op grote schaal om te zien hoe ver ze afstaan van de huidige stand van het web. Daarbij bezoeken we openbaar toegankelijke websites en leggen we vast: het websiteadres en de bedrijfsnaam, de meetresultaten (vijf rapportcijfers en de bevindingen daarachter), een schermafbeelding van de openbare pagina, en de contactgegevens die het bedrijf zelf openbaar op die website of in een openbaar register heeft gepubliceerd. Zijn die contactgegevens die van een persoon: bij een eenmanszaak of zzp\u2019er bijvoorbeeld, dan zijn het persoonsgegevens en geldt deze paragraaf.' },
     { p: '**We hebben deze gegevens niet van u gekregen, maar zelf uit openbare bronnen verzameld.** Daarom informeren wij u hier actief, en niet pas als u het vraagt.' },
@@ -1391,21 +1694,29 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
       '**Delen met partners:** wij kunnen zo\u2019n beoordeling (een \u201clead\u201d) beschikbaar stellen aan een ontwerpstudio waarmee wij samenwerken. Die partner mag de gegevens uitsluitend gebruiken om het bedrijf te benaderen over een website, mag ze niet doorverkopen of verder verspreiden, en is voor dat eigen gebruik zelf verwerkingsverantwoordelijke.',
       '**Bewaartermijn:** wij bewaren een beoordeling zolang die actueel genoeg is om bruikbaar te zijn en in elk geval niet langer dan twaalf maanden na de meting, tenzij het bedrijf klant wordt.',
     ] },
-    { p: 'U kunt hier op elk moment bezwaar tegen maken, en dat kost u niets meer dan een e-mail aan contact@rinsly.com. Bij bezwaar verwijderen we het bedrijf uit onze gegevens, benaderen we het niet meer, stellen we het niet meer aan partners beschikbaar en geven we het bezwaar door aan partners die de beoordeling al hadden ontvangen. Dezelfde rechten uit artikel 9 (inzage, rectificatie, verwijdering) gelden onverkort.' },
-    { h: '8. Doorgifte buiten de EER' },
-    { p: "Cloudflare, Inc. en Anthropic, PBC zijn gevestigd in de Verenigde Staten. Voor zover daarbij persoonsgegevens buiten de Europese Economische Ruimte worden verwerkt, gebeurt dat onder passende waarborgen zoals het EU-US Data Privacy Framework of de modelcontractbepalingen (SCC's) van de Europese Commissie." },
-    { h: '9. Uw rechten' },
+    { p: 'U kunt hier op elk moment bezwaar tegen maken, en dat kost u niets meer dan een e-mail aan contact@rinsly.com. Bij bezwaar verwijderen we het bedrijf uit onze gegevens, benaderen we het niet meer, stellen we het niet meer aan partners beschikbaar en geven we het bezwaar door aan partners die de beoordeling al hadden ontvangen. Dezelfde rechten uit artikel 10 (inzage, rectificatie, verwijdering) gelden onverkort.' },
+    { h: '8. Zakelijke benadering (acquisitie)' },
+    { p: '**Wat wij doen.** Rinsly benadert soms bedrijven en ontwerpstudio\u2019s om onze diensten (bouw, hosting en onderhoud van websites) of ons partnerprogramma aan te bieden. Dat doen wij per post, telefonisch (alleen naar zakelijke nummers van rechtspersonen, of als u ons daarvoor toestemming gaf), via LinkedIn, en per e-mail **alleen als u daarvoor toestemming gaf** of klant bij ons bent.' },
+    { p: '**Welke gegevens.** Bedrijfsnaam, rechtsvorm, KvK-nummer, zakelijk adres, zakelijk telefoonnummer, website, uw naam en functie zoals u die zakelijk publiceert, uw openbare LinkedIn-profiel, en notities over ons contact (datum, kanaal, uitkomst, eventuele afmelding).' },
+    { p: '**Waar wij ze vandaan halen.** Uit het KVK Handelsregister, van uw eigen website, uit openbare branchelijsten (zoals de BNO-ledenlijst), van uw openbare LinkedIn-profiel en van uw reactie op ons bericht. Wij kopen geen e-maillijsten.' },
+    { p: '**Grondslag.** Ons gerechtvaardigd belang om bedrijven over onze diensten te informeren en ontwerpstudio\u2019s voor ons partnerprogramma te benaderen (art. 6 lid 1 sub f AVG), en voor e-mail of telefoon waar de wet dat vraagt: uw toestemming (art. 6 lid 1 sub a AVG en art. 11.7 Telecommunicatiewet). U kunt uw toestemming op elk moment intrekken. Wij respecteren de KVK-aanduiding dat uw adres niet voor reclamepost gebruikt mag worden.' },
+    { p: '**Hoe lang.** Gegevens van bedrijven die geen klant worden verwijderen wij 12 maanden na ons laatste contact. Als u zich afmeldt, bewaren wij alleen wat nodig is om u niet opnieuw te benaderen. Een gegeven toestemming en het bewijs daarvan bewaren wij tot 5 jaar na ons laatste bericht.' },
+    { p: '**Met wie.** Alleen met partijen die in onze opdracht werken (verwerkers), zoals onze e-mail- en hostingprovider en de AI- en opslagdiensten die wij gebruiken. Zij mogen de gegevens alleen voor ons gebruiken. Wij verkopen uw gegevens niet. Sommige verwerkers zijn gevestigd buiten de Europese Economische Ruimte. De waarborgen daarvoor, en hoe u een kopie daarvan kunt krijgen, staan in artikel 9.' },
+    { p: '**Afmelden en uw rechten.** U heeft te allen tijde het recht om bezwaar te maken tegen het gebruik van uw gegevens voor direct marketing (art. 21 lid 2 AVG); wij stoppen dan direct, via alle kanalen. Afmelden: mail \u201cafmelden\u201d naar contact@rinsly.com, bel 06 24118912, of antwoord op ons bericht. U kunt ook inzage, correctie of verwijdering vragen; wij reageren binnen een maand (zie ook artikel 10). Een klacht over uw gegevens kunt u indienen bij de Autoriteit Persoonsgegevens. Over ongevraagde commerci\u00eble berichten kunt u ook klagen bij de ACM.' },
+    { h: '9. Doorgifte buiten de EER' },
+    { p: 'Sommige van onze verwerkers zijn gevestigd in de Verenigde Staten. Dat geldt voor Cloudflare, Inc. (hosting en werking van de website, en onze voorzieningen voor zakelijke benadering) en voor Anthropic, PBC (alleen de websitebeoordelingen van artikel 7). Voor zover de AI- en opslagdiensten van artikel 8 persoonsgegevens buiten de Europese Economische Ruimte verwerken, geldt hetzelfde. Die doorgifte vindt plaats op basis van een adequaatheidsbesluit van de Europese Commissie (het EU-VS Data Privacy Framework), voor zover de betreffende verwerker daarvoor is gecertificeerd, en anders op basis van de modelcontractbepalingen (SCC\u2019s) van de Europese Commissie (artikel 46 AVG). Een kopie van de gebruikte waarborgen kunt u opvragen via contact@rinsly.com.' },
+    { h: '10. Uw rechten' },
     { p: 'U heeft het recht op inzage, rectificatie, verwijdering, beperking van de verwerking, bezwaar tegen de verwerking en gegevensoverdraagbaarheid. Stuur uw verzoek naar contact@rinsly.com; we reageren binnen de wettelijke termijn. Bent u het niet eens met hoe we met uw gegevens omgaan, dan kunt u een klacht indienen bij de Autoriteit Persoonsgegevens.' },
-    { h: '10. Beveiliging' },
+    { h: '11. Beveiliging' },
     { p: 'We nemen passende technische en organisatorische maatregelen om uw persoonsgegevens te beschermen, waaronder versleutelde verbindingen (TLS), toegangsbeheer, doorlopend puntherstel van de database (Cloudflare D1 Time Travel) en een nachtelijke back-up van mediabestanden naar aparte opslag.' },
-    { h: '11. Wijzigingen' },
+    { h: '12. Wijzigingen' },
     { p: 'We kunnen deze privacyverklaring van tijd tot tijd aanpassen. De actuele versie staat altijd op deze pagina, met de datum van de laatste wijziging bovenaan.' },
   ],
   en: [
-    { p: 'Last updated: 29 October 2026.' },
-    { p: 'Rinsly takes the protection of your personal data seriously. This privacy policy explains which data we process when you visit our website or contact us, and also when we have measured your company’s website without you having contacted us (see section 7), for what purpose and on what legal basis, and what rights you have.' },
+    { p: 'Last updated: 26 November 2026.' },
+    { p: 'Rinsly takes the protection of your personal data seriously. This privacy policy explains which data we process when you visit our website or contact us, and also when we have measured your company’s website without you having contacted us (see section 7) or approach your business to offer our services (see section 8), for what purpose and on what legal basis, and what rights you have.' },
     { h: '1. Controller' },
-    { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, the Netherlands. Chamber of Commerce (KvK) 85578835. Email: contact@rinsly.com. Rinsly is the controller for the processing of personal data through this website.' },
+    { p: 'Rinsly (Yaron Schaeffer), Kazernestraat 6, 3441 BB Woerden, the Netherlands. Chamber of Commerce (KvK) 85578835. Email: contact@rinsly.com. Rinsly is the controller for the processing of personal data described in this policy.' },
     { h: '2. Data we process' },
     { ul: [
       '**Contact details** you provide yourself through the contact form or by email: your name, email address and the content of your message.',
@@ -1424,7 +1735,7 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
     { h: '5. Retention' },
     { p: 'We do not keep your data longer than necessary for the purposes above. We keep contact details for as long as needed to handle your enquiry and for a reasonable period afterwards; data subject to a legal retention obligation is kept for the statutory term. Technical logs are kept for a limited period.' },
     { h: '6. Processors and third parties' },
-    { p: 'For hosting and running the website we use Cloudflare, Inc., which processes personal data as our processor on our instructions. For the assessments we generate when measuring business websites (see section 7) we also use Anthropic, PBC, which processes the measured data and screenshots as our processor to generate that assessment. We do not sell your data and do not share it with third parties except where necessary for the purposes above or where legally required.' },
+    { p: 'For hosting and running the website we use Cloudflare, Inc., which processes personal data as our processor on our instructions. For the assessments we generate when measuring business websites (see section 7) we also use Anthropic, PBC, which processes the measured data and screenshots as our processor to generate that assessment. We do not sell your data and do not share it with third parties except where necessary for the purposes above or where legally required. For business data we collect ourselves by measuring websites, a separate arrangement applies: we may share it with our partners, under the conditions in section 7. For the processors we use in business outreach, see section 8.' },
     { h: '7. Businesses whose website we measured' },
     { p: 'Rinsly measures websites at scale to see how far they sit from current web practice. In doing so we visit publicly accessible websites and record: the web address and company name, the measurement results (five grades and the findings behind them), a screenshot of the public page, and the contact details the business itself has published on that website or in a public register. Where those contact details belong to an individual (a sole trader or freelancer, for instance) they are personal data and this section applies.' },
     { p: '**We did not obtain this data from you; we collected it ourselves from public sources.** That is why we inform you here actively, rather than only on request.' },
@@ -1435,14 +1746,22 @@ const privacyNodes: Record<Locale, ProseNode[]> = {
       '**Sharing with partners:** we may make such an assessment (a \u201clead\u201d) available to a design studio we work with. That partner may use the data only to approach the business about a website, may not resell or further distribute it, and is an independent controller for its own use.',
       '**Retention:** we keep an assessment for as long as it is current enough to be useful, and in any event no longer than twelve months after the measurement, unless the business becomes a client.',
     ] },
-    { p: 'You may object to this at any time, and it costs you no more than an email to contact@rinsly.com. On objection we remove the business from our data, stop approaching it, stop making it available to partners, and pass the objection on to any partner that had already received the assessment. The rights in section 9 (access, rectification, erasure) apply in full.' },
-    { h: '8. Transfers outside the EEA' },
-    { p: "Cloudflare, Inc. and Anthropic, PBC are based in the United States. Where personal data is processed outside the European Economic Area, this takes place under appropriate safeguards such as the EU-US Data Privacy Framework or the European Commission's Standard Contractual Clauses (SCCs)." },
-    { h: '9. Your rights' },
+    { p: 'You may object to this at any time, and it costs you no more than an email to contact@rinsly.com. On objection we remove the business from our data, stop approaching it, stop making it available to partners, and pass the objection on to any partner that had already received the assessment. The rights in section 10 (access, rectification, erasure) apply in full.' },
+    { h: '8. Business outreach' },
+    { p: '**What we do.** Rinsly sometimes contacts businesses and design studios to offer our services (website build, hosting and maintenance) or our partner programme. We do so by post, by phone (only business numbers of legal entities, or with your consent), via LinkedIn, and by e-mail **only with your consent** or if you are a client.' },
+    { p: '**Data.** Business name, legal form, KvK number, business address and phone, website, your name and role as you publish them, your public LinkedIn profile, and notes about our contact (date, channel, outcome, any opt-out).' },
+    { p: '**Sources.** KVK Handelsregister, your own website, public trade directories (e.g. BNO), your public LinkedIn profile, and your reply to our message. We don\u2019t buy e-mail lists.' },
+    { p: '**Basis.** Our legitimate interest in informing businesses about our services and approaching design studios about our partner programme (GDPR art. 6(1)(f)); where the law requires it for e-mail or phone, your consent (GDPR art. 6(1)(a) and Dutch Telecommunications Act art. 11.7). You can withdraw consent at any time. We respect the KVK no-advertising-mail flag.' },
+    { p: '**Retention.** Businesses that do not become clients are deleted 12 months after our last contact. If you opt out, we keep only what is needed to honour it. Consent and its proof are kept for up to 5 years after our last message.' },
+    { p: '**Sharing.** Only with parties working on our instructions (processors), such as our e-mail and hosting provider and the AI and storage services we use. They may use the data only for us. We don\u2019t sell your data. Some processors are established outside the European Economic Area. The safeguards, and how you can obtain a copy of them, are set out in section 9.' },
+    { p: '**Opt out and your rights.** You have the right to object at any time to the use of your data for direct marketing (GDPR art. 21(2)); we then stop at once on all channels. E-mail \u201cunsubscribe\u201d to contact@rinsly.com, call +31 6 24118912, or reply to our message. Access, correction and erasure on request within one month (see also section 10). Data complaints: Autoriteit Persoonsgegevens; complaints about unsolicited commercial messages: ACM.' },
+    { h: '9. Transfers outside the EEA' },
+    { p: 'Some of our processors are established in the United States. That applies to Cloudflare, Inc. (hosting and operation of the website, and our business-outreach facilities) and to Anthropic, PBC (only the website assessments in section 7). Where the AI and storage services in section 8 process personal data outside the European Economic Area, the same applies. Such transfers take place on the basis of an adequacy decision of the European Commission (the EU-US Data Privacy Framework), to the extent the relevant processor is certified under it, and otherwise on the basis of the European Commission\u2019s Standard Contractual Clauses (SCCs) (GDPR Article 46). You can obtain a copy of the safeguards used by e-mailing contact@rinsly.com.' },
+    { h: '10. Your rights' },
     { p: 'You have the right to access, rectification, erasure, restriction of processing, objection to processing and data portability. Send your request to contact@rinsly.com; we will respond within the statutory period. If you disagree with how we handle your data, you may lodge a complaint with the Dutch Data Protection Authority (Autoriteit Persoonsgegevens).' },
-    { h: '10. Security' },
+    { h: '11. Security' },
     { p: 'We take appropriate technical and organisational measures to protect your personal data, including encrypted connections (TLS), access control, continuous point-in-time restore of the database (Cloudflare D1 Time Travel) and a nightly backup of media files to separate storage.' },
-    { h: '11. Changes' },
+    { h: '12. Changes' },
     { p: 'We may update this privacy policy from time to time. The current version is always available on this page, with the date of the last change shown at the top.' },
   ],
 }
@@ -1661,9 +1980,11 @@ async function repairOrphanedVersions(payload: PayloadInstance) {
   }
 }
 
+// beginSeed() is the first statement in run(): no getPayload, repair, or writes before it.
 async function run() {
+  const { production } = beginSeed()
   const payload = await getPayload({ config })
-  await repairOrphanedVersions(payload)
+  if (!production) await repairOrphanedVersions(payload)
 
   // Admin user
   const users = await payload.find({ collection: 'users', limit: 1, sort: 'createdAt' })
@@ -1681,7 +2002,7 @@ async function run() {
       data: { email, password, roles: ['admin'] },
     })
     console.log(`Created admin ${email}`)
-  } else if (!user.roles.includes('admin')) {
+  } else if (!production && !user.roles.includes('admin')) {
     user = await payload.update({
       collection: 'users',
       id: user.id,
@@ -1693,7 +2014,12 @@ async function run() {
   // Every page in the site, in one list. Layouts are written only after all of
   // them exist, because an internal link stores the TARGET PAGE'S id — a page
   // cannot link to a sibling that has not been created yet.
-  const sitePages: { slug: string; title: (l: Locale) => string; layout: (l: Locale, ids: PageIds) => Block[] }[] = [
+  const sitePages: {
+    slug: string
+    title: (l: Locale) => string
+    layout: (l: Locale, ids: PageIds) => Block[]
+    meta?: (l: Locale) => { title: string; description: string }
+  }[] = [
     { slug: SLUG.home, title: () => 'Rinsly', layout: homeLayout },
     {
       slug: SLUG.partner,
@@ -1707,8 +2033,15 @@ async function run() {
       title: (l) => t(l, 'Website bij Rinsly', 'A website from Rinsly'),
       layout: websiteLayout,
     },
+    { slug: SLUG.cases, title: (l) => t(l, 'Cases', 'Cases'), layout: casesLayout },
     { slug: SLUG.over, title: (l) => t(l, 'Over ons', 'About'), layout: overLayout },
     { slug: SLUG.contact, title: () => 'Contact', layout: (l) => contactLayout(l) },
+    {
+      slug: SLUG.woerden,
+      title: (l) => t(l, 'Website laten maken in Woerden', 'Website building from Woerden'),
+      layout: localWoerdenLayout,
+      meta: localWoerdenMeta,
+    },
     // The legal pages carry no internal links, but they ride along so that one
     // loop owns "which pages exist".
     {
@@ -1725,6 +2058,20 @@ async function run() {
 
   // Pass 1 — make sure every page row exists, and collect slug → id.
   const ids: PageIds = {}
+  const created = new Set<string>()
+  const finish = new Map<string, PageSeedAction>()
+  const readPageLocale = async (pageId: number, locale: Locale, draft: boolean) => {
+    const found = await payload.find({
+      collection: 'pages',
+      where: { id: { equals: pageId } },
+      locale,
+      fallbackLocale: false,
+      draft,
+      limit: 1,
+      depth: 0,
+    })
+    return found.docs[0] as { layout?: unknown; _status?: unknown; updatedAt?: unknown } | undefined
+  }
   for (const page of sitePages) {
     const existing = await payload.find({
       collection: 'pages',
@@ -1738,19 +2085,30 @@ async function run() {
     if (stored && !stored.success) throw new Error(`seed: page row ${page.slug} failed validation`)
     let pageId = stored?.success ? stored.data.id : undefined
     if (pageId === undefined) {
-      const created = idRowSchema.safeParse(
+      const createdRow = idRowSchema.safeParse(
         await payload.create({
           collection: 'pages',
           draft: true,
           locale: 'nl',
-          data: { slug: page.slug, title: page.title('nl') },
+          data: { slug: page.slug, title: page.title('nl'), ...placeholderNoindexMeta(page.slug) },
           user,
         }),
       )
-      if (!created.success) throw new Error(`seed: created page ${page.slug} failed validation`)
-      pageId = created.data.id
+      if (!createdRow.success) throw new Error(`seed: created page ${page.slug} failed validation`)
+      pageId = createdRow.data.id
+      created.add(page.slug)
     }
     ids[page.slug] = pageId
+    const published = {
+      nl: await readPageLocale(pageId, 'nl', false),
+      en: await readPageLocale(pageId, 'en', false),
+    }
+    const drafts = {
+      nl: await readPageLocale(pageId, 'nl', true),
+      en: await readPageLocale(pageId, 'en', true),
+    }
+    const plan = pageSeedPlan(created.has(page.slug), published, drafts)
+    finish.set(page.slug, plan)
   }
 
   const idFor = (slug: string): number => {
@@ -1759,38 +2117,114 @@ async function run() {
     return id
   }
 
-  // Pass 2 — write both locales' layouts, then publish.
+  // Pass 2 — write only the locales that still have no layout, publishing
+  // each one with locale + _status (publishSpecificLocale, publishAllLocales:
+  // false). Never publish the document without a locale: `_status` is
+  // document-level, and that would promote another locale's unpublished draft
+  // and fire onContentPublished for it. A locale that already has blocks, or
+  // an editor-owned draft, is left alone (copy lives in D1).
   for (const page of sitePages) {
-    for (const locale of ['nl', 'en'] as Locale[]) {
+    const plan = finish.get(page.slug)
+    const path = `/${page.slug === SLUG.home ? '' : page.slug}`
+    if (!plan || plan.action === 'keep') {
+      console.log(`Kept ${path} (${plan?.reason ?? 'exists; copy lives in D1'})`)
+      continue
+    }
+    const pageId = idFor(page.slug)
+    const writeLocales = (['nl', 'en'] as const).filter((locale) => plan.locales[locale])
+    for (const locale of writeLocales) {
       await payload.update({
         collection: 'pages',
-        id: idFor(page.slug),
-        draft: true,
+        id: pageId,
         locale,
-        data: { title: page.title(locale), layout: page.layout(locale, ids) },
+        draft: false,
+        // Without this, Payload treats a published update as publish-all
+        // because `_status` is not localized on pages.
+        publishAllLocales: false,
+        publishSpecificLocale: locale,
+        data: {
+          title: page.title(locale),
+          layout: page.layout(locale, ids),
+          // Localized meta (title/description) is written with the locale it
+          // completes. `noindex` is document-level, so it is only seeded for a
+          // page row created in this run; completing a locale on an existing
+          // page must not touch an editor's noindex choice.
+          ...(page.meta || created.has(page.slug)
+            ? {
+                meta: {
+                  ...(page.meta ? page.meta(locale) : {}),
+                  ...(created.has(page.slug) ? placeholderNoindexMeta(page.slug).meta : {}),
+                },
+              }
+            : {}),
+          _status: 'published',
+        } as never,
         user,
       })
     }
-    await payload.update({
-      collection: 'pages',
-      id: idFor(page.slug),
-      data: { _status: 'published' } as never,
-      user,
-    })
-    console.log(`Published /${page.slug === SLUG.home ? '' : page.slug}`)
+    const which = writeLocales.join(', ')
+    console.log(`Published ${path} (${which})`)
   }
 
-  // Globals
-  await payload.updateGlobal({ slug: 'header', locale: 'nl', data: headerData('nl', ids), user })
-  await payload.updateGlobal({ slug: 'header', locale: 'en', data: headerData('en', ids), user })
-  await payload.updateGlobal({
-    slug: 'footer',
-    locale: 'nl',
-    data: { ...footerShared, ...footerLocalized('nl') },
-    user,
-  })
-  await payload.updateGlobal({ slug: 'footer', locale: 'en', data: footerLocalized('en'), user })
-  console.log('Globals seeded (header, footer)')
+  // Recreating a deleted page assigns a new id. Kept header/footer links to
+  // the old id are not rewritten; say which ones need a hand relink.
+  if (created.size) {
+    const pathsFor = async (slug: string, pageId: number) => {
+      const paths: string[] = []
+      for (const locale of ['nl', 'en'] as Locale[]) {
+        const header = (await payload.findGlobal({
+          slug: 'header',
+          locale,
+          fallbackLocale: false,
+          depth: 0,
+        })) as unknown as GlobalLinks
+        const footer = (await payload.findGlobal({
+          slug: 'footer',
+          locale,
+          fallbackLocale: false,
+          depth: 0,
+        })) as unknown as GlobalLinks
+        if (!globalIsUnseeded('header', header)) {
+          paths.push(...unrelinkedPaths(slug, pageId, headerData(locale, ids), header, 'header'))
+        }
+        if (!globalIsUnseeded('footer', footer)) {
+          const expectedFooter: GlobalLinks =
+            locale === 'nl' ? { ...footerShared, ...footerLocalized('nl') } : footerLocalized('en')
+          paths.push(...unrelinkedPaths(slug, pageId, expectedFooter, footer, 'footer'))
+        }
+      }
+      return [...new Set(paths)]
+    }
+    for (const slug of created) {
+      const warning = recreateLinkWarning(slug, idFor(slug), await pathsFor(slug, idFor(slug)))
+      if (warning) console.warn(warning)
+    }
+  }
+
+  // Globals: each locale is decided on its own, with fallbackLocale: false, so
+  // a written NL cannot hide a missing EN. A locale that already has copy is
+  // left alone.
+  const seedGlobal = async (slug: 'header' | 'footer', dataFor: (locale: Locale) => Record<string, unknown>) => {
+    const written: Locale[] = []
+    for (const locale of ['nl', 'en'] as Locale[]) {
+      const current = (await payload.findGlobal({
+        slug,
+        locale,
+        fallbackLocale: false,
+        depth: 0,
+      })) as unknown as Record<string, unknown>
+      if (!globalIsUnseeded(slug, current)) continue
+      await payload.updateGlobal({ slug, locale, data: dataFor(locale), user })
+      written.push(locale)
+    }
+    const title = slug === 'header' ? 'Header' : 'Footer'
+    if (written.length) console.log(`${title} seeded (${written.join(', ')})`)
+    else console.log(`Kept ${slug} (exists; copy lives in D1)`)
+  }
+  await seedGlobal('header', (locale) => headerData(locale, ids))
+  await seedGlobal('footer', (locale) =>
+    locale === 'nl' ? { ...footerShared, ...footerLocalized('nl') } : footerLocalized('en'),
+  )
 
   console.log('Seed complete.')
 }

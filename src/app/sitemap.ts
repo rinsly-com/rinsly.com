@@ -3,7 +3,7 @@ import config from '@payload-config'
 
 import { getRenderablePages } from '@rinsly-com/site-core/lib/pages'
 import { absoluteUrl } from '@rinsly-com/site-core/lib/siteUrl'
-import { slugsForSitemap } from '@/lib/sitemapSlugs'
+import { slugsForSitemapFromPages } from '@/lib/sitemapSlugs'
 import { siteConfig } from '@/site.config'
 
 export const dynamic = 'force-dynamic'
@@ -17,8 +17,9 @@ function localeHref(locale: (typeof SITEMAP_LOCALES)[number], slug: string): str
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const pages = await getRenderablePages(config, 'nl')
-  // privacy and voorwaarden stay published; they are noindex and not listed here.
-  const slugs = slugsForSitemap(pages.map((p) => p.slug))
+  // privacy, voorwaarden, /cases and Woerden stay published but are omitted
+  // (slug denylist, and any page with meta.noindex).
+  const slugs = slugsForSitemapFromPages(pages)
 
   const entries: MetadataRoute.Sitemap = []
   for (const slug of slugs) {

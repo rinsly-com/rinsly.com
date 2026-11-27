@@ -79,4 +79,8 @@ jobs:
           PAYLOAD_API_URL: https://accp.rinsly.com
           DISPATCH_NAMESPACE: rinsly-fleet
           NEXT_PUBLIC_TURNSTILE_SITEKEY: ${{ secrets.NEXT_PUBLIC_TURNSTILE_SITEKEY }}
+          # Unset / empty keeps /cases out of the static export (default off).
+          # Re-enable with the repo Actions variable of the same name, together
+          # with the accp Worker var — see docs/cases-page.md.
+          RINSLY_CASES_PAGE_ENABLED: ${{ vars.RINSLY_CASES_PAGE_ENABLED }}
           NODE_AUTH_TOKEN: ${{ secrets.PACKAGES_TOKEN || github.token }}

@@ -9,6 +9,7 @@ import { cloudflareEmailAdapter } from './email/cloudflareEmailAdapter'
 import { CheckRuns } from './collections/CheckRuns'
 import { Offertes } from './collections/Offertes'
 import { PartnerAanvragen } from './collections/PartnerAanvragen'
+import { contentAllowlist } from './contentAllowlist'
 import { diagramBlock } from './blocks/Diagram'
 import { revenueCalculatorBlock } from './blocks/RevenueCalculator'
 import { checkAanvraagHandler } from './endpoints/checkAanvraag'
@@ -23,6 +24,7 @@ import {
 } from './endpoints/partnerAanvraag'
 import { deployHandler } from './endpoints/deploy'
 import { triggerDeploy } from './hooks/triggerStaticDeploy'
+import { applyCasesPageReadAccess } from './lib/casesPageReadAccess'
 import { readServerEnv } from './lib/env'
 
 const dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -33,9 +35,26 @@ const dirname = path.dirname(fileURLToPath(import.meta.url))
  * here we add Rinsly's quote-request feature (Offertes collection + /offerte
  * endpoint) and the accp→prod static Deploy button, and pass the two path
  * anchors that must resolve app-side.
+ *
+ * `applyCasesPageReadAccess` hides the cases document from the public Payload
+ * API while RINSLY_CASES_PAGE_ENABLED is off (Lawyer §13 P2-01). site-core's
+ * pages collection is otherwise world-readable.
  */
 export default buildSiteConfig({
   siteConfig,
+  // POST /api/rinsly/content (site-core 0.26+). Adds the content-audit and
+  // content-replay collections (migration 20261126_232114_content_endpoint). Only the
+  // accp Worker runs Payload; the prod static export has no runtime and no D1,
+  // so prod never serves the route. On accp it answers 404 until
+  // RINSLY_CONTENT_ENABLED is set on the rinsly-accp Worker (never set by
+  // `rinsly content setup`), and stays closed without Access
+  // (RINSLY_ACCESS_AUD / RINSLY_ACCESS_TEAM_DOMAIN secrets) and the
+  // RINSLY_CONTENT_RATE_LIMITER binding. The allowlist is the generated,
+  // reviewable list in src/contentAllowlist.ts (SEO title/description plus two
+  // pinned block headings). RINSLY_CONTENT_ALLOWLIST stays unset: when set it
+  // replaces this list. See docs/content-endpoint.md.
+  contentEndpoint: true,
+  contentAllowlist,
   // Accp origin for auth mails (forgot-password links). Not the static public URL.
   serverURL: readServerEnv().PAYLOAD_SERVER_URL || 'https://accp.rinsly.com',
   // Transactional mail (auth mails + submission notifications) as
@@ -69,7 +88,13 @@ export default buildSiteConfig({
   // TURNSTILE_HOSTNAMES (vars) + NEXT_PUBLIC_TURNSTILE_SITEKEY (build). Widget
   // create is human-only (turnstile-spin). Keep honeypots.
   turnstile: {
-    protect: ['/offerte', '/check-aanvraag', '/check-run', '/partner-aanvraag', '/partner-interesse'],
+    protect: [
+      '/offerte',
+      '/check-aanvraag',
+      '/check-run',
+      '/partner-aanvraag',
+      '/partner-interesse',
+    ],
   },
   // Sidebar link + custom view for the manual production static deploy.
   adminComponents: {
@@ -96,4 +121,4 @@ export default buildSiteConfig({
   // TOTP enrolment for admins (steered in, never locked out). This is what
   // makes the DPA's "tweefactorauthenticatie voor beheertoegang" true.
   totp: { require: 'admin' },
-})
+}).then(applyCasesPageReadAccess)
