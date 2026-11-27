@@ -75,6 +75,8 @@ const workerSecretsSchema = z.object({
   LEDGER_PULL_SECRET: optionalString,
   PARTNER_TOKEN_SECRET: optionalString,
   PSI_API_KEY: optionalString,
+  // Set by Fleet/Yaron as a Worker secret. Never created or assigned here.
+  UNSUBSCRIBE_TOKEN_SECRET: optionalString,
 })
 
 export type WorkerSecrets = z.infer<typeof workerSecretsSchema>
@@ -90,6 +92,7 @@ export function readWorkerSecrets(env: CloudflareEnv): WorkerSecrets {
     LEDGER_PULL_SECRET: raw['LEDGER_PULL_SECRET'],
     PARTNER_TOKEN_SECRET: raw['PARTNER_TOKEN_SECRET'],
     PSI_API_KEY: raw['PSI_API_KEY'],
+    UNSUBSCRIBE_TOKEN_SECRET: raw['UNSUBSCRIBE_TOKEN_SECRET'],
   })
   if (!parsed.success) {
     logCaught('[env] worker secrets failed validation', parsed.error)

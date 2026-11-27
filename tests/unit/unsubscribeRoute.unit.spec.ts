@@ -1,0 +1,305 @@
+import { readFileSync } from 'node:fs'
+import { describe, expect, it } from 'vitest'
+
+import { staticRedirectLines } from '../../scripts/staticRedirects.mjs'
+
+import {
+  UNSUBSCRIBE_ALL_CHANNELS_LINE_PENDING,
+  UNSUBSCRIBE_COPY,
+  UNSUBSCRIBE_COPY_STATUS,
+} from '../../src/lib/unsubscribeCopy'
+import { renderUnsubscribePage } from '../../src/lib/unsubscribePage'
+import { handleUnsubscribeRequest, parseUnsubscribePost } from '../../src/lib/unsubscribeRequest'
+import { unsubscribePostRewrite } from '../../src/lib/unsubscribePostRewrite'
+import { MemoryUnsubscribeStore, UnavailableUnsubscribeStore } from '../../src/lib/unsubscribeStore'
+import { mintUnsubscribeToken } from '../../src/lib/unsubscribeToken'
+
+const SECRET = 'test-secret-do-not-use-in-production'
+const NOW = new Date('2026-11-27T22:00:00.000Z')
+const RECIPIENT = 'person@example.com'
+
+async function tokenFor(email = RECIPIENT) {
+  return mintUnsubscribeToken(email, SECRET)
+}
+
+function assertNoRecipientEmail(html: string) {
+  expect(html.toLowerCase()).not.toContain(RECIPIENT)
+  const emails = html.match(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi) ?? []
+  expect(emails.every((address) => address === 'contact@rinsly.com')).toBe(true)
+}
+
+describe('unsubscribe copy', () => {
+  it('is the Lawyer + Marketeer approved wording, in the je-form', () => {
+    expect(UNSUBSCRIBE_COPY_STATUS).toBe('approved-lawyer-marketeer')
+    expect(UNSUBSCRIBE_COPY.nl.confirm).toBe(
+      'Wil je geen marketingberichten van Rinsly meer ontvangen?',
+    )
+    expect(UNSUBSCRIBE_COPY.nl.success).toBe(
+      'Je bent afgemeld voor marketingberichten van Rinsly.',
+    )
+    expect(UNSUBSCRIBE_COPY.nl.invalid).toContain('Je kunt je ook afmelden')
+    expect(UNSUBSCRIBE_COPY.nl.button).toBe('Ja, meld mij af')
+    const nlText = Object.values(UNSUBSCRIBE_COPY.nl).join('\n')
+    expect(nlText).not.toMatch(/\b[Uu]\b/)
+    expect(nlText).not.toMatch(/\buw\b/i)
+    expect(UNSUBSCRIBE_ALL_CHANNELS_LINE_PENDING).toBe(true)
+  })
+})
+
+describe('parseUnsubscribePost', () => {
+  it('accepts the RFC 8058 body, with or without a form content type', () => {
+    expect(parseUnsubscribePost('List-Unsubscribe=One-Click', 'text/plain')).toEqual({
+      kind: 'one-click',
+    })
+    expect(
+      parseUnsubscribePost('List-Unsubscribe=One-Click', 'application/x-www-form-urlencoded'),
+    ).toEqual({ kind: 'one-click' })
+  })
+
+  it('accepts the confirm form', () => {
+    expect(
+      parseUnsubscribePost('token=abc&confirm=1', 'application/x-www-form-urlencoded'),
+    ).toEqual({ kind: 'confirm', token: 'abc' })
+  })
+
+  it('rejects an empty or unrelated body', () => {
+    expect(parseUnsubscribePost('', 'application/x-www-form-urlencoded')).toEqual({ kind: 'unknown' })
+    expect(parseUnsubscribePost('foo=bar', 'application/x-www-form-urlencoded')).toEqual({
+      kind: 'unknown',
+    })
+  })
+})
+
+describe('handleUnsubscribeRequest', () => {
+  it('GET with a valid token shows the confirm page and does not record an opt-out', async () => {
+    const store = new MemoryUnsubscribeStore()
+    const token = await tokenFor()
+    const result = await handleUnsubscribeRequest({
+      method: 'GET',
+      token,
+      locale: 'nl',
+      body: '',
+      contentType: '',
+      secret: SECRET,
+      store,
+      now: NOW,
+    })
+    expect(result.status).toBe(200)
+    expect(result.view).toBe('confirm')
+    expect(result.body).toContain('Wil je geen marketingberichten van Rinsly meer ontvangen?')
+    expect(result.body).toContain('Ja, meld mij af')
+    expect(result.body).toContain('name="token"')
+    expect(result.body).toContain('noindex, nofollow')
+    assertNoRecipientEmail(result.body)
+    expect(store.rows).toEqual([])
+  })
+
+  it('HEAD also leaves the store empty', async () => {
+    const store = new MemoryUnsubscribeStore()
+    const token = await tokenFor()
+    const result = await handleUnsubscribeRequest({
+      method: 'HEAD',
+      token,
+      locale: 'en',
+      body: '',
+      contentType: '',
+      secret: SECRET,
+      store,
+      now: NOW,
+    })
+    expect(result.view).toBe('confirm')
+    expect(result.body).toContain('Do you want to stop receiving marketing messages from Rinsly?')
+    expect(store.rows).toEqual([])
+  })
+
+  it('RFC 8058 POST unsubscribes directly, with a success body and no confirm button', async () => {
+    const store = new MemoryUnsubscribeStore()
+    const token = await tokenFor()
+    const first = await handleUnsubscribeRequest({
+      method: 'POST',
+      token,
+      locale: 'nl',
+      body: 'List-Unsubscribe=One-Click',
+      contentType: 'application/x-www-form-urlencoded',
+      secret: SECRET,
+      store,
+      now: NOW,
+    })
+    expect(first.status).toBe(200)
+    expect(first.view).toBe('success')
+    expect(first.body).toContain('Je bent afgemeld voor marketingberichten van Rinsly.')
+    expect(first.body).toContain('Je ontvangt alleen nog berichten die nodig zijn voor een lopende opdracht')
+    expect(first.body).toContain('href="/nl/privacy"')
+    expect(first.body).toContain('rinsly.com/nl/privacy')
+    expect(first.body).toContain('Terug naar rinsly.com')
+    expect(first.body).not.toContain('Ja, meld mij af')
+    expect(first.body).not.toContain('name="confirm"')
+    assertNoRecipientEmail(first.body)
+    expect(store.rows).toHaveLength(1)
+    expect(store.rows[0]).toMatchObject({
+      source: 'one-click',
+      locale: 'nl',
+      optedOutAt: NOW.toISOString(),
+      tokenVersion: 1,
+    })
+    expect(store.rows[0]?.emailHash).toMatch(/^[A-Za-z0-9_-]+$/)
+
+    const second = await handleUnsubscribeRequest({
+      method: 'POST',
+      token,
+      locale: 'en',
+      body: 'List-Unsubscribe=One-Click',
+      contentType: 'text/plain',
+      secret: SECRET,
+      store,
+      now: new Date('2026-11-28T00:00:00.000Z'),
+    })
+    expect(second.status).toBe(200)
+    expect(second.view).toBe('success')
+    expect(second.body).toContain('You will only receive messages needed for an ongoing assignment')
+    expect(second.body).toContain('href="/en/privacy"')
+    expect(second.body).toContain('Back to rinsly.com')
+    expect(second.body).not.toContain('Yes, unsubscribe me')
+    expect(store.rows).toHaveLength(1)
+  })
+
+  it('POST confirm form records source confirm', async () => {
+    const store = new MemoryUnsubscribeStore()
+    const token = await tokenFor()
+    const result = await handleUnsubscribeRequest({
+      method: 'POST',
+      token: '',
+      locale: 'en',
+      body: `token=${encodeURIComponent(token)}&confirm=1`,
+      contentType: 'application/x-www-form-urlencoded',
+      secret: SECRET,
+      store,
+      now: NOW,
+    })
+    expect(result.status).toBe(200)
+    expect(result.view).toBe('success')
+    expect(store.rows[0]?.source).toBe('confirm')
+    assertNoRecipientEmail(result.body)
+  })
+
+  it('POST with an invalid token does not write and tells the visitor to use contact@', async () => {
+    const store = new MemoryUnsubscribeStore()
+    const result = await handleUnsubscribeRequest({
+      method: 'POST',
+      token: 'v1.not-a-real-hash.not-a-real-sig',
+      locale: 'nl',
+      body: 'List-Unsubscribe=One-Click',
+      contentType: 'text/plain',
+      secret: SECRET,
+      store,
+      now: NOW,
+    })
+    expect(result.status).toBe(400)
+    expect(result.view).toBe('invalid')
+    expect(result.body).toContain('contact@rinsly.com')
+    expect(result.body).toContain('Je kunt je ook afmelden')
+    expect(store.rows).toEqual([])
+  })
+
+  it('POST fails closed when the store is unavailable or the secret is missing', async () => {
+    const token = await tokenFor()
+    const unavailable = await handleUnsubscribeRequest({
+      method: 'POST',
+      token,
+      locale: 'nl',
+      body: 'List-Unsubscribe=One-Click',
+      contentType: 'text/plain',
+      secret: SECRET,
+      store: new UnavailableUnsubscribeStore(),
+      now: NOW,
+    })
+    expect(unavailable.status).toBe(503)
+    expect(unavailable.view).toBe('unavailable')
+    expect(unavailable.body).toContain('contact@rinsly.com')
+    assertNoRecipientEmail(unavailable.body)
+
+    const store = new MemoryUnsubscribeStore()
+    const noSecret = await handleUnsubscribeRequest({
+      method: 'POST',
+      token,
+      locale: 'nl',
+      body: 'List-Unsubscribe=One-Click',
+      contentType: 'text/plain',
+      secret: '',
+      store,
+      now: NOW,
+    })
+    expect(noSecret.status).toBe(503)
+    expect(noSecret.view).toBe('unavailable')
+    expect(store.rows).toEqual([])
+  })
+})
+
+describe('confirm button is only on the body-link GET page', () => {
+  it('renders the confirm button on GET confirm, and never on success, invalid or unavailable', async () => {
+    const token = await tokenFor()
+    const confirm = renderUnsubscribePage({ locale: 'nl', view: 'confirm', token })
+    expect(confirm).toContain('Ja, meld mij af')
+    expect(confirm).toContain('<form method="post"')
+    expect(confirm).toContain('min-height: 32px')
+    expect(confirm).toContain('gap: 12px')
+    assertNoRecipientEmail(confirm)
+
+    for (const view of ['success', 'invalid', 'unavailable'] as const) {
+      const html = renderUnsubscribePage({ locale: 'nl', view })
+      expect(html).not.toContain('Ja, meld mij af')
+      expect(html).not.toContain('name="confirm"')
+      expect(html).toContain('noindex, nofollow')
+      assertNoRecipientEmail(html)
+    }
+
+    const enSuccess = renderUnsubscribePage({ locale: 'en', view: 'success' })
+    expect(enSuccess).not.toContain('Yes, unsubscribe me')
+    expect(enSuccess).toContain('href="/en/privacy"')
+    assertNoRecipientEmail(enSuccess)
+  })
+})
+
+describe('unsubscribe POST rewrite', () => {
+  it('rewrites RFC 8058 POST on /{locale}/afmelden, and ignores GET and server actions', () => {
+    expect(
+      unsubscribePostRewrite({ method: 'POST', pathname: '/nl/afmelden', hasNextAction: false }),
+    ).toEqual({ locale: 'nl', rewritePath: '/nl/afmelden/one-click' })
+    expect(
+      unsubscribePostRewrite({ method: 'POST', pathname: '/en/afmelden/', hasNextAction: false }),
+    ).toEqual({ locale: 'en', rewritePath: '/en/afmelden/one-click' })
+    expect(
+      unsubscribePostRewrite({ method: 'GET', pathname: '/nl/afmelden', hasNextAction: false }),
+    ).toBeNull()
+    expect(
+      unsubscribePostRewrite({ method: 'POST', pathname: '/nl/afmelden', hasNextAction: true }),
+    ).toBeNull()
+    expect(
+      unsubscribePostRewrite({ method: 'POST', pathname: '/nl/partner', hasNextAction: false }),
+    ).toBeNull()
+  })
+})
+
+describe('static export, redirects and noindex', () => {
+  it('stashes the afmelden route and middleware out of the static export', () => {
+    const src = readFileSync('scripts/build-static.mjs', 'utf8')
+    expect(src).toContain("'src/app/(frontend)/[locale]/afmelden'")
+    expect(src).toContain("'src/middleware.ts'")
+  })
+
+  it('redirects bare /afmelden to the default locale, without making it permanent', () => {
+    const lines = staticRedirectLines('nl', ['nl', 'en'])
+    expect(lines).toContain('/afmelden    /nl/afmelden    302')
+    const nextCfg = readFileSync('next.config.ts', 'utf8')
+    expect(nextCfg).toContain("{ source: '/afmelden', destination: '/nl/afmelden', permanent: false }")
+  })
+
+  it('keeps the GET page noindex and out of the sitemap helper', () => {
+    const page = readFileSync('src/app/(frontend)/[locale]/afmelden/page.tsx', 'utf8')
+    expect(page).toContain('robots: { index: false, follow: false }')
+    const slugs = readFileSync('src/lib/sitemapSlugs.ts', 'utf8')
+    expect(slugs).not.toContain('afmelden')
+    const sitemap = readFileSync('src/app/sitemap.ts', 'utf8')
+    expect(sitemap).not.toContain('afmelden')
+  })
+})

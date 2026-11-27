@@ -19,6 +19,9 @@ export function staticRedirectLines(defaultLocale, locales) {
     // The mirror of next.config's /partner rule: bare /partner goes to the
     // default locale, so an invite link without one still lands on the form.
     `/partner    /${defaultLocale}/partner    302`,
+    // Same idea as /partner: a typable shortcut. The locale route itself is
+    // not in this export (it is stashed and zone-routed to rinsly-accp).
+    `/afmelden    /${defaultLocale}/afmelden    302`,
     // Trailing slash -> no slash, permanently (one and two path segments are
     // all the routes the export has).
     '/:a/    /:a    308',
