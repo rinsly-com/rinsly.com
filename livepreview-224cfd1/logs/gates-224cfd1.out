@@ -1,0 +1,54 @@
+head 224cfd1b8197a1153f0e5a4df146c79a97ba9521 pre status: 0 uncommitted
+== lint-content 2026-11-27T22:47:44+01:00
+lint-content exit 0
+$ node scripts/lint-content.mjs
+✔ Content lint passed: no em dashes in 48 file(s).
+== lint-migrations 2026-11-27T22:47:45+01:00
+lint-migrations exit 0
+$ node scripts/lint-migrations.mjs
+✔ Migration lint passed: 668 statement(s) replayed, 0 warning(s).
+== tsc 2026-11-27T22:47:45+01:00
+tsc exit 0
+npm warn Unknown project config "verify-deps-before-run". This will stop working in the next major version of npm. See `npm help npmrc` for supported config options.
+== eslint 2026-11-27T22:47:54+01:00
+eslint exit 0
+
+/workspace/builder-redesign-v5/src/components/check/CheckRunner.tsx
+  111:13  warning  Do not use `window.location.assign()` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination  @next/next/no-location-assign-relative-destination
+
+✖ 1 problem (0 errors, 1 warning)
+
+== unit 2026-11-27T22:48:07+01:00
+unit exit 0
+
+ Test Files  29 passed (29)
+      Tests  387 passed (387)
+   Start at  22:48:08
+   Duration  2.88s (transform 2.19s, setup 0ms, import 4.14s, tests 4.41s, environment 1.06s)
+
+== int 2026-11-27T22:48:11+01:00
+int exit 0
+
+ Test Files  5 passed (5)
+      Tests  51 passed (51)
+   Start at  22:48:12
+   Duration  2.06s (transform 216ms, setup 59ms, import 521ms, tests 430ms, environment 608ms)
+
+== build 2026-11-27T22:48:14+01:00
+build exit 0
+
+  The expression "typeof x" actually evaluates to "object" in JavaScript, not "null". You need to use "x === null" to test for null.
+
+[35mWorker saved in `.open-next/worker.js` 🚀
+[0m
+OpenNext build complete.
+== build-static 2026-11-27T22:49:07+01:00
+build-static exit 0
+
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+
+
+✔ Static site built to ./out
+post status: 0 uncommitted
+done 2026-11-27T22:50:44+01:00

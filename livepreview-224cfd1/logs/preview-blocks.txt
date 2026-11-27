@@ -1,0 +1,16 @@
+Local reproduction, develop 9939f05 (before) vs fix 224cfd1 (after). next dev on :3000 (in the csrf allowlist; :3115 is not, so preview auth fails there for an unrelated reason),
+local D1 = accp-like snapshot + 170000/190000 + 200000/200500 (v5 drafts, not published), throwaway local admin user (TOTP enrolled locally).
+Rendered height (px) of each block wrapper [data-rinsly-block-type] in the admin live-preview iframe (/nl...?preview=1):
+
+BEFORE (9939f05)
+  /nl?preview=1                  productHero:0 doorCards:0 stepsShowcase:0 trustBar:0 accordion:403 cta:250
+  /nl/prijzen?preview=1          productHero:0 pricingCards:0 note:146 productShowcase:0 accordion:705 cta:270
+  /nl/partnerprogramma?preview=1 productHero:0 ladderSteps:0 stepsShowcase:0 revenueCalculator:739 diagram:735 accordion:705 cta:270   (direct ?preview=1 load)
+
+AFTER (224cfd1)
+  /nl?preview=1                  productHero:279 doorCards:499 stepsShowcase:447 trustBar:113 accordion:403 cta:250
+  /nl/prijzen?preview=1          productHero:307 pricingCards:894 note:146 productShowcase:548 accordion:705 cta:270
+  /nl/partnerprogramma?preview=1 productHero:307 ladderSteps:490 stepsShowcase:562 revenueCalculator:1021 diagram:629 accordion:705 cta:270
+  /en/prijzen?preview=1          productHero:367 pricingCards:538 note:126 productShowcase:416 accordion:705 cta:270   (direct ?preview=1 load, 1440 wide)
+
+Some "before" iframe readings in the admin run were all 0 because the split view was still opening; the direct ?preview=1 loads and the screenshots show the same thing.
