@@ -1,0 +1,426 @@
+[
+  {
+    "page": "/nl",
+    "viewport": "desktop",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": true,
+    "gsapInline": 3,
+    "frameOpacity": [
+      "1",
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": []
+  },
+  {
+    "page": "/nl/prijzen",
+    "viewport": "desktop",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": true,
+    "gsapInline": 1,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": []
+  },
+  {
+    "page": "/nl/partnerprogramma",
+    "viewport": "desktop",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": true,
+    "gsapInline": 1,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          ".opacity-80",
+          ".bg-accent\\/8 > .flex-none.tabular-nums.text-xs"
+        ]
+      }
+    ]
+  },
+  {
+    "page": "/en",
+    "viewport": "desktop",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": true,
+    "gsapInline": 3,
+    "frameOpacity": [
+      "1",
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": []
+  },
+  {
+    "page": "/en/prijzen",
+    "viewport": "desktop",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": true,
+    "gsapInline": 1,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": []
+  },
+  {
+    "page": "/en/partnerprogramma",
+    "viewport": "desktop",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": true,
+    "gsapInline": 1,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          ".opacity-80",
+          ".bg-accent\\/8 > .flex-none.tabular-nums.text-xs"
+        ]
+      }
+    ]
+  },
+  {
+    "page": "/nl",
+    "viewport": "desktop",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1",
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/nl/prijzen",
+    "viewport": "desktop",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/nl/partnerprogramma",
+    "viewport": "desktop",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/en",
+    "viewport": "desktop",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1",
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/en/prijzen",
+    "viewport": "desktop",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/en/partnerprogramma",
+    "viewport": "desktop",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/nl",
+    "viewport": "mobile",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0.0001,
+    "totalCls": 0.0001,
+    "anim": true,
+    "gsapInline": 3,
+    "frameOpacity": [
+      "1",
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": []
+  },
+  {
+    "page": "/nl/prijzen",
+    "viewport": "mobile",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0.0003,
+    "anim": true,
+    "gsapInline": 1,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": []
+  },
+  {
+    "page": "/nl/partnerprogramma",
+    "viewport": "mobile",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": true,
+    "gsapInline": 1,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          ".opacity-80",
+          ".bg-accent\\/8 > .flex-none.tabular-nums.text-xs"
+        ]
+      },
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".overflow-x-auto"
+        ]
+      }
+    ]
+  },
+  {
+    "page": "/en",
+    "viewport": "mobile",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": true,
+    "gsapInline": 3,
+    "frameOpacity": [
+      "1",
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": []
+  },
+  {
+    "page": "/en/prijzen",
+    "viewport": "mobile",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0.0003,
+    "anim": true,
+    "gsapInline": 1,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": []
+  },
+  {
+    "page": "/en/partnerprogramma",
+    "viewport": "mobile",
+    "motion": "no-preference",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": true,
+    "gsapInline": 1,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": [
+      {
+        "id": "color-contrast",
+        "impact": "serious",
+        "nodes": 2,
+        "targets": [
+          ".opacity-80",
+          ".bg-accent\\/8 > .flex-none.tabular-nums.text-xs"
+        ]
+      },
+      {
+        "id": "scrollable-region-focusable",
+        "impact": "serious",
+        "nodes": 1,
+        "targets": [
+          ".overflow-x-auto"
+        ]
+      }
+    ]
+  },
+  {
+    "page": "/nl",
+    "viewport": "mobile",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1",
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/nl/prijzen",
+    "viewport": "mobile",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/nl/partnerprogramma",
+    "viewport": "mobile",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/en",
+    "viewport": "mobile",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1",
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/en/prijzen",
+    "viewport": "mobile",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  },
+  {
+    "page": "/en/partnerprogramma",
+    "viewport": "mobile",
+    "motion": "reduce",
+    "status": 200,
+    "foldCls": 0,
+    "totalCls": 0,
+    "anim": false,
+    "gsapInline": 0,
+    "frameOpacity": [
+      "1"
+    ],
+    "smallTapTargets": [],
+    "axe": null
+  }
+]
