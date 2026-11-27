@@ -27,6 +27,11 @@ const serverEnvSchema = z.object({
   SEED_ADMIN_PASSWORD: optionalString,
   RINSLY_KVK_COLLECTION_ENABLED: optionalString,
   RINSLY_CASES_PAGE_ENABLED: optionalString,
+  RINSLY_FLAG_X3V3_AND_F1: optionalString,
+  RINSLY_FLAG_NICHE_PAGES: optionalString,
+  RINSLY_FLAG_WOERDEN_PAGE: optionalString,
+  RINSLY_FLAG_FOOTER_OWNER_NAME: optionalString,
+  RINSLY_FLAG_PORTRAIT_BIO: optionalString,
 })
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>
@@ -52,6 +57,11 @@ export function readServerEnv(): ServerEnv {
     SEED_ADMIN_PASSWORD: process.env.SEED_ADMIN_PASSWORD,
     RINSLY_KVK_COLLECTION_ENABLED: process.env.RINSLY_KVK_COLLECTION_ENABLED,
     RINSLY_CASES_PAGE_ENABLED: process.env.RINSLY_CASES_PAGE_ENABLED,
+    RINSLY_FLAG_X3V3_AND_F1: process.env.RINSLY_FLAG_X3V3_AND_F1,
+    RINSLY_FLAG_NICHE_PAGES: process.env.RINSLY_FLAG_NICHE_PAGES,
+    RINSLY_FLAG_WOERDEN_PAGE: process.env.RINSLY_FLAG_WOERDEN_PAGE,
+    RINSLY_FLAG_FOOTER_OWNER_NAME: process.env.RINSLY_FLAG_FOOTER_OWNER_NAME,
+    RINSLY_FLAG_PORTRAIT_BIO: process.env.RINSLY_FLAG_PORTRAIT_BIO,
   })
   if (!parsed.success) {
     logCaught('[env] server environment failed validation', parsed.error)

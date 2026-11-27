@@ -28,4 +28,12 @@ export const siteConfig = {
   // accepts API calls from it (e.g. the offerte form). accp.rinsly.com is the
   // CMS's own origin.
   extraOrigins: ['https://accp.rinsly.com'] as string[],
+  // Same locales and default as the engine's built-in nl/en set, so Payload
+  // localization (and the D1 schema) is unchanged. Only the Open Graph locale
+  // of the English pages moves from en_US to en_GB (refactor plan 003 T-02).
+  i18n: {
+    locales: ['nl', 'en'] as string[],
+    defaultLocale: 'nl',
+    og: { nl: 'nl_NL', en: 'en_GB' } as Record<string, string>,
+  },
 } as const

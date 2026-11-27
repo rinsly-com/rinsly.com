@@ -9,6 +9,8 @@ import { getPayload } from 'payload'
 
 import { excludeHiddenCasesParams, isCasesPublicRouteHidden } from '@/lib/casesPagePublicRoute'
 import { LOCAL_PAGE_SLUG, buildLocalPageJsonLd } from '@/lib/localPageJsonLd'
+import { buildBreadcrumbJsonLd, withXDefault } from '@/lib/siteJsonLd'
+import { getPageBySlug } from '@rinsly-com/site-core/lib/pages'
 
 const loadPayload = () => getPayload({ config })
 
@@ -34,24 +36,28 @@ export const generateStaticParams = async () => {
 export const generateMetadata = async (props: Parameters<typeof route.generateMetadata>[0]) => {
   const { slug } = await props.params
   if (await isCasesPublicRouteHidden(slug, loadPayload)) notFound()
-  return route.generateMetadata(props)
+  // hreflang x-default → the Dutch URL (plan 003 T-02).
+  return withXDefault(await route.generateMetadata(props))
 }
 
 /**
- * The engine page, plus the Woerden local page's Service JSON-LD (remote
- * service from Woerden, Utrecht province as the area served). Every other slug
- * renders exactly what the engine renders. /cases 404s until the public-page
- * flag is on (written client consent). A renamed cases document is
- * hidden the same way — slug-only checks would still render it.
+ * The engine page, plus a BreadcrumbList (Home → page, plan 003 T-02) and the
+ * Woerden local page's Service JSON-LD (remote service from Woerden, Utrecht
+ * province as the area served). /cases 404s until the public-page flag is on
+ * (written client consent). A renamed cases document is hidden the same
+ * way — slug-only checks would still render it.
  */
 export default async function Page(props: Parameters<typeof route.Page>[0]) {
   const { locale, slug } = await props.params
   if (await isCasesPublicRouteHidden(slug, loadPayload)) notFound()
   const content = <route.Page {...props} />
-  if (slug !== LOCAL_PAGE_SLUG || (locale !== 'nl' && locale !== 'en')) return content
+  if (locale !== 'nl' && locale !== 'en') return content
+  const page = await getPageBySlug(config, slug, locale)
+  const breadcrumb = page ? buildBreadcrumbJsonLd(siteConfig.url, locale, slug, page.title) : null
   return (
     <>
-      <JsonLd data={buildLocalPageJsonLd(siteConfig.url, locale)} />
+      {breadcrumb && <JsonLd data={breadcrumb} />}
+      {slug === LOCAL_PAGE_SLUG && <JsonLd data={buildLocalPageJsonLd(siteConfig.url, locale)} />}
       {content}
     </>
   )

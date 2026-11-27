@@ -13,6 +13,7 @@ import path from 'node:path'
 import { z } from 'zod'
 
 import { staticContentSecurityPolicy } from './staticCsp.mjs'
+import { staticRedirectLines } from './staticRedirects.mjs'
 
 const env = z
   .object({
@@ -196,18 +197,8 @@ if (existsSync(path.join(root, '.next-static'))) {
 // The public site has no root page (routes live under /[locale]); redirect `/`
 // to the default locale at the edge (Cloudflare static-asset _redirects). The
 // /check funnel is locale-less — send locale-prefixed variants there too
-// (mirrors next.config.ts's dynamic-server redirects).
-writeFileSync(
-  path.join(root, 'out', '_redirects'),
-  [
-    `/    /${DEFAULT_LOCALE}    302`,
-    ...LOCALES.flatMap((l) => [`/${l}/check    /check    301`, `/${l}/check/*    /check/:splat    301`]),
-    // The mirror of next.config's /partner rule: bare /partner goes to the
-    // default locale, so an invite link without one still lands on the form.
-    `/partner    /${DEFAULT_LOCALE}/partner    302`,
-    '',
-  ].join('\n'),
-)
+// (mirrors next.config.ts's dynamic-server redirects). See staticRedirects.mjs.
+writeFileSync(path.join(root, 'out', '_redirects'), staticRedirectLines(DEFAULT_LOCALE, LOCALES).join('\n'))
 
 // Security AND caching headers for every static response (Workers Static Assets
 // _headers). Written here rather than committed as public/_headers, because

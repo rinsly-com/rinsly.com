@@ -13,11 +13,24 @@ import { CheckRunner } from '@/components/check/CheckRunner'
  * rinsly.com export); both forms talk to the accp API cross-origin.
  */
 
+const TITLE = 'Gratis websitecheck | Rinsly'
+const DESCRIPTION =
+  'Test uw website gratis op moderniteit, snelheid, mobiel gebruik, vindbaarheid en veiligheid, met direct resultaat.'
+
+// Social tags reuse the existing title and description (plan 002 B-08).
 export const metadata: Metadata = {
-  title: 'Gratis websitecheck | Rinsly',
-  description:
-    'Test uw website gratis op moderniteit, snelheid, mobiel gebruik, vindbaarheid en veiligheid, met direct resultaat.',
+  title: { absolute: TITLE },
+  description: DESCRIPTION,
   robots: { index: false, follow: false },
+  openGraph: {
+    type: 'website',
+    siteName: 'Rinsly',
+    locale: 'nl_NL',
+    url: '/check',
+    title: TITLE,
+    description: DESCRIPTION,
+  },
+  twitter: { card: 'summary_large_image', title: TITLE, description: DESCRIPTION },
 }
 
 const CHECKS = [
