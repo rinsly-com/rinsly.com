@@ -7,7 +7,9 @@ import { PLACEHOLDER_NOINDEX_SLUGS, SITEMAP_EXCLUDED_SLUGS, slugsForSitemap } fr
  * Yaron (26 Nov 15:59): a cases page is OK for burojazz.nl and Up2Brand. The
  * copy comes later from Marketeer, after Lawyer. Until then every string is a
  * marked placeholder, and no quote or number is attributed to a client.
- * /nl/cases used to answer 404 because no page with this slug existed.
+ * The seed and page data stay so the page can be re-enabled. The public
+ * route 404s until written client consent exists (Yaron 27 Nov 00:53,
+ * Lawyer §13 P2-01) — see casesPageFlag.unit.spec.ts.
  */
 const seed = readFileSync(new URL('../../scripts/seed.ts', import.meta.url), 'utf8')
 
@@ -37,10 +39,10 @@ const BANNED = [
 describe('cases page', () => {
   const layout = casesLayoutSource()
 
-  it('is registered at /cases (fixes the /nl/cases 404), noindex, and omitted from the sitemap until final copy', () => {
+  it('keeps the /cases seed row, noindex, and omits it from the sitemap until it may be public again', () => {
     expect(seed).toMatch(/cases:\s*'cases'/)
     expect(seed).toMatch(/slug:\s*SLUG\.cases/)
-    // Drop 'cases' from PLACEHOLDER_NOINDEX_SLUGS when Marketeer's final copy lands.
+    // Stay out of the sitemap until the page may be public (client consent).
     expect(PLACEHOLDER_NOINDEX_SLUGS.has('cases')).toBe(true)
     expect(SITEMAP_EXCLUDED_SLUGS.has('cases')).toBe(true)
     expect(slugsForSitemap(['over', 'cases'])).not.toContain('cases')

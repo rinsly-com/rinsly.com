@@ -32,3 +32,18 @@ export function slugsForSitemap(pageSlugs: readonly (string | null | undefined)[
     ),
   ]
 }
+
+/** Page rows from getRenderablePages (slug plus optional meta.noindex). */
+export type SitemapPage = {
+  slug?: string | null
+  meta?: { noindex?: boolean | null } | null
+}
+
+/**
+ * Sitemap slugs from CMS page rows: drop the denylist, and also drop any
+ * page with meta.noindex set. The denylist is the safety net when a stored
+ * row is missing noindex (seed is create-only and will not rewrite it).
+ */
+export function slugsForSitemapFromPages(pages: readonly SitemapPage[]): string[] {
+  return slugsForSitemap(pages.filter((page) => page.meta?.noindex !== true).map((page) => page.slug))
+}

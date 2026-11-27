@@ -26,6 +26,7 @@ const serverEnvSchema = z.object({
   SEED_ADMIN_EMAIL: optionalString,
   SEED_ADMIN_PASSWORD: optionalString,
   RINSLY_KVK_COLLECTION_ENABLED: optionalString,
+  RINSLY_CASES_PAGE_ENABLED: optionalString,
 })
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>
@@ -50,6 +51,7 @@ export function readServerEnv(): ServerEnv {
     SEED_ADMIN_EMAIL: process.env.SEED_ADMIN_EMAIL,
     SEED_ADMIN_PASSWORD: process.env.SEED_ADMIN_PASSWORD,
     RINSLY_KVK_COLLECTION_ENABLED: process.env.RINSLY_KVK_COLLECTION_ENABLED,
+    RINSLY_CASES_PAGE_ENABLED: process.env.RINSLY_CASES_PAGE_ENABLED,
   })
   if (!parsed.success) {
     logCaught('[env] server environment failed validation', parsed.error)
