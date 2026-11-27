@@ -194,6 +194,7 @@ function prijzen(base: PageDoc, l: Locale): PageDoc {
   const pricing = byBlockId(base, id.pricing)
   const faq = byBlockId(base, id.faq)
   const cta = byBlockId(base, id.cta)
+  const paid = byBlockId(base, id.paid)
   const p = V5.prijzen
   const tiers = list(pricing.tiers)
   if (tiers.length !== 4) throw new Error(`[redesign-v5] prijzen.${l}: expected 4 plans, found ${String(tiers.length)}`)
@@ -203,7 +204,8 @@ function prijzen(base: PageDoc, l: Locale): PageDoc {
     tag: tier.recommended ? str(tier.badge) || null : null,
     tagline: str(tier.for) || null,
     price: str(tier.price),
-    period: str(tier.per) || null,
+    // Every plan price says excl. btw / excl. VAT (Marketeer review 21:25): "/ mnd" → "/ mnd, excl. btw".
+    period: str(tier.per) ? `${str(tier.per)}${tx(p.periodSuffix, l)}` : null,
     priceNote: str(tier.priceNote) || null,
     features: list(tier.features).map((feature, j) => ({
       id: v5Id(l, `prijzen-plan-${String(i + 1)}-f${String(j + 1)}`),
@@ -249,11 +251,14 @@ function prijzen(base: PageDoc, l: Locale): PageDoc {
         eyebrow: null,
         title: null,
         plans,
-        sharedLine: PRICING.dpaLine[l],
+        // Lawyer via Marketeer: the excl.-btw prices rest on "business clients only", so it stays visible next to the plans.
+        sharedLine: `${PRICING.dpaLine[l]} · ${tx(V5.home.businessBullets[2], l)}`,
         limitsNote: PRICING.limitNote[l],
         // Same public hash as the #122 pricing block, so existing links keep working.
         anchor: str(pricing.anchor) || 'pakketten',
       },
+      // P-03 paid-build note, verbatim from the #122 draft (kept: removing it is Yaron's call).
+      paid,
       {
         id: v5Id(l, 'prijzen-showcase'),
         blockType: 'productShowcase',
@@ -359,13 +364,29 @@ function partner(base: PageDoc, l: Locale): PageDoc {
         items: [
           cost,
           faqItem(v5Id(l, 'partner-faq-basis'), tx(p.basisFaqTitle, l), firstParagraph(basis.content)),
-          ...items.filter((item) => item.id !== id.faqCost),
+          ...items.filter((item) => item.id !== id.faqCost).map((item) => withoutCloudflare(item, l)),
         ],
       },
       // No eyebrow, as on prijzen (v5 mockup; contrast on the dark band).
       { ...closing, eyebrow: null, button: { ...obj(closing.button), label: PARTNER.closingTitle[l] } },
     ],
   }
+}
+
+/**
+ * Marketeer review of #126 (spec §0.4): the reseller FAQ drops its Cloudflare
+ * clause; the rest of the answer stays verbatim. Throws if the #122 text moved.
+ */
+const CLOUDFLARE_CLAUSE: Record<Locale, string> = {
+  nl: ', en je mag Rinsly noemen zoals je Cloudflare noemt: hosting bij Rinsly.',
+  en: ', and you may name Rinsly the way anyone names Cloudflare: hosting at Rinsly.',
+}
+function withoutCloudflare(item: Obj, l: Locale): Obj {
+  const body = JSON.stringify(item.body ?? null)
+  if (!/cloudflare/i.test(body)) return item
+  const clause = JSON.stringify(CLOUDFLARE_CLAUSE[l]).slice(1, -1)
+  if (!body.includes(clause)) throw new Error(`[redesign-v5] partnerprogramma.${l}: FAQ "${str(item.title)}" mentions Cloudflare outside the known clause`)
+  return { ...item, body: JSON.parse(body.replace(clause, '.')) as Json }
 }
 
 /** "Basis 10%" → ["Basis", "10%"], "Eerste lijn +10%" → ["Eerste lijn", "+10%"]. */

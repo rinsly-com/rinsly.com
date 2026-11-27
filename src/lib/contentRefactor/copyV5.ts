@@ -40,7 +40,6 @@ export const SOURCE_QUOTES: string[] = [
   'Vier pakketten, excl. 21% btw. De bouwkosten en de looptijd staan in de offerte.',
   'Care, per maand, excl. btw',
   'Worden de prijzen geïndexeerd?',
-  'voorbeeld.uwbedrijf.nl',
   // String audit (partner)
   'basis van het aandeel',
   'Elke toegeschreven, betalende site.',
@@ -51,7 +50,21 @@ export const SOURCE_QUOTES: string[] = [
   'Stap 3',
   'Wij verkopen geen ontwerp. Dat doen onze partners.',
   'Waarover wordt het percentage berekend?',
-  'voorbeeld.studio.nl',
+  // Marketeer review of #126 (27 Nov 21:25): every plan price carries excl. btw / excl. VAT; EN chip text.
+  ', excl. btw',
+  ', excl. VAT',
+  'vanaf €49 / mnd, excl. btw',
+  'Managed · Aanbevolen €99 / mnd, excl. btw',
+  'Care, per month, excl. VAT',
+  '/ mnd, excl. btw',
+  '/ mo, excl. VAT',
+  // The #122 reseller answers with only the Cloudflare clause removed (Marketeer review, item 5).
+  'Ja. Doorverkoop en eigen branding zijn toegestaan. Factureer je zelf, dan bepaal je je eigen prijs en desgewenst je eigen abonnementsvorm. De overeenkomst blijft tussen Rinsly en de eindklant.',
+  'Yes. Reselling and your own branding are allowed. If you invoice, you set your own price and your own tiers if you want. The agreement stays between Rinsly and the end client.',
+  // Lawyer via Marketeer (27 Nov 21:26): hero frame URLs on reserved example domains.
+  'example.nl',
+  'example.com',
+  'studio.example.com',
 ]
 
 const s = (nl: string, en: string, confirm?: Locale[]): V5String => (confirm ? { nl, en, confirm } : { nl, en })
@@ -67,8 +80,8 @@ export const V5 = {
   home: {
     h1: s('Wij bouwen en hosten uw website.', 'We build and host your website.', ['en']),
     sub: s('Hosting vanaf €49 per maand, excl. btw.', 'Hosting from €49 a month, excl. VAT.'),
-    url: s('voorbeeld.uwbedrijf.nl', 'example.yourbusiness.com', ['en']),
-    badge: s('vanaf €49 / mnd', 'from €49 / mo', ['en']),
+    url: s('example.nl', 'example.com'),
+    badge: s('vanaf €49 / mnd, excl. btw', 'from €49 / mo, excl. VAT', ['en']),
     door1Label: s('Deur 1', 'Door 1', ['en']),
     door2Label: s('Deur 2', 'Door 2', ['en']),
     howLine: s('Hoe het werkt', 'How it works'),
@@ -116,15 +129,17 @@ export const V5 = {
       'Four plans, excl. 21% VAT. The build fee and the term are in the quote.',
       ['en'],
     ),
-    chipSuffix: s('Care, per maand, excl. btw', 'Care, a month, excl. VAT', ['en']),
-    url: s('voorbeeld.uwbedrijf.nl', 'example.yourbusiness.com', ['en']),
-    badge: s('Managed · Aanbevolen €99', 'Managed · Recommended €99', ['en']),
+    chipSuffix: s('Care, per maand, excl. btw', 'Care, per month, excl. VAT'),
+    url: s('example.nl', 'example.com'),
+    badge: s('Managed · Aanbevolen €99 / mnd, excl. btw', 'Managed · Recommended €99 / mo, excl. VAT', ['en']),
+    /** Appended to every plan period ("/ mnd" → "/ mnd, excl. btw"), Marketeer review 21:25. */
+    periodSuffix: s(', excl. btw', ', excl. VAT'),
     invoiceUrl: s('rinsly.com/prijzen', 'rinsly.com/en/prijzen', ['nl', 'en']),
     invoiceTitle: s('Maandelijks, excl. 21% btw', 'Monthly, excl. 21% VAT', ['nl', 'en']),
     indexationFaqTitle: s('Worden de prijzen geïndexeerd?', 'Are prices indexed?', ['en']),
   },
   partner: {
-    url: s('voorbeeld.studio.nl', 'example.studio.com', ['en']),
+    url: s('studio.example.com', 'studio.example.com'),
     badge: s('basis 10%', 'base 10%', ['en']),
     chipSuffix: s('basis van het aandeel', 'base share'),
     rungTexts: [

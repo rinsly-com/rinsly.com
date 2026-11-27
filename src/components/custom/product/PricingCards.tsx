@@ -28,18 +28,19 @@ export function PricingCards({ eyebrow, title, plans, sharedLine, limitsNote, lo
           <article
             key={plan.id ?? i}
             className={[
-              'flex flex-col rounded-2xl border bg-card p-4 shadow-card',
+              'flex flex-col rounded-2xl border bg-card p-3.5 shadow-card',
               plan.featured ? 'border-accent ring-2 ring-accent' : 'border-hair',
             ].join(' ')}
           >
             {plan.tag && (
-              <p className="mb-2 self-start rounded-pill bg-accent px-2.5 py-0.5 text-[11px] font-bold tracking-[0.08em] text-accent-ink uppercase">
+              // Full-width bar on the recommended plan (v5 mockup); white on accent is 4.9:1.
+              <p className="mb-2 rounded-pill bg-accent px-3 py-1 text-[11px] font-bold tracking-[0.08em] text-accent-ink uppercase">
                 {plan.tag}
               </p>
             )}
             <h3 className="text-[17px] font-bold tracking-[-0.01em] text-ink">{plan.title}</h3>
             {plan.tagline && <p className="mt-0.5 text-[13px] leading-snug text-muted">{plan.tagline}</p>}
-            <p className="mt-2 flex flex-wrap items-baseline gap-x-1">
+            <p className="mt-1.5 flex flex-wrap items-baseline gap-x-1">
               <span data-count className="text-[24px] font-extrabold tracking-[-0.03em] text-ink tabular-nums">
                 {plan.price}
               </span>
@@ -47,11 +48,11 @@ export function PricingCards({ eyebrow, title, plans, sharedLine, limitsNote, lo
             </p>
             {plan.priceNote && <p className="text-[12.5px] text-muted">{plan.priceNote}</p>}
             {plan.features?.length ? (
-              <ul className="mt-2.5 flex flex-col gap-1 border-t border-hair pt-2.5">
+              <ul className="mt-2 flex flex-col gap-[3px] border-t border-hair pt-2">
                 {plan.features.map((feature, j) => {
                   const included = feature.included !== false
                   return (
-                    <li key={feature.id ?? j} className={['flex items-start gap-2 text-[12.5px] leading-snug', included ? 'text-ink' : 'text-muted'].join(' ')}>
+                    <li key={feature.id ?? j} className={['flex items-start gap-2 text-[12.5px] leading-[1.35]', included ? 'text-ink' : 'text-muted'].join(' ')}>
                       <span
                         aria-hidden
                         className={['mt-[3px] block size-2.5 shrink-0 rounded-full border-2', included ? 'border-accent' : 'border-hair'].join(' ')}

@@ -56,7 +56,9 @@ describe('redesign v5 copy provenance', () => {
     for (const l of LOCALES) {
       it(`${slug}.${l}: every string is sourced or listed for Marketeer to confirm`, () => {
         const confirm = toConfirm(l)
-        const unsourced = leaves(v5Page(slug, l)).filter((text) => !CORPUS.includes(fold(text)) && !confirm.has(fold(text)))
+        const sourced = (text: string) => CORPUS.includes(fold(text)) || confirm.has(fold(text))
+        // A line joined with " · " is sourced when each part is.
+        const unsourced = leaves(v5Page(slug, l)).filter((text) => !sourced(text) && !text.split(' · ').every(sourced))
         expect(unsourced).toEqual([])
       })
     }
@@ -110,7 +112,7 @@ describe('redesign v5 layouts', () => {
     const show = (slug: (typeof V5_SLUGS)[number]) => (v5Page(slug, 'nl').layout as Obj[])[0].showcase as Obj
     expect([show('home').kind, show('prijzen').kind, show('partnerprogramma').kind]).toEqual(['business', 'plans', 'studio'])
     expect([show('home').showPhone, show('prijzen').showPhone, show('partnerprogramma').showPhone]).toEqual([true, false, false])
-    expect([show('home').badge, show('prijzen').badge, show('partnerprogramma').badge]).toEqual(['vanaf €49 / mnd', 'Managed · Aanbevolen €99', 'basis 10%'])
+    expect([show('home').badge, show('prijzen').badge, show('partnerprogramma').badge]).toEqual(['vanaf €49 / mnd, excl. btw', 'Managed · Aanbevolen €99 / mnd, excl. btw', 'basis 10%'])
   })
 
   it('partner: the lower heading does not repeat the H1', () => {
@@ -130,6 +132,45 @@ describe('redesign v5 layouts', () => {
       if (['doorCards', 'stepsShowcase', 'pricingCards', 'ladderSteps', 'productShowcase'].includes(block.blockType as string)) expect(block.anchor).toBeTruthy()
     }
     expect(V5_SLUGS).not.toContain('contact')
+  })
+
+  it('Marketeer review: every plan price says excl. btw / excl. VAT; EN chip; frame badges', () => {
+    for (const l of LOCALES) {
+      const layout = v5Page('prijzen', l).layout as Obj[]
+      const plans = layout.find((b) => b.blockType === 'pricingCards')?.plans as Obj[]
+      expect(plans).toHaveLength(4)
+      for (const plan of plans) expect(plan.period).toBe(l === 'nl' ? '/ mnd, excl. btw' : '/ mo, excl. VAT')
+      const hero = layout[0]
+      expect(JSON.stringify(hero.priceChip)).toMatch(l === 'nl' ? /excl\. btw/ : /excl\. VAT/)
+      expect((hero.showcase as Obj).badge).toMatch(l === 'nl' ? /excl\. btw$/ : /excl\. VAT$/)
+      expect(((v5Page('home', l).layout as Obj[])[0].showcase as Obj).badge).toMatch(l === 'nl' ? /excl\. btw$/ : /excl\. VAT$/)
+    }
+    expect(((v5Page('prijzen', 'en').layout as Obj[])[0].priceChip as Obj).suffix).toBe('Care, per month, excl. VAT')
+  })
+
+  it('prijzen keeps the P-03 paid-build note verbatim and shows "business clients only" next to the plans', () => {
+    for (const l of LOCALES) {
+      const layout = v5Page('prijzen', l).layout as Obj[]
+      const before = (page122('prijzen', l).layout as Obj[]).find((b) => JSON.stringify(b).includes(l === 'nl' ? 'vanaf €2.500' : 'from €2,500'))
+      expect(before).toBeDefined()
+      expect(layout).toContainEqual(before)
+      const plans = layout.find((b) => b.blockType === 'pricingCards')
+      expect(plans?.sharedLine).toContain(l === 'nl' ? 'Alleen voor zakelijke opdrachtgevers' : 'Business clients only')
+    }
+  })
+
+  it('no Cloudflare anywhere in the v5 drafts; the reseller answer is otherwise verbatim', () => {
+    for (const slug of V5_SLUGS) for (const l of LOCALES) expect(JSON.stringify(v5Page(slug, l))).not.toMatch(/cloudflare/i)
+    const text = (l: Locale) => JSON.stringify((v5Page('partnerprogramma', l).layout as Obj[]).find((b) => b.blockType === 'accordion'))
+    expect(text('nl')).toContain('Factureer je zelf, dan bepaal je je eigen prijs en desgewenst je eigen abonnementsvorm. De overeenkomst blijft tussen Rinsly en de eindklant.')
+    expect(text('en')).toContain('If you invoice, you set your own price and your own tiers if you want. The agreement stays between Rinsly and the end client.')
+  })
+
+  it('hero frame URLs are reserved example domains', () => {
+    for (const slug of V5_SLUGS) for (const l of LOCALES) {
+      const url = ((v5Page(slug, l).layout as Obj[])[0].showcase as Obj).url as string
+      expect(url).toMatch(/^([a-z0-9-]+\.)*example\.(com|nl)$/)
+    }
   })
 
   it('splitRung', () => {

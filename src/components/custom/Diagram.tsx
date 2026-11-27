@@ -262,11 +262,13 @@ export function Diagram({ kind, eyebrow, title, caption, locale }: Props) {
     <Section className="py-12 sm:py-16">
       <SectionHeading header={{ eyebrow, title }} />
       <figure className={eyebrow || title ? 'mt-7' : undefined} data-reveal>
-        {/* The drawing scrolls inside its own box rather than widening the page. */}
+        {/* The drawing scrolls inside its own box rather than widening the page.
+            Focusable, so keyboard users can scroll it (axe scrollable-region-focusable). */}
         <div
-          role="group"
-          aria-label={caption ?? undefined}
-          className="overflow-x-auto rounded-2xl border border-hair bg-card p-6 sm:p-8"
+          role="region"
+          tabIndex={0}
+          aria-label={caption ?? title ?? undefined}
+          className="overflow-x-auto rounded-2xl border border-hair bg-card p-6 outline-none focus-visible:ring-2 focus-visible:ring-accent sm:p-8"
         >
           {drawing}
         </div>
