@@ -2,7 +2,12 @@ import { readFileSync } from 'node:fs'
 
 import { describe, expect, it } from 'vitest'
 
-import { productHeroBlock } from '@/blocks/product'
+import type { Block, Field } from 'payload'
+
+import { pageBlocks } from '@rinsly-com/site-core/blocks'
+import { diagramBlock } from '@/blocks/Diagram'
+import { productBlocks, productHeroBlock } from '@/blocks/product'
+import { revenueCalculatorBlock } from '@/blocks/RevenueCalculator'
 import { V5 } from '@/lib/contentRefactor/copyV5'
 import { V8 } from '@/lib/contentRefactor/copyV8'
 import { type Obj, sameValue } from '@/lib/contentRefactor/edit'
@@ -27,6 +32,44 @@ const read = (path: string): string | null => {
   }
 }
 const CHANGE_TABLE = read('/workspace/redesign-2026-11-27/v6/CHANGE-TABLE.md')
+
+/** minRows/maxRows on array fields in a Payload block config, including nested arrays (e.g. doors.bullets). */
+type ArrayLimit = { path: string; minRows?: number; maxRows?: number }
+function arrayLimits(fields: Field[] | undefined, prefix = ''): ArrayLimit[] {
+  if (!fields) return []
+  const out: ArrayLimit[] = []
+  for (const field of fields) {
+    if (!('type' in field)) continue
+    if (field.type === 'array' && 'name' in field) {
+      const path = prefix ? `${prefix}.${field.name}` : field.name
+      if (field.minRows != null || field.maxRows != null) out.push({ path, minRows: field.minRows, maxRows: field.maxRows })
+      if ('fields' in field) out.push(...arrayLimits(field.fields, path))
+      continue
+    }
+    if (field.type === 'group' && 'name' in field && 'fields' in field) {
+      out.push(...arrayLimits(field.fields, prefix ? `${prefix}.${field.name}` : field.name))
+      continue
+    }
+    if (field.type === 'tabs' && 'tabs' in field) {
+      for (const tab of field.tabs) out.push(...arrayLimits(tab.fields, prefix))
+      continue
+    }
+    if ('fields' in field) out.push(...arrayLimits(field.fields, prefix))
+  }
+  return out
+}
+
+/** Every array at `path` (dot path) under `root`. A missing field is an empty array, so a minRows check still runs. A missing parent object yields no arrays (no instances). */
+function arraysAt(root: unknown, path: string): unknown[][] {
+  const walk = (value: unknown, parts: string[]): unknown[][] => {
+    if (parts.length === 0) return [Array.isArray(value) ? value : value == null ? [] : [value]]
+    if (Array.isArray(value)) return value.flatMap((item) => walk(item, parts))
+    if (typeof value !== 'object' || value === null) return []
+    return walk((value as Record<string, unknown>)[parts[0]], parts.slice(1))
+  }
+  return walk(root, path.split('.'))
+}
+
 
 describe('redesign v8 drafts: CHANGE-TABLE (v6 first-screen dedupe)', () => {
   it('home: sub and closing CTA text are the new home sub; no €49 in the sub, frame badge or door 2 bullets', () => {
@@ -120,6 +163,33 @@ describe('redesign v8 drafts: frames and the rest', () => {
         expect(changed).toEqual(expected.map((name) => `v5-20261127-${l}-${name}`))
       }
     }
+  })
+
+  it("every array in the v8 drafts sits within that block's minRows and maxRows (from the real configs)", () => {
+    const configs = new Map(([...pageBlocks, revenueCalculatorBlock, diagramBlock, ...productBlocks] as Block[]).map((block) => [block.slug, block]))
+    const limitsOf = (blockType: string) => arrayLimits(configs.get(blockType)?.fields)
+    let checked = 0
+    for (const slug of V8_SLUGS) {
+      for (const l of LOCALES) {
+        for (const block of layout(buildV8Page(slug, l, v5Page(slug, l)))) {
+          const type = block.blockType as string
+          const limits = limitsOf(type)
+          // A typo in the draft (or a missing config) would otherwise skip the check.
+          expect(configs.has(type), `${slug}.${l} block ${type}`).toBe(true)
+          for (const limit of limits) {
+            const arrays = arraysAt(block, limit.path)
+            for (const rows of arrays) {
+              const n = rows.length
+              const where = `${slug}.${l} ${type}.${limit.path}`
+              if (limit.minRows != null) expect(n, `${where} minRows ${String(limit.minRows)}`).toBeGreaterThanOrEqual(limit.minRows)
+              if (limit.maxRows != null) expect(n, `${where} maxRows ${String(limit.maxRows)}`).toBeLessThanOrEqual(limit.maxRows)
+              checked += 1
+            }
+          }
+        }
+      }
+    }
+    expect(checked).toBeGreaterThan(0)
   })
 
   it('the transform refuses a base that is not the v5 draft', () => {
