@@ -78,12 +78,29 @@ export const productHeroBlock: Block = {
             { label: t('Business site', 'Bedrijfssite'), value: 'business' },
             { label: t('Plans / dashboard', 'Pakketten / dashboard'), value: 'plans' },
             { label: t('Studio portfolio', 'Studioportfolio'), value: 'studio' },
+            { label: t('Live and staging environments', 'Live- en stagingomgeving'), value: 'environments' },
           ],
         },
         text('url', 'Address bar label', 'Label in de adresbalk'),
         text('badge', 'Overlay chip', 'Chip op het frame'),
         text('caption', 'Caption', 'Onderschrift'),
         { name: 'showPhone', label: t('Show the CMS phone', 'Toon de CMS-telefoon'), type: 'checkbox', defaultValue: false },
+        // Redesign v8: the few words drawn inside the frames are content too (no copy in components).
+        text('saveLabel', 'Save button in the phone', 'Opslaanknop in de telefoon', {
+          admin: {
+            // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+            condition: (_data, sibling) => sibling?.['showPhone'] === true,
+            description: t('Empty: the button is drawn without text.', 'Leeg: de knop wordt zonder tekst getekend.'),
+          },
+        }),
+        text('liveLabel', 'Label above the live window', 'Label boven het live-venster', {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          admin: { condition: (_data, sibling) => sibling?.['kind'] === 'environments' },
+        }),
+        text('stagingLabel', 'Label above the staging window', 'Label boven het stagingvenster', {
+          // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+          admin: { condition: (_data, sibling) => sibling?.['kind'] === 'environments' },
+        }),
       ],
     },
     anchor(),
@@ -186,7 +203,7 @@ export const stepsShowcaseBlock: Block = {
   ],
 }
 
-/** §4.4 doorCards: the two home doors as offer cards (three bullets, price, one button each). */
+/** §4.4 doorCards: the two home doors as offer cards (2 or 3 bullets, price, one button each). */
 export const doorCardsBlock: Block = {
   slug: 'doorCards',
   interfaceName: 'DoorCardsBlock',
@@ -206,7 +223,7 @@ export const doorCardsBlock: Block = {
         text('title', 'Title', 'Titel', { required: true }),
         { type: 'row', fields: [text('price', 'Price or %', 'Prijs of %'), text('priceNote', 'Price note', 'Toelichting bij de prijs')] },
         text('howLine', 'Line above the bullets', 'Regel boven de opsomming'),
-        textList('bullets', 'Bullets (exactly 3)', 'Opsomming (precies 3)', 3, 3),
+        textList('bullets', 'Bullets (2 or 3)', 'Opsomming (2 of 3)', 2, 3),
         textarea('finePrint', 'Fine print (above the button)', 'Kleine letters (boven de knop)'),
         linkGroup('button', 'Button', 'Knop'),
       ],

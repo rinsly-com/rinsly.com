@@ -1,8 +1,10 @@
 /**
  * Decorative frames for the product-led blocks: a browser window holding a
  * small example layout, a phone with a CMS edit view, and the step frames.
- * No text inside them is content (bars, not copy); the overlay chip and the
- * caption are rendered by the block itself. All sizes are fixed or come from
+ * CSS only (no images). The only words inside them (the phone's save button,
+ * the Live/Staging labels, v8) come from the block's CMS fields; everything
+ * else is bars, not copy. The overlay chip and the caption are rendered by
+ * the block itself. All sizes are fixed or come from
  * normal flow, so nothing shifts when RinslyMotion animates them (transform
  * and opacity only).
  */
@@ -28,30 +30,88 @@ export function BrowserFrame({ url, children, className }: { url?: string | null
   )
 }
 
-/** Home: a business site (nav, headline, brand image, three cards). */
+/** Home: a business site (nav, a two-line headline, brand art, three cards with an icon, a button). v8 mockup. */
 export function MiniBusinessSite() {
   return (
-    <div aria-hidden className="flex h-full flex-col gap-3 bg-paper p-4 pr-20">
-      <div className="flex items-center gap-2.5">
-        <span className="block size-2.5 rounded-sm bg-accent" />
-        {bar('18%', 'bg-ink', 'h-2')}
-        <span className="ml-auto flex gap-2">{bar('28px')}{bar('28px')}{bar('28px')}</span>
+    <div aria-hidden className="flex h-full flex-col gap-2 bg-paper py-3 pr-[96px] pl-3.5">
+      <div className="flex items-center gap-2">
+        <span className="block size-2.5 shrink-0 rounded-[3px] bg-accent" />
+        {bar('22px', 'bg-hair', 'h-[5px]')}
+        {bar('22px', 'bg-hair', 'h-[5px]')}
+        {bar('22px', 'bg-hair', 'h-[5px]')}
       </div>
-      <div className="flex flex-col gap-1.5">
-        {bar('62%', 'bg-ink/80', 'h-2.5')}
-        {bar('40%', 'bg-muted/40')}
+      <div className="flex flex-col gap-[5px] pt-1">
+        {bar('72%', 'bg-ink/90', 'h-[9px]')}
+        {bar('48%', 'bg-ink/70', 'h-[9px]')}
+        {bar('36%', 'bg-muted/40', 'h-1.5')}
       </div>
-      <div className="relative h-24 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-accent-soft via-accent-soft to-accent/70">
-        <span className="absolute top-7 left-4 block h-2.5 w-[38%] rounded-full bg-card/80" />
-        <span className="absolute top-12 left-4 block h-1.5 w-[24%] rounded-full bg-card/60" />
+      <div className="relative h-[72px] shrink-0 overflow-hidden rounded-[10px] bg-gradient-to-br from-accent-soft via-accent-soft to-accent/70">
+        <span className="absolute -top-6 -right-3.5 block size-24 rounded-full bg-card/45" />
+        <span className="absolute bottom-3 left-5 block h-9 w-14 rotate-[16deg] rounded-xl bg-slate/20" />
+        <span className="absolute top-6 left-4 block h-2 w-[34%] rounded-full bg-card/80" />
       </div>
-      <div className="grid grid-cols-3 gap-2">
+      <div className="grid grid-cols-3 gap-[7px]">
         {[0, 1, 2].map((i) => (
-          <span key={i} className="flex h-14 flex-col gap-1.5 rounded-lg border border-hair bg-card p-2">
-            {bar('60%', 'bg-ink/60')}
-            {bar('80%')}
+          <span key={i} className="flex flex-col gap-[5px] rounded-lg border border-hair bg-card px-[7px] pt-[7px] pb-2">
+            <i className="block size-2 rounded-full bg-accent/85" />
+            {bar('78%', 'bg-hair', 'h-[5px]')}
+            {bar('52%', 'bg-hair/70', 'h-1')}
           </span>
         ))}
+      </div>
+      <span className="block h-3.5 w-[52px] rounded-pill bg-accent" />
+    </div>
+  )
+}
+
+/**
+ * Prijzen (v8): a live and a staging window of the same site, one above the
+ * other (no second price list). The two labels are CMS content
+ * (showcase.liveLabel / stagingLabel); without a label the window is drawn alone.
+ */
+export function MiniEnvironments({ liveLabel, stagingLabel }: { liveLabel?: string | null; stagingLabel?: string | null }) {
+  return (
+    <div aria-hidden className="flex h-full flex-col gap-1.5 bg-paper px-3 pt-2">
+      <EnvWindow label={liveLabel} />
+      <EnvWindow label={stagingLabel} staging />
+    </div>
+  )
+}
+
+function EnvWindow({ label, staging = false }: { label?: string | null; staging?: boolean }) {
+  return (
+    <div>
+      {label && <p className="mb-1 ml-px text-[10px] leading-none font-bold tracking-[0.08em] text-accent-strong uppercase">{label}</p>}
+      <div className="overflow-hidden rounded-lg border border-hair bg-card">
+        <div className="flex items-center gap-[3px] border-b border-hair bg-paper px-1.5 py-1">
+          <i className="block size-1 rounded-full bg-hair" />
+          <i className="block size-1 rounded-full bg-hair" />
+          <i className="block size-1 rounded-full bg-hair" />
+          <span className="ml-1 block h-2 flex-1 rounded-[3px] border border-hair bg-card" />
+        </div>
+        <div className={['flex flex-col gap-1 px-[7px] pt-1 pb-1.5', staging ? 'opacity-90' : ''].join(' ')}>
+          <div className="flex items-center gap-[5px]">
+            <span className="block size-[7px] rounded-[2px] bg-accent" />
+            {bar('14px', 'bg-hair', 'h-1')}
+            {bar('14px', 'bg-hair', 'h-1')}
+          </div>
+          <div
+            className={[
+              'relative h-[22px] overflow-hidden rounded-[5px]',
+              staging
+                ? 'bg-[repeating-linear-gradient(135deg,var(--accent-soft)_0_5px,color-mix(in_srgb,var(--accent-soft)_60%,var(--card))_5px_8px)]'
+                : 'bg-gradient-to-br from-accent-soft via-accent-soft to-accent/70',
+            ].join(' ')}
+          >
+            {!staging && <span className="absolute -top-5 -right-2 block size-16 rounded-full bg-card/45" />}
+            <span className="absolute bottom-1 left-3 block h-1.5 w-[34%] rounded-full bg-card/80" />
+          </div>
+          <div className="grid grid-cols-3 gap-1">
+            <span className="block h-2.5 rounded-[3px] border border-hair bg-card" />
+            <span className={['block h-2.5 rounded-[3px] border bg-card', staging ? 'border-dashed border-muted/50 bg-transparent' : 'border-hair'].join(' ')} />
+            <span className={['block h-2.5 rounded-[3px] border bg-card', staging ? 'border-dashed border-muted/50 bg-transparent' : 'border-hair'].join(' ')} />
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -98,48 +158,80 @@ export function MiniPlanDashboard() {
   )
 }
 
-/** Partner: a design studio's portfolio site (big type, work grid). */
+/** Partner: a design studio's portfolio site (big type, a work grid of three pieces). v8 mockup. */
 export function MiniStudioPortfolio() {
   return (
-    <div aria-hidden className="flex h-full flex-col gap-3 bg-card p-4 pr-20">
-      <div className="flex items-center gap-2.5">
-        {bar('14%', 'bg-ink', 'h-2')}
-        <span className="ml-auto flex gap-2">{bar('24px')}{bar('24px')}{bar('24px')}</span>
+    <div aria-hidden className="flex h-full flex-col gap-2 bg-paper p-3.5">
+      <div className="flex items-center gap-2">
+        <span className="block size-2.5 shrink-0 rounded-[3px] bg-accent" />
+        {bar('22px', 'bg-hair', 'h-[5px]')}
+        {bar('22px', 'bg-hair', 'h-[5px]')}
+        {bar('22px', 'bg-hair', 'h-[5px]')}
       </div>
-      <div className="flex flex-col gap-1.5 pt-1">
-        {bar('78%', 'bg-ink', 'h-3.5')}
-        {bar('52%', 'bg-ink', 'h-3.5')}
+      <div className="flex flex-col gap-[5px] pt-1">
+        {bar('78%', 'bg-ink/90', 'h-3')}
+        {bar('52%', 'bg-ink/70', 'h-3')}
       </div>
-      <div className="grid flex-1 grid-cols-[1.4fr_1fr] gap-2">
-        <span className="block rounded-lg bg-gradient-to-br from-slate to-accent/80" />
-        <span className="grid grid-rows-2 gap-2">
-          <span className="block rounded-lg bg-accent-soft" />
-          <span className="block rounded-lg bg-gradient-to-br from-accent/30 to-accent-soft" />
+      <div className="grid flex-1 grid-cols-[1.35fr_1fr] gap-[7px]">
+        <span className="relative block overflow-hidden rounded-lg bg-gradient-to-br from-slate via-slate to-accent">
+          <span className="absolute -top-2.5 -right-2 block size-[46px] rounded-full bg-card/25" />
+        </span>
+        <span className="flex flex-col gap-[7px]">
+          <span className="relative block flex-1 overflow-hidden rounded-lg bg-gradient-to-br from-accent/40 via-accent-soft to-accent-soft">
+            <span className="absolute top-2 left-2 block size-7 rounded-md bg-accent/30" />
+          </span>
+          <span className="relative block flex-1 overflow-hidden rounded-lg bg-gradient-to-br from-accent/70 to-accent-soft">
+            <span className="absolute -top-2.5 -right-2 block size-[46px] rounded-full bg-card/30" />
+          </span>
         </span>
       </div>
     </div>
   )
 }
 
-/** Home only: a phone showing the CMS edit view (fields, one in focus). */
-export function CmsPhone() {
+/**
+ * Home only (v8): a phone with a mobile CMS. Thin bezel, a camera dot (no
+ * notch), status bar, app bar (back, title, avatar), stacked fields with one
+ * in edit state (selection and caret), image thumbnails, and a sticky save
+ * button. The button label is CMS content (showcase.saveLabel); without one
+ * the button is drawn empty.
+ */
+export function CmsPhone({ saveLabel }: { saveLabel?: string | null }) {
   return (
-    <div aria-hidden className="w-[128px] rounded-[22px] border-[3px] border-slate bg-slate p-2 pb-3 shadow-card">
-      <span className="mx-auto mb-2 block h-1.5 w-11 rounded-full bg-paper/20" />
-      <div className="overflow-hidden rounded-xl bg-paper">
-        <div className="flex items-center gap-1.5 bg-slate px-2 py-1.5">
-          <i className="block size-1.5 rounded-full bg-slate-ink/40" />
-          <i className="block size-1.5 rounded-full bg-slate-ink/40" />
-          <span className="block h-1 flex-1 rounded-full bg-slate-ink/20" />
+    <div aria-hidden className="relative w-[128px] rounded-[30px] bg-slate p-[7px] shadow-[0_8px_20px_rgba(20,33,46,0.14)]">
+      <span className="absolute top-[11px] left-1/2 z-[1] block size-[7px] -translate-x-1/2 rounded-full bg-ink shadow-[inset_0_0_0_1.5px_rgba(255,255,255,0.12)]" />
+      <div className="flex min-h-[198px] flex-col overflow-hidden rounded-[23px] bg-paper">
+        <div className="flex items-center justify-between px-2.5 pt-[9px] pb-0.5">
+          {bar('22px', 'bg-muted/40', 'h-1')}
+          <span className="flex items-center gap-[3px]">
+            <i className="block size-[5px] rounded-full bg-muted/40" />
+            <i className="block h-1.5 w-[11px] rounded-[1.5px] border border-muted/40" />
+          </span>
         </div>
-        <div className="flex flex-col gap-1.5 p-2.5">
-          {bar('40%', 'bg-muted/50', 'h-1')}
-          <span className="block h-5 rounded-md border-2 border-accent bg-card" />
-          {bar('46%', 'bg-muted/50', 'h-1')}
-          <span className="block h-5 rounded-md border border-hair bg-card" />
-          {bar('34%', 'bg-muted/50', 'h-1')}
-          <span className="block h-11 rounded-md border border-hair bg-card" />
-          <span className="mt-1 block h-4 w-1/2 self-end rounded-full bg-accent" />
+        <div className="flex items-center gap-1.5 border-b border-hair px-2 pt-1 pb-[7px]">
+          <span className="block size-2 shrink-0 rotate-45 border-b-[1.5px] border-l-[1.5px] border-ink/70" />
+          <span className="block h-[7px] flex-1 rounded-[3px] bg-ink/70" />
+          <span className="block size-3 shrink-0 rounded-full border border-accent/35 bg-accent-soft" />
+        </div>
+        <div className="flex flex-1 flex-col gap-1.5 px-2 pt-1.5 pb-1.5">
+          {bar('44%', 'bg-muted/60', 'h-[5px]')}
+          <span className="flex h-5 items-center gap-[3px] rounded-[5px] border border-accent bg-card px-1.5 shadow-[0_0_0_2px_color-mix(in_srgb,var(--accent)_22%,transparent)]">
+            {bar('34%', 'bg-muted/70', 'h-[5px]')}
+            <span className="block h-2 w-[24%] rounded-[1px] bg-accent/35" />
+            <span className="block h-2.5 w-[1.5px] shrink-0 rounded-[1px] bg-accent-strong" />
+          </span>
+          <span className="grid grid-cols-3 gap-1">
+            <span className="block h-[26px] rounded bg-gradient-to-br from-accent-soft to-accent/30" />
+            <span className="block h-[26px] rounded bg-gradient-to-br from-accent-soft via-accent-soft to-accent/20" />
+            <span className="block h-[26px] rounded bg-gradient-to-br from-accent/45 to-accent-soft" />
+          </span>
+          {bar('28%', 'bg-muted/60', 'h-[5px]')}
+          <span className="flex h-5 items-center rounded-[5px] border border-hair bg-card px-1.5">{bar('58%', 'bg-hair', 'h-[5px]')}</span>
+        </div>
+        <div className="border-t border-hair bg-card/60 px-2 pt-1.5 pb-2">
+          <span className="flex h-[18px] w-full items-center justify-center rounded-pill bg-accent text-[8px] leading-none font-bold tracking-[0.02em] text-accent-ink">
+            {saveLabel}
+          </span>
         </div>
       </div>
     </div>
