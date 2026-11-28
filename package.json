@@ -31,7 +31,8 @@
     "lint:content": "node scripts/lint-content.mjs",
     "content:publish-refactor": "cross-env NODE_OPTIONS=--no-deprecation payload run scripts/publish-refactor.ts",
     "content:publish-refactor:check": "tsx scripts/publish-refactor.ts --from-public-api=https://accp.rinsly.com",
-    "content:publish-refactor:manifest": "tsx scripts/publish-refactor-manifest.ts"
+    "content:publish-refactor:manifest": "tsx scripts/publish-refactor-manifest.ts",
+    "test:unsubscribe-worker": "tsx scripts/test-unsubscribe-worker.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

@@ -5,7 +5,6 @@
  */
 import type { NextRequest } from 'next/server'
 
-import { applyUnsubscribeHeaders } from '@/lib/unsubscribeHeaders'
 import { handleUnsubscribeRequest } from '@/lib/unsubscribeRequest'
 import { readUnsubscribeTokenSecret } from '@/lib/unsubscribeSecret'
 import { UnavailableUnsubscribeStore } from '@/lib/unsubscribeStore'
@@ -19,7 +18,6 @@ function html(body: string, status: number): Response {
     'content-type': 'text/html; charset=utf-8',
     'x-robots-tag': 'noindex, nofollow',
   })
-  applyUnsubscribeHeaders(headers)
   return new Response(body, { status, headers })
 }
 

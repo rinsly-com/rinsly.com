@@ -18,6 +18,7 @@ import {
   unsubscribeDocumentStatusRewrite,
   unsubscribeViewFromVerification,
 } from '../../src/lib/unsubscribeDocumentStatus'
+import { unsubscribeBareRedirect } from '../../src/lib/unsubscribeBareRedirect'
 import { resolveUnsubscribeSecret } from '../../src/lib/unsubscribeSecret'
 import { handleUnsubscribeRequest, parseUnsubscribePost } from '../../src/lib/unsubscribeRequest'
 import { unsubscribePostRewrite } from '../../src/lib/unsubscribePostRewrite'
@@ -361,6 +362,17 @@ describe('unsubscribe POST rewrite', () => {
   })
 })
 
+describe('unsubscribe bare redirect', () => {
+  it('maps /afmelden and /afmelden/ to /nl/afmelden, and ignores locale routes', () => {
+    expect(unsubscribeBareRedirect('/afmelden')).toEqual({ pathname: '/nl/afmelden' })
+    expect(unsubscribeBareRedirect('/afmelden/')).toEqual({ pathname: '/nl/afmelden' })
+    expect(unsubscribeBareRedirect('/nl/afmelden')).toBeNull()
+    expect(unsubscribeBareRedirect('/en/afmelden')).toBeNull()
+    expect(unsubscribeBareRedirect('/nl/afmelden/one-click')).toBeNull()
+    expect(unsubscribeBareRedirect('/partner')).toBeNull()
+  })
+})
+
 describe('unsubscribe secret lookup', () => {
   it('prefers bindings, then env, and does not treat a failed read as missing', () => {
     expect(resolveUnsubscribeSecret('from-bindings', 'from-env', true)).toEqual({
@@ -485,17 +497,24 @@ describe('unsubscribe HTTP headers', () => {
     applyUnsubscribeHeaders(headers)
     expect(headers.get('Referrer-Policy')).toBe('no-referrer')
     expect(headers.get('Cache-Control')).toBe('no-store')
+    // A single value, not "no-referrer, no-referrer".
+    expect(headers.get('Referrer-Policy')).toBe('no-referrer')
+    expect(headers.get('Cache-Control')).toBe('no-store')
+    expect(headers.get('Referrer-Policy')?.includes(',')).toBe(false)
+    expect(headers.get('Cache-Control')?.includes(',')).toBe(false)
 
     expect(UNSUBSCRIBE_HEADER_SOURCES).toEqual([
-      '/afmelden',
-      '/afmelden/',
       '/:locale(nl|en)/afmelden',
       '/:locale(nl|en)/afmelden/',
       '/:locale(nl|en)/afmelden/one-click',
       '/:locale(nl|en)/afmelden/one-click/',
     ])
+    expect(UNSUBSCRIBE_HEADER_SOURCES).not.toContain('/afmelden')
+    expect(UNSUBSCRIBE_HEADER_SOURCES).not.toContain('/afmelden/')
 
     const middleware = readFileSync('src/middleware.ts', 'utf8')
+    expect(middleware).toContain('unsubscribeBareRedirect')
+    expect(middleware).toContain('NextResponse.redirect')
     expect(middleware).toContain('applyUnsubscribeHeaders')
     expect(middleware).toContain('unsubscribeDocumentStatusRewrite')
     expect(middleware).toContain('status: statusRewrite.status')
@@ -503,10 +522,19 @@ describe('unsubscribe HTTP headers', () => {
     expect(middleware).toContain('/en/afmelden/:path*')
     expect(middleware).toContain("'/afmelden'")
     expect(middleware).toContain("'/afmelden/'")
+    // Headers are applied only on the terminal bare 307, not on next()/rewrite
+    // (those get a single value from next.config headers() after the catch-all).
+    const applyAt = middleware.indexOf('applyUnsubscribeHeaders(res.headers)')
+    const redirectAt = middleware.indexOf('NextResponse.redirect')
+    const postRewriteAt = middleware.indexOf('unsubscribePostRewrite({')
+    expect(applyAt).toBeGreaterThan(redirectAt)
+    expect(applyAt).toBeGreaterThan(-1)
+    expect(postRewriteAt).toBeGreaterThan(applyAt)
 
     const nextCfg = readFileSync('next.config.ts', 'utf8')
     expect(nextCfg).toContain('UNSUBSCRIBE_HTTP_HEADERS')
     expect(nextCfg).toContain('UNSUBSCRIBE_HEADER_SOURCES')
+    expect(nextCfg).not.toMatch(/source:\s*'\/afmelden'/)
     const catchAllAt = nextCfg.indexOf("source: '/:path*'")
     const unsubSourcesAt = nextCfg.indexOf('...UNSUBSCRIBE_HEADER_SOURCES.map')
     expect(catchAllAt).toBeGreaterThan(-1)
@@ -516,7 +544,7 @@ describe('unsubscribe HTTP headers', () => {
       'src/app/(frontend)/[locale]/afmelden/one-click/route.ts',
       'utf8',
     )
-    expect(oneClick).toContain('applyUnsubscribeHeaders')
+    expect(oneClick).not.toContain('applyUnsubscribeHeaders')
   })
 })
 
@@ -527,11 +555,14 @@ describe('static export, redirects and noindex', () => {
     expect(src).toContain("'src/middleware.ts'")
   })
 
-  it('redirects bare /afmelden to the default locale, without making it permanent', () => {
+  it('keeps the typable /afmelden shortcut on the static export, and does the accp redirect in middleware', () => {
     const lines = staticRedirectLines('nl', ['nl', 'en'])
     expect(lines).toContain('/afmelden    /nl/afmelden    302')
     const nextCfg = readFileSync('next.config.ts', 'utf8')
-    expect(nextCfg).toContain("{ source: '/afmelden', destination: '/nl/afmelden', permanent: false }")
+    expect(nextCfg).not.toMatch(/source:\s*'\/afmelden'/)
+    const middleware = readFileSync('src/middleware.ts', 'utf8')
+    expect(middleware).toContain('unsubscribeBareRedirect')
+    expect(middleware).toContain('NextResponse.redirect')
   })
 
   it('keeps the GET page noindex and out of the sitemap helper', () => {
