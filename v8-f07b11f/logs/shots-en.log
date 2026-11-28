@@ -1,0 +1,16 @@
+totp confirm 200
+login 200 cookies payload-token
+200 en-desktop cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe 0 | WEBSITE BUILD AND HOSTING, FOR DESIGN STUDIOS AND BUSINESSES We build and host your website. A website we build and main
+200 en-prijzen-desktop cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe 0 | PRICING Pricing: hosting from €49 a month Four plans, excl. 21% VAT. The build fee and the term are in the quote. Reques
+200 en-partnerprogramma-desktop cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe 0 | FOR DESIGN STUDIOS You design. Rinsly builds and hosts. You can earn a share of the recurring subscription revenue, unde
+200 en-desktop-reduced cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe - | WEBSITE BUILD AND HOSTING, FOR DESIGN STUDIOS AND BUSINESSES We build and host your website. A website we build and main
+200 en-prijzen-desktop-reduced cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe - | PRICING Pricing: hosting from €49 a month Four plans, excl. 21% VAT. The build fee and the term are in the quote. Reques
+200 en-partnerprogramma-desktop-reduced cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe - | FOR DESIGN STUDIOS You design. Rinsly builds and hosts. You can earn a share of the recurring subscription revenue, unde
+200 en-mobile cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe 0 | WEBSITE BUILD AND HOSTING, FOR DESIGN STUDIOS AND BUSINESSES We build and host your website. A website we build and main
+200 en-prijzen-mobile cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe 0 | PRICING Pricing: hosting from €49 a month Four plans, excl. 21% VAT. The build fee and the term are in the quote. Reques
+200 en-partnerprogramma-mobile cls 0.8472 0.8472 anim false inline 0 taps<32 0 axe 0 | FOR DESIGN STUDIOS You design. Rinsly builds and hosts. You can earn a share of the recurring subscription revenue, unde
+200 en-mobile-reduced cls 0.8472 0.8472 anim false inline 0 taps<32 0 axe - | WEBSITE BUILD AND HOSTING, FOR DESIGN STUDIOS AND BUSINESSES We build and host your website. A website we build and main
+200 en-prijzen-mobile-reduced cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe - | PRICING Pricing: hosting from €49 a month Four plans, excl. 21% VAT. The build fee and the term are in the quote. Reques
+200 en-partnerprogramma-mobile-reduced cls 0.0000 0.0000 anim false inline 0 taps<32 0 axe - | FOR DESIGN STUDIOS You design. Rinsly builds and hosts. You can earn a share of the recurring subscription revenue, unde
+
+# CLS re-measure of two mobile EN runs that first read 0.8472: both 0.0000 on a second pass; those two shots and checks.json were retaken.
