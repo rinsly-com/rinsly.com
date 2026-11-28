@@ -1,0 +1,85 @@
+== 2026-11-28T00:02:18+01:00 head 6723595, local D1 = accp-like snapshot + #122 (170000, 190000) + v5 (200000, 200500) migrations run on develop b424feb
+== migrate:status (before)
+│         20261127_170000_content_refactor │     2 │ Yes │
+│        20261127_190000_partner_v33_rungs │     2 │ Yes │
+│       20261127_200000_redesign_v5_blocks │     3 │ Yes │
+│      20261127_200500_redesign_v5_content │     3 │ Yes │
+│ 20261127_225200_redesign_v8_frame_labels │       │  No │
+│      20261127_225300_redesign_v8_content │       │  No │
+== migrate (up)
+$ cross-env NODE_OPTIONS=--no-deprecation payload migrate
+[00:02:27] INFO: Reading migration files from /workspace/builder-redesign-v8/src/migrations
+[00:02:27] INFO: Migrating: 20261127_225200_redesign_v8_frame_labels
+[00:02:27] INFO: Migrated:  20261127_225200_redesign_v8_frame_labels (98ms)
+[00:02:27] INFO: Migrating: 20261127_225300_redesign_v8_content
+[00:02:28] INFO: [redesign-v8 up] wrote home.nl (draft)
+[00:02:28] INFO: [redesign-v8 up] wrote home.en (draft)
+[00:02:28] INFO: [redesign-v8 up] wrote prijzen.nl (draft)
+[00:02:29] INFO: [redesign-v8 up] wrote prijzen.en (draft)
+[00:02:29] INFO: [redesign-v8 up] wrote partnerprogramma.nl (draft)
+[00:02:29] INFO: [redesign-v8 up] wrote partnerprogramma.en (draft)
+[00:02:29] INFO: Migrated:  20261127_225300_redesign_v8_content (2251ms)
+[00:02:29] INFO: Done.
+== re-run up (idempotency)
+REPORT up {"written":[],"unchanged":["home.nl","home.en","prijzen.nl","prijzen.en","partnerprogramma.nl","partnerprogramma.en"],"skipped":[]}
+== re-run down (writes the v5 drafts back)
+REPORT down {"written":["home.nl (draft)","home.en (draft)","prijzen.nl (draft)","prijzen.en (draft)","partnerprogramma.nl (draft)","partnerprogramma.en (draft)"],"unchanged":[],"skipped":[]}
+== re-run down again (idempotency)
+REPORT down {"written":[],"unchanged":["home.nl","home.en","prijzen.nl","prijzen.en","partnerprogramma.nl","partnerprogramma.en"],"skipped":[]}
+== re-run up
+REPORT up {"written":["home.nl (draft)","home.en (draft)","prijzen.nl (draft)","prijzen.en (draft)","partnerprogramma.nl (draft)","partnerprogramma.en (draft)"],"unchanged":[],"skipped":[]}
+== migrate:down (both v8 migrations: content down, then the label columns dropped)
+$ cross-env NODE_OPTIONS=--no-deprecation payload migrate:down
+[00:02:53] INFO: Reading migration files from /workspace/builder-redesign-v8/src/migrations
+[00:02:53] INFO: Rolling back batch 4 consisting of 18 migration(s).
+[00:02:53] INFO: Migrating down: 20261127_225300_redesign_v8_content
+[00:02:54] INFO: [redesign-v8 down] wrote home.nl (draft)
+[00:02:54] INFO: [redesign-v8 down] wrote home.en (draft)
+[00:02:54] INFO: [redesign-v8 down] wrote prijzen.nl (draft)
+[00:02:54] INFO: [redesign-v8 down] wrote prijzen.en (draft)
+[00:02:55] INFO: [redesign-v8 down] wrote partnerprogramma.nl (draft)
+[00:02:55] INFO: [redesign-v8 down] wrote partnerprogramma.en (draft)
+[00:02:55] INFO: Migrated down:  20261127_225300_redesign_v8_content (1794ms)
+[00:02:55] INFO: Migrating down: 20261127_225200_redesign_v8_frame_labels
+[00:02:55] INFO: Migrated down:  20261127_225200_redesign_v8_frame_labels (80ms)
+[00:02:55] INFO: Done.
+== migrate:status (after down)
+│         20261127_170000_content_refactor │     2 │ Yes │
+│        20261127_190000_partner_v33_rungs │     2 │ Yes │
+│       20261127_200000_redesign_v5_blocks │     3 │ Yes │
+│      20261127_200500_redesign_v5_content │     3 │ Yes │
+│ 20261127_225200_redesign_v8_frame_labels │       │  No │
+│      20261127_225300_redesign_v8_content │       │  No │
+== migrate (up again)
+$ cross-env NODE_OPTIONS=--no-deprecation payload migrate
+[00:03:03] INFO: Reading migration files from /workspace/builder-redesign-v8/src/migrations
+[00:03:03] INFO: Migrating: 20261127_225200_redesign_v8_frame_labels
+[00:03:03] INFO: Migrated:  20261127_225200_redesign_v8_frame_labels (79ms)
+[00:03:03] INFO: Migrating: 20261127_225300_redesign_v8_content
+[00:03:04] INFO: [redesign-v8 up] wrote home.nl (draft)
+[00:03:04] INFO: [redesign-v8 up] wrote home.en (draft)
+[00:03:04] INFO: [redesign-v8 up] wrote prijzen.nl (draft)
+[00:03:04] INFO: [redesign-v8 up] wrote prijzen.en (draft)
+[00:03:05] INFO: [redesign-v8 up] wrote partnerprogramma.nl (draft)
+[00:03:05] INFO: [redesign-v8 up] wrote partnerprogramma.en (draft)
+[00:03:05] INFO: Migrated:  20261127_225300_redesign_v8_content (1696ms)
+[00:03:05] INFO: Done.
+== migrate:status (after)
+│         20261127_170000_content_refactor │     2 │ Yes │
+│        20261127_190000_partner_v33_rungs │     2 │ Yes │
+│       20261127_200000_redesign_v5_blocks │     3 │ Yes │
+│      20261127_200500_redesign_v5_content │     3 │ Yes │
+│ 20261127_225200_redesign_v8_frame_labels │     4 │ Yes │
+│      20261127_225300_redesign_v8_content │     4 │ Yes │
+== publish dry run (local D1, committed manifest; dry run is the default, no apply)
+$ cross-env NODE_OPTIONS=--no-deprecation payload run scripts/publish-refactor.ts
+[publish-refactor] target: local D1, dry run
+[publish-refactor] would publish home.nl (bd05d24d03d8)
+[publish-refactor] would publish home.en (3fe30a6b0f55)
+[publish-refactor] would publish prijzen.nl (a09af48b1f3d)
+[publish-refactor] would publish prijzen.en (1fb930eb3b40)
+[publish-refactor] would publish partnerprogramma.nl (380afabb6275)
+[publish-refactor] would publish partnerprogramma.en (95c713b6455a)
+[publish-refactor] would publish contact.nl (f2f553c2f60a)
+[publish-refactor] would publish contact.en (7213d2da4427)
+[publish-refactor] dry run: 8 to publish, 0 already published. Nothing written.

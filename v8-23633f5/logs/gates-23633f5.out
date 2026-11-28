@@ -1,0 +1,83 @@
+head 23633f5190e9d5476cc909934a66ef85b51c26f2 pre status: 0 uncommitted
+== install 2026-11-28T00:22:33+01:00
+install exit 0
++ tailwindcss 4.3.2
++ tsx 4.22.4
++ typescript 5.7.3
++ typescript-eslint 8.64.0
++ vite-tsconfig-paths 6.0.5
++ vitest 4.1.11
++ wrangler 4.153.0
+Done in 9.3s using pnpm v11.11.0
+== types 2026-11-28T00:26:37+01:00
+types exit 0
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "DEPLOY_DISPATCH_URL" | "TURNSTILE_HOSTNAMES">> {}
+}
+Generating runtime types...
+Runtime types generated.
+✨ Types written to cloudflare-env.d.ts
+📖 Read about runtime types
+https://developers.cloudflare.com/workers/languages/typescript/#generate-types
+📣 Remember to rerun 'wrangler types' after you change your wrangler.jsonc file.
+== lint-content 2026-11-28T00:26:40+01:00
+lint-content exit 0
+$ node scripts/lint-content.mjs
+✔ Content lint passed: no em dashes in 49 file(s).
+== lint-migrations 2026-11-28T00:26:40+01:00
+lint-migrations exit 0
+$ node scripts/lint-migrations.mjs
+✔ Migration lint passed: 680 statement(s) replayed, 0 warning(s).
+== tsc 2026-11-28T00:26:41+01:00
+tsc exit 0
+== eslint 2026-11-28T00:43:21+01:00
+eslint exit 0
+$ cross-env NODE_OPTIONS=--no-deprecation eslint .
+/workspace/redesign-v8-gates/src/components/check/CheckRunner.tsx
+  111:13  warning  Do not use `window.location.assign()` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination  @next/next/no-location-assign-relative-destination
+✖ 1 problem (0 errors, 1 warning)
+== unit 2026-11-28T01:02:58+01:00
+unit exit 0
+$ cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.unit.config.mts
+ RUN  v4.1.11 /workspace/redesign-v8-gates
+ Test Files  32 passed (32)
+      Tests  406 passed (406)
+   Start at  01:02:59
+   Duration  4.31s (transform 3.30s, setup 0ms, import 6.57s, tests 6.45s, environment 1.79s)
+== int 2026-11-28T01:03:03+01:00
+int exit 0
+$ cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts
+ RUN  v4.1.11 /workspace/redesign-v8-gates
+ Test Files  5 passed (5)
+      Tests  51 passed (51)
+   Start at  01:03:04
+   Duration  2.22s (transform 298ms, setup 62ms, import 613ms, tests 454ms, environment 618ms)
+== build 2026-11-28T01:03:06+01:00
+build exit 0
+▲ [WARNING] The "typeof" operator will never evaluate to "null" [impossible-typeof]
+    .open-next/server-functions/default/.next/server/chunks/ssr/_04f49xfrqsq4x._.js:1:83335:
+      1 │ ...se"number":case"boolean":case"null":return String(C);case"object...
+        ╵                                 ~~~~~~
+  The expression "typeof x" actually evaluates to "object" in JavaScript, not "null". You need to use "x === null" to test for null.
+Worker saved in `.open-next/worker.js` 🚀
+
+OpenNext build complete.
+== build-static 2026-11-28T01:04:14+01:00
+build-static exit 1
+  signal: null,
+  output: [ null, null, null ],
+  pid: 1968528,
+  stdout: null,
+  stderr: null
+}
+Node.js v24.22.1
+[ELIFECYCLE] Command failed with exit code 1.
+post status: 0 uncommitted
+done 2026-11-28T01:08:39+01:00
+== build-static (re-run after SIGKILL/OOM under box load) 2026-11-28T01:12:14+01:00 head 23633f5
+build-static exit 0
+└ ○ /sitemap.xml
+○  (Static)  prerendered as static content
+●  (SSG)     prerendered as static HTML (uses generateStaticParams)
+✔ Static site built to ./out
+post status: 0 uncommitted
+done 2026-11-28T01:14:24+01:00

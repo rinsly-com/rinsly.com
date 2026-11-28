@@ -2,7 +2,9 @@
 
 Screenshots and logs for the rinsly.com PR "feat(redesign): direction B v5". This branch is an orphan proof branch; never merge it.
 
-**Current: `v5-169709f/` = PR head 169709f** (Marketeer/Lawyer review round: excl. btw on every plan price, P-03 note back, business-only line, reserved frame domains, no Cloudflare clause, Aanbevolen bar, axe fixes, tighter prijzen fold). Adds `compare/prijzen-en-*` and `logs/prijzen-fold-1440x900.txt`. Earlier runs: `v5-896bd12/`, `v5-4d3d17a/`, `v5-2e75da6-motion-recheck/`.
+**v8 drafts PR: `v8-23633f5/`** (see its README).
+
+**v5: `v5-169709f/` = PR head 169709f** (Marketeer/Lawyer review round: excl. btw on every plan price, P-03 note back, business-only line, reserved frame domains, no Cloudflare clause, Aanbevolen bar, axe fixes, tighter prijzen fold). Adds `compare/prijzen-en-*` and `logs/prijzen-fold-1440x900.txt`. Earlier runs: `v5-896bd12/`, `v5-4d3d17a/`, `v5-2e75da6-motion-recheck/`.
 
 `v5-4d3d17a/` was rendered at feature commit 4d3d17a. The PR head 5987c8b differs from it only by
 `src/migrations/20261127_200500_redesign_v5_content.json` (the drizzle snapshot lint:migrations wants), so the render is the same.
