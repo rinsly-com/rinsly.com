@@ -15,9 +15,13 @@ describe('redesign v8 frames', () => {
     const nl = renderToStaticMarkup(<CmsPhone saveLabel="Opslaan" />)
     expect(nl).toContain('>Opslaan<')
     expect(nl).not.toMatch(/<img|<svg|url\(/)
-    const en = renderToStaticMarkup(<CmsPhone saveLabel={null} />)
+    const en = renderToStaticMarkup(<CmsPhone saveLabel="Save" />)
+    expect(en).toContain('>Save<')
     expect(en).not.toContain('Opslaan')
-    expect(en).toContain('aria-hidden="true"')
+    const empty = renderToStaticMarkup(<CmsPhone saveLabel={null} />)
+    expect(empty).not.toContain('Opslaan')
+    expect(empty).not.toContain('Save')
+    expect(empty).toContain('aria-hidden="true"')
   })
 
   it('Live/Staging labels come from the CMS; without them only the windows are drawn', () => {

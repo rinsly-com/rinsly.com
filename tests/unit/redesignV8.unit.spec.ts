@@ -97,14 +97,15 @@ describe('redesign v8 drafts: frames and the rest', () => {
       for (const slug of V8_SLUGS) expect(showcase(slug, l).url).toBe((layout(v5Page(slug, l))[0].showcase as Obj).url)
     }
     expect(showcase('home', 'nl').saveLabel).toBe('Opslaan')
+    expect(showcase('home', 'en').saveLabel).toBe('Save')
     expect([showcase('prijzen', 'nl').liveLabel, showcase('prijzen', 'nl').stagingLabel]).toEqual(['Live', 'Staging'])
+    expect([showcase('prijzen', 'en').liveLabel, showcase('prijzen', 'en').stagingLabel]).toEqual(['Live', 'Staging'])
   })
 
-  it('EN gaps stay empty (no invented copy): phone save button, Live/Staging labels', () => {
-    expect(showcase('home', 'en').saveLabel ?? null).toBeNull()
-    expect(showcase('prijzen', 'en').liveLabel ?? null).toBeNull()
-    expect(showcase('prijzen', 'en').stagingLabel ?? null).toBeNull()
-    expect([V8.home.saveLabel.en, V8.prijzen.liveLabel.en, V8.prijzen.stagingLabel.en]).toEqual([null, null, null])
+  it('EN frame labels are the ones Marketeer confirmed for #132: Save, Live, Staging', () => {
+    expect(showcase('home', 'en').saveLabel).toBe('Save')
+    expect([showcase('prijzen', 'en').liveLabel, showcase('prijzen', 'en').stagingLabel]).toEqual(['Live', 'Staging'])
+    expect([V8.home.saveLabel.en, V8.prijzen.liveLabel.en, V8.prijzen.stagingLabel.en]).toEqual(['Save', 'Live', 'Staging'])
   })
 
   it('only the listed fields change: v8 minus the edits is the v5 draft', () => {

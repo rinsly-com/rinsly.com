@@ -8,17 +8,16 @@
  *    and the text fixes to Builder as drafts, no publish"): the two home door 2
  *    bullets and the home frame badge, marked "Lawyer OK" there.
  *  - MOCKUP_V8: words drawn inside the v8 mockup frames
- *    (redesign-2026-11-27/v8/*.html), NL only.
+ *    (redesign-2026-11-27/v8/*.html). The NL values come from the mockup; the
+ *    EN values were confirmed by Marketeer for rinsly.com #132 (28 Nov 2026):
+ *    Opslaan = "Save", Live = "Live", Staging = "Staging".
  *
- * A locale value of `null` is a gap: the source has no text for that locale
- * and none is invented here. The renderer draws that element without text and
- * the PR lists it for Marketeer. tests/unit/redesignV8.unit.spec.ts checks the
- * sources and the gaps.
+ * tests/unit/redesignV8.unit.spec.ts checks the sources and the frame labels.
  */
 import type { Locale } from './pages'
 
 export type V8String = { nl: string; en: string; source: 'CHANGE_TABLE' | 'LAWYER_OK' }
-export type V8Label = { nl: string; en: string | null; source: 'MOCKUP_V8' }
+export type V8Label = { nl: string; en: string; source: 'MOCKUP_V8' }
 
 const s = (nl: string, en: string, source: V8String['source']): V8String => ({ nl, en, source })
 
@@ -35,13 +34,13 @@ export const V8 = {
     ],
     /** CHANGE-TABLE (same pass below the fold): home trustBar items[0]. */
     trust0: s('Eén omgeving per site, aan de edge', 'One environment per site, at the edge', 'CHANGE_TABLE'),
-    /** v8 mockup: the sticky button in the CMS phone. No EN text in any source. */
-    saveLabel: { nl: 'Opslaan', en: null, source: 'MOCKUP_V8' } satisfies V8Label,
+    /** v8 mockup (NL) + Marketeer confirmation for #132 (EN): the sticky button in the CMS phone. */
+    saveLabel: { nl: 'Opslaan', en: 'Save', source: 'MOCKUP_V8' } satisfies V8Label,
   },
   prijzen: {
-    /** v8 mockup: the two window labels in the prijzen frame. No EN text in any source. */
-    liveLabel: { nl: 'Live', en: null, source: 'MOCKUP_V8' } satisfies V8Label,
-    stagingLabel: { nl: 'Staging', en: null, source: 'MOCKUP_V8' } satisfies V8Label,
+    /** v8 mockup (NL) + Marketeer confirmation for #132 (EN): the two window labels in the prijzen frame. */
+    liveLabel: { nl: 'Live', en: 'Live', source: 'MOCKUP_V8' } satisfies V8Label,
+    stagingLabel: { nl: 'Staging', en: 'Staging', source: 'MOCKUP_V8' } satisfies V8Label,
   },
   partner: {
     /** CHANGE-TABLE: partner productHero.showcase.badge. */
