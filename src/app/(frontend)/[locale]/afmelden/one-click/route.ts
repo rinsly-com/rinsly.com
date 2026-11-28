@@ -5,10 +5,9 @@
  */
 import type { NextRequest } from 'next/server'
 
-import { getBindings } from '@/lib/bindings'
-import { readWorkerSecrets } from '@/lib/env'
 import { applyUnsubscribeHeaders } from '@/lib/unsubscribeHeaders'
 import { handleUnsubscribeRequest } from '@/lib/unsubscribeRequest'
+import { readUnsubscribeTokenSecret } from '@/lib/unsubscribeSecret'
 import { UnavailableUnsubscribeStore } from '@/lib/unsubscribeStore'
 
 export const dynamic = 'force-dynamic'
@@ -34,13 +33,8 @@ export async function POST(req: NextRequest, ctx: Ctx) {
   const body = await req.text()
   const contentType = req.headers.get('content-type') ?? ''
 
-  let secret = ''
-  try {
-    const env = await getBindings()
-    secret = readWorkerSecrets(env).UNSUBSCRIBE_TOKEN_SECRET ?? ''
-  } catch {
-    secret = ''
-  }
+  const lookup = await readUnsubscribeTokenSecret()
+  const secret = lookup.state === 'present' ? lookup.secret : ''
 
   const result = await handleUnsubscribeRequest({
     method: 'POST',

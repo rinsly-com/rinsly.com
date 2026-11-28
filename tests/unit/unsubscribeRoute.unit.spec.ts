@@ -18,6 +18,7 @@ import {
   unsubscribeDocumentStatusRewrite,
   unsubscribeViewFromVerification,
 } from '../../src/lib/unsubscribeDocumentStatus'
+import { resolveUnsubscribeSecret } from '../../src/lib/unsubscribeSecret'
 import { handleUnsubscribeRequest, parseUnsubscribePost } from '../../src/lib/unsubscribeRequest'
 import { unsubscribePostRewrite } from '../../src/lib/unsubscribePostRewrite'
 import { MemoryUnsubscribeStore, UnavailableUnsubscribeStore } from '../../src/lib/unsubscribeStore'
@@ -357,6 +358,47 @@ describe('unsubscribe POST rewrite', () => {
     expect(
       unsubscribePostRewrite({ method: 'POST', pathname: '/nl/partner', hasNextAction: false }),
     ).toBeNull()
+  })
+})
+
+describe('unsubscribe secret lookup', () => {
+  it('prefers bindings, then env, and does not treat a failed read as missing', () => {
+    expect(resolveUnsubscribeSecret('from-bindings', 'from-env', true)).toEqual({
+      state: 'present',
+      secret: 'from-bindings',
+    })
+    expect(resolveUnsubscribeSecret('', 'from-env', true)).toEqual({
+      state: 'present',
+      secret: 'from-env',
+    })
+    expect(resolveUnsubscribeSecret('', 'from-env', false)).toEqual({
+      state: 'present',
+      secret: 'from-env',
+    })
+    expect(resolveUnsubscribeSecret('', '', true)).toEqual({ state: 'missing' })
+    expect(resolveUnsubscribeSecret('', '', false)).toEqual({ state: 'unknown' })
+  })
+
+  it('is the only secret read for middleware, the confirm page, and one-click', () => {
+    const helper = readFileSync('src/lib/unsubscribeSecret.ts', 'utf8')
+    expect(helper).toContain('readWorkerSecrets')
+    expect(helper).toContain('getBindings')
+    expect(helper).not.toContain('process.env.UNSUBSCRIBE_TOKEN_SECRET')
+    expect(helper).toContain("['UNSUBSCRIBE', 'TOKEN', 'SECRET'].join('_')")
+
+    for (const file of [
+      'src/middleware.ts',
+      'src/app/(frontend)/[locale]/afmelden/page.tsx',
+      'src/app/(frontend)/[locale]/afmelden/one-click/route.ts',
+    ]) {
+      const src = readFileSync(file, 'utf8')
+      expect(src).toContain('readUnsubscribeTokenSecret')
+      expect(src).not.toContain('readWorkerSecrets')
+      expect(src).not.toContain('getBindings')
+      expect(src).not.toContain('process.env')
+    }
+
+    expect(readFileSync('src/middleware.ts', 'utf8')).toContain("lookup.state === 'unknown'")
   })
 })
 
