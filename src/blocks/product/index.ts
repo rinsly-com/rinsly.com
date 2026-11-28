@@ -203,7 +203,7 @@ export const stepsShowcaseBlock: Block = {
   ],
 }
 
-/** §4.4 doorCards: the two home doors as offer cards (three bullets, price, one button each). */
+/** §4.4 doorCards: the two home doors as offer cards (2 or 3 bullets, price, one button each). */
 export const doorCardsBlock: Block = {
   slug: 'doorCards',
   interfaceName: 'DoorCardsBlock',
@@ -223,7 +223,7 @@ export const doorCardsBlock: Block = {
         text('title', 'Title', 'Titel', { required: true }),
         { type: 'row', fields: [text('price', 'Price or %', 'Prijs of %'), text('priceNote', 'Price note', 'Toelichting bij de prijs')] },
         text('howLine', 'Line above the bullets', 'Regel boven de opsomming'),
-        textList('bullets', 'Bullets (exactly 3)', 'Opsomming (precies 3)', 3, 3),
+        textList('bullets', 'Bullets (2 or 3)', 'Opsomming (2 of 3)', 2, 3),
         textarea('finePrint', 'Fine print (above the button)', 'Kleine letters (boven de knop)'),
         linkGroup('button', 'Button', 'Knop'),
       ],
