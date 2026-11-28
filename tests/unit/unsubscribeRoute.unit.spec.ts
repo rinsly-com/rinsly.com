@@ -14,6 +14,10 @@ import {
   UNSUBSCRIBE_HEADER_SOURCES,
   UNSUBSCRIBE_HTTP_HEADERS,
 } from '../../src/lib/unsubscribeHeaders'
+import {
+  unsubscribeDocumentStatusRewrite,
+  unsubscribeViewFromVerification,
+} from '../../src/lib/unsubscribeDocumentStatus'
 import { handleUnsubscribeRequest, parseUnsubscribePost } from '../../src/lib/unsubscribeRequest'
 import { unsubscribePostRewrite } from '../../src/lib/unsubscribePostRewrite'
 import { MemoryUnsubscribeStore, UnavailableUnsubscribeStore } from '../../src/lib/unsubscribeStore'
@@ -114,6 +118,45 @@ describe('handleUnsubscribeRequest', () => {
     })
     expect(result.view).toBe('confirm')
     expect(result.body).toContain('Do you want to stop receiving marketing messages from Rinsly?')
+    expect(store.rows).toEqual([])
+  })
+
+  it('GET with an invalid token returns 400 and the friendly invalid body', async () => {
+    const store = new MemoryUnsubscribeStore()
+    const result = await handleUnsubscribeRequest({
+      method: 'GET',
+      token: 'v1.not-a-real-hash.not-a-real-sig',
+      locale: 'nl',
+      body: '',
+      contentType: '',
+      secret: SECRET,
+      store,
+      now: NOW,
+    })
+    expect(result.status).toBe(400)
+    expect(result.view).toBe('invalid')
+    expect(result.body).toContain('contact@rinsly.com')
+    expect(result.body).toContain('Je kunt je ook afmelden')
+    expect(store.rows).toEqual([])
+  })
+
+  it('GET fails closed with 503 when the secret is missing', async () => {
+    const store = new MemoryUnsubscribeStore()
+    const token = await tokenFor()
+    const result = await handleUnsubscribeRequest({
+      method: 'GET',
+      token,
+      locale: 'nl',
+      body: '',
+      contentType: '',
+      secret: '',
+      store,
+      now: NOW,
+    })
+    expect(result.status).toBe(503)
+    expect(result.view).toBe('unavailable')
+    expect(result.body).toContain('contact@rinsly.com')
+    expect(result.body).toContain('Afmelden is nu niet mogelijk')
     expect(store.rows).toEqual([])
   })
 
@@ -317,6 +360,79 @@ describe('unsubscribe POST rewrite', () => {
   })
 })
 
+describe('unsubscribe document status rewrite', () => {
+  it('rewrites human GET/HEAD /{locale}/afmelden to 400 or 503, and leaves other paths alone', async () => {
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/nl/afmelden',
+        token: 'v1.not-a-real-hash.not-a-real-sig',
+        secret: SECRET,
+      }),
+    ).toEqual({ status: 400 })
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'HEAD',
+        pathname: '/en/afmelden/',
+        token: 'not-a-token',
+        secret: SECRET,
+      }),
+    ).toEqual({ status: 400 })
+    const token = await tokenFor()
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/nl/afmelden',
+        token,
+        secret: '',
+      }),
+    ).toEqual({ status: 503 })
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/nl/afmelden',
+        token,
+        secret: SECRET,
+      }),
+    ).toBeNull()
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'POST',
+        pathname: '/nl/afmelden',
+        token: 'v1.not-a-real-hash.not-a-real-sig',
+        secret: SECRET,
+      }),
+    ).toBeNull()
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/afmelden',
+        token: 'v1.not-a-real-hash.not-a-real-sig',
+        secret: SECRET,
+      }),
+    ).toBeNull()
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/nl/afmelden/one-click',
+        token: 'v1.not-a-real-hash.not-a-real-sig',
+        secret: SECRET,
+      }),
+    ).toBeNull()
+  })
+
+  it('maps a failed verification to the same 400/503 codes as one-click', () => {
+    expect(unsubscribeViewFromVerification({ ok: false, reason: 'invalid' })).toEqual({
+      view: 'invalid',
+      status: 400,
+    })
+    expect(unsubscribeViewFromVerification({ ok: false, reason: 'missing_secret' })).toEqual({
+      view: 'unavailable',
+      status: 503,
+    })
+  })
+})
+
 describe('unsubscribe HTTP headers', () => {
   it('sets Referrer-Policy: no-referrer and Cache-Control: no-store on GET and one-click', () => {
     expect(UNSUBSCRIBE_HTTP_HEADERS).toEqual([
@@ -328,21 +444,31 @@ describe('unsubscribe HTTP headers', () => {
     expect(headers.get('Referrer-Policy')).toBe('no-referrer')
     expect(headers.get('Cache-Control')).toBe('no-store')
 
-    expect(UNSUBSCRIBE_HEADER_SOURCES).toEqual(
-      expect.arrayContaining([
-        '/:locale(nl|en)/afmelden',
-        '/:locale(nl|en)/afmelden/one-click',
-      ]),
-    )
+    expect(UNSUBSCRIBE_HEADER_SOURCES).toEqual([
+      '/afmelden',
+      '/afmelden/',
+      '/:locale(nl|en)/afmelden',
+      '/:locale(nl|en)/afmelden/',
+      '/:locale(nl|en)/afmelden/one-click',
+      '/:locale(nl|en)/afmelden/one-click/',
+    ])
 
     const middleware = readFileSync('src/middleware.ts', 'utf8')
     expect(middleware).toContain('applyUnsubscribeHeaders')
+    expect(middleware).toContain('unsubscribeDocumentStatusRewrite')
+    expect(middleware).toContain('status: statusRewrite.status')
     expect(middleware).toContain('/nl/afmelden/:path*')
     expect(middleware).toContain('/en/afmelden/:path*')
+    expect(middleware).toContain("'/afmelden'")
+    expect(middleware).toContain("'/afmelden/'")
 
     const nextCfg = readFileSync('next.config.ts', 'utf8')
     expect(nextCfg).toContain('UNSUBSCRIBE_HTTP_HEADERS')
     expect(nextCfg).toContain('UNSUBSCRIBE_HEADER_SOURCES')
+    const catchAllAt = nextCfg.indexOf("source: '/:path*'")
+    const unsubSourcesAt = nextCfg.indexOf('...UNSUBSCRIBE_HEADER_SOURCES.map')
+    expect(catchAllAt).toBeGreaterThan(-1)
+    expect(unsubSourcesAt).toBeGreaterThan(catchAllAt)
 
     const oneClick = readFileSync(
       'src/app/(frontend)/[locale]/afmelden/one-click/route.ts',
@@ -369,6 +495,7 @@ describe('static export, redirects and noindex', () => {
   it('keeps the GET page noindex and out of the sitemap helper', () => {
     const page = readFileSync('src/app/(frontend)/[locale]/afmelden/page.tsx', 'utf8')
     expect(page).toContain('robots: { index: false, follow: false }')
+    expect(page).toContain('resolveUnsubscribeDocument')
     const slugs = readFileSync('src/lib/sitemapSlugs.ts', 'utf8')
     expect(slugs).not.toContain('afmelden')
     const sitemap = readFileSync('src/app/sitemap.ts', 'utf8')

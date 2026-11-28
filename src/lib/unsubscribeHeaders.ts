@@ -1,5 +1,5 @@
 /**
- * HTTP headers for /{nl|en}/afmelden and ./one-click.
+ * HTTP headers for /afmelden, /{nl|en}/afmelden and ./one-click.
  *
  * Referrer-Policy no-referrer keeps ?token= out of Referer on same-origin
  * clicks (the global accp header is strict-origin-when-cross-origin).
@@ -11,6 +11,8 @@ export const UNSUBSCRIBE_HTTP_HEADERS = [
 ] as const
 
 export const UNSUBSCRIBE_HEADER_SOURCES = [
+  '/afmelden',
+  '/afmelden/',
   '/:locale(nl|en)/afmelden',
   '/:locale(nl|en)/afmelden/',
   '/:locale(nl|en)/afmelden/one-click',

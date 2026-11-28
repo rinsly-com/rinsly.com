@@ -8,8 +8,8 @@ import { UnsubscribeConfirmForm } from '@/components/unsubscribe/UnsubscribeConf
 import { getBindings } from '@/lib/bindings'
 import { readWorkerSecrets } from '@/lib/env'
 import { unsubscribeCopy } from '@/lib/unsubscribeCopy'
-import type { UnsubscribeView } from '@/lib/unsubscribePage'
-import { verifyUnsubscribeToken, type UnsubscribeLocale } from '@/lib/unsubscribeToken'
+import { resolveUnsubscribeDocument } from '@/lib/unsubscribeDocumentStatus'
+import type { UnsubscribeLocale } from '@/lib/unsubscribeToken'
 
 /**
  * /nl/afmelden and /en/afmelden — marketing mail unsubscribe (human GET).
@@ -65,12 +65,10 @@ export default async function AfmeldenPage({
     secret = ''
   }
 
-  const verified = await verifyUnsubscribeToken(token, secret)
-  const view: UnsubscribeView = verified.ok
-    ? 'confirm'
-    : verified.reason === 'missing_secret'
-      ? 'unavailable'
-      : 'invalid'
+  // The friendly body is rendered here under the locale chrome. HTTP 400/503
+  // for invalid/unavailable is attached by a same-URL middleware rewrite —
+  // App Router pages cannot set those statuses themselves.
+  const { view } = await resolveUnsubscribeDocument(token, secret)
 
   return (
     <Section className="flex min-h-[calc(100vh-12rem)] items-center justify-center py-16 sm:py-24">

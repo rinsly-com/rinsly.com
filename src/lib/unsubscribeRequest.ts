@@ -2,6 +2,10 @@
  * GET/POST behaviour for /{locale}/afmelden, independent of Next.js so it
  * can be unit-tested. GET and HEAD never write. Only POST records an opt-out.
  */
+import {
+  resolveUnsubscribeDocument,
+  unsubscribeViewFromVerification,
+} from './unsubscribeDocumentStatus'
 import { renderUnsubscribePage, type UnsubscribeView } from './unsubscribePage'
 import type { OptOutSource, UnsubscribeStore } from './unsubscribeStore'
 import {
@@ -75,9 +79,9 @@ export async function handleUnsubscribeRequest(
   const method = req.method
 
   if (method === 'GET' || method === 'HEAD') {
-    const verified = await verifyUnsubscribeToken(req.token, req.secret)
-    if (!verified.ok) {
-      return page(locale, verified.reason === 'missing_secret' ? 'unavailable' : 'invalid', verified.reason === 'missing_secret' ? 503 : 400)
+    const resolved = await resolveUnsubscribeDocument(req.token, req.secret)
+    if (resolved.view !== 'confirm') {
+      return page(locale, resolved.view, resolved.status)
     }
     return page(locale, 'confirm', 200, req.token)
   }
@@ -90,11 +94,8 @@ export async function handleUnsubscribeRequest(
 
   const verified = await verifyUnsubscribeToken(token, req.secret)
   if (!verified.ok) {
-    return page(
-      locale,
-      verified.reason === 'missing_secret' ? 'unavailable' : 'invalid',
-      verified.reason === 'missing_secret' ? 503 : 400,
-    )
+    const resolved = unsubscribeViewFromVerification(verified)
+    return page(locale, resolved.view, resolved.status)
   }
 
   const source: OptOutSource = parsed.kind === 'one-click' ? 'one-click' : 'confirm'
