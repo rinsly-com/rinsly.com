@@ -1,0 +1,94 @@
+head 1edde0d4cb04c01ebd9087470a5b5fd464f8a3bb pre status: 0 uncommitted
+== install 2026-11-28T01:31:53+01:00
+install exit 0
++ tailwindcss 4.3.2
++ tsx 4.22.4
++ typescript 5.7.3
++ typescript-eslint 8.64.0
++ vite-tsconfig-paths 6.0.5
++ vitest 4.1.11
++ wrangler 4.153.0
+Done in 11.8s using pnpm v11.11.0
+== types 2026-11-28T01:32:05+01:00
+types exit 0
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "DEPLOY_DISPATCH_URL" | "TURNSTILE_HOSTNAMES">> {}
+}
+Generating runtime types...
+Runtime types generated.
+✨ Types written to cloudflare-env.d.ts
+📖 Read about runtime types
+https://developers.cloudflare.com/workers/languages/typescript/#generate-types
+📣 Remember to rerun 'wrangler types' after you change your wrangler.jsonc file.
+== lint-content 2026-11-28T01:32:07+01:00
+lint-content exit 0
+$ node scripts/lint-content.mjs
+✔ Content lint passed: no em dashes in 49 file(s).
+== lint-migrations 2026-11-28T01:32:08+01:00
+lint-migrations exit 0
+$ node scripts/lint-migrations.mjs
+✔ Migration lint passed: 680 statement(s) replayed, 0 warning(s).
+== tsc 2026-11-28T01:32:08+01:00
+tsc exit 0
+== eslint 2026-11-28T01:32:17+01:00
+eslint exit 0
+$ cross-env NODE_OPTIONS=--no-deprecation eslint .
+/workspace/redesign-v8-gates/src/components/check/CheckRunner.tsx
+  111:13  warning  Do not use `window.location.assign()` to navigate to internal Next.js pages. Use `redirect()` in the render phase, or `useRouter().push()` in Client Components' event handlers instead. See: https://nextjs.org/docs/messages/no-location-assign-relative-destination  @next/next/no-location-assign-relative-destination
+✖ 1 problem (0 errors, 1 warning)
+== unit 2026-11-28T01:32:31+01:00
+unit exit 0
+This ensures that you're testing the behavior the user would see in the browser. Learn more at https://react.dev/link/wrap-tests-with-act
+ ✓ tests/unit/emailConsentCheckbox.unit.spec.ts (5 tests) 760ms
+ ✓ tests/unit/contentAllowlist.unit.spec.ts (34 tests) 3291ms
+     ✓ points at writable text leaves in the real pages schema  3235ms
+ Test Files  32 passed (32)
+      Tests  406 passed (406)
+   Start at  01:32:32
+   Duration  3.69s (transform 3.02s, setup 0ms, import 5.73s, tests 5.59s, environment 1.27s)
+== int 2026-11-28T01:32:35+01:00
+int exit 0
+ ✓ tests/int/form-controls.int.spec.ts (4 tests) 399ms
+ ✓ tests/int/lint-migrations.int.spec.ts (10 tests) 38ms
+ ✓ tests/int/leadlens.int.spec.ts (16 tests) 8ms
+ ✓ tests/int/partnerToken.int.spec.ts (8 tests) 10ms
+ Test Files  5 passed (5)
+      Tests  51 passed (51)
+   Start at  01:32:36
+   Duration  2.42s (transform 319ms, setup 67ms, import 689ms, tests 466ms, environment 711ms)
+== build 2026-11-28T01:32:38+01:00
+build exit 1
+  status: 1,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 2006322,
+  stdout: null,
+  stderr: null
+}
+Node.js v24.22.1
+post status: 0 uncommitted
+done 2026-11-28T01:33:17+01:00
+== build (re-run after a silent next-build fail, dev server stopped) 2026-11-28T01:35:51+01:00 head 1edde0d
+build exit 1
+  status: 1,
+  signal: null,
+  output: [ null, null, null ],
+  pid: 2011699,
+  stdout: null,
+  stderr: null
+}
+Node.js v24.22.1
+post status: 0 uncommitted
+done 2026-11-28T01:45:50+01:00
+== build (third try, box load quieter) 2026-11-28T01:48:21+01:00 head 1edde0d
+build exit 0
+Applying code patches: 6.783s
+# copyPackageTemplateFiles
+⚙️ Bundling the OpenNext server...
+▲ [WARNING] The "typeof" operator will never evaluate to "null" [impossible-typeof]
+    .open-next/server-functions/default/.next/server/chunks/ssr/_04f49xfrqsq4x._.js:1:83335:
+      1 │ ...se"number":case"boolean":case"null":return String(C);case"object...
+        ╵                                 ~~~~~~
+  The expression "typeof x" actually evaluates to "object" in JavaScript, not "null". You need to use "x === null" to test for null.
+Worker saved in `.open-next/worker.js` 🚀
+OpenNext build complete.
+done 2026-11-28T01:49:26+01:00
