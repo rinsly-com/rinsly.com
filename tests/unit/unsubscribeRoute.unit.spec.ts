@@ -9,6 +9,17 @@ import {
   UNSUBSCRIBE_COPY_STATUS,
 } from '../../src/lib/unsubscribeCopy'
 import { renderUnsubscribePage } from '../../src/lib/unsubscribePage'
+import {
+  applyUnsubscribeHeaders,
+  UNSUBSCRIBE_HEADER_SOURCES,
+  UNSUBSCRIBE_HTTP_HEADERS,
+} from '../../src/lib/unsubscribeHeaders'
+import {
+  unsubscribeDocumentStatusRewrite,
+  unsubscribeViewFromVerification,
+} from '../../src/lib/unsubscribeDocumentStatus'
+import { unsubscribeBareRedirect } from '../../src/lib/unsubscribeBareRedirect'
+import { resolveUnsubscribeSecret } from '../../src/lib/unsubscribeSecret'
 import { handleUnsubscribeRequest, parseUnsubscribePost } from '../../src/lib/unsubscribeRequest'
 import { unsubscribePostRewrite } from '../../src/lib/unsubscribePostRewrite'
 import { MemoryUnsubscribeStore, UnavailableUnsubscribeStore } from '../../src/lib/unsubscribeStore'
@@ -112,6 +123,45 @@ describe('handleUnsubscribeRequest', () => {
     expect(store.rows).toEqual([])
   })
 
+  it('GET with an invalid token returns 400 and the friendly invalid body', async () => {
+    const store = new MemoryUnsubscribeStore()
+    const result = await handleUnsubscribeRequest({
+      method: 'GET',
+      token: 'v1.not-a-real-hash.not-a-real-sig',
+      locale: 'nl',
+      body: '',
+      contentType: '',
+      secret: SECRET,
+      store,
+      now: NOW,
+    })
+    expect(result.status).toBe(400)
+    expect(result.view).toBe('invalid')
+    expect(result.body).toContain('contact@rinsly.com')
+    expect(result.body).toContain('Je kunt je ook afmelden')
+    expect(store.rows).toEqual([])
+  })
+
+  it('GET fails closed with 503 when the secret is missing', async () => {
+    const store = new MemoryUnsubscribeStore()
+    const token = await tokenFor()
+    const result = await handleUnsubscribeRequest({
+      method: 'GET',
+      token,
+      locale: 'nl',
+      body: '',
+      contentType: '',
+      secret: '',
+      store,
+      now: NOW,
+    })
+    expect(result.status).toBe(503)
+    expect(result.view).toBe('unavailable')
+    expect(result.body).toContain('contact@rinsly.com')
+    expect(result.body).toContain('Afmelden is nu niet mogelijk')
+    expect(store.rows).toEqual([])
+  })
+
   it('RFC 8058 POST unsubscribes directly, with a success body and no confirm button', async () => {
     const store = new MemoryUnsubscribeStore()
     const token = await tokenFor()
@@ -178,6 +228,38 @@ describe('handleUnsubscribeRequest', () => {
     })
     expect(result.status).toBe(200)
     expect(result.view).toBe('success')
+    expect(store.rows[0]?.source).toBe('confirm')
+    assertNoRecipientEmail(result.body)
+  })
+
+  it('a no-JS confirm form POST records the opt-out and shows success', async () => {
+    const formSrc = readFileSync('src/components/unsubscribe/UnsubscribeConfirmForm.tsx', 'utf8')
+    expect(formSrc).toContain('method="post"')
+    expect(formSrc).toContain('/${locale}/afmelden?token=${encodeURIComponent(token)}')
+    expect(formSrc).toContain('name="token"')
+    expect(formSrc).toContain('name="confirm"')
+    expect(formSrc).not.toContain("'use client'")
+    expect(formSrc).not.toContain('confirmUnsubscribeAction')
+    expect(formSrc).not.toContain('useState')
+
+    const store = new MemoryUnsubscribeStore()
+    const token = await tokenFor()
+    const result = await handleUnsubscribeRequest({
+      method: 'POST',
+      token: '',
+      locale: 'nl',
+      body: `token=${encodeURIComponent(token)}&confirm=1`,
+      contentType: 'application/x-www-form-urlencoded',
+      secret: SECRET,
+      store,
+      now: NOW,
+    })
+    expect(result.status).toBe(200)
+    expect(result.view).toBe('success')
+    expect(result.body).toContain('Je bent afgemeld voor marketingberichten van Rinsly.')
+    expect(result.body).not.toContain('Ja, meld mij af')
+    expect(result.body).not.toContain('name="confirm"')
+    expect(store.rows).toHaveLength(1)
     expect(store.rows[0]?.source).toBe('confirm')
     assertNoRecipientEmail(result.body)
   })
@@ -280,6 +362,192 @@ describe('unsubscribe POST rewrite', () => {
   })
 })
 
+describe('unsubscribe bare redirect', () => {
+  it('maps /afmelden and /afmelden/ to /nl/afmelden, and ignores locale routes', () => {
+    expect(unsubscribeBareRedirect('/afmelden')).toEqual({ pathname: '/nl/afmelden' })
+    expect(unsubscribeBareRedirect('/afmelden/')).toEqual({ pathname: '/nl/afmelden' })
+    expect(unsubscribeBareRedirect('/nl/afmelden')).toBeNull()
+    expect(unsubscribeBareRedirect('/en/afmelden')).toBeNull()
+    expect(unsubscribeBareRedirect('/nl/afmelden/one-click')).toBeNull()
+    expect(unsubscribeBareRedirect('/partner')).toBeNull()
+  })
+})
+
+describe('unsubscribe secret lookup', () => {
+  it('prefers bindings, then env, and does not treat a failed read as missing', () => {
+    expect(resolveUnsubscribeSecret('from-bindings', 'from-env', true)).toEqual({
+      state: 'present',
+      secret: 'from-bindings',
+    })
+    expect(resolveUnsubscribeSecret('', 'from-env', true)).toEqual({
+      state: 'present',
+      secret: 'from-env',
+    })
+    expect(resolveUnsubscribeSecret('', 'from-env', false)).toEqual({
+      state: 'present',
+      secret: 'from-env',
+    })
+    expect(resolveUnsubscribeSecret('', '', true)).toEqual({ state: 'missing' })
+    expect(resolveUnsubscribeSecret('', '', false)).toEqual({ state: 'unknown' })
+  })
+
+  it('is the only secret read for middleware, the confirm page, and one-click', () => {
+    const helper = readFileSync('src/lib/unsubscribeSecret.ts', 'utf8')
+    expect(helper).toContain('readWorkerSecrets')
+    expect(helper).toContain('getBindings')
+    expect(helper).not.toContain('process.env.UNSUBSCRIBE_TOKEN_SECRET')
+    expect(helper).toContain("['UNSUBSCRIBE', 'TOKEN', 'SECRET'].join('_')")
+
+    for (const file of [
+      'src/middleware.ts',
+      'src/app/(frontend)/[locale]/afmelden/page.tsx',
+      'src/app/(frontend)/[locale]/afmelden/one-click/route.ts',
+    ]) {
+      const src = readFileSync(file, 'utf8')
+      expect(src).toContain('readUnsubscribeTokenSecret')
+      expect(src).not.toContain('readWorkerSecrets')
+      expect(src).not.toContain('getBindings')
+      expect(src).not.toContain('process.env')
+    }
+
+    expect(readFileSync('src/middleware.ts', 'utf8')).toContain("lookup.state === 'unknown'")
+  })
+})
+
+describe('unsubscribe document status rewrite', () => {
+  it('rewrites human GET/HEAD /{locale}/afmelden to 400 or 503, and leaves other paths alone', async () => {
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/nl/afmelden',
+        token: 'v1.not-a-real-hash.not-a-real-sig',
+        secret: SECRET,
+      }),
+    ).toEqual({ status: 400 })
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'HEAD',
+        pathname: '/en/afmelden/',
+        token: 'not-a-token',
+        secret: SECRET,
+      }),
+    ).toEqual({ status: 400 })
+    const token = await tokenFor()
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/nl/afmelden',
+        token,
+        secret: '',
+      }),
+    ).toEqual({ status: 503 })
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/nl/afmelden',
+        token,
+        secret: SECRET,
+      }),
+    ).toBeNull()
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'POST',
+        pathname: '/nl/afmelden',
+        token: 'v1.not-a-real-hash.not-a-real-sig',
+        secret: SECRET,
+      }),
+    ).toBeNull()
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/afmelden',
+        token: 'v1.not-a-real-hash.not-a-real-sig',
+        secret: SECRET,
+      }),
+    ).toBeNull()
+    expect(
+      await unsubscribeDocumentStatusRewrite({
+        method: 'GET',
+        pathname: '/nl/afmelden/one-click',
+        token: 'v1.not-a-real-hash.not-a-real-sig',
+        secret: SECRET,
+      }),
+    ).toBeNull()
+  })
+
+  it('maps a failed verification to the same 400/503 codes as one-click', () => {
+    expect(unsubscribeViewFromVerification({ ok: false, reason: 'invalid' })).toEqual({
+      view: 'invalid',
+      status: 400,
+    })
+    expect(unsubscribeViewFromVerification({ ok: false, reason: 'missing_secret' })).toEqual({
+      view: 'unavailable',
+      status: 503,
+    })
+  })
+})
+
+describe('unsubscribe HTTP headers', () => {
+  it('sets Referrer-Policy: no-referrer and Cache-Control: no-store on GET and one-click', () => {
+    expect(UNSUBSCRIBE_HTTP_HEADERS).toEqual([
+      { key: 'Referrer-Policy', value: 'no-referrer' },
+      { key: 'Cache-Control', value: 'no-store' },
+    ])
+    const headers = new Headers()
+    applyUnsubscribeHeaders(headers)
+    expect(headers.get('Referrer-Policy')).toBe('no-referrer')
+    expect(headers.get('Cache-Control')).toBe('no-store')
+    // A single value, not "no-referrer, no-referrer".
+    expect(headers.get('Referrer-Policy')).toBe('no-referrer')
+    expect(headers.get('Cache-Control')).toBe('no-store')
+    expect(headers.get('Referrer-Policy')?.includes(',')).toBe(false)
+    expect(headers.get('Cache-Control')?.includes(',')).toBe(false)
+
+    expect(UNSUBSCRIBE_HEADER_SOURCES).toEqual([
+      '/:locale(nl|en)/afmelden',
+      '/:locale(nl|en)/afmelden/',
+      '/:locale(nl|en)/afmelden/one-click',
+      '/:locale(nl|en)/afmelden/one-click/',
+    ])
+    expect(UNSUBSCRIBE_HEADER_SOURCES).not.toContain('/afmelden')
+    expect(UNSUBSCRIBE_HEADER_SOURCES).not.toContain('/afmelden/')
+
+    const middleware = readFileSync('src/middleware.ts', 'utf8')
+    expect(middleware).toContain('unsubscribeBareRedirect')
+    expect(middleware).toContain('NextResponse.redirect')
+    expect(middleware).toContain('applyUnsubscribeHeaders')
+    expect(middleware).toContain('unsubscribeDocumentStatusRewrite')
+    expect(middleware).toContain('status: statusRewrite.status')
+    expect(middleware).toContain('/nl/afmelden/:path*')
+    expect(middleware).toContain('/en/afmelden/:path*')
+    expect(middleware).toContain("'/afmelden'")
+    expect(middleware).toContain("'/afmelden/'")
+    // Headers are applied only on the terminal bare 307, not on next()/rewrite
+    // (those get a single value from next.config headers() after the catch-all).
+    const applyAt = middleware.indexOf('applyUnsubscribeHeaders(res.headers)')
+    const redirectAt = middleware.indexOf('NextResponse.redirect')
+    const postRewriteAt = middleware.indexOf('unsubscribePostRewrite({')
+    expect(applyAt).toBeGreaterThan(redirectAt)
+    expect(applyAt).toBeGreaterThan(-1)
+    expect(postRewriteAt).toBeGreaterThan(applyAt)
+
+    const nextCfg = readFileSync('next.config.ts', 'utf8')
+    expect(nextCfg).toContain('UNSUBSCRIBE_HTTP_HEADERS')
+    expect(nextCfg).toContain('UNSUBSCRIBE_HEADER_SOURCES')
+    expect(nextCfg).not.toMatch(/source:\s*'\/afmelden'/)
+    const catchAllAt = nextCfg.indexOf("source: '/:path*'")
+    const unsubSourcesAt = nextCfg.indexOf('...UNSUBSCRIBE_HEADER_SOURCES.map')
+    expect(catchAllAt).toBeGreaterThan(-1)
+    expect(unsubSourcesAt).toBeGreaterThan(catchAllAt)
+
+    const oneClick = readFileSync(
+      'src/app/(frontend)/[locale]/afmelden/one-click/route.ts',
+      'utf8',
+    )
+    expect(oneClick).not.toContain('applyUnsubscribeHeaders')
+  })
+})
+
 describe('static export, redirects and noindex', () => {
   it('stashes the afmelden route and middleware out of the static export', () => {
     const src = readFileSync('scripts/build-static.mjs', 'utf8')
@@ -287,16 +555,20 @@ describe('static export, redirects and noindex', () => {
     expect(src).toContain("'src/middleware.ts'")
   })
 
-  it('redirects bare /afmelden to the default locale, without making it permanent', () => {
+  it('keeps the typable /afmelden shortcut on the static export, and does the accp redirect in middleware', () => {
     const lines = staticRedirectLines('nl', ['nl', 'en'])
     expect(lines).toContain('/afmelden    /nl/afmelden    302')
     const nextCfg = readFileSync('next.config.ts', 'utf8')
-    expect(nextCfg).toContain("{ source: '/afmelden', destination: '/nl/afmelden', permanent: false }")
+    expect(nextCfg).not.toMatch(/source:\s*'\/afmelden'/)
+    const middleware = readFileSync('src/middleware.ts', 'utf8')
+    expect(middleware).toContain('unsubscribeBareRedirect')
+    expect(middleware).toContain('NextResponse.redirect')
   })
 
   it('keeps the GET page noindex and out of the sitemap helper', () => {
     const page = readFileSync('src/app/(frontend)/[locale]/afmelden/page.tsx', 'utf8')
     expect(page).toContain('robots: { index: false, follow: false }')
+    expect(page).toContain('resolveUnsubscribeDocument')
     const slugs = readFileSync('src/lib/sitemapSlugs.ts', 'utf8')
     expect(slugs).not.toContain('afmelden')
     const sitemap = readFileSync('src/app/sitemap.ts', 'utf8')

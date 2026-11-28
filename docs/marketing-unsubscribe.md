@@ -18,14 +18,18 @@ this PR cannot do.
   - body `List-Unsubscribe=One-Click` (RFC 8058) is rewritten to
     `/{locale}/afmelden/one-click` and returns success HTML directly (no
     confirm page);
-  - the confirm form on the GET page (a server action) is for humans who
-    opened the body link.
+  - the confirm form on the GET page is a native `method="post"` form to
+    the same public URL (token in a hidden field and the action query),
+    so it works without JavaScript. Middleware rewrites it to
+    `/{locale}/afmelden/one-click`, which returns success HTML.
 - A second POST is still a success. Invalid tokens do not write. Missing
   secret or missing store fails closed (503) and points the visitor to
   contact@rinsly.com.
 - Bare `/afmelden` redirects to `/nl/afmelden` (query string kept).
-- The page is `noindex, nofollow`. The URL and the token contain no email
-  address or other PII.
+- The page is `noindex, nofollow`. GET and one-click also send
+  `Referrer-Policy: no-referrer` and `Cache-Control: no-store`, so the
+  `?token=` URL is not stored in caches or sent as a same-origin Referer.
+- The URL and the token contain no email address or other PII.
 
 Until the D1 table and the HMAC secret exist, POST cannot persist and returns
 503. Do not send marketing mail until those steps and the mail-script link
@@ -40,6 +44,11 @@ Both values are HMAC-SHA256, base64url without padding, keyed by
 
 - `emailHash = HMAC-SHA256(secret, "unsub-id:v1:" || normalized_email)`
 - `signature = HMAC-SHA256(secret, "unsub-sig:v1:" || emailHash)`
+
+Each part is 43 characters of unpadded base64url (`[A-Za-z0-9_-]` only).
+Verify rejects a bad charset, the wrong length, an extra segment, or an
+empty part before any HMAC work. A well-formed signature is still compared
+in constant time.
 
 Normalized email: trim, lowercase, exactly one `@`, non-empty local and
 domain parts, no spaces. The mail script should normalize the same way

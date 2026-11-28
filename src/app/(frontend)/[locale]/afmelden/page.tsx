@@ -5,11 +5,10 @@ import { Section } from '@rinsly-com/site-core/ui'
 
 import { UnsubscribeCard } from '@/components/unsubscribe/UnsubscribeCard'
 import { UnsubscribeConfirmForm } from '@/components/unsubscribe/UnsubscribeConfirmForm'
-import { getBindings } from '@/lib/bindings'
-import { readWorkerSecrets } from '@/lib/env'
 import { unsubscribeCopy } from '@/lib/unsubscribeCopy'
-import type { UnsubscribeView } from '@/lib/unsubscribePage'
-import { verifyUnsubscribeToken, type UnsubscribeLocale } from '@/lib/unsubscribeToken'
+import { resolveUnsubscribeDocument } from '@/lib/unsubscribeDocumentStatus'
+import { readUnsubscribeTokenSecret } from '@/lib/unsubscribeSecret'
+import type { UnsubscribeLocale } from '@/lib/unsubscribeToken'
 
 /**
  * /nl/afmelden and /en/afmelden — marketing mail unsubscribe (human GET).
@@ -57,20 +56,14 @@ export default async function AfmeldenPage({
   const rawToken = (await searchParams).token
   const token = typeof rawToken === 'string' ? rawToken : ''
 
-  let secret = ''
-  try {
-    const env = await getBindings()
-    secret = readWorkerSecrets(env).UNSUBSCRIBE_TOKEN_SECRET ?? ''
-  } catch {
-    secret = ''
-  }
+  const lookup = await readUnsubscribeTokenSecret()
+  const secret = lookup.state === 'present' ? lookup.secret : ''
 
-  const verified = await verifyUnsubscribeToken(token, secret)
-  const view: UnsubscribeView = verified.ok
-    ? 'confirm'
-    : verified.reason === 'missing_secret'
-      ? 'unavailable'
-      : 'invalid'
+  // Friendly body under the locale chrome. Middleware attaches 400/503 with a
+  // same-URL rewrite when it could read the secret — App Router pages cannot
+  // set those statuses. When middleware could not, the response stays 200 so
+  // a confirm form is not hidden behind a 503.
+  const { view } = await resolveUnsubscribeDocument(token, secret)
 
   return (
     <Section className="flex min-h-[calc(100vh-12rem)] items-center justify-center py-16 sm:py-24">

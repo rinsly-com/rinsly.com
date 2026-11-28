@@ -1,6 +1,7 @@
 import { withPayload } from '@payloadcms/next/withPayload'
 
 import { readServerEnv } from './src/lib/env'
+import { UNSUBSCRIBE_HEADER_SOURCES, UNSUBSCRIBE_HTTP_HEADERS } from './src/lib/unsubscribeHeaders'
 import type { NextConfig } from 'next'
 import path from 'path'
 import { fileURLToPath } from 'url'
@@ -76,9 +77,9 @@ if (!isStatic) {
     // recruiting may not be Dutch. Bare /partner keeps working — invites already
     // sent carry that form, and Next preserves the ?token= query across this.
     { source: '/partner', destination: '/nl/partner', permanent: false },
-    // Marketing unsubscribe lives under a locale. Bare /afmelden keeps a
-    // typable shortcut; the query token is preserved by the redirect.
-    { source: '/afmelden', destination: '/nl/afmelden', permanent: false },
+    // Bare /afmelden is redirected in middleware, not here. OpenNext's
+    // routingHandler.handleRedirects would return this 307 before headers()
+    // or (in the server function) middleware, dropping no-referrer/no-store.
   ]
 }
 
@@ -114,6 +115,13 @@ if (!isStatic) {
           { key: 'Permissions-Policy', value: 'camera=(), microphone=(), geolocation=()' },
         ],
       },
+      // Next.js applies every matching headers() source; the last value for a
+      // key wins. These must follow the catch-all so Referrer-Policy stays
+      // no-referrer and ?token= is not sent as Referer on same-origin clicks.
+      ...UNSUBSCRIBE_HEADER_SOURCES.map((source) => ({
+        source,
+        headers: [...UNSUBSCRIBE_HTTP_HEADERS],
+      })),
     ]
   }
 }
